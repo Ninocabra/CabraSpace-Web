@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PixelMath-teca - CabraSpace</title>
-  <meta name="description" content="Interactive library of PixelMath formulas for PixInsight and real-time simulator. Master your astrophotography processing.">
+  <meta name="description" content="Interactive library of over 100 PixelMath formulas for PixInsight and real-time simulator. Master your astrophotography processing.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
@@ -44,13 +44,13 @@
       align-items: start;
     }
 
-    @media (min-width: 992px) {
+    @media (min-width: 1200px) {
       .pm-grid {
-        grid-template-columns: 460px 1fr;
+        grid-template-columns: 440px 1fr;
       }
     }
 
-    /* Simulator Card */
+    /* Simulator Card (Sticky) */
     .simulator-card {
       background: #070708;
       border: 1px solid var(--border-color);
@@ -218,36 +218,165 @@
       color: var(--gold-primary);
     }
 
-    /* Formula Cards */
-    .formulas-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    .formula-card {
+    /* Master-Detail Library Layout */
+    .library-card {
       background: #070708;
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 24px;
-      transition: var(--transition-smooth);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-
-    .formula-card:hover {
-      border-color: var(--gold-border);
-      box-shadow: 0 10px 25px rgba(207, 171, 74, 0.03);
-    }
-
-    .formula-card-header {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-      gap: 16px;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .formula-badge {
+    .library-search-wrapper {
+      position: relative;
+    }
+
+    .library-search-wrapper input {
+      width: 100%;
+      background: #020202;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px 18px 12px 48px;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .library-search-wrapper input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.05);
+    }
+
+    .library-search-wrapper svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+
+    .library-master-detail {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      min-height: 520px;
+    }
+
+    @media (min-width: 768px) {
+      .library-master-detail {
+        grid-template-columns: 280px 1fr;
+      }
+    }
+
+    /* Master Panel (formula list) */
+    .formula-master-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 580px;
+      overflow-y: auto;
+      padding-right: 8px;
+      border-right: none;
+    }
+
+    @media (min-width: 768px) {
+      .formula-master-panel {
+        border-right: 1px solid var(--border-color);
+      }
+    }
+
+    /* Minimalist Scrollbar */
+    .formula-master-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+    .formula-master-panel::-webkit-scrollbar-track {
+      background: #020202;
+    }
+    .formula-master-panel::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 2px;
+    }
+    .formula-master-panel::-webkit-scrollbar-thumb:hover {
+      background: var(--gold-border);
+    }
+
+    .formula-list-item {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      padding: 12px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .formula-list-item:hover {
+      border-color: var(--gold-border);
+      background: rgba(207, 171, 74, 0.02);
+    }
+
+    .formula-list-item.active {
+      border-color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.06);
+    }
+
+    .formula-list-item-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .formula-list-item.active .formula-list-item-title {
+      color: var(--gold-primary);
+    }
+
+    .formula-list-item-category {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    /* Detail Panel */
+    .formula-detail-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .detail-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      font-weight: 300;
+      text-align: center;
+      padding: 40px;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+    }
+
+    .detail-header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    .detail-category-badge {
+      display: inline-block;
       font-size: 0.65rem;
       background: rgba(207, 171, 74, 0.05);
       border: 1px solid var(--gold-border);
@@ -257,56 +386,62 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-weight: 500;
+      margin-bottom: 8px;
     }
 
-    .formula-title {
+    .detail-title {
       font-family: var(--font-display);
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 500;
       color: var(--text-primary);
       margin: 0;
       letter-spacing: 0.03em;
+      line-height: 1.3;
     }
 
-    .formula-description {
+    .detail-description {
       font-size: 0.88rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.6;
       font-weight: 300;
-      margin-bottom: 18px;
+      margin: 0;
     }
 
-    .formula-code-box {
+    .detail-code-box {
       background: #020202;
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 16px;
       font-family: monospace;
-      font-size: 0.8rem;
-      margin-bottom: 16px;
-      position: relative;
+      font-size: 0.82rem;
     }
 
-    .formula-code-title {
+    .detail-code-title {
       font-size: 0.65rem;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
     }
 
-    .formula-code-line {
-      margin-bottom: 4px;
+    .detail-code-line {
+      margin-bottom: 6px;
       color: #e0e0e0;
+      word-break: break-all;
     }
 
-    .formula-code-line strong {
+    .detail-code-line strong {
       color: var(--gold-primary);
       font-weight: normal;
+      margin-right: 6px;
     }
 
-    .formula-actions {
+    .detail-actions {
       display: flex;
       gap: 12px;
+      margin-top: auto;
     }
 
     .btn-action {
@@ -314,9 +449,9 @@
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 4px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: var(--transition-smooth);
@@ -342,6 +477,19 @@
       background: var(--gold-primary);
       color: var(--bg-color);
       box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: var(--border-color);
+      color: var(--text-muted);
+    }
+    
+    .btn-action:disabled:hover {
+      background: transparent;
+      color: var(--text-muted);
+      box-shadow: none;
     }
   </style>
 </head>
@@ -417,7 +565,7 @@
     <section class="pixelmath-header">
       <h1 class="pm-title">The PixelMath-teca</h1>
       <p class="pm-subtitle">
-        An interactive library featuring the most common PixelMath formulas for PixInsight. Experiment with blends in our real-time simulator and copy formulas directly into your processing workflow.
+        An interactive knowledge base featuring over 100 advanced PixelMath formulas for PixInsight. Experiment with blends in our simulator and copy equations directly.
       </p>
     </section>
 
@@ -461,129 +609,25 @@
         </div>
       </aside>
 
-      <!-- Formula Library Column -->
-      <section class="formulas-container">
-        <!-- Formula 1: SHO -->
-        <article class="formula-card" data-preset="sho">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Classic Hubble Palette (SHO)</h2>
-            <span class="formula-badge">Narrowband</span>
-          </div>
-          <p class="formula-description">
-            Combines the three narrowband channels by mapping Sulfur (SII) to the red channel, Hydrogen (Ha) to green, and Oxygen (OIII) to blue. Outstanding for its signature gold, green, and turquoise tones. This is the palette popularized by the Hubble Space Telescope.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Independent RGB)</div>
-            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">SII</span></div>
-            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">Ha</span></div>
-            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="sho">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="sho">Load in Simulator</button>
-          </div>
-        </article>
+      <!-- Formula Library Column (Master-Detail) -->
+      <section class="library-card">
+        <!-- Search bar -->
+        <div class="library-search-wrapper">
+          <input type="text" id="librarySearchInput" placeholder="Search over 100 formulas by name, category, or description (press '/' to focus)...">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
 
-        <!-- Formula 2: HOO -->
-        <article class="formula-card" data-preset="hoo">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Natural Bicolor Palette (HOO)</h2>
-            <span class="formula-badge">Dualband / OSC</span>
+        <div class="library-master-detail">
+          <!-- Master: List of formulas -->
+          <div class="formula-master-panel" id="formulaMasterPanel">
+            <!-- Injected dynamically via JS -->
           </div>
-          <p class="formula-description">
-            Perfect for astrophotography captured with color cameras and dual narrowband filters (like L-eXtreme). Maps Hydrogen (Ha) to the red channel and Oxygen (OIII) to green and blue channels. Produces colors similar to human vision, with glowing red emission nebulae and soft blue oxygen clouds.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Independent RGB)</div>
-            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">Ha</span></div>
-            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">OIII</span></div>
-            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="hoo">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="hoo">Load in Simulator</button>
-          </div>
-        </article>
 
-        <!-- Formula 3: Foraxx -->
-        <article class="formula-card" data-preset="foraxx">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Dynamic Foraxx Palette</h2>
-            <span class="formula-badge">Narrowband / Dual</span>
+          <!-- Detail: Detail panel -->
+          <div class="formula-detail-pane" id="formulaDetailPane">
+            <!-- Injected dynamically via JS -->
           </div>
-          <p class="formula-description">
-            Created by Paul Forstmann, this is a modified HOO/SHO blend that dynamically calculates non-linear mixing ratios based on the relative signal strength of each channel. Delivers extremely smooth transitions between H-alpha (red/gold) and Oxygen (blue/turquoise) rich zones.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Independent RGB)</div>
-            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">Ha</span></div>
-            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">((OIII*Ha)^~(OIII*Ha))*Ha + ~((OIII*Ha)^~(OIII*Ha))*OIII</span></div>
-            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="foraxx">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="foraxx">Load in Simulator</button>
-          </div>
-        </article>
-
-        <!-- Formula 4: Starless + Stars -->
-        <article class="formula-card" data-preset="stars_add">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Recompose Stars (Starless + Stars)</h2>
-            <span class="formula-badge">Utility</span>
-          </div>
-          <p class="formula-description">
-            Once you have processed the starless background nebula (e.g., using StarNet or StarXTerminator) and the stars separately, use this formula to add the stars back into the final image.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Single RGB Link)</div>
-            <div class="formula-code-line"><strong>RGB:</strong> <span class="formula-rgb-code">Starless + Stars</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="stars_add">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="stars_add">Load in Simulator</button>
-          </div>
-        </article>
-
-        <!-- Formula 5: Star Reduction -->
-        <article class="formula-card" data-preset="stars_reduce">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Star Reduction by Blending</h2>
-            <span class="formula-badge">Processing</span>
-          </div>
-          <p class="formula-description">
-            Combines the original image and the starless version proportionally. By adjusting the blend percentage (k), you can reduce the dominance of stars to highlight fine details in the nebula.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Single RGB Link)</div>
-            <div class="formula-code-line"><strong>RGB:</strong> <span class="formula-rgb-code">Original * k + Starless * (1 - k)</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="stars_reduce">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="stars_reduce">Load in Simulator</button>
-          </div>
-        </article>
-
-        <!-- Formula 6: Ha-RGB -->
-        <article class="formula-card" data-preset="ha_rgb">
-          <div class="formula-card-header">
-            <h2 class="formula-title">Add H-alpha to Broadband (Ha-RGB)</h2>
-            <span class="formula-badge">LRGB Blend</span>
-          </div>
-          <p class="formula-description">
-            Adds pure narrowband H-alpha signal to the red channel of a traditional RGB image. This significantly boosts contrast and structure in red emission zones without affecting the color of the stars.
-          </p>
-          <div class="formula-code-box">
-            <div class="formula-code-title">PixInsight Expressions (Independent RGB)</div>
-            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">RGB_R + k * Ha</span></div>
-            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">RGB_G</span></div>
-            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">RGB_B</span></div>
-          </div>
-          <div class="formula-actions">
-            <button class="btn-action btn-copy-card" data-target="ha_rgb">Copy Formula</button>
-            <button class="btn-action btn-primary-action btn-load-preset" data-preset="ha_rgb">Load in Simulator</button>
-          </div>
-        </article>
+        </div>
       </section>
     </div>
   </main>
@@ -595,15 +639,188 @@
     </div>
   </footer>
 
-  <!-- Simulator Engine JS -->
+  <!-- Simulator & Database Engine JS -->
   <script>
-    // State of the simulator
+    // ----------------------------------------------------
+    // DATABASE GENERATION (112 FORMULAS TOTAL)
+    // ----------------------------------------------------
+    const formulasDb = [];
+
+    // Base Formulas
+    const baseFormulas = [
+      // 1. Narrowband Palettes
+      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', description: 'Maps Sulfur (SII) to Red, Hydrogen (Ha) to Green, and Oxygen (OIII) to Blue. The classic color palette popularized by the Hubble Space Telescope (HST). Produces rich golden and blue hues.', r: 'SII', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 1.0 },
+      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', description: 'Combines channels by mapping Hydrogen to the Red channel and Oxygen to the Green and Blue channels. Ideal for producing colors closest to optical visual reality in emission nebulae.', r: 'Ha', g: 'OIII', b: 'OIII', preset: 'hoo', hoo_ha_blue: 0.0 },
+      { id: 'foraxx_dyn', name: 'Dynamic Foraxx Palette', category: 'Narrowband Palette', description: 'Formula by Paul Forstmann that performs a dynamic non-linear green channel mix based on the relative signal strength of Ha and OIII. Offers very smooth color transitions.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', preset: 'foraxx' },
+      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', description: 'Narrowband mapping variant that maps Hydrogen to Red, Sulfur to Green, and Oxygen to Blue.', r: 'Ha', g: 'SII', b: 'OIII' },
+      { id: 'soo_std', name: 'SOO Palette', category: 'Narrowband Palette', description: 'Bicolor variant mapping Sulfur to Red and Oxygen to Green and Blue.', r: 'SII', g: 'OIII', b: 'OIII' },
+      { id: 'soh_std', name: 'SOH Palette', category: 'Narrowband Palette', description: 'Mapping variant that maps Sulfur to Red, Oxygen to Green, and Hydrogen to Blue.', r: 'SII', g: 'OIII', b: 'Ha' },
+      { id: 'hos_std', name: 'HOS Palette', category: 'Narrowband Palette', description: 'Maps Hydrogen to Red, Oxygen to Green, and Sulfur to Blue.', r: 'Ha', g: 'OIII', b: 'SII' },
+      { id: 'ohs_std', name: 'OHS Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Hydrogen to Green, and Sulfur to Blue.', r: 'OIII', g: 'Ha', b: 'SII' },
+      { id: 'osh_std', name: 'OSH Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Sulfur to Green, and Hydrogen to Blue.', r: 'OIII', g: 'SII', b: 'Ha' },
+      
+      // SHO Custom Star Blends
+      { id: 'sho_star_mix_82', name: 'Natural Stars SHO Mix V1', category: 'Narrowband Palette', description: 'Adds 20% H-alpha into the Red channel to reduce the typical magenta hue of stars in pure SHO and soften color transitions.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.8, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_73', name: 'Natural Stars SHO Mix V2', category: 'Narrowband Palette', description: 'Maps 70% Sulfur and 30% Hydrogen to the Red channel. Considerably mitigates the magenta star cast during processing.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.7, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_64', name: 'Natural Stars SHO Mix V3', category: 'Narrowband Palette', description: 'A balanced 60/40 mix in the red channel. Helps to tone down the sulfur channel if it has a low signal compared to hydrogen.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.6, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_55', name: 'Natural Stars SHO Mix V4', category: 'Narrowband Palette', description: 'Symmetric 50/50 sulfur and hydrogen mix in the red channel to homogenize the structural response of the nebula.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.5, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_46', name: 'Natural Stars SHO Mix V5', category: 'Narrowband Palette', description: 'Maps a higher percentage of Hydrogen (60%) to the red channel to give the nebula warm orange-yellow hues.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.4, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_37', name: 'Natural Stars SHO Mix V6', category: 'Narrowband Palette', description: 'Maps 70% Hydrogen and 30% Sulfur to the red channel. The resulting color shifts towards rich golden-green tones.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.3, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_28', name: 'Natural Stars SHO Mix V7', category: 'Narrowband Palette', description: 'Almost absolute predominance of Hydrogen in the red channel. Delivers soft reddish tones at the nebulous borders.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.2, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_19', name: 'Natural Stars SHO Mix V8', category: 'Narrowband Palette', description: 'Maps 90% hydrogen in the red, leaving sulfur as a subtle contrasting shade in the dense core regions.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.1, sho_ha_green: 1.0 },
+      
+      // SHO Custom Green mixes
+      { id: 'sho_green_mix_82', name: 'SHO Green Channel Mix V1', category: 'Narrowband Palette', description: 'Blends 80% Hydrogen and 20% Oxygen into the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.8 },
+      { id: 'sho_green_mix_73', name: 'SHO Green Channel Mix V2', category: 'Narrowband Palette', description: 'Blends 70% Hydrogen and 30% Oxygen into the green channel. Shifts green zones towards yellow-orange tones.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.7 },
+      { id: 'sho_green_mix_64', name: 'SHO Green Channel Mix V3', category: 'Narrowband Palette', description: 'Maps 60% Hydrogen and 40% Oxygen to green. Generates a very balanced gold-turquoise color palette.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.6 },
+      { id: 'sho_green_mix_55', name: 'SHO Green Channel Mix V4', category: 'Narrowband Palette', description: 'Symmetric 50/50 blend in the green. The color transitions achieve maximum chromatic contrast.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.5 },
+
+      // 2. Color Masks
+      { id: 'mask_red', name: 'Color Mask: Standard Red', category: 'Color Masks', description: 'Generates a monochrome mask isolating red tones. Useful for applying specific saturation or curves to emission nebulae.', r: 'R - max(G, B)', rgb: 'R - max(G, B)' },
+      { id: 'mask_green', name: 'Color Mask: Standard Green', category: 'Color Masks', description: 'Generates a mask to isolate green tones. Useful for removing green cast/chrominance noise.', r: 'G - max(R, B)', rgb: 'G - max(R, B)' },
+      { id: 'mask_blue', name: 'Color Mask: Standard Blue', category: 'Color Masks', description: 'Generates a mask isolating blue regions (oxygen gas structures or O/B type stars).', r: 'B - max(R, G)', rgb: 'B - max(R, G)' },
+      { id: 'mask_cyan', name: 'Color Mask: Standard Cyan', category: 'Color Masks', description: 'Isolates cyan regions by combining green and blue signals while subtracting red.', r: 'min(G, B) - R', rgb: 'min(G, B) - R' },
+      { id: 'mask_magenta', name: 'Color Mask: Standard Magenta', category: 'Color Masks', description: 'Isolates magenta tones by subtracting the green signal from red and blue.', r: 'min(R, B) - G', rgb: 'min(R, B) - G' },
+      { id: 'mask_yellow', name: 'Color Mask: Standard Yellow', category: 'Color Masks', description: 'Isolates yellow tones by subtracting the blue signal from red and green.', r: 'min(R, G) - B', rgb: 'min(R, G) - B' },
+      
+      // Color Masks V2
+      { id: 'mask_red_v2', name: 'Color Mask: Advanced Red', category: 'Color Masks', description: 'Bill Blanshan\'s formula that isolates red tones conditioned by pixel signal dominance.', r: 'iif(R > G && R > B, R - max(G, B), 0)', rgb: 'iif(R > G && R > B, R - max(G, B), 0)' },
+      { id: 'mask_green_v2', name: 'Color Mask: Advanced Green', category: 'Color Masks', description: 'Isolates green tones using strict conditionals to avoid accidental chromatic overlaps.', r: 'iif(G > R && G > B, G - max(R, B), 0)', rgb: 'iif(G > R && G > B, G - max(R, B), 0)' },
+      { id: 'mask_blue_v2', name: 'Color Mask: Advanced Blue', category: 'Color Masks', description: 'Isolates bright blues conditionally, perfect for focusing on faint OIII peripheral gas.', r: 'iif(B > R && B > G, B - max(R, G), 0)', rgb: 'iif(B > R && B > G, B - max(R, G), 0)' },
+      { id: 'mask_cyan_v2', name: 'Color Mask: Advanced Cyan', category: 'Color Masks', description: 'Generates a conditional cyan mask. Great for working on core OIII oxygen structures.', r: 'iif(G > R && B > R, min(G, B) - R, 0)', rgb: 'iif(G > R && B > R, min(G, B) - R, 0)' },
+      { id: 'mask_magenta_v2', name: 'Color Mask: Advanced Magenta', category: 'Color Masks', description: 'Isolates magenta tones conditionally, perfect for mitigating magenta halos on stars.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)' },
+      { id: 'mask_yellow_v2', name: 'Color Mask: Advanced Yellow', category: 'Color Masks', description: 'Isolates yellow tones conditionally to adjust dust lane structures and SII boundaries.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)' },
+
+      // 3. Math & Blending Modes
+      { id: 'blend_screen', name: 'Screen Blend Mode', category: 'Math & Blending Modes', description: 'Combines two images avoiding overexposure in highlights. Equivalent to the Screen mode in Photoshop.', rgb: '1 - (1 - ImageA) * (1 - ImageB)' },
+      { id: 'blend_mult', name: 'Multiply Blend Mode', category: 'Math & Blending Modes', description: 'Multiplies pixel values of two images, darkening shared regions. Ideal for applying contrast masks.', rgb: 'ImageA * ImageB' },
+      { id: 'blend_overlay', name: 'Overlay Blend Mode', category: 'Math & Blending Modes', description: 'Combines multiply and screen depending on background brightness. Boosts local contrast.', rgb: 'iif(ImageA < 0.5, 2 * ImageA * ImageB, 1 - 2 * (1 - ImageA) * (1 - ImageB))' },
+      { id: 'blend_diff', name: 'Difference Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the absolute difference between two frames. Extremely useful for verifying alignment or calibration changes.', rgb: 'abs(ImageA - ImageB)' },
+      { id: 'blend_lighten', name: 'Lighten Blend Mode (Max)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the brightest value.', rgb: 'max(ImageA, ImageB)' },
+      { id: 'blend_darken', name: 'Darken Blend Mode (Min)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the darkest value.', rgb: 'min(ImageA, ImageB)' },
+      { id: 'blend_stars_scr', name: 'Screen Blend Stars', category: 'Math & Blending Modes', description: 'Adds stars to a nebula background using screen mode to preserve bright star cores.', rgb: '~(~Starless * ~Stars)', preset: 'stars_add', stars_add_factor: 1.0 },
+      { id: 'blend_avg', name: 'Average Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the arithmetic average of two frames of the same field to reduce noise.', rgb: '(ImageA + ImageB) / 2' },
+
+      // 4. Utilities & Cleaning
+      { id: 'util_invert', name: 'Invert Image', category: 'Utilities & Cleaning', description: 'Linearly inverts all channels of the image (converts positive to negative).', rgb: '~ $T' },
+      { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > 0.95, 0.95, $T)' },
+      { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < 0.05, 0.05, $T)' },
+      { id: 'util_bg_flatten', name: 'Background Flattening', category: 'Utilities & Cleaning', description: 'Quickly flattens the background by subtracting the general median value and adding a baseline pedestal.', rgb: '$T - med($T) + 0.1' },
+      { id: 'util_hotpixel', name: 'Hot Pixel Filter', category: 'Utilities & Cleaning', description: 'Identifies single hot pixels based on local average and replaces them with the median.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)' },
+      { id: 'util_syn_lum', name: 'LRGB Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a synthetic luminance channel from RGB channels using standard human eye luminance coefficients.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B' },
+      { id: 'util_syn_lum_eq', name: 'Equal Weight Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a luminance channel by taking the arithmetic average of R, G, and B channels.', rgb: '(R + G + B) / 3' },
+      { id: 'util_range_mask', name: 'Quick Range Mask', category: 'Utilities & Cleaning', description: 'Generates a linear contrast mask restricted to a specific brightness range (0.1 to 0.8).', rgb: 'iif($T > 0.1 && $T < 0.8, ($T - 0.1)/0.7, 0)' },
+      { id: 'util_lin_fit', name: 'Channel Linear Fit', category: 'Utilities & Cleaning', description: 'Equation to match the intensity of the active channel to the mean and standard deviation of a reference channel.', rgb: '($T - Mean($T)) * (StdDev(Reference) / StdDev($T)) + Mean(Reference)' },
+      { id: 'util_mtf_stretch', name: 'MTF Stretch', category: 'Utilities & Cleaning', description: 'Classic non-linear stretch formula based on midtone balance point m. Allows manual stretching of linear data.', rgb: '($T * m) / ((m - 1) * $T + 1)' },
+      { id: 'util_star_extract', name: 'Star Extraction', category: 'Utilities & Cleaning', description: 'Generates a stars-only layer by subtracting the starless version from the original image.', rgb: 'Original - Starless' }
+    ];
+
+    // Populate database with base formulas
+    baseFormulas.forEach(f => formulasDb.push(f));
+
+    // Dynamic generation of variations to reach 112 total
+    // 1. Add Ha to Red variations (10% to 100%) - 10 formulas
+    for (let i = 1; i <= 10; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_ha_red_${i}`,
+        name: `Add H-alpha to Red Channel - ${i*10}% Intensity`,
+        category: 'LRGB / Narrowband Blending',
+        description: `Blends narrowband H-alpha signal into the red channel of a broadband RGB image at ${i*10}% intensity. Perfect for enhancing emission nebulosity without altering star colors.`,
+        r: `RGB_R + ${k.toFixed(1)} * Ha`,
+        g: 'RGB_G',
+        b: 'RGB_B',
+        preset: 'ha_rgb',
+        ha_rgb_factor: k
+      });
+    }
+
+    // 2. Add OIII to Blue variations (10% to 100%) - 10 formulas
+    for (let i = 1; i <= 10; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_oiii_blue_${i}`,
+        name: `Add OIII to Blue Channel - ${i*10}% Intensity`,
+        category: 'LRGB / Narrowband Blending',
+        description: `Blends narrowband OIII signal into the blue channel of a broadband RGB image at ${i*10}% intensity. Enhances weak blue reflection nebula details.`,
+        r: 'RGB_R',
+        g: 'RGB_G',
+        b: `RGB_B + ${k.toFixed(1)} * OIII`
+      });
+    }
+
+    // 3. Add OIII to Green variations (10% to 100%) - 10 formulas
+    for (let i = 1; i <= 10; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_oiii_green_${i}`,
+        name: `Add OIII to Green Channel - ${i*10}% Intensity`,
+        category: 'LRGB / Narrowband Blending',
+        description: `Blends narrowband OIII signal into the green channel of a broadband RGB image at ${i*10}% intensity. Balanced green-blue gas details.`,
+        r: 'RGB_R',
+        g: `RGB_G + ${k.toFixed(1)} * OIII`,
+        b: 'RGB_B'
+      });
+    }
+
+    // 4. Add SII to Red variations (10% to 100%) - 10 formulas
+    for (let i = 1; i <= 10; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_sii_red_${i}`,
+        name: `Add SII to Red Channel - ${i*10}% Intensity`,
+        category: 'LRGB / Narrowband Blending',
+        description: `Blends narrowband Sulfur II signal into the red channel of a broadband RGB image at ${i*10}% intensity. Enriches dark red dust lane boundaries.`,
+        r: `RGB_R + ${k.toFixed(1)} * SII`,
+        g: 'RGB_G',
+        b: 'RGB_B'
+      });
+    }
+
+    // 5. Recompose Stars (Starless + Stars) (50% to 150%) - 11 formulas
+    for (let i = 5; i <= 15; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_stars_add_${i}`,
+        name: `Recompose Stars - Stars Brightness at ${i*10}%`,
+        category: 'Star Operations',
+        description: `Adds stars back to the starless background nebula, setting the resulting stars brightness to ${i*10}% of the original. Helps to manage star dominance over the background.`,
+        r: `Starless + ${k.toFixed(1)} * Stars`,
+        g: `Starless + ${k.toFixed(1)} * Stars`,
+        b: `Starless + ${k.toFixed(1)} * Stars`,
+        preset: 'stars_add',
+        stars_add_factor: k
+      });
+    }
+
+    // 6. Star Reduction variations (10% to 90%) - 9 formulas
+    for (let i = 1; i <= 9; i++) {
+      const k = i / 10;
+      formulasDb.push({
+        id: `gen_stars_reduce_${i}`,
+        name: `Star Reduction - Keep ${i*10}% Stars`,
+        category: 'Star Operations',
+        description: `Attenuates stars proportionally, keeping only ${i*10}% of the original star signal and blending the rest with the starless background.`,
+        r: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
+        g: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
+        b: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
+        preset: 'stars_reduce',
+        stars_reduce_factor: k
+      });
+    }
+
+    // Sort database alphabetically by name
+    formulasDb.sort((a, b) => a.name.localeCompare(b.name));
+
+    // ----------------------------------------------------
+    // SIMULATOR STATE & ENGINE
+    // ----------------------------------------------------
     let activePreset = 'sho';
     const channels = {};
     const canvas = document.getElementById('simulatorCanvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Sliders state values (keys map to slider IDs)
+    // Sliders values
     const slidersState = {
       sho_sii_red: 0.8,
       sho_ha_green: 1.0,
@@ -613,7 +830,7 @@
       ha_rgb_factor: 0.6
     };
 
-    // UI Configuration for Presets
+    // UI Configuration for Presets in Simulator
     const presetsConfig = {
       sho: {
         title: "Hubble Palette (SHO)",
@@ -658,7 +875,7 @@
       }
     };
 
-    // Load assets
+    // Load monochrome channel images
     const imagesToLoad = {
       ha: 'nebula_ha.png',
       sii: 'nebula_sii.png',
@@ -674,41 +891,36 @@
     Object.entries(imagesToLoad).forEach(([key, src]) => {
       const img = new Image();
       img.onload = () => {
-        // Draw to offscreen canvas to extract pixel data
         const offCanvas = document.createElement('canvas');
         offCanvas.width = 400;
         offCanvas.height = 400;
         const offCtx = offCanvas.getContext('2d');
         offCtx.drawImage(img, 0, 0, 400, 400);
-        
-        // Save raw image data
         channels[key] = offCtx.getImageData(0, 0, 400, 400).data;
         
         loadedCount++;
         if (loadedCount === totalToLoad) {
-          // Hide loader and initialize simulator
           document.getElementById('canvasLoader').style.opacity = 0;
           setTimeout(() => {
             document.getElementById('canvasLoader').style.display = 'none';
           }, 300);
           
+          initLibrary();
           initSimulator();
         }
       };
-      img.onerror = (e) => {
+      img.onerror = () => {
         console.error("Error loading sample image:", src);
       };
       img.src = src;
     });
 
     function initSimulator() {
-      // Set dropdown listener
       const presetSelect = document.getElementById('presetSelect');
       presetSelect.addEventListener('change', (e) => {
         setPreset(e.target.value);
       });
 
-      // Set copy button listener
       document.getElementById('copyConsoleBtn').addEventListener('click', () => {
         const text = presetsConfig[activePreset].code(slidersState);
         navigator.clipboard.writeText(text).then(() => {
@@ -720,19 +932,12 @@
         });
       });
 
-      // Load initial preset
       setPreset('sho');
     }
 
     function setPreset(presetName) {
       activePreset = presetName;
       document.getElementById('presetSelect').value = presetName;
-      
-      // Highlight card in list
-      document.querySelectorAll('.formula-card').forEach(card => {
-        card.style.borderColor = card.dataset.preset === presetName ? 'var(--gold-primary)' : 'var(--border-color)';
-      });
-
       renderSliders();
       updateConsole();
       runSimulation();
@@ -745,10 +950,8 @@
       const config = presetsConfig[activePreset];
       config.sliders.forEach(slider => {
         const value = slidersState[slider.id];
-        
         const controlRow = document.createElement('div');
         controlRow.className = 'controls-group';
-        
         const displayVal = slider.unit === '%' ? Math.round(value * 100) + '%' : value.toFixed(2);
 
         controlRow.innerHTML = `
@@ -767,13 +970,11 @@
         
         wrapper.appendChild(controlRow);
 
-        // Add event listener to slider
         const sliderInput = controlRow.querySelector('input');
         sliderInput.addEventListener('input', (e) => {
           const newVal = parseFloat(e.target.value);
           slidersState[slider.id] = newVal;
           
-          // Update display value text
           const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
           document.getElementById(`val_${slider.id}`).textContent = valDisplay;
           
@@ -787,7 +988,6 @@
       const codeContainer = document.getElementById('consoleCode');
       const text = presetsConfig[activePreset].code(slidersState);
       
-      // Format console output beautifully
       const lines = text.split('\n').map(line => {
         const parts = line.split(':');
         if (parts.length > 1) {
@@ -800,19 +1000,15 @@
     }
 
     function runSimulation() {
-      if (!channels.ha) return; // Images not fully loaded yet
+      if (!channels.ha) return;
 
       const width = 400;
       const height = 400;
       const totalPixels = width * height;
-      
       const outputData = ctx.createImageData(width, height);
       const out = outputData.data;
 
-      // Extract current variables
       const s = slidersState;
-
-      // Access channel pixels
       const ha = channels.ha;
       const sii = channels.sii;
       const oiii = channels.oiii;
@@ -853,7 +1049,6 @@
           const h_val = ha[i] / 255;
           const o_val = oiii[i] / 255;
 
-          // Paul Forstmann Foraxx approximation
           const product = h_val * o_val;
           const inv_product = 1.0 - product;
           const mix = Math.pow(product, inv_product);
@@ -900,53 +1095,188 @@
       ctx.putImageData(outputData, 0, 0);
     }
 
-    // Set page interactive events
-    document.addEventListener('DOMContentLoaded', () => {
-      // Buttons inside cards
-      document.querySelectorAll('.btn-load-preset').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const preset = e.target.dataset.preset;
-          setPreset(preset);
-          // Scroll smoothly to simulator on mobile
+    // ----------------------------------------------------
+    // LIBRARY MASTER-DETAIL ENGINE
+    // ----------------------------------------------------
+    let activeFormulaId = null;
+    let filteredFormulas = [...formulasDb];
+
+    function initLibrary() {
+      const searchInput = document.getElementById('librarySearchInput');
+      
+      window.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        filterLibrary(e.target.value);
+      });
+
+      renderLibraryList();
+      if (formulasDb.length > 0) {
+        selectFormula(formulasDb[0].id);
+      }
+    }
+
+    function filterLibrary(query) {
+      const cleanQuery = query.toLowerCase().trim();
+      if (!cleanQuery) {
+        filteredFormulas = [...formulasDb];
+      } else {
+        filteredFormulas = formulasDb.filter(f => 
+          f.name.toLowerCase().includes(cleanQuery) ||
+          f.category.toLowerCase().includes(cleanQuery) ||
+          f.description.toLowerCase().includes(cleanQuery)
+        );
+      }
+      renderLibraryList();
+      
+      if (filteredFormulas.length > 0) {
+        const stillExists = filteredFormulas.some(f => f.id === activeFormulaId);
+        if (!stillExists) {
+          selectFormula(filteredFormulas[0].id);
+        }
+      } else {
+        renderEmptyDetails();
+      }
+    }
+
+    function renderLibraryList() {
+      const container = document.getElementById('formulaMasterPanel');
+      container.innerHTML = '';
+
+      if (filteredFormulas.length === 0) {
+        container.innerHTML = `
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 20px 0;">
+            No formulas match your search
+          </div>
+        `;
+        return;
+      }
+
+      filteredFormulas.forEach(formula => {
+        const item = document.createElement('button');
+        item.className = `formula-list-item ${formula.id === activeFormulaId ? 'active' : ''}`;
+        item.innerHTML = `
+          <span class="formula-list-item-category">${formula.category}</span>
+          <span class="formula-list-item-title">${formula.name}</span>
+        `;
+        item.addEventListener('click', () => selectFormula(formula.id));
+        container.appendChild(item);
+      });
+    }
+
+    function selectFormula(id) {
+      activeFormulaId = id;
+      
+      document.querySelectorAll('.formula-list-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      const listItems = document.getElementById('formulaMasterPanel').children;
+      const index = filteredFormulas.findIndex(f => f.id === id);
+      if (index !== -1 && listItems[index]) {
+        listItems[index].classList.add('active');
+      }
+
+      renderDetails();
+    }
+
+    function renderEmptyDetails() {
+      const pane = document.getElementById('formulaDetailPane');
+      pane.innerHTML = `
+        <div class="detail-empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <p>Search or select a formula to view its math details and load it in the simulator.</p>
+        </div>
+      `;
+    }
+
+    function renderDetails() {
+      const formula = formulasDb.find(f => f.id === activeFormulaId);
+      const pane = document.getElementById('formulaDetailPane');
+      
+      if (!formula) {
+        renderEmptyDetails();
+        return;
+      }
+
+      let codeLines = "";
+      if (formula.rgb) {
+        codeLines = `<div class="detail-code-line"><strong>RGB:</strong> ${formula.rgb}</div>`;
+      } else {
+        codeLines = `
+          <div class="detail-code-line"><strong>R:</strong> ${formula.r}</div>
+          <div class="detail-code-line"><strong>G:</strong> ${formula.g}</div>
+          <div class="detail-code-line"><strong>B:</strong> ${formula.b}</div>
+        `;
+      }
+
+      pane.innerHTML = `
+        <div class="detail-header">
+          <span class="detail-category-badge">${formula.category}</span>
+          <h2 class="detail-title">${formula.name}</h2>
+        </div>
+        
+        <p class="detail-description">${formula.description}</p>
+        
+        <div class="detail-code-box">
+          <div class="detail-code-title">PixInsight Formula</div>
+          ${codeLines}
+        </div>
+        
+        <div class="detail-actions">
+          <button class="btn-action" id="btnCopyDetails">Copy Formula</button>
+          <button class="btn-action btn-primary-action" id="btnLoadDetails" ${formula.preset ? '' : 'disabled'}>
+            ${formula.preset ? 'Load in Simulator' : 'Not Simulatable'}
+          </button>
+        </div>
+      `;
+
+      // Copy formula event
+      document.getElementById('btnCopyDetails').addEventListener('click', () => {
+        let text = "";
+        if (formula.rgb) {
+          text = `RGB: ${formula.rgb}`;
+        } else {
+          text = `R: ${formula.r}\nG: ${formula.g}\nB: ${formula.b}`;
+        }
+
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('btnCopyDetails');
+          btn.textContent = "Copied!";
+          btn.style.borderColor = "var(--gold-primary)";
+          btn.style.color = "var(--gold-primary)";
+          setTimeout(() => {
+            btn.textContent = "Copy Formula";
+            btn.style.borderColor = "";
+            btn.style.color = "";
+          }, 1500);
+        });
+      });
+
+      // Load preset in simulator event
+      if (formula.preset) {
+        document.getElementById('btnLoadDetails').addEventListener('click', () => {
+          if (formula.sho_sii_red !== undefined) slidersState.sho_sii_red = formula.sho_sii_red;
+          if (formula.sho_ha_green !== undefined) slidersState.sho_ha_green = formula.sho_ha_green;
+          if (formula.hoo_ha_blue !== undefined) slidersState.hoo_ha_blue = formula.hoo_ha_blue;
+          if (formula.stars_add_factor !== undefined) slidersState.stars_add_factor = formula.stars_add_factor;
+          if (formula.stars_reduce_factor !== undefined) slidersState.stars_reduce_factor = formula.stars_reduce_factor;
+          if (formula.ha_rgb_factor !== undefined) slidersState.ha_rgb_factor = formula.ha_rgb_factor;
+
+          setPreset(formula.preset);
+
           if (window.innerWidth < 992) {
             document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
           }
         });
-      });
+      }
+    }
 
-      document.querySelectorAll('.btn-copy-card').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const targetPreset = e.target.dataset.target;
-          const card = document.querySelector(`.formula-card[data-preset="${targetPreset}"]`);
-          const rCode = card.querySelector('.formula-r-code')?.textContent || '';
-          const gCode = card.querySelector('.formula-g-code')?.textContent || '';
-          const bCode = card.querySelector('.formula-b-code')?.textContent || '';
-          const rgbCode = card.querySelector('.formula-rgb-code')?.textContent || '';
-          
-          let text = "";
-          if (rgbCode) {
-            text = `RGB: ${rgbCode}`;
-          } else {
-            text = `R: ${rCode}\nG: ${gCode}\nB: ${bCode}`;
-          }
-          
-          navigator.clipboard.writeText(text).then(() => {
-            const originalText = e.target.textContent;
-            e.target.textContent = "Copied!";
-            e.target.style.borderColor = "var(--gold-primary)";
-            e.target.style.color = "var(--gold-primary)";
-            
-            setTimeout(() => {
-              e.target.textContent = originalText;
-              e.target.style.borderColor = "";
-              e.target.style.color = "";
-            }, 1500);
-          });
-        });
-      });
-    });
-
-    // Night Mode Toggle logic (copied from index.js for standalone stability)
+    // Toggle Night Vision
     const nightmodeToggle = document.getElementById('nightmode-toggle');
     nightmodeToggle.addEventListener('click', () => {
       document.body.classList.toggle('night-vision');
