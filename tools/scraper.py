@@ -6,6 +6,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import re
 import sys
+import ssl
+
+ssl_context = ssl._create_unverified_context()
 
 # Redefine print to handle Windows encoding issues with emojis
 _original_print = print
@@ -28,6 +31,8 @@ MAX_DB_SIZE = 100         # Keep DB file size light
 SOURCES = [
     # Official Forum Announcements
     {"name": "PixInsight Forum", "url": "https://pixinsight.com/forum/index.php?forums/announcements.10/index.rss", "is_youtube": False},
+    # Reddit Communities
+    {"name": "Reddit r/pixinsight", "url": "https://www.reddit.com/r/pixinsight/new/.rss", "is_youtube": False},
     # YouTube Channel Feeds
     {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True},
     {"name": "Cuiv, The Lazy Geek", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ5qRydYf3lMJ9A63cvsSEA", "is_youtube": True},
@@ -57,7 +62,7 @@ def fetch_feed_items(source_info):
     req = urllib.request.Request(url, headers=headers)
     
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, context=ssl_context) as response:
             xml_data = response.read()
             
         root = ET.fromstring(xml_data)
