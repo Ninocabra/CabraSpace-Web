@@ -41,7 +41,8 @@ jobs:
           echo "Changes detected in novedades.json. Committing..."
           git add novedades.json
           git commit -m "Auto-update: Aggregated latest PixInsight updates [skip ci]"
-          git push
+          git pull --rebase origin main
+          git push origin main
         else
           echo "No changes in novedades.json. Skipping commit."
         fi
