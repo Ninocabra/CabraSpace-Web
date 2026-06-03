@@ -65,6 +65,17 @@ SOURCES = [
     {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True}
 ]
 
+GITHUB_REPOS = [
+    {"name": "N.I.N.A.", "repo": "isbeorn/nina", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
+    {"name": "PHD2 Guiding", "repo": "OpenPHDGuiding/phd2", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
+    {"name": "INDI Library", "repo": "indilib/indi", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
+    {"name": "Stellarium", "repo": "Stellarium/stellarium", "category_es": "SOFTWARE", "category_en": "SOFTWARE"}
+]
+
+GITLAB_REPOS = [
+    {"name": "Siril", "project": "free-astro/siril", "category_es": "SOFTWARE", "category_en": "SOFTWARE"}
+]
+
 def fetch_feed_items(source_info):
     """Fetches and parses items from a single RSS or Atom feed with SSL bypass."""
     url = source_info["url"]
@@ -148,6 +159,82 @@ def fetch_feed_items(source_info):
         print(f"Error fetching feed '{source_info['name']}': {e}")
         return []
 
+def fetch_github_release(repo_info):
+    """Fetches the latest release for a GitHub repository."""
+    repo = repo_info["repo"]
+    url = f"https://api.github.com/repos/{repo}/releases/latest"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+    req = urllib.request.Request(url, headers=headers)
+    
+    try:
+        with urllib.request.urlopen(req, context=ssl_context, timeout=12) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            
+        tag = data.get('tag_name', '')
+        name = data.get('name', '')
+        pub_date = data.get('published_at', '')
+        html_url = data.get('html_url', '')
+        body = data.get('body', '')
+        
+        date_formatted = pub_date.split('T')[0] if 'T' in pub_date else datetime.now().strftime("%Y-%m-%d")
+        version_title = name if name else tag
+        
+        if html_url:
+            return {
+                "id": html_url,
+                "title": f"{repo_info['name']} Release {version_title}",
+                "url": html_url,
+                "date": date_formatted,
+                "source": f"GitHub Releases ({repo_info['name']})",
+                "is_youtube": False,
+                "body_content": body
+            }
+    except Exception as e:
+        print(f"Error fetching GitHub release for '{repo}': {e}")
+        
+    return None
+
+def fetch_gitlab_release(repo_info):
+    """Fetches the latest release for a GitLab repository."""
+    project = repo_info["project"]
+    project_encoded = urllib.parse.quote_plus(project)
+    url = f"https://gitlab.com/api/v4/projects/{project_encoded}/releases"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+    req = urllib.request.Request(url, headers=headers)
+    
+    try:
+        with urllib.request.urlopen(req, context=ssl_context, timeout=12) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            
+        if data and isinstance(data, list):
+            latest = data[0]
+            tag = latest.get('tag_name', '')
+            name = latest.get('name', '')
+            released_at = latest.get('released_at', '')
+            description = latest.get('description', '')
+            
+            date_formatted = released_at.split('T')[0] if 'T' in released_at else datetime.now().strftime("%Y-%m-%d")
+            version_title = name if name else tag
+            html_url = f"https://gitlab.com/{project}/-/releases/{tag}"
+            
+            return {
+                "id": html_url,
+                "title": f"{repo_info['name']} Release {version_title}",
+                "url": html_url,
+                "date": date_formatted,
+                "source": f"GitLab Releases ({repo_info['name']})",
+                "is_youtube": False,
+                "body_content": description
+            }
+    except Exception as e:
+        print(f"Error fetching GitLab release for '{project}': {e}")
+        
+    return None
+
 def load_database():
     """Loads the database of equipment updates."""
     if os.path.exists(DB_FILE):
@@ -172,13 +259,20 @@ def process_with_gemini(item, api_key):
     """Uses the Gemini 2.5 API with responseSchema to translate, summarize, and filter equipment relevance."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
+    body_content = item.get("body_content", "")
+    body_prompt = ""
+    if body_content:
+        body_trimmed = body_content[:1500] + "..." if len(body_content) > 1500 else body_content
+        body_prompt = f"\nRelease Notes / Details:\n{body_trimmed}\n"
+
     prompt = f"""
     You are an expert astrophotographer and astrophotography equipment specialist.
-    Analyze the following resource (video, blog post, or forum topic).
+    Analyze the following resource.
     
     Title: "{item['title']}"
     Source/Creator: "{item['source']}"
     URL: {item['url']}
+    {body_prompt}
     
     Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
     *   If it is a general photo processing tutorial (e.g. "how to process M31 in Photoshop/PixInsight" without discussing specific equipment setup or gear), or if it is completely off-topic (like landscape photography, space science news, general vlogs), mark relevant = false.
@@ -294,9 +388,16 @@ You MUST respond ONLY with a JSON object matching this schema:
 }
 Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
 
+    body_content = item.get("body_content", "")
+    body_prompt = ""
+    if body_content:
+        body_trimmed = body_content[:1500] + "..." if len(body_content) > 1500 else body_content
+        body_prompt = f"\nRelease Notes / Details:\n{body_trimmed}\n"
+
     user_prompt = f"""Title: "{item['title']}"
 Source/Creator: "{item['source']}"
-URL: {item['url']}"""
+URL: {item['url']}
+{body_prompt}"""
 
     payload = {
         "model": "deepseek-chat",
@@ -461,7 +562,7 @@ def process_fallback(item):
         
     # Check for software
     software_keywords = ["software", "firmware", "nina", "asiair", "indi", "ekos", "driver", "app", "kstars", "stellarMate", "controlador"]
-    if any(k in title_lower for k in software_keywords):
+    if any(k in title_lower for k in software_keywords) or "releases" in item['source'].lower():
         category_es = "SOFTWARE"
         category_en = "SOFTWARE"
         tags.append("Software")
@@ -497,6 +598,24 @@ def main():
         items = fetch_feed_items(source)
         print(f"Fetched {len(items)} items from {source['name']}.")
         candidates.extend(items)
+        
+    # Gather software releases from GitHub
+    print("\nFetching software releases from GitHub...")
+    for repo_info in GITHUB_REPOS:
+        print(f"Checking GitHub: {repo_info['name']}...")
+        release_item = fetch_github_release(repo_info)
+        if release_item:
+            print(f"Found release for {repo_info['name']}: {release_item['title']}")
+            candidates.append(release_item)
+            
+    # Gather software releases from GitLab
+    print("\nFetching software releases from GitLab...")
+    for repo_info in GITLAB_REPOS:
+        print(f"Checking GitLab: {repo_info['name']}...")
+        release_item = fetch_gitlab_release(repo_info)
+        if release_item:
+            print(f"Found release for {repo_info['name']}: {release_item['title']}")
+            candidates.append(release_item)
         
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
