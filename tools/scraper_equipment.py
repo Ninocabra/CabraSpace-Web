@@ -369,6 +369,14 @@ def main():
             print("Reached processing limit for this run.")
             break
             
+        # Check if candidate is from a manufacturer feed (not YouTube and not Stargazers Lounge)
+        is_mfg = not item['is_youtube'] and item['source'] != "Stargazers Lounge"
+        
+        # Pre-filter YouTube and forum candidates using keyword check to save Gemini API quota and avoid rate limits
+        if not is_mfg and not check_relevance_fallback(item['title']):
+            print(f"Skipping off-topic candidate (pre-filtered): '{item['title']}' from {item['source']}")
+            continue
+            
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
@@ -377,10 +385,7 @@ def main():
             processed_item = process_with_gemini(item, api_key)
         else:
             # Fallback local filter
-            if check_relevance_fallback(item['title']):
-                processed_item = process_fallback(item)
-            else:
-                print(f"Skipping off-topic resource in fallback: '{item['title']}' (no keywords matched)")
+            processed_item = process_fallback(item)
                 
         if processed_item:
             updates_to_add.append(processed_item)
