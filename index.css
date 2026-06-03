@@ -1039,3 +1039,217 @@ footer {
   }
 }
 
+/* ==========================================================================
+   Night Vision (Astronomy Red Mode) Styles
+   ========================================================================== */
+body.night-vision {
+  --bg-color: #030000; /* Deepest pure black to prevent light bleed */
+  --bg-card: #0a0101;
+  --bg-card-hover: #120202;
+  
+  --gold-primary: #ff0000; /* Pure red to preserve eye adaptation to darkness */
+  --gold-secondary: #cc0000;
+  --gold-light: #ff4d4d;
+  --gold-dark: #330000;
+  --gold-glow: rgba(255, 0, 0, 0.15);
+  --gold-border: rgba(255, 0, 0, 0.25);
+  --gold-border-muted: rgba(255, 0, 0, 0.1);
+  
+  --text-primary: #ff3333; /* Soft red for text */
+  --text-secondary: #b30000;
+  --text-muted: #660000;
+  
+  --border-color: #220505;
+  --border-hover: #3a0808;
+}
+
+/* Red Tint Filter for Media to prevent blinding the astrophotographer */
+body.night-vision img,
+body.night-vision video,
+body.night-vision iframe,
+body.night-vision .video-thumbnail-bg,
+body.night-vision svg:not(.moon-red-icon):not(.star-decor) {
+  filter: grayscale(100%) sepia(100%) hue-rotate(-50deg) saturate(800%) brightness(55%) !important;
+  opacity: 0.65;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+body.night-vision img:hover,
+body.night-vision video:hover,
+body.night-vision iframe:hover,
+body.night-vision .video-thumbnail-bg:hover {
+  opacity: 0.85;
+}
+
+/* Nightmode Toggle Button in Navbar */
+.nightmode-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.nightmode-btn:hover {
+  border-color: var(--gold-border);
+  color: var(--gold-primary);
+}
+
+.nightmode-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+}
+
+body.night-vision .nightmode-btn {
+  color: var(--gold-primary);
+  border-color: var(--gold-border);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.15);
+}
+
+/* Search Highlights */
+.search-highlight {
+  background: rgba(207, 171, 74, 0.22);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+body.night-vision .search-highlight {
+  background: rgba(255, 0, 0, 0.3);
+  color: #ff3333;
+}
+
+/* ==========================================================================
+   Live Dashboard Section Styles
+   ========================================================================== */
+.dashboard-section {
+  padding: 40px 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-top: 36px;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dashboard-col {
+  background: #070708;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  transition: var(--transition-smooth);
+  position: relative;
+}
+
+.dashboard-col:hover {
+  border-color: var(--gold-border);
+}
+
+.col-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.dashboard-item {
+  border-bottom: 1px solid #1a1917;
+  padding-bottom: 16px;
+}
+
+.dashboard-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dashboard-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.dashboard-item h4 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 6px;
+  transition: var(--transition-smooth);
+}
+
+.dashboard-item:hover h4 {
+  color: var(--gold-primary);
+}
+
+.dashboard-item p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.dashboard-item a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dashboard-view-all {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+  margin-top: 12px;
+  display: inline-block;
+}
+
+.dashboard-view-all:hover {
+  color: var(--gold-light);
+  transform: translateX(4px);
+}
+
+.dashboard-loading {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+}
+
+

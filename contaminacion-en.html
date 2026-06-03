@@ -166,6 +166,12 @@
   </style>
 </head>
 <body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
 
   <!-- Background Overlays for Resend Aesthetic -->
   <div class="grid-overlay"></div>
@@ -207,6 +213,9 @@
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Night Mode" title="Astronomical Night Mode">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
         <div class="lang-switcher">
           <a href="contaminacion.html" class="lang-link">ES</a>
           <span class="lang-separator">|</span>
@@ -409,6 +418,19 @@
           card.style.setProperty('--mouse-y', `${y}px`);
         });
       });
+
+      // Toggle Night Mode
+      const nightToggle = document.getElementById('nightmode-toggle');
+      if (nightToggle) {
+        nightToggle.addEventListener('click', () => {
+          document.body.classList.toggle('night-vision');
+          if (document.body.classList.contains('night-vision')) {
+            localStorage.setItem('night-vision', 'enabled');
+          } else {
+            localStorage.setItem('night-vision', 'disabled');
+          }
+        });
+      }
     });
   </script>
 </body>

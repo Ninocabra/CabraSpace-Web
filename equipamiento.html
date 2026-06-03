@@ -344,6 +344,12 @@
   </style>
 </head>
 <body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
 
   <!-- Background Overlays for Resend Aesthetic -->
   <div class="grid-overlay"></div>
@@ -385,6 +391,9 @@
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
         <div class="lang-switcher">
           <a href="equipamiento.html" class="lang-link active">ES</a>
           <span class="lang-separator">|</span>
@@ -471,6 +480,31 @@
 
   <!-- Script for Page Interactions and Data Binding -->
   <script>
+    function debounce(func, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    function highlightText(text, query) {
+      if (!query) return text;
+      const tokens = query.split(/\s+/).filter(Boolean);
+      if (tokens.length === 0) return text;
+      
+      let highlighted = text;
+      const sortedTokens = [...tokens].sort((a, b) => b.length - a.length);
+      
+      sortedTokens.forEach(token => {
+        const escapedToken = token.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`(${escapedToken})`, 'gi');
+        highlighted = highlighted.replace(regex, '<mark class="search-highlight">$1</mark>');
+      });
+      
+      return highlighted;
+    }
+
     let newsData = [];
     let activeCategory = 'TODOS';
     let activeTag = null;
@@ -481,12 +515,25 @@
       // 1. Fetch JSON Database
       loadDatabase();
 
-      // 2. Set search inputs handlers
+      // 2. Set search inputs handlers (with debounce)
       const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', (e) => {
+      searchInput.addEventListener('input', debounce((e) => {
         searchQuery = e.target.value.trim().toLowerCase();
         renderNews();
-      });
+      }, 200));
+
+      // 6. Toggle Modo Noche
+      const nightToggle = document.getElementById('nightmode-toggle');
+      if (nightToggle) {
+        nightToggle.addEventListener('click', () => {
+          document.body.classList.toggle('night-vision');
+          if (document.body.classList.contains('night-vision')) {
+            localStorage.setItem('night-vision', 'enabled');
+          } else {
+            localStorage.setItem('night-vision', 'disabled');
+          }
+        });
+      }
 
       // Keyboard shortcut to focus search ('/')
       document.addEventListener('keydown', (e) => {
@@ -620,7 +667,7 @@
       const resultsCountEl = document.getElementById('resultsCount');
       const clearBtn = document.getElementById('clearFiltersBtn');
       
-      // Filter logic
+      // Filter logic (Tokenized AND Search)
       const filtered = newsData.filter(item => {
         // 1. Category filter
         if (activeCategory !== 'TODOS' && item.category_es !== activeCategory) {
@@ -634,11 +681,15 @@
 
         // 3. Search query filter
         if (searchQuery) {
+          const tokens = searchQuery.split(/\s+/).filter(Boolean);
           const title = (item.title_es || '').toLowerCase();
           const summary = (item.summary_es || '').toLowerCase();
           const tagsStr = (item.tags || []).join(' ').toLowerCase();
           
-          if (!title.includes(searchQuery) && !summary.includes(searchQuery) && !tagsStr.includes(searchQuery)) {
+          const allMatched = tokens.every(token => 
+            title.includes(token) || summary.includes(token) || tagsStr.includes(token)
+          );
+          if (!allMatched) {
             return false;
           }
         }
@@ -674,6 +725,9 @@
           return `<span class="card-tag" ${isActive} onclick="triggerTagFilter('${tag}')">${tag}</span>`;
         }).join('');
 
+        const titleHtml = highlightText(item.title_es, searchQuery);
+        const summaryHtml = highlightText(item.summary_es, searchQuery);
+
         return `
           <div class="feature-card news-card">
             <div class="feature-card-content news-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
@@ -682,8 +736,8 @@
                   <span class="card-date">${dateStr}</span>
                   <span class="card-category">${item.category_es}</span>
                 </div>
-                <h3>${item.title_es}</h3>
-                <p style="margin-top: 10px; min-height: auto;">${item.summary_es}</p>
+                <h3>${titleHtml}</h3>
+                <p style="margin-top: 10px; min-height: auto;">${summaryHtml}</p>
                 <div class="card-tags">
                   ${tagsHtml}
                 </div>

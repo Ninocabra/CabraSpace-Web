@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="support.css">
 </head>
 <body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
 
   <!-- Background Overlays for Resend Aesthetic -->
   <div class="grid-overlay"></div>
@@ -50,6 +56,9 @@
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
         <div class="lang-switcher">
           <a href="index.html" class="lang-link active">ES</a>
           <span class="lang-separator">|</span>
@@ -135,6 +144,39 @@
           <h3>Equipamiento</h3>
           <p>Análisis objetivos de telescopios, cámaras astronómicas (CMOS/CCD), monturas ecuatoriales y software. Guías de optimización para sesiones de captura.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vintage Divider -->
+  <div class="vintage-divider">
+    <span class="divider-line"></span>
+    <svg class="star-decor" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z"/></svg>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Live Dashboard Section -->
+  <section id="dashboard" class="dashboard-section container">
+    <h2 class="section-title">Últimas Actualizaciones</h2>
+    <p class="section-subtitle">Novedades en tiempo real de nuestra base de datos de software y equipamiento astronómico.</p>
+    
+    <div class="dashboard-grid">
+      <!-- PixInsight & Software Column -->
+      <div class="dashboard-col">
+        <h3 class="col-title">PixInsight y Software</h3>
+        <div id="softwareDashboardContainer" class="dashboard-list">
+          <div class="dashboard-loading">Cargando actualizaciones...</div>
+        </div>
+        <a href="novedades.html" class="dashboard-view-all">Ver todas las novedades de software →</a>
+      </div>
+      
+      <!-- Equipment & Hardware Column -->
+      <div class="dashboard-col">
+        <h3 class="col-title">Equipamiento y Hardware</h3>
+        <div id="hardwareDashboardContainer" class="dashboard-list">
+          <div class="dashboard-loading">Cargando actualizaciones...</div>
+        </div>
+        <a href="equipamiento.html" class="dashboard-view-all">Ver todo el equipamiento →</a>
       </div>
     </div>
   </section>
