@@ -25,7 +25,7 @@ def print(*args, **kwargs):
 
 # Database and Scraping Config
 DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "equipamiento.json")
-MAX_ITEMS_TO_PROCESS = 5  # Process max 5 new items per run to stay within API limits
+MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
 MAX_DB_SIZE = 150         # Keep DB file size balanced
 
 # Scraping Sources
@@ -62,7 +62,9 @@ SOURCES = [
     {"name": "Astrotivissa", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIOTjw9A7ckpkCEbdowmV_g", "is_youtube": True},
     {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True},
     {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True},
-    {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True}
+    {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True},
+    {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True},
+    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True}
 ]
 
 GITHUB_REPOS = [
@@ -479,7 +481,7 @@ if not FABRICANTES:
         "ZWO", "Pegasus Astro", "Player One", "PrimaLuceLab", "Planewave", 
         "William Optics", "Celestron", "Sky-Watcher", "Skywatcher", "Explore Scientific", 
         "Lunt Solar Systems", "Askar", "Sharpstar", "Svbony", "QHY", "Meade", 
-        "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab", "MLAstro"
+        "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab", "MLAstro", "Touptek", "ToupTek"
     ]
 
 if not PALABRAS_CLAVE:

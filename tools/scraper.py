@@ -24,7 +24,7 @@ def print(*args, **kwargs):
 
 # Database and Scraping Config
 DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "novedades.json")
-MAX_ITEMS_TO_PROCESS = 5  # Process max 5 new items per run to stay within API limits
+MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
 MAX_DB_SIZE = 100         # Keep DB file size light
 
 # Scraping Sources
