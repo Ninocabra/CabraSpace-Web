@@ -348,6 +348,10 @@ def main():
         processed_item = None
         
         if api_key:
+            # Sleep 4.5 seconds to strictly respect the 15 RPM rate limit of Gemini's free tier
+            import time
+            print("Sleeping 4.5s to respect Gemini API rate limits...")
+            time.sleep(4.5)
             # Let Gemini process and check relevance
             processed_item = process_with_gemini(item, api_key)
         else:
