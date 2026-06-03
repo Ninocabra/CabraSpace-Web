@@ -1,5 +1,95 @@
 [
   {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1toskho/pixinsight_194_update_and_gpu_acceleration/",
+    "title_es": "Actualización PixInsight 1.9.4 y Aceleración por GPU",
+    "title_en": "PixInsight 1.9.4 Update and GPU Acceleration",
+    "summary_es": "Este recurso detalla las novedades de la versión 1.9.4 de PixInsight, enfocándose en la implementación de aceleración por GPU para ciertos procesos, lo que mejora significativamente el rendimiento en tareas como deconvolución y apilado.",
+    "summary_en": "This resource details the new features of PixInsight version 1.9.4, focusing on the implementation of GPU acceleration for certain processes, which significantly improves performance in tasks such as deconvolution and stacking.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-05-27",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1toskho/pixinsight_194_update_and_gpu_acceleration/",
+    "tags": [
+      "PixInsight 1.9.4",
+      "GPU Acceleration",
+      "Update",
+      "Performance",
+      "Deconvolution",
+      "Stacking"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1tmca0l/pixinsight/",
+    "title_es": "PixInsight",
+    "title_en": "PixInsight",
+    "summary_es": "Este recurso es una publicación genérica en el subreddit r/pixinsight, titulada simplemente 'PixInsight'. Representa una interacción dentro de la comunidad de usuarios, probablemente una pregunta o discusión general sobre el software PixInsight, su uso o algún aspecto de su funcionamiento.",
+    "summary_en": "This resource is a generic post on the r/pixinsight subreddit, simply titled 'PixInsight'. It represents an interaction within the user community, likely a general question or discussion about PixInsight software, its usage, or some aspect of its functionality.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2026-05-24",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1tmca0l/pixinsight/",
+    "tags": [
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=mQRsR7-cu6g",
+    "title_es": "Script gratuito de PixInsight para crear mosaicos anotados de objetos",
+    "title_en": "Free PixInsight Script to Create Annotated Object Mosaics",
+    "summary_es": "Este script gratuito para PixInsight permite combinar y anotar múltiples imágenes de objetos astronómicos en un solo mosaico con etiquetas y referencias. Se explica su instalación y uso paso a paso, ideal para aficionados que quieran generar composiciones de campo amplio con nomenclatura automática.",
+    "summary_en": "This free PixInsight script enables combining and annotating multiple astronomical object images into a single mosaic with labels and references. The tutorial covers installation and usage step by step, perfect for hobbyists wanting to generate wide-field compositions with automatic naming.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2026-05-22",
+    "url": "https://www.youtube.com/watch?v=mQRsR7-cu6g",
+    "tags": [
+      "Script",
+      "Mosaic",
+      "Annotation",
+      "Wide Field",
+      "Installation",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=RMTpQSTMMtg",
+    "title_es": "PixInsight 1.9.4: Qué Sucedió, Qué Funciona y Cómo Actualizar de Forma Segura",
+    "title_en": "PixInsight 1.9.4: What Happened, What Works, and How to Update Safely",
+    "summary_es": "Este recurso aborda la actualización de PixInsight 1.9.4, detallando los problemas iniciales que surgieron y las soluciones implementadas. Explica qué funcionalidades están operativas y ofrece una guía sobre cómo realizar la actualización de manera segura. Es una guía esencial para comprender y gestionar correctamente la transición a esta versión del software.",
+    "summary_en": "This resource addresses the PixInsight 1.9.4 update, detailing the initial issues that arose and the implemented solutions. It explains which functionalities are operational and provides a guide on how to perform the update safely. This is an essential guide for understanding and properly managing the transition to this software version.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-05-14",
+    "url": "https://www.youtube.com/watch?v=RMTpQSTMMtg",
+    "tags": [
+      "PixInsight",
+      "Update",
+      "1.9.4",
+      "Software",
+      "Installation",
+      "Troubleshooting"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=HfTJfY3Enqk",
+    "title_es": "Desde una configuración de galaxia económica hasta la imagen final: flujo de trabajo completo en PixInsight",
+    "title_en": "From Budget Galaxy Setup to Finished Image — Full PixInsight Workflow",
+    "summary_es": "Este tutorial detalla un flujo de trabajo completo de PixInsight para procesar galaxias, desde la calibración hasta la imagen final. Cubre técnicas como apilamiento de calibración, estiramiento, eliminación de gradientes, mejora de detalles y ajuste de color específico para galaxias.",
+    "summary_en": "This tutorial outlines a full PixInsight workflow for processing galaxies, from calibration to final image. It covers calibration stacking, stretching, gradient removal, detail enhancement, and color adjustment specific to galaxy targets.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-05-05",
+    "url": "https://www.youtube.com/watch?v=HfTJfY3Enqk",
+    "tags": [
+      "PixInsight",
+      "Galaxy Processing",
+      "Workflow",
+      "Calibration",
+      "Stretching",
+      "Gradient Removal"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=nCpmB7c4UWc",
     "title_es": "NBExtract: Separando datos de banda estrecha con estrellas, no curvas QE",
     "title_en": "NBExtract: Separating Narrowband Data Using Stars, Not QE Curves",
