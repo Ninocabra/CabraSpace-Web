@@ -251,7 +251,7 @@ def process_with_gemini(item, api_key):
         # Check relevance
         if not gemini_result.get('relevant', False):
             print(f"Skipping off-topic resource: '{item['title']}' is not related to astrophotography equipment.")
-            return None
+            return {"skipped": True}
             
         processed_item = {
             "id": item['url'],
@@ -269,6 +269,83 @@ def process_with_gemini(item, api_key):
         
     except Exception as e:
         print(f"Error calling Gemini API for '{item['title']}': {e}")
+        return None
+
+def process_with_deepseek(item, api_key):
+    """Uses the DeepSeek API to translate, summarize, and filter equipment relevance as fallback."""
+    url = "https://api.deepseek.com/chat/completions"
+    
+    system_prompt = """You are an expert astrophotographer and astrophotography equipment specialist.
+Analyze the provided resource (video, blog post, or forum topic).
+Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
+- If it is a general photo processing tutorial (e.g. "how to process M31 in Photoshop/PixInsight" without discussing specific equipment setup or gear), or if it is completely off-topic (like landscape photography, space science news, general vlogs), mark relevant = false.
+- If it is about hardware announcements, firmware releases, software updates for controlling astrophotography gear, or reviews/guides of telescopes, cameras, mounts, accessories (filters, focal reducers, etc.), mark relevant = true.
+
+You MUST respond ONLY with a JSON object matching this schema:
+{
+  "relevant": boolean,
+  "title_es": "A clean, natural Spanish title (translated and adapted, no excessive emojis or YouTube clickbait)",
+  "title_en": "A refined, clean title in English",
+  "summary_es": "A technical summary in Spanish of 2-3 sentences detailing what this equipment, review, or update is about",
+  "summary_en": "A concise technical summary in English of 2-3 sentences",
+  "category_es": "TELESCOPIOS" | "CÁMARAS" | "MONTURAS" | "ACCESORIOS" | "SOFTWARE",
+  "category_en": "TELESCOPES" | "CAMERAS" | "MOUNTS" | "ACCESSORIES" | "SOFTWARE",
+  "tags": ["array of up to 6 specific equipment keywords, including the brand (e.g. ZWO, Pegasus, Sky-Watcher, Celestron) and product type"]
+}
+Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
+
+    user_prompt = f"""Title: "{item['title']}"
+Source/Creator: "{item['source']}"
+URL: {item['url']}"""
+
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "response_format": {
+            "type": "json_object"
+        },
+        "stream": False
+    }
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    
+    try:
+        # Use 15 seconds timeout
+        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            
+        text_response = res_data['choices'][0]['message']['content'].strip()
+        deepseek_result = json.loads(text_response)
+        
+        # Check relevance
+        if not deepseek_result.get('relevant', False):
+            print(f"Skipping off-topic resource (DeepSeek): '{item['title']}' is not related to astrophotography equipment.")
+            return {"skipped": True}
+            
+        processed_item = {
+            "id": item['url'],
+            "title_es": deepseek_result['title_es'],
+            "title_en": deepseek_result['title_en'],
+            "summary_es": deepseek_result['summary_es'],
+            "summary_en": deepseek_result['summary_en'],
+            "category_es": deepseek_result['category_es'],
+            "category_en": deepseek_result['category_en'],
+            "date": item['date'],
+            "url": item['url'],
+            "tags": deepseek_result['tags']
+        }
+        return processed_item
+        
+    except Exception as e:
+        print(f"Error calling DeepSeek API for '{item['title']}': {e}")
         return None
 
 # Load manufacturers and keywords from JSON files if available
@@ -404,9 +481,11 @@ def process_fallback(item):
 
 def main():
     print("Starting Astrophotography Equipment News Scraper...")
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        print("Warning: GEMINI_API_KEY environment variable not found. Running in fallback dry-run mode.")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
+    
+    if not gemini_key and not deepseek_key:
+        print("Warning: Neither GEMINI_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
         
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
@@ -449,17 +528,39 @@ def main():
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
-        if api_key:
-            # Sleep 4.5 seconds to strictly respect the 15 RPM rate limit of Gemini's free tier
+        # 1. Try Gemini first
+        if gemini_key:
             import time
             print("Sleeping 4.5s to respect Gemini API rate limits...")
             time.sleep(4.5)
             # Let Gemini process and check relevance
-            processed_item = process_with_gemini(item, api_key)
-        else:
-            # Fallback local filter
-            processed_item = process_fallback(item)
+            processed_item = process_with_gemini(item, gemini_key)
+            
+            # If Gemini successfully determined that the item is NOT relevant
+            if processed_item and processed_item.get("skipped"):
+                print(f"Gemini classified item as not relevant. Skipping.")
+                continue
                 
+            # If Gemini failed (returned None), we will try DeepSeek next if key exists
+            if processed_item is None:
+                print("Gemini failed. Will attempt failover to DeepSeek if key is available...")
+        
+        # 2. Try DeepSeek if Gemini was not tried, or if Gemini failed
+        if processed_item is None and deepseek_key:
+            print("Trying DeepSeek API...")
+            processed_item = process_with_deepseek(item, deepseek_key)
+            
+            if processed_item and processed_item.get("skipped"):
+                print(f"DeepSeek classified item as not relevant. Skipping.")
+                continue
+                
+            if processed_item is None:
+                print("DeepSeek failed as well.")
+                
+        # 3. Fallback to local heuristic parsing if both APIs were tried and failed, or neither is configured
+        if processed_item is None:
+            processed_item = process_fallback(item)
+            
         if processed_item:
             updates_to_add.append(processed_item)
             processed_count += 1
