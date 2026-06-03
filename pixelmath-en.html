@@ -118,6 +118,29 @@
       margin-bottom: 20px;
     }
     
+    .btn-reset-inputs {
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold-primary);
+      font-size: 0.65rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .btn-reset-inputs:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 6px rgba(212, 175, 55, 0.2);
+    }
+    
     .inputs-title {
       font-size: 0.65rem;
       color: var(--text-muted);
@@ -657,7 +680,7 @@
     <section class="pixelmath-header">
       <h1 class="pm-title">The PixelMath-teca</h1>
       <p class="pm-subtitle">
-        An interactive knowledge base featuring over 100 advanced PixelMath formulas for PixInsight. Experiment with blends in our simulator and copy equations directly.
+        <strong>Test the simulator with your own astrophotography images!</strong> An interactive knowledge base featuring over 100 advanced PixelMath formulas for PixInsight. Experiment with blends in our simulator and copy equations directly.
       </p>
     </section>
 
@@ -672,7 +695,13 @@
 
         <!-- Input Images -->
         <div id="inputsArea" class="inputs-area" style="display:none;">
-          <div class="inputs-title">Input Images</div>
+          <div class="inputs-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div class="inputs-title" style="margin-bottom: 0;">Input Images</div>
+            <button id="btnResetInputs" class="btn-reset-inputs" title="Restore original test images">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px; stroke-width: 2.5;"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M16 3h5v5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 21H3v-5"/></svg>
+              Reset
+            </button>
+          </div>
           <div id="inputsPreviewGrid" class="inputs-preview-grid">
             <!-- Entry canvases dynamically injected -->
           </div>
@@ -818,6 +847,7 @@
     // ----------------------------------------------------
     let activeFormulaId = null;
     const channels = {};
+    const originalChannels = {};
     const canvas = document.getElementById('simulatorCanvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
@@ -845,7 +875,9 @@
         offCanvas.height = 400;
         const offCtx = offCanvas.getContext('2d');
         offCtx.drawImage(img, 0, 0, 400, 400);
-        channels[key] = offCtx.getImageData(0, 0, 400, 400).data;
+        const imgData = offCtx.getImageData(0, 0, 400, 400).data;
+        channels[key] = imgData;
+        originalChannels[key] = new Uint8ClampedArray(imgData);
         
         loadedCount++;
         if (loadedCount === totalToLoad) {
@@ -877,6 +909,21 @@
       searchInput.addEventListener('input', (e) => {
         filterLibrary(e.target.value);
       });
+
+      // Reset inputs event listener
+      const btnReset = document.getElementById('btnResetInputs');
+      if (btnReset) {
+        btnReset.addEventListener('click', () => {
+          Object.keys(originalChannels).forEach(key => {
+            channels[key] = new Uint8ClampedArray(originalChannels[key]);
+          });
+          const formula = formulasDb.find(f => f.id === activeFormulaId);
+          if (formula) {
+            renderInputPreviews(formula.sources);
+            runSimulation();
+          }
+        });
+      }
 
       // Set copy button listener for the simulator console
       document.getElementById('copyConsoleBtn').addEventListener('click', () => {
