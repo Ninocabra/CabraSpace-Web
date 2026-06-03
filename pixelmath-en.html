@@ -1242,6 +1242,11 @@
           fileInput.click();
         });
 
+        // Click propagation fix to avoid infinite loops
+        fileInput.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+
         fileInput.addEventListener('change', (e) => {
           const file = e.target.files[0];
           handleCustomImageUpload(key, file, canvasEl);
@@ -1268,6 +1273,8 @@
         drawChannelToCanvas(key, canvasEl);
       });
     }
+
+
 
 
 
@@ -1351,7 +1358,7 @@
 
       if (!formula.sliders || formula.sliders.length === 0) return;
 
-      const duration = 2500; // Animation duration in milliseconds
+      const duration = 10000; // Animation duration in milliseconds (10 seconds)
       const startTime = performance.now();
 
       formula.sliders.forEach(slider => {
@@ -1419,7 +1426,11 @@
     }
 
     function handleCustomImageUpload(key, file, canvasEl) {
-      if (!file || !file.type.startsWith('image/')) return;
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert("Error: The file format is not an image. Please load PNG, JPG or WebP files.");
+        return;
+      }
       
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1457,10 +1468,15 @@
           void canvasEl.offsetWidth; // reflow trigger
           canvasEl.classList.add('upload-success');
         };
+        img.onerror = () => {
+          alert("Error: The image format is not supported by the browser. Astrophotography formats like FITS (.fits) or XISF (.xisf) must be converted to PNG or JPG before uploading.");
+        };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
+
+
 
 
 
