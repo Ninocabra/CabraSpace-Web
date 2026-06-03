@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contaminación Lumínica - CabraSpace</title>
+  <meta name="description" content="Recursos, mapas interactivos y vídeos explicativos para combatir la contaminación lumínica en astrofotografía. Planifica tus salidas y optimiza tus tomas.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Estilos específicos para la sección de Contaminación Lumínica */
+    .section-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .sec-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .sec-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* Map Highlight Card */
+    .map-highlight-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 40px;
+      margin-bottom: 56px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .map-highlight-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+      }
+    }
+
+    .map-highlight-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(300px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(207, 171, 74, 0.06), transparent 80%);
+      z-index: 0;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .map-highlight-card:hover::before {
+      opacity: 1;
+    }
+
+    .map-card-text {
+      flex: 1;
+      position: relative;
+      z-index: 10;
+    }
+
+    .map-card-text h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .map-card-text p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .map-card-action {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Video section grid styling */
+    .video-grid-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 32px;
+    }
+
+    .videos-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-bottom: 80px;
+    }
+
+    @media (min-width: 768px) {
+      .videos-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .clean-video-card {
+      min-height: 380px;
+    }
+
+    .thumbnail-placeholder {
+      width: 100%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-icon-overlay {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--gold-border);
+      border-radius: 50%;
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-primary);
+      transition: var(--transition-smooth);
+    }
+
+    .clean-video-card:hover .play-icon-overlay {
+      background: var(--gold-primary);
+      color: var(--bg-color);
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="novedades.html" class="dropdown-item">Últimas Novedades</a></li>
+                <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
+              </ul>
+            </li>
+            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
+            <li><a href="contaminacion.html" class="dropdown-item active">Contaminación Lumínica</a></li>
+          </ul>
+        </li>
+        <li><a href="index.html#youtube" class="nav-link">YouTube</a></li>
+        <li><a href="index.html#support" class="nav-link">Apóyame</a></li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="lang-switcher">
+          <a href="contaminacion.html" class="lang-link active">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="contaminacion-en.html" class="lang-link">EN</a>
+        </div>
+        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="container">
+    <section class="section-header">
+      <h1 class="sec-title">Contaminación Lumínica</h1>
+      <p class="sec-subtitle">
+        Planifica tus observaciones y sesiones fotográficas utilizando mapas interactivos y aprende las técnicas y filtros necesarios para ganarle la batalla al cielo brillante de ciudad.
+      </p>
+    </section>
+
+    <!-- Map Highlight Card -->
+    <section class="map-highlight-card" id="mapCard">
+      <div class="map-card-text">
+        <h2>Mapa Interactivo Oficial</h2>
+        <p>
+          Accede a <strong>LightPollutionMap.info</strong>, el mapa interactivo de contaminación lumínica más completo del mundo. Encuentra de forma sencilla zonas de cielo oscuro, calcula la clase Bortle de tu ubicación y planifica tu próxima escapada fotográfica bajo un cielo limpio de estrellas.
+        </p>
+        <span class="card-badge" style="border: 1px solid var(--gold-border); color: var(--gold-primary); background: rgba(207, 171, 74, 0.03); padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Recomendado</span>
+      </div>
+      <div class="map-card-action">
+        <a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="box-shadow: 0 0 15px rgba(207, 171, 74, 0.1); font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 14px 28px; white-space: nowrap;">Abrir Mapa Interactivo ↗</a>
+      </div>
+    </section>
+
+    <!-- Explanatory Videos Section -->
+    <h2 class="video-grid-title">Vídeos Explicativos y Tutoriales</h2>
+    
+    <section class="videos-grid">
+      <!-- Video 1 (Astrocity) -->
+      <div class="feature-card clean-video-card">
+        <div class="feature-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
+          <div class="thumbnail-placeholder" style="background-image: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(3,3,3,0.9) 100%), url('https://img.youtube.com/vi/kYJvswJ9lEM/hqdefault.jpg');">
+            <a href="https://www.youtube.com/watch?v=kYJvswJ9lEM" target="_blank" rel="noopener noreferrer" class="play-icon-overlay" aria-label="Reproducir vídeo">
+              <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><path d="M1 21V1L17 11L1 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+          <div style="padding: 24px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="card-category" style="margin-bottom: 12px; display: inline-block;">Astrocity.es</span>
+              <h3 style="font-family: var(--font-sans); font-size: 1.1rem; line-height: 1.4; margin-bottom: 8px;">Comparativa y Review de Filtros Anticontaminación</h3>
+              <p style="color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; font-weight: 300;">Análisis en profundidad de los filtros Optolong L-PRO (cielo urbano moderado) junto a los filtros de banda estrecha L-Enhance y L-Extreme para capturar nebulosas de emisión.</p>
+            </div>
+            <a href="https://www.youtube.com/watch?v=kYJvswJ9lEM" target="_blank" rel="noopener noreferrer" class="card-link" style="margin-top: 16px; display: inline-block;">Ver en YouTube ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video 2 (Nebula Photos) -->
+      <div class="feature-card clean-video-card">
+        <div class="feature-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
+          <div class="thumbnail-placeholder" style="background-image: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(3,3,3,0.9) 100%), url('https://img.youtube.com/vi/q6bQ3Y60WlY/hqdefault.jpg');">
+            <a href="https://www.youtube.com/watch?v=q6bQ3Y60WlY" target="_blank" rel="noopener noreferrer" class="play-icon-overlay" aria-label="Reproducir vídeo">
+              <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><path d="M1 21V1L17 11L1 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+          <div style="padding: 24px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="card-category" style="margin-bottom: 12px; display: inline-block;">Nebula Photos</span>
+              <h3 style="font-family: var(--font-sans); font-size: 1.1rem; line-height: 1.4; margin-bottom: 8px;">Astrofotografía de Cielo Profundo bajo Cielos Bortle 7 y 8</h3>
+              <p style="color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; font-weight: 300;">Una guía práctica para capturar grandes campos, galaxias y nebulosas con cámaras DSLR comunes desde entornos urbanos y suburbanos con contaminación lumínica severa.</p>
+            </div>
+            <a href="https://www.youtube.com/watch?v=q6bQ3Y60WlY" target="_blank" rel="noopener noreferrer" class="card-link" style="margin-top: 16px; display: inline-block;">Ver en YouTube ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video 3 (Cuiv the Lazy Geek) -->
+      <div class="feature-card clean-video-card">
+        <div class="feature-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
+          <div class="thumbnail-placeholder" style="background-image: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(3,3,3,0.9) 100%), url('https://img.youtube.com/vi/pD45L2YEq24/hqdefault.jpg');">
+            <a href="https://www.youtube.com/watch?v=pD45L2YEq24" target="_blank" rel="noopener noreferrer" class="play-icon-overlay" aria-label="Reproducir vídeo">
+              <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><path d="M1 21V1L17 11L1 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+          <div style="padding: 24px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="card-category" style="margin-bottom: 12px; display: inline-block;">Cuiv, The Lazy Geek</span>
+              <h3 style="font-family: var(--font-sans); font-size: 1.1rem; line-height: 1.4; margin-bottom: 8px;">Ciudad vs Campo: Comparando Cielos con Nebula Photos</h3>
+              <p style="color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; font-weight: 300;">Comparación directa disparando al mismo objeto celeste desde el centro de la megaciudad de Tokio (cielo Bortle 9) y desde un cielo de campo rural limpio.</p>
+            </div>
+            <a href="https://www.youtube.com/watch?v=pD45L2YEq24" target="_blank" rel="noopener noreferrer" class="card-link" style="margin-top: 16px; display: inline-block;">Ver en YouTube ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video 4 (Ed Ting) -->
+      <div class="feature-card clean-video-card">
+        <div class="feature-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
+          <div class="thumbnail-placeholder" style="background-image: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(3,3,3,0.9) 100%), url('https://img.youtube.com/vi/mDmg4YyO08E/hqdefault.jpg');">
+            <a href="https://www.youtube.com/watch?v=mDmg4YyO08E" target="_blank" rel="noopener noreferrer" class="play-icon-overlay" aria-label="Reproducir vídeo">
+              <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><path d="M1 21V1L17 11L1 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+          <div style="padding: 24px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="card-category" style="margin-bottom: 12px; display: inline-block;">Ed Ting</span>
+              <h3 style="font-family: var(--font-sans); font-size: 1.1rem; line-height: 1.4; margin-bottom: 8px;">Astrofotografía urbana: ¿Qué es posible capturar?</h3>
+              <p style="color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; font-weight: 300;">Vídeo explicativo sobre las capacidades reales que ofrecen los telescopios y sensores modernos para capturar objetos brillantes de cielo profundo desde balcones contaminados.</p>
+            </div>
+            <a href="https://www.youtube.com/watch?v=mDmg4YyO08E" target="_blank" rel="noopener noreferrer" class="card-link" style="margin-top: 16px; display: inline-block;">Ver en YouTube ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <a href="index.html" class="footer-logo">
+        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace.com</span>
+      </a>
+      <span class="copyright">© 2026 CabraSpace. Todos los derechos reservados.</span>
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contacto</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize page interactions
+    document.addEventListener('DOMContentLoaded', () => {
+      // Spotlight tracking on map card
+      const mapCard = document.getElementById('mapCard');
+      mapCard.addEventListener('mousemove', e => {
+        const rect = mapCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mapCard.style.setProperty('--mouse-x', `${x}px`);
+        mapCard.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      // Shrink navbar on scroll
+      const header = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+      
+      // Spotlight tracking on video cards
+      const videoCards = document.querySelectorAll('.clean-video-card');
+      videoCards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
