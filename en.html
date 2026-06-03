@@ -18,15 +18,28 @@
   <header id="navbar">
     <div class="container nav-container">
       <a href="#" class="logo-link">
-        <img src="logo.png" style="height: 42px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace Logo">
+        <img src="logo.png" alt="CabraSpace Logo">
         <span>CabraSpace</span>
       </a>
       
       <ul class="nav-menu">
         <li><a href="#" class="nav-link">Home</a></li>
-        <li><a href="#features" class="nav-link">Content</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="#" class="dropdown-item">Latest News</a></li>
+                <li><a href="#" class="dropdown-item">YouTube Courses</a></li>
+              </ul>
+            </li>
+            <li><a href="#" class="dropdown-item">Light Pollution</a></li>
+          </ul>
+        </li>
         <li><a href="#youtube" class="nav-link">YouTube</a></li>
-        <li><a href="#support" class="nav-link">Support</a></li>
+        <li><a href="#support" class="nav-link">Support Me</a></li>
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
@@ -35,7 +48,7 @@
           <span class="lang-separator">|</span>
           <a href="en.html" class="lang-link active">EN</a>
         </div>
-        <a href="#newsletter" class="nav-cta">Subscribe</a>
+        <a href="#newsletter" class="nav-cta hidden">Subscribe</a>
       </div>
     </div>
   </header>
