@@ -269,19 +269,73 @@ def process_with_gemini(item, api_key):
         print(f"Error calling Gemini API for '{item['title']}': {e}")
         return None
 
-def check_relevance_fallback(title):
-    """Rule-based relevance filter for fallback dry-run mode."""
-    keywords = [
-        "telescope", "refractor", "newtonian", "mount", "camera", "filter", "zwo", "pegasus", 
-        "skywatcher", "sky-watcher", "celestron", "sensor", "optics", "software", "firmware", 
-        "nina", "asiair", "indi", "ekos", "askar", "sharpstar", "svbony", "qhy", "player-one", 
-        "player one", "meade", "orion", "vixen", "takahashi", "bresser", "dwarflab", 
-        "explore scientific", "planewave", "william optics", "focuser", "rotator", 
-        "flattener", "reducer", "guiding", "guide scope", "review", "unboxing", "setup",
-        "harmony", "seestar", "vespera", "stellina", "hype", "accessory", "accessories"
+# Load manufacturers and keywords from JSON files if available
+TOOLS_DIR = os.path.dirname(__file__)
+FABRICANTES_FILE = os.path.join(TOOLS_DIR, "fabricantes.json")
+PALABRAS_CLAVE_FILE = os.path.join(TOOLS_DIR, "palabras_clave.json")
+
+FABRICANTES = []
+PALABRAS_CLAVE = []
+
+if os.path.exists(FABRICANTES_FILE):
+    try:
+        with open(FABRICANTES_FILE, 'r', encoding='utf-8') as f:
+            FABRICANTES = json.load(f)
+    except Exception as e:
+        print(f"Error loading fabricantes.json: {e}")
+
+if os.path.exists(PALABRAS_CLAVE_FILE):
+    try:
+        with open(PALABRAS_CLAVE_FILE, 'r', encoding='utf-8') as f:
+            keywords_data = json.load(f)
+            PALABRAS_CLAVE = keywords_data.get("es", []) + keywords_data.get("en", [])
+    except Exception as e:
+        print(f"Error loading palabras_clave.json: {e}")
+
+# Fallback hardcoded lists if files are missing or empty
+if not FABRICANTES:
+    FABRICANTES = [
+        "ZWO", "Pegasus Astro", "Player One", "PrimaLuceLab", "Planewave", 
+        "William Optics", "Celestron", "Sky-Watcher", "Skywatcher", "Explore Scientific", 
+        "Lunt Solar Systems", "Askar", "Sharpstar", "Svbony", "QHY", "Meade", 
+        "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab"
     ]
+
+if not PALABRAS_CLAVE:
+    PALABRAS_CLAVE = [
+        "telescope", "refractor", "newtonian", "mount", "camera", "filter", "sensor", 
+        "optics", "software", "firmware", "nina", "asiair", "indi", "ekos", "focuser", 
+        "rotator", "flattener", "reducer", "guiding", "guide scope", "review", 
+        "unboxing", "setup", "seestar", "vespera", "stellina", "accessory", "accessories"
+    ]
+
+def check_relevance_fallback(title):
+    """Rule-based relevance filter for equipment updates using manufacturers and keywords."""
     title_lower = title.lower()
-    return any(k in title_lower for k in keywords)
+    
+    # 1. Match brand names
+    for brand in FABRICANTES:
+        brand_lower = brand.lower()
+        if len(brand_lower) <= 3:
+            if re.search(r'\b' + re.escape(brand_lower) + r'\b', title_lower):
+                return True
+        elif brand_lower in title_lower:
+            return True
+            
+    # 2. Match keywords
+    for keyword in PALABRAS_CLAVE:
+        keyword_lower = keyword.lower()
+        if keyword_lower.startswith('*'):
+            term = keyword_lower[1:]
+            if term in title_lower:
+                return True
+        elif len(keyword_lower) <= 4:
+            if re.search(r'\b' + re.escape(keyword_lower) + r'\b', title_lower):
+                return True
+        elif keyword_lower in title_lower:
+            return True
+            
+    return False
 
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
@@ -290,32 +344,45 @@ def process_fallback(item):
     tags = ["Equipamiento", item['source']]
     title_lower = item['title'].lower()
     
-    # Try to find a brand name
-    brands = ["zwo", "pegasus", "skywatcher", "sky-watcher", "celestron", "askar", "sharpstar", 
-              "svbony", "qhy", "player one", "player-one", "meade", "orion", "vixen", "takahashi", 
-              "bresser", "dwarflab", "explore scientific", "planewave", "william optics"]
-              
-    for brand in brands:
-        if brand in title_lower:
-            tags.append(brand.title())
-            
-    # Try to find category
+    # 1. Identify brands from our comprehensive list
+    for brand in FABRICANTES:
+        brand_lower = brand.lower()
+        if len(brand_lower) <= 3:
+            if re.search(r'\b' + re.escape(brand_lower) + r'\b', title_lower):
+                if brand not in tags:
+                    tags.append(brand)
+        elif brand_lower in title_lower:
+            if brand not in tags:
+                tags.append(brand)
+                
+    # 2. Categorize and tag based on keywords
     category_es = "ACCESORIOS"
     category_en = "ACCESSORIES"
     
-    if any(k in title_lower for k in ["telescope", "refractor", "newtonian", "dobsonian", "optics", "cat", "redcat"]):
+    # Check for telescopes
+    telescope_keywords = ["telescopio", "telescope", "refractor", "reflector", "newtonian", "newtoniano", "dobsonian", "dobson", "schmidt-cassegrain", "maksutov-cassegrain", "ritchey-chretien", "astrograph", "astrografo", "ota", "redcat"]
+    if any(k in title_lower for k in telescope_keywords):
         category_es = "TELESCOPIOS"
         category_en = "TELESCOPES"
         tags.append("Telescopio")
-    elif any(k in title_lower for k in ["camera", "sensor", "cmos", "ccd"]):
+        
+    # Check for cameras
+    camera_keywords = ["camera", "cámara", "sensor", "cmos", "ccd", "mono", "monocroma", "color", "refrigerada", "cooled", "guia", "guide cam"]
+    if any(k in title_lower for k in camera_keywords):
         category_es = "CÁMARAS"
         category_en = "CAMERAS"
         tags.append("Cámara")
-    elif any(k in title_lower for k in ["mount", "eq", "alt-az", "strain wave", "wave"]):
+        
+    # Check for mounts
+    mount_keywords = ["mount", "montura", "ecuatorial", "alt-az", "goto", "strain wave", "wave", "tracker", "seguidor"]
+    if any(k in title_lower for k in mount_keywords):
         category_es = "MONTURAS"
         category_en = "MOUNTS"
         tags.append("Montura")
-    elif any(k in title_lower for k in ["software", "firmware", "nina", "asiair", "indi", "ekos", "driver", "app"]):
+        
+    # Check for software
+    software_keywords = ["software", "firmware", "nina", "asiair", "indi", "ekos", "driver", "app", "kstars", "stellarMate", "controlador"]
+    if any(k in title_lower for k in software_keywords):
         category_es = "SOFTWARE"
         category_en = "SOFTWARE"
         tags.append("Software")
@@ -330,7 +397,7 @@ def process_fallback(item):
         "category_en": category_en,
         "date": item['date'],
         "url": item['url'],
-        "tags": tags[:6]
+        "tags": list(dict.fromkeys(tags))[:6] # Unique elements, limit to 6
     }
 
 def main():
