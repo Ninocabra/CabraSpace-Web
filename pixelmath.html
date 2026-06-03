@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PixelMath-teca - CabraSpace</title>
-  <meta name="description" content="Biblioteca interactiva de más de 100 fórmulas PixelMath para PixInsight y simulador en tiempo real. Domina el procesado de astrofotografía.">
+  <meta name="description" content="Biblioteca interactiva de más de 100 fórmulas PixelMath agrupadas para PixInsight y simulador en tiempo real con canales de entrada.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
@@ -110,17 +110,73 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Previsualizaciones de canales y fuentes de entrada */
+    .inputs-area {
+      background: rgba(2, 2, 2, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .inputs-title {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .inputs-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      justify-items: center;
+      align-items: center;
+    }
+
+    .input-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .input-canvas {
+      width: 100%;
+      max-width: 120px;
+      aspect-ratio: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #000;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .input-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 110px;
+    }
+
     /* Controles y Sliders */
     .controls-group {
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .control-label-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.8rem;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
       color: var(--text-secondary);
     }
 
@@ -142,45 +198,24 @@
       border-radius: 2px;
       background: var(--border-color);
       outline: none;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
       transition: background 0.3s;
     }
 
     .pm-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: var(--gold-primary);
       cursor: pointer;
-      box-shadow: 0 0 8px var(--gold-glow);
+      box-shadow: 0 0 6px var(--gold-glow);
       transition: transform 0.1s;
     }
 
     .pm-slider::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-    }
-
-    .preset-select-wrapper {
-      margin-bottom: 20px;
-    }
-
-    .preset-dropdown {
-      width: 100%;
-      background: #020202;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 12px;
-      border-radius: 4px;
-      font-size: 0.88rem;
-      outline: none;
-      cursor: pointer;
-      font-family: var(--font-sans);
-    }
-
-    .preset-dropdown:focus {
-      border-color: var(--gold-primary);
     }
 
     /* Consola PixelMath */
@@ -266,20 +301,20 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
-      min-height: 520px;
+      min-height: 540px;
     }
 
     @media (min-width: 768px) {
       .library-master-detail {
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 290px 1fr;
       }
     }
 
-    /* Panel Maestro (Lista de fórmulas) */
+    /* Panel Maestro (Lista de fórmulas agrupadas) */
     .formula-master-panel {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       max-height: 580px;
       overflow-y: auto;
       padding-right: 8px;
@@ -307,17 +342,32 @@
       background: var(--gold-border);
     }
 
+    .category-group-header {
+      font-size: 0.68rem;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      border-left: 2px solid var(--gold-primary);
+      padding-left: 8px;
+      margin-bottom: 10px;
+      margin-top: 6px;
+    }
+
+    .category-group-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
     .formula-list-item {
       background: #020202;
       border: 1px solid var(--border-color);
-      padding: 12px 14px;
+      padding: 10px 12px;
       border-radius: 4px;
       cursor: pointer;
       transition: var(--transition-smooth);
       text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
     }
 
     .formula-list-item:hover {
@@ -331,21 +381,15 @@
     }
 
     .formula-list-item-title {
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: 0.78rem;
+      font-weight: 400;
       color: var(--text-primary);
       line-height: 1.3;
+      display: block;
     }
 
     .formula-list-item.active .formula-list-item-title {
       color: var(--gold-primary);
-    }
-
-    .formula-list-item-category {
-      font-size: 0.62rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       font-weight: 500;
     }
 
@@ -478,19 +522,6 @@
       color: var(--bg-color);
       box-shadow: 0 0 10px var(--gold-glow);
     }
-
-    .btn-action:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      border-color: var(--border-color);
-      color: var(--text-muted);
-    }
-    
-    .btn-action:disabled:hover {
-      background: transparent;
-      color: var(--text-muted);
-      box-shadow: none;
-    }
   </style>
 </head>
 <body>
@@ -572,24 +603,29 @@
     <div class="pm-grid">
       <!-- Columna simulador (Sticky) -->
       <aside class="simulator-card">
-        <div class="canvas-wrapper">
-          <div class="canvas-loader" id="canvasLoader">
-            <div class="spinner"></div>
-            <span>Cargando canales de la nebulosa...</span>
-          </div>
-          <canvas id="simulatorCanvas" width="400" height="400"></canvas>
+        <!-- Título de fórmula activa -->
+        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+          <label style="display:block; margin-bottom:4px; font-size:0.62rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Fórmula Activa en Simulador</label>
+          <h3 id="activeFormulaTitle" style="font-family:var(--font-display); font-size:1.1rem; color:var(--gold-primary); margin:0; font-weight:500;">Cargando...</h3>
         </div>
 
-        <div class="preset-select-wrapper">
-          <label for="presetSelect" style="display:block; margin-bottom:8px; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Elegir Ajuste Preestablecido</label>
-          <select id="presetSelect" class="preset-dropdown">
-            <option value="sho">Paleta Hubble (SHO)</option>
-            <option value="hoo">Paleta Bicolor (HOO)</option>
-            <option value="foraxx">Paleta Dinámica Foraxx</option>
-            <option value="stars_add">Recomponer Estrellas (Starless + Stars)</option>
-            <option value="stars_reduce">Reducción de Estrellas (Blending)</option>
-            <option value="ha_rgb">Añadir H-alpha al Canal Rojo (Ha-RGB)</option>
-          </select>
+        <!-- Imágenes de Entrada -->
+        <div id="inputsArea" class="inputs-area" style="display:none;">
+          <div class="inputs-title">Imágenes de Entrada</div>
+          <div id="inputsPreviewGrid" class="inputs-preview-grid">
+            <!-- Canvases de entrada inyectados dinámicamente -->
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div class="inputs-title">Resultado de la Fórmula</div>
+          <div class="canvas-wrapper" style="margin-bottom:0;">
+            <div class="canvas-loader" id="canvasLoader">
+              <div class="spinner"></div>
+              <span>Cargando canales de la nebulosa...</span>
+            </div>
+            <canvas id="simulatorCanvas" width="400" height="400"></canvas>
+          </div>
         </div>
 
         <!-- Sliders Dinámicos -->
@@ -613,7 +649,7 @@
       <section class="library-card">
         <!-- Buscador -->
         <div class="library-search-wrapper">
-          <input type="text" id="librarySearchInput" placeholder="Buscar entre más de 100 fórmulas por nombre, categoría o descripción (presiona '/' para enfocar)...">
+          <input type="text" id="librarySearchInput" placeholder="Buscar entre más de 100 fórmulas por nombre o descripción (presiona '/' para enfocar)...">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
 
@@ -648,71 +684,71 @@
 
     // Base Formulas
     const baseFormulas = [
-      // 1. Narrowband Palettes
-      { id: 'sho_hub', name: 'Paleta Hubble (SHO) - Clásica', category: 'Paleta Banda Estrecha', description: 'Mapea Azufre al canal Rojo, Hidrógeno al Verde y Oxígeno al Azul. Paleta de colores clásica popularizada por el telescopio espacial Hubble (HST). Produce tonos dorados y azulados.', r: 'SII', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 1.0 },
-      { id: 'hoo_std', name: 'Paleta Bicolor (HOO) - Estándar', category: 'Paleta Banda Estrecha', description: 'Combina tomas asignando el Hidrógeno al canal Rojo y el Oxígeno a los canales Verde y Azul. Ideal para dar colores muy cercanos a la realidad óptica visual en nebulosas de emisión.', r: 'Ha', g: 'OIII', b: 'OIII', preset: 'hoo', hoo_ha_blue: 0.0 },
-      { id: 'foraxx_dyn', name: 'Paleta Dinámica Foraxx', category: 'Paleta Banda Estrecha', description: 'Fórmula de Paul Forstmann que realiza una mezcla dinámica no lineal del canal verde basándose en la fuerza de señal relativa de Ha y OIII. Ofrece transiciones cromáticas muy suaves.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', preset: 'foraxx' },
-      { id: 'hso_std', name: 'Paleta HSO', category: 'Paleta Banda Estrecha', description: 'Variante de mapeado narrowband que asigna Hidrógeno al Rojo, Azufre al Verde y Oxígeno al Azul.', r: 'Ha', g: 'SII', b: 'OIII' },
-      { id: 'soo_std', name: 'Paleta SOO', category: 'Paleta Banda Estrecha', description: 'Variante bicolor que asigna Azufre al canal Rojo y Oxígeno a los canales Verde y Azul.', r: 'SII', g: 'OIII', b: 'OIII' },
-      { id: 'soh_std', name: 'Paleta SOH', category: 'Paleta Banda Estrecha', description: 'Variante que mapea Azufre al canal Rojo, Oxígeno al Verde e Hidrógeno al canal Azul.', r: 'SII', g: 'OIII', b: 'Ha' },
-      { id: 'hos_std', name: 'Paleta HOS', category: 'Paleta Banda Estrecha', description: 'Mapea Hidrógeno al canal Rojo, Oxígeno al Verde y Azufre al canal Azul.', r: 'Ha', g: 'OIII', b: 'SII' },
-      { id: 'ohs_std', name: 'Paleta OHS', category: 'Paleta Banda Estrecha', description: 'Mapea Oxígeno al canal Rojo, Hidrógeno al Verde y Azufre al canal Azul.', r: 'OIII', g: 'Ha', b: 'SII' },
-      { id: 'osh_std', name: 'Paleta OSH', category: 'Paleta Banda Estrecha', description: 'Mapea Oxígeno al canal Rojo, Azufre al Verde e Hidrógeno al canal Azul.', r: 'OIII', g: 'SII', b: 'Ha' },
+      // 1. Paletas de Banda Estrecha
+      { id: 'sho_hub', name: 'Paleta Hubble (SHO) - Clásica', category: 'Paleta Banda Estrecha', description: 'Mapea Azufre al canal Rojo, Hidrógeno al Verde y Oxígeno al Azul. Paleta clásica popularizada por el telescopio espacial Hubble (HST). Produce tonos dorados y azulados.', r: 'SII', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hoo_std', name: 'Paleta Bicolor (HOO) - Estándar', category: 'Paleta Banda Estrecha', description: 'Combina tomas asignando el Hidrógeno al canal Rojo y el Oxígeno a los canales Verde y Azul. Ideal para dar colores muy cercanos a la realidad óptica visual en nebulosas de emisión.', r: 'Ha', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'oiii', sources: ['ha', 'oiii'], sliders: [{ id: 'k_b', label: 'Mezcla Ha / OIII en canal Azul', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'foraxx_dyn', name: 'Paleta Dinámica Foraxx', category: 'Paleta Banda Estrecha', description: 'Fórmula de Paul Forstmann que realiza una mezcla dinámica no lineal del canal verde basándose en la fuerza de señal relativa de Ha y OIII. Ofrece transiciones cromáticas muy suaves.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', renderType: 'foraxx', sources: ['ha', 'oiii'], sliders: [] },
+      { id: 'hso_std', name: 'Paleta HSO', category: 'Paleta Banda Estrecha', description: 'Variante de mapeado narrowband que asigna Hidrógeno al Rojo, Azufre al Verde y Oxígeno al Azul.', r: 'Ha', g: 'SII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'sii', b_chan: 'oiii', sources: ['ha', 'sii', 'oiii'], sliders: [{ id: 'k_g', label: 'Mezcla SII / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'soo_std', name: 'Paleta SOO', category: 'Paleta Banda Estrecha', description: 'Variante bicolor que asigna Azufre al canal Rojo y Oxígeno a los canales Verde y Azul.', r: 'SII', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'oiii', sources: ['sii', 'oiii'], sliders: [{ id: 'k_b', label: 'Mezcla SII / OIII en canal Azul', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'soh_std', name: 'Paleta SOH', category: 'Paleta Banda Estrecha', description: 'Variante que mapea Azufre al canal Rojo, Oxígeno al Verde e Hidrógeno al canal Azul.', r: 'SII', g: 'OIII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'ha', sources: ['sii', 'oiii', 'ha'], sliders: [{ id: 'k_g', label: 'Mezcla OIII / Ha en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hos_std', name: 'Paleta HOS', category: 'Paleta Banda Estrecha', description: 'Mapea Hidrógeno al canal Rojo, Oxígeno al Verde y Azufre al canal Azul.', r: 'Ha', g: 'OIII', b: 'SII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'sii', sources: ['ha', 'oiii', 'sii'], sliders: [{ id: 'k_g', label: 'Mezcla OIII / SII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'ohs_std', name: 'Paleta OHS', category: 'Paleta Banda Estrecha', description: 'Mapea Oxígeno al canal Rojo, Hidrógeno al Verde y Azufre al canal Azul.', r: 'OIII', g: 'Ha', b: 'SII', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'ha', b_chan: 'sii', sources: ['oiii', 'ha', 'sii'], sliders: [{ id: 'k_g', label: 'Mezcla Ha / SII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'osh_std', name: 'Paleta OSH', category: 'Paleta Banda Estrecha', description: 'Mapea Oxígeno al canal Rojo, Azufre al Verde e Hidrógeno al canal Azul.', r: 'OIII', g: 'SII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'sii', b_chan: 'ha', sources: ['oiii', 'sii', 'ha'], sliders: [{ id: 'k_g', label: 'Mezcla SII / Ha en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       
       // SHO Custom Star Blends
-      { id: 'sho_star_mix_82', name: 'Mezcla SHO Estrellas Naturales V1', category: 'Paleta Banda Estrecha', description: 'Suma un 20% de H-alpha en el canal Rojo para reducir la tonalidad magenta en las estrellas típica del SHO puro y suavizar las transiciones cromáticas.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.8, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_73', name: 'Mezcla SHO Estrellas Naturales V2', category: 'Paleta Banda Estrecha', description: 'Asigna 70% Azufre y 30% Hidrógeno al canal Rojo. Reduce considerablemente la dominante magenta en el procesado.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.7, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_64', name: 'Mezcla SHO Estrellas Naturales V3', category: 'Paleta Banda Estrecha', description: 'Mezcla balanceada 60/40 en el canal rojo. Ayuda a atenuar el canal de azufre si éste tiene una baja señal frente al hidrógeno.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.6, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_55', name: 'Mezcla SHO Estrellas Naturales V4', category: 'Paleta Banda Estrecha', description: 'Mezcla simétrica 50/50 de azufre e hidrógeno en el canal rojo para homogeneizar la respuesta estructural de las nebulosas.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.5, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_46', name: 'Mezcla SHO Estrellas Naturales V5', category: 'Paleta Banda Estrecha', description: 'Asigna mayor presencia de Hidrógeno (60%) al canal rojo para dotar a la nebulosa de tonos más anaranjados y cálidos.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.4, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_37', name: 'Mezcla SHO Estrellas Naturales V6', category: 'Paleta Banda Estrecha', description: 'Asigna 70% Hidrógeno y 30% Azufre al canal rojo. El color resultante gira hacia los tonos dorados ricos.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.3, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_28', name: 'Mezcla SHO Estrellas Naturales V7', category: 'Paleta Banda Estrecha', description: 'Predominancia casi absoluta del Hidrógeno en el canal rojo. Da tonos rojizos suaves en los bordes nebulosos.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.2, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_19', name: 'Mezcla SHO Estrellas Naturales V8', category: 'Paleta Banda Estrecha', description: 'Asigna un 90% de hidrógeno en el rojo, dejando al azufre como un sutil matiz contrastante en las zonas más densas.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.1, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_82', name: 'Mezcla SHO Estrellas Naturales V1 (80/20)', category: 'Paleta Banda Estrecha', description: 'Suma un 20% de H-alpha en el canal Rojo para reducir la tonalidad magenta en las estrellas típica del SHO puro y suavizar las transiciones cromáticas.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.8 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_73', name: 'Mezcla SHO Estrellas Naturales V2 (70/30)', category: 'Paleta Banda Estrecha', description: 'Asigna 70% Azufre y 30% Hidrógeno al canal Rojo. Reduce considerablemente la dominante magenta en el procesado.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.7 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_64', name: 'Mezcla SHO Estrellas Naturales V3 (60/40)', category: 'Paleta Banda Estrecha', description: 'Mezcla balanceada 60/40 en el canal rojo. Ayuda a atenuar el canal de azufre si éste tiene una baja señal frente al hidrógeno.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.6 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_55', name: 'Mezcla SHO Estrellas Naturales V4 (50/50)', category: 'Paleta Banda Estrecha', description: 'Mezcla simétrica 50/50 de azufre e hidrógeno en el canal rojo para homogeneizar la respuesta estructural de las nebulosas.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.5 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_46', name: 'Mezcla SHO Estrellas Naturales V5 (40/60)', category: 'Paleta Banda Estrecha', description: 'Asigna mayor presencia de Hidrógeno (60%) al canal rojo para dotar a la nebulosa de tonos más anaranjados y cálidos.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.4 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_37', name: 'Mezcla SHO Estrellas Naturales V6 (30/70)', category: 'Paleta Banda Estrecha', description: 'Asigna 70% Hidrógeno y 30% Azufre al canal rojo. El color resultante gira hacia los tonos dorados ricos.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.3 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_28', name: 'Mezcla SHO Estrellas Naturales V7 (20/80)', category: 'Paleta Banda Estrecha', description: 'Predominancia casi absoluta del Hidrógeno en el canal rojo. Delivers soft reddish tones at the nebulous borders.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.2 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_19', name: 'Mezcla SHO Estrellas Naturales V8 (10/90)', category: 'Paleta Banda Estrecha', description: 'Asigna un 90% de hidrógeno en el rojo, dejando al azufre como un sutil matiz contrastante en las zonas más densas.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.1 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       
       // SHO Custom Green mixes
-      { id: 'sho_green_mix_82', name: 'Mezcla SHO Canal Verde V1', category: 'Paleta Banda Estrecha', description: 'Mezcla 80% Hidrógeno y 20% Oxígeno en el canal verde para mitigar el tono verde dominante del hidrógeno.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.8 },
-      { id: 'sho_green_mix_73', name: 'Mezcla SHO Canal Verde V2', category: 'Paleta Banda Estrecha', description: 'Mezcla de 70% Hidrógeno y 30% Oxígeno en el canal verde. Vira las zonas verdes hacia tonos amarillos-naranjas.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.7 },
-      { id: 'sho_green_mix_64', name: 'Mezcla SHO Canal Verde V3', category: 'Paleta Banda Estrecha', description: 'Asigna 60% Hidrógeno y 40% Oxígeno al verde. Genera una paleta de color oro-turquesa muy equilibrada.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.6 },
-      { id: 'sho_green_mix_55', name: 'Mezcla SHO Canal Verde V4', category: 'Paleta Banda Estrecha', description: 'Mezcla simétrica 50/50 en el verde. La transición de colores adquiere un contraste cromático máximo.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.5 },
+      { id: 'sho_green_mix_82', name: 'SHO Canal Verde Mix V1 (80/20)', category: 'Paleta Banda Estrecha', description: 'Mezcla 80% Hidrógeno y 20% Oxígeno en el canal verde para mitigar el tono verde dominante del hidrógeno.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 0.8 }] },
+      { id: 'sho_green_mix_73', name: 'SHO Canal Verde Mix V2 (70/30)', category: 'Paleta Banda Estrecha', description: 'Mezcla de 70% Hidrógeno y 30% Oxígeno en el canal verde. Vira las zonas verdes hacia tonos amarillos-naranjas.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 0.7 }] },
+      { id: 'sho_green_mix_64', name: 'SHO Canal Verde Mix V3 (60/40)', category: 'Paleta Banda Estrecha', description: 'Asigna 60% Hidrógeno y 40% Oxígeno al verde. Genera una paleta de color oro-turquesa muy equilibrada.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 0.6 }] },
+      { id: 'sho_green_mix_55', name: 'SHO Canal Verde Mix V4 (50/50)', category: 'Paleta Banda Estrecha', description: 'Mezcla simétrica 50/50 en el verde. La transición de colores adquiere un contraste cromático máximo.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 0.5 }] },
 
-      // 2. Color Masks
-      { id: 'mask_red', name: 'Máscara de Color: Rojo Estándar', category: 'Máscaras de Color', description: 'Genera una máscara monocromática aislando los tonos rojos. Útil para aplicar procesos de saturación específicos en nebulosas de emisión.', r: 'R - max(G, B)', rgb: 'R - max(G, B)' },
-      { id: 'mask_green', name: 'Máscara de Color: Verde Estándar', category: 'Máscaras de Color', description: 'Genera una máscara para aislar los tonos verdes. Útil para eliminar ruido de crominancia verde o calibrar canales.', r: 'G - max(R, B)', rgb: 'G - max(R, B)' },
-      { id: 'mask_blue', name: 'Máscara de Color: Azul Estándar', category: 'Máscaras de Color', description: 'Genera una máscara aislando las zonas azules de la imagen (gas oxígeno o estrellas de tipo O/B).', r: 'B - max(R, G)', rgb: 'B - max(R, G)' },
-      { id: 'mask_cyan', name: 'Máscara de Color: Cian Estándar', category: 'Máscaras de Color', description: 'Aísla las regiones cian combinando la señal de los canales verde y azul restando el rojo.', r: 'min(G, B) - R', rgb: 'min(G, B) - R' },
-      { id: 'mask_magenta', name: 'Máscara de Color: Magenta Estándar', category: 'Máscaras de Color', description: 'Aísla los tonos magentas restando la señal verde de la combinación roja y azul.', r: 'min(R, B) - G', rgb: 'min(R, B) - G' },
-      { id: 'mask_yellow', name: 'Máscara de Color: Amarillo Estándar', category: 'Máscaras de Color', description: 'Genera una máscara aislando los tonos amarillos restando la señal azul de la combinación de rojo y verde.', r: 'min(R, G) - B', rgb: 'min(R, G) - B' },
+      // 2. Máscaras de Color
+      { id: 'mask_red', name: 'Máscara: Rojo Estándar', category: 'Máscaras de Color', description: 'Genera una máscara monocromática aislando los tonos rojos. Útil para aplicar procesos de saturación específicos en nebulosas de emisión.', r: 'R - max(G, B)', rgb: 'R - max(G, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_green', name: 'Máscara: Verde Estándar', category: 'Máscaras de Color', description: 'Genera una máscara para aislar los tonos verdes. Útil para eliminar ruido de crominancia verde o calibrar canales.', r: 'G - max(R, B)', rgb: 'G - max(R, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_blue', name: 'Máscara: Azul Estándar', category: 'Máscaras de Color', description: 'Genera una máscara aislando las zonas azules de la imagen (gas oxígeno o estrellas de tipo O/B).', r: 'B - max(R, G)', rgb: 'B - max(R, G)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_cyan', name: 'Máscara: Cian Estándar', category: 'Máscaras de Color', description: 'Aísla las regiones cian combinando la señal de los canales verde y azul restando el rojo.', r: 'min(G, B) - R', rgb: 'min(G, B) - R', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_magenta', name: 'Máscara: Magenta Estándar', category: 'Máscaras de Color', description: 'Aísla los tonos magentas restando la señal verde de la combinación roja y azul.', r: 'min(R, B) - G', rgb: 'min(R, B) - G', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_yellow', name: 'Máscara: Amarillo Estándar', category: 'Máscaras de Color', description: 'Genera una máscara aislando los tonos amarillos restando la señal azul de la combinación de rojo y verde.', r: 'min(R, G) - B', rgb: 'min(R, G) - B', renderType: 'mask_color', sources: ['original'], sliders: [] },
       
       // Color Masks V2
-      { id: 'mask_red_v2', name: 'Máscara de Color: Rojo Avanzada', category: 'Máscaras de Color', description: 'Fórmula de Bill Blanshan que aísla los tonos rojos condicionados a que la señal roja sea la dominante absoluta en cada píxel.', r: 'iif(R > G && R > B, R - max(G, B), 0)', rgb: 'iif(R > G && R > B, R - max(G, B), 0)' },
-      { id: 'mask_green_v2', name: 'Máscara de Color: Verde Avanzada', category: 'Máscaras de Color', description: 'Aísla el canal verde mediante condicionales estrictos para evitar solapamientos cromáticos accidentales.', r: 'iif(G > R && G > B, G - max(R, B), 0)', rgb: 'iif(G > R && G > B, G - max(R, B), 0)' },
-      { id: 'mask_blue_v2', name: 'Máscara de Color: Azul Avanzada', category: 'Máscaras de Color', description: 'Aísla los azules intensos de forma condicional para enfocar el procesado en gas OIII periférico.', r: 'iif(B > R && B > G, B - max(R, G), 0)', rgb: 'iif(B > R && B > G, B - max(R, G), 0)' },
-      { id: 'mask_cyan_v2', name: 'Máscara de Color: Cian Avanzada', category: 'Máscaras de Color', description: 'Genera una máscara condicional de cian. Ideal para trabajar en el núcleo y detalles finos del gas OIII.', r: 'iif(G > R && B > R, min(G, B) - R, 0)', rgb: 'iif(G > R && B > R, min(G, B) - R, 0)' },
-      { id: 'mask_magenta_v2', name: 'Máscara de Color: Magenta Avanzada', category: 'Máscaras de Color', description: 'Aísla tonos magentas de forma condicional, perfecto para mitigar halos magentas en estrellas defectuosas.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)' },
-      { id: 'mask_yellow_v2', name: 'Máscara de Color: Amarillo Avanzada', category: 'Máscaras de Color', description: 'Aísla las tonalidades amarillas de manera condicional para ajustar los filamentos de azufre y polvo.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)' },
+      { id: 'mask_red_v2', name: 'Máscara: Rojo Avanzada V2', category: 'Máscaras de Color', description: 'Fórmula de Bill Blanshan que aísla los tonos rojos condicionados a que la señal roja sea la dominante absoluta en cada píxel.', r: 'iif(R > G && R > B, R - max(G, B), 0)', rgb: 'iif(R > G && R > B, R - max(G, B), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_green_v2', name: 'Máscara: Verde Avanzada V2', category: 'Máscaras de Color', description: 'Aísla el canal verde mediante condicionales estrictos para evitar solapamientos cromáticos accidentales.', r: 'iif(G > R && G > B, G - max(R, B), 0)', rgb: 'iif(G > R && G > B, G - max(R, B), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_blue_v2', name: 'Máscara: Azul Avanzada V2', category: 'Máscaras de Color', description: 'Aísla los azules intensos de forma condicional para enfocar el procesado en gas OIII periférico.', r: 'iif(B > R && B > G, B - max(R, G), 0)', rgb: 'iif(B > R && B > G, B - max(R, G), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_cyan_v2', name: 'Máscara: Cian Avanzada V2', category: 'Máscaras de Color', description: 'Genera una máscara condicional de cian. Ideal para trabajar en el núcleo y detalles finos del gas OIII.', r: 'iif(G > R && B > R, min(G, B) - R, 0)', rgb: 'iif(G > R && B > R, min(G, B) - R, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_magenta_v2', name: 'Máscara: Magenta Avanzada V2', category: 'Máscaras de Color', description: 'Aísla tonos magentas de forma condicional, perfecto para mitigar halos magentas en estrellas defectuosas.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_yellow_v2', name: 'Máscara: Amarillo Avanzada V2', category: 'Máscaras de Color', description: 'Aísla las tonalidades amarillas de manera condicional para ajustar los filamentos de azufre y polvo.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
 
-      // 3. Math & Blending Modes
-      { id: 'blend_screen', name: 'Fusión por Pantalla (Screen)', category: 'Matemáticas y Modos de Fusión', description: 'Combina dos imágenes evitando la sobreexposición en las altas luces. Equivalente al modo Pantalla en Photoshop.', rgb: '1 - (1 - ImagenA) * (1 - ImagenB)' },
-      { id: 'blend_mult', name: 'Fusión por Multiplicación (Multiply)', category: 'Matemáticas y Modos de Fusión', description: 'Multiplica los valores de píxel de dos imágenes, oscureciendo las zonas comunes. Ideal para superponer máscaras de contraste.', rgb: 'ImagenA * ImagenB' },
-      { id: 'blend_overlay', name: 'Fusión por Superposición (Overlay)', category: 'Matemáticas y Modos de Fusión', description: 'Combina multiplicación y pantalla según el brillo del fondo. Aumenta el contraste local drásticamente.', rgb: 'iif(ImagenA < 0.5, 2 * ImagenA * ImagenB, 1 - 2 * (1 - ImagenA) * (1 - ImagenB))' },
-      { id: 'blend_diff', name: 'Fusión por Diferencia (Difference)', category: 'Matemáticas y Modos de Fusión', description: 'Calcula la diferencia absoluta entre dos tomas. Extremadamente útil para verificar cambios geométricos o de calibración.', rgb: 'abs(ImagenA - ImagenB)' },
-      { id: 'blend_lighten', name: 'Fusión por Aclarado (Lighten / Max)', category: 'Matemáticas y Modos de Fusión', description: 'Compara ambas imágenes píxel a píxel y se queda con el valor más brillante de los dos.', rgb: 'max(ImagenA, ImagenB)' },
-      { id: 'blend_darken', name: 'Fusión por Oscurecido (Darken / Min)', category: 'Matemáticas y Modos de Fusión', description: 'Compara ambas imágenes píxel a píxel y se queda con el valor de menor brillo.', rgb: 'min(ImagenA, ImagenB)' },
-      { id: 'blend_stars_scr', name: 'Suma de Estrellas por Pantalla', category: 'Matemáticas y Modos de Fusión', description: 'Suma estrellas a un fondo nebula usando el modo pantalla para no alterar los núcleos brillantes de las estrellas.', rgb: '~(~Starless * ~Stars)', preset: 'stars_add', stars_add_factor: 1.0 },
-      { id: 'blend_avg', name: 'Fusión por Promedio (Average)', category: 'Matemáticas y Modos de Fusión', description: 'Realiza un promedio aritmético de dos exposiciones del mismo campo para mitigar ruido.', rgb: '(ImagenA + ImagenB) / 2' },
+      // 3. Matemáticas y Modos de Fusión
+      { id: 'blend_screen', name: 'Fusión por Pantalla (Screen)', category: 'Matemáticas y Modos de Fusión', description: 'Combina dos imágenes evitando la sobreexposición en las altas luces. Ajusta la opacidad de mezcla k. Equivalente a Photoshop.', rgb: '1 - (1 - ImagenA) * (1 - ImagenB)', renderType: 'blend_screen', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Opacidad de Fusión (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_mult', name: 'Fusión por Multiplicación (Multiply)', category: 'Matemáticas y Modos de Fusión', description: 'Multiplica los valores de píxel de dos imágenes, oscureciendo las zonas comunes. Ideal para superponer máscaras de contraste.', rgb: 'ImagenA * ImagenB', renderType: 'blend_mult', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Opacidad de Fusión (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_overlay', name: 'Fusión por Superposición (Overlay)', category: 'Matemáticas y Modos de Fusión', description: 'Combina multiplicación y pantalla según el brillo del fondo. Aumenta el contraste local drásticamente.', rgb: 'iif(ImagenA < 0.5, 2 * ImagenA * ImagenB, 1 - 2 * (1 - ImagenA) * (1 - ImagenB))', renderType: 'blend_overlay', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Opacidad de Fusión (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_diff', name: 'Fusión por Diferencia (Difference)', category: 'Matemáticas y Modos de Fusión', description: 'Calcula la diferencia absoluta entre dos tomas. Extremadamente útil para verificar cambios geométricos o de calibración.', rgb: 'abs(ImagenA - ImagenB)', renderType: 'blend_diff', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Opacidad de Diferencia (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_lighten', name: 'Fusión por Aclarado (Lighten / Max)', category: 'Matemáticas y Modos de Fusión', description: 'Compara ambas imágenes píxel a píxel y se queda con el valor más brillante de los dos de forma no lineal.', rgb: 'max(ImagenA, ImagenB)', renderType: 'blend_lighten', sources: ['original', 'starless'], sliders: [] },
+      { id: 'blend_darken', name: 'Fusión por Oscurecido (Darken / Min)', category: 'Matemáticas y Modos de Fusión', description: 'Compara ambas imágenes píxel a píxel y se queda con el valor de menor brillo.', rgb: 'min(ImagenA, ImagenB)', renderType: 'blend_darken', sources: ['original', 'starless'], sliders: [] },
+      { id: 'blend_stars_scr', name: 'Suma de Estrellas por Pantalla', category: 'Matemáticas y Modos de Fusión', description: 'Suma estrellas a un fondo nebula usando el modo pantalla para no alterar los núcleos brillantes de las estrellas.', rgb: '~(~Starless * ~Stars)', renderType: 'blend_screen', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Intensidad de Estrellas (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_avg', name: 'Fusión por Promedio (Average)', category: 'Matemáticas y Modos de Fusión', description: 'Realiza un promedio aritmético de dos exposiciones del mismo campo para mitigar ruido.', rgb: '(ImagenA + ImagenB) / 2', renderType: 'blend_average', sources: ['original', 'starless'], sliders: [] },
 
-      // 4. Utilities & Cleaning
-      { id: 'util_invert', name: 'Invertir Imagen', category: 'Utilidades y Limpieza', description: 'Invierte de forma lineal todos los canales de la imagen (pasa de positivo a negativo).', rgb: '~ $T' },
-      { id: 'util_clip_high', name: 'Recortar Altas Luces (Clipping)', category: 'Utilidades y Limpieza', description: 'Establece un techo máximo de brillo para evitar la saturación de los núcleos estelares.', rgb: 'iif($T > 0.95, 0.95, $T)' },
-      { id: 'util_clip_low', name: 'Recortar Sombras (Clipping)', category: 'Utilidades y Limpieza', description: 'Establece un suelo mínimo de negro para evitar píxeles con valores negativos tras restas.', rgb: 'iif($T < 0.05, 0.05, $T)' },
-      { id: 'util_bg_flatten', name: 'Aplanado de Fondo (Resta Media)', category: 'Utilidades y Limpieza', description: 'Realiza un aplanado rápido del fondo restando el valor mediano general de la imagen y añadiendo un pedestal.', rgb: '$T - med($T) + 0.1' },
-      { id: 'util_hotpixel', name: 'Filtro de Píxeles Calientes', category: 'Utilidades y Limpieza', description: 'Identifica píxeles individuales sospechosos de ser píxeles calientes basándose en el promedio local y los reemplaza por la mediana.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)' },
-      { id: 'util_syn_lum', name: 'Luminancia Sintética LRGB', category: 'Utilidades y Limpieza', description: 'Genera un canal de luminancia sintético a partir de canales RGB usando coeficientes estándar de luminancia humana.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B' },
-      { id: 'util_syn_lum_eq', name: 'Luminancia Sintética Equitativa', category: 'Utilidades y Limpieza', description: 'Genera un canal de luminancia a partir de un promedio equitativo de los canales rojo, verde y azul.', rgb: '(R + G + B) / 3' },
-      { id: 'util_range_mask', name: 'Máscara de Rango rápida', category: 'Utilidades y Limpieza', description: 'Genera un mapa de contraste binario lineal restringido a un rango específico de brillo (de 0.1 a 0.8).', rgb: 'iif($T > 0.1 && $T < 0.8, ($T - 0.1)/0.7, 0)' },
-      { id: 'util_lin_fit', name: 'Ajuste Lineal de Canales (Linear Fit)', category: 'Utilidades y Limpieza', description: 'Ecuación matemática para emparejar la intensidad de un canal activo frente al promedio y desviación estándar de un canal de referencia.', rgb: '($T - Mean($T)) * (StdDev(Referencia) / StdDev($T)) + Mean(Referencia)' },
-      { id: 'util_mtf_stretch', name: 'Estirado por MTF (Midtones Transfer)', category: 'Utilidades y Limpieza', description: 'Fórmula clásica de estirado no lineal basada en el punto de tonos medios m. Permite pasar una imagen lineal a no lineal manualmente.', rgb: '($T * m) / ((m - 1) * $T + 1)' },
-      { id: 'util_star_extract', name: 'Extracción de Estrellas', category: 'Utilidades y Limpieza', description: 'Genera una capa exclusiva de estrellas restando la versión sin estrellas de la imagen original.', rgb: 'Original - Starless' }
+      // 5. Utilidades y Limpieza
+      { id: 'util_invert', name: 'Invertir Imagen', category: 'Utilidades y Limpieza', description: 'Invierte de forma lineal todos los canales de la imagen (pasa de positivo a negativo).', rgb: '~ $T', renderType: 'util_invert', sources: ['original'], sliders: [] },
+      { id: 'util_clip_high', name: 'Recortar Altas Luces (Clipping)', category: 'Utilidades y Limpieza', description: 'Establece un techo máximo de brillo para evitar la saturación de los núcleos estelares.', rgb: 'iif($T > t, t, $T)', renderType: 'util_clip_high', sources: ['original'], sliders: [{ id: 'threshold', label: 'Umbral Máximo (t)', min: 0.5, max: 1.0, step: 0.01, value: 0.95 }] },
+      { id: 'util_clip_low', name: 'Recortar Sombras (Clipping)', category: 'Utilidades y Limpieza', description: 'Establece un suelo mínimo de negro para evitar píxeles con valores negativos tras restas.', rgb: 'iif($T < t, t, $T)', renderType: 'util_clip_low', sources: ['original'], sliders: [{ id: 'threshold', label: 'Umbral Mínimo (t)', min: 0.0, max: 0.3, step: 0.01, value: 0.05 }] },
+      { id: 'util_bg_flatten', name: 'Aplanado de Fondo (Resta Media)', category: 'Utilidades y Limpieza', description: 'Realiza un aplanado rápido del fondo restando el valor mediano general de la imagen y añadiendo un pedestal.', rgb: '$T - med($T) + Pedestal', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'pedestal', label: 'Pedestal de Fondo', min: 0.0, max: 0.3, step: 0.01, value: 0.1 }] },
+      { id: 'util_hotpixel', name: 'Filtro de Píxeles Calientes', category: 'Utilidades y Limpieza', description: 'Identifica píxeles individuales sospechosos de ser píxeles calientes basándose en el promedio local y los reemplaza por la mediana.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)', renderType: 'util_hotpixel', sources: ['original'], sliders: [] },
+      { id: 'util_syn_lum', name: 'Luminancia Sintética LRGB', category: 'Utilidades y Limpieza', description: 'Genera un canal de luminancia sintético a partir de canales RGB usando coeficientes estándar de luminancia humana.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B', renderType: 'util_syn_lum', sources: ['original'], sliders: [] },
+      { id: 'util_syn_lum_eq', name: 'Luminancia Sintética Equitativa', category: 'Utilidades y Limpieza', description: 'Genera un canal de luminancia a partir de un promedio equitativo de los canales rojo, verde y azul.', rgb: '(R + G + B) / 3', renderType: 'util_syn_lum_eq', sources: ['original'], sliders: [] },
+      { id: 'util_range_mask', name: 'Máscara de Rango rápida', category: 'Utilidades y Limpieza', description: 'Genera un mapa de contraste binario lineal restringido a un rango específico de brillo (de Bajo a Alto).', rgb: 'iif($T > Bajo && $T < Alto, ($T - Bajo)/(Alto - Bajo), 0)', renderType: 'util_range_mask', sources: ['original'], sliders: [{ id: 'low', label: 'Límite Inferior (Bajo)', min: 0.0, max: 0.4, step: 0.01, value: 0.1 }, { id: 'high', label: 'Límite Superior (Alto)', min: 0.5, max: 1.0, step: 0.01, value: 0.8 }] },
+      { id: 'util_lin_fit', name: 'Ajuste Lineal de Canales (Linear Fit)', category: 'Utilidades y Limpieza', description: 'Ecuación matemática para emparejar la intensidad de un canal activo frente al promedio y desviación estándar de un canal de referencia.', rgb: '($T - Mean($T)) * (StdDev(Ref) / StdDev($T)) + Mean(Ref)', renderType: 'util_lin_fit', sources: ['original'], sliders: [] },
+      { id: 'util_mtf_stretch', name: 'Estirado por MTF (Midtones Transfer)', category: 'Utilidades y Limpieza', description: 'Fórmula clásica de estirado no lineal basada en el punto de tonos medios m. Permite pasar una imagen lineal a no lineal manualmente.', rgb: '($T * m) / ((m - 1) * $T + 1)', renderType: 'util_mtf_stretch', sources: ['original'], sliders: [{ id: 'm', label: 'Punto Medio (m)', min: 0.005, max: 0.3, step: 0.005, value: 0.05 }] },
+      { id: 'util_star_extract', name: 'Extracción de Estrellas', category: 'Utilidades y Limpieza', description: 'Genera una capa exclusiva de estrellas restando la versión sin estrellas de la imagen original.', rgb: 'Original - Starless', renderType: 'util_star_extract', sources: ['original', 'starless'], sliders: [] }
     ];
 
     // Populate database with base formulas
@@ -730,8 +766,9 @@
         r: `RGB_R + ${k.toFixed(1)} * Ha`,
         g: 'RGB_G',
         b: 'RGB_B',
-        preset: 'ha_rgb',
-        ha_rgb_factor: k
+        renderType: 'ha_rgb',
+        sources: ['original', 'ha'],
+        sliders: [{ id: 'k', label: 'Intensidad H-alpha (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -745,7 +782,10 @@
         description: `Mezcla señal de Oxígeno III en banda estrecha al canal azul de una imagen RGB para potenciar reflejos de gas cian/azul con un peso del ${i*10}%.`,
         r: 'RGB_R',
         g: 'RGB_G',
-        b: `RGB_B + ${k.toFixed(1)} * OIII`
+        b: `RGB_B + ${k.toFixed(1)} * OIII`,
+        renderType: 'oiii_blue',
+        sources: ['original', 'oiii'],
+        sliders: [{ id: 'k', label: 'Intensidad OIII (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -759,7 +799,10 @@
         description: `Mezcla señal de Oxígeno III al canal verde RGB con un peso del ${i*10}%. Útil para equilibrar los detalles verdosos de la estructura gaseosa del OIII.`,
         r: 'RGB_R',
         g: `RGB_G + ${k.toFixed(1)} * OIII`,
-        b: 'RGB_B'
+        b: 'RGB_B',
+        renderType: 'oiii_green',
+        sources: ['original', 'oiii'],
+        sliders: [{ id: 'k', label: 'Intensidad OIII (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -773,7 +816,10 @@
         description: `Mezcla señal de Azufre II (banda estrecha) en el canal rojo RGB a una intensidad del ${i*10}% para enriquecer las estructuras rojas de polvo denso.`,
         r: `RGB_R + ${k.toFixed(1)} * SII`,
         g: 'RGB_G',
-        b: 'RGB_B'
+        b: 'RGB_B',
+        renderType: 'sii_red',
+        sources: ['original', 'sii'],
+        sliders: [{ id: 'k', label: 'Intensidad SII (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -788,8 +834,9 @@
         r: `Starless + ${k.toFixed(1)} * Stars`,
         g: `Starless + ${k.toFixed(1)} * Stars`,
         b: `Starless + ${k.toFixed(1)} * Stars`,
-        preset: 'stars_add',
-        stars_add_factor: k
+        renderType: 'stars_add',
+        sources: ['starless', 'stars'],
+        sliders: [{ id: 'k', label: 'Intensidad de Estrellas (k)', min: 0, max: 1.5, step: 0.05, value: k }]
       });
     }
 
@@ -804,8 +851,9 @@
         r: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
         g: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
         b: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
-        preset: 'stars_reduce',
-        stars_reduce_factor: k
+        renderType: 'stars_reduce',
+        sources: ['original', 'starless'],
+        sliders: [{ id: 'k', label: 'Porcentaje de Estrellas (k)', min: 0, max: 1, step: 0.05, value: k }]
       });
     }
 
@@ -815,65 +863,13 @@
     // ----------------------------------------------------
     // SIMULATOR STATE & ENGINE
     // ----------------------------------------------------
-    let activePreset = 'sho';
+    let activeFormulaId = null;
     const channels = {};
     const canvas = document.getElementById('simulatorCanvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Sliders values
-    const slidersState = {
-      sho_sii_red: 0.8,
-      sho_ha_green: 1.0,
-      hoo_ha_blue: 0.15,
-      stars_add_factor: 0.8,
-      stars_reduce_factor: 0.4,
-      ha_rgb_factor: 0.6
-    };
-
-    // UI Configuration for Presets in Simulator
-    const presetsConfig = {
-      sho: {
-        title: "Paleta Hubble (SHO)",
-        sliders: [
-          { id: 'sho_sii_red', label: 'Mezcla SII / Ha en Canal Rojo', min: 0, max: 1, step: 0.05, unit: '%' },
-          { id: 'sho_ha_green', label: 'Mezcla Ha / OIII en Canal Verde', min: 0, max: 1, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R: ${s.sho_sii_red.toFixed(2)} * SII + ${(1-s.sho_sii_red).toFixed(2)} * Ha\nG: ${s.sho_ha_green.toFixed(2)} * Ha + ${(1-s.sho_ha_green).toFixed(2)} * OIII\nB: OIII`
-      },
-      hoo: {
-        title: "Paleta Bicolor (HOO)",
-        sliders: [
-          { id: 'hoo_ha_blue', label: 'Añadir Ha al Canal Azul', min: 0, max: 0.5, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R: Ha\nG: OIII\nB: ${(1-s.hoo_ha_blue).toFixed(2)} * OIII + ${s.hoo_ha_blue.toFixed(2)} * Ha`
-      },
-      foraxx: {
-        title: "Paleta Dinámica Foraxx",
-        sliders: [],
-        code: () => `R: Ha\nG: ((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII\nB: OIII`
-      },
-      stars_add: {
-        title: "Recomponer Estrellas",
-        sliders: [
-          { id: 'stars_add_factor', label: 'Intensidad de Estrellas (k)', min: 0, max: 1.5, step: 0.05, unit: '' }
-        ],
-        code: (s) => `R/G/B: Starless + ${s.stars_add_factor.toFixed(2)} * Stars`
-      },
-      stars_reduce: {
-        title: "Reducción de Estrellas",
-        sliders: [
-          { id: 'stars_reduce_factor', label: 'Porcentaje de Estrellas (k)', min: 0, max: 1, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R/G/B: Original * ${s.stars_reduce_factor.toFixed(2)} + Starless * ${(1-s.stars_reduce_factor).toFixed(2)}`
-      },
-      ha_rgb: {
-        title: "Ha-RGB",
-        sliders: [
-          { id: 'ha_rgb_factor', label: 'Intensidad H-alpha (k)', min: 0, max: 1.2, step: 0.05, unit: '' }
-        ],
-        code: (s) => `R: RGB_R + ${s.ha_rgb_factor.toFixed(2)} * Ha\nG: RGB_G\nB: RGB_B`
-      }
-    };
+    // Sliders dynamic state values (instantiated on preset load)
+    const slidersState = {};
 
     // Load monochrome channel images
     const imagesToLoad = {
@@ -906,7 +902,6 @@
           }, 300);
           
           initLibrary();
-          initSimulator();
         }
       };
       img.onerror = () => {
@@ -914,192 +909,6 @@
       };
       img.src = src;
     });
-
-    function initSimulator() {
-      const presetSelect = document.getElementById('presetSelect');
-      presetSelect.addEventListener('change', (e) => {
-        setPreset(e.target.value);
-      });
-
-      document.getElementById('copyConsoleBtn').addEventListener('click', () => {
-        const text = presetsConfig[activePreset].code(slidersState);
-        navigator.clipboard.writeText(text).then(() => {
-          const btn = document.getElementById('copyConsoleBtn');
-          btn.textContent = "¡Copiado!";
-          setTimeout(() => {
-            btn.textContent = "Copiar todo";
-          }, 1500);
-        });
-      });
-
-      setPreset('sho');
-    }
-
-    function setPreset(presetName) {
-      activePreset = presetName;
-      document.getElementById('presetSelect').value = presetName;
-      renderSliders();
-      updateConsole();
-      runSimulation();
-    }
-
-    function renderSliders() {
-      const wrapper = document.getElementById('slidersWrapper');
-      wrapper.innerHTML = '';
-      
-      const config = presetsConfig[activePreset];
-      config.sliders.forEach(slider => {
-        const value = slidersState[slider.id];
-        const controlRow = document.createElement('div');
-        controlRow.className = 'controls-group';
-        const displayVal = slider.unit === '%' ? Math.round(value * 100) + '%' : value.toFixed(2);
-
-        controlRow.innerHTML = `
-          <div class="control-label-row">
-            <span class="control-title">${slider.label}</span>
-            <span class="control-val" id="val_${slider.id}">${displayVal}</span>
-          </div>
-          <input type="range" 
-                 class="pm-slider" 
-                 id="${slider.id}" 
-                 min="${slider.min}" 
-                 max="${slider.max}" 
-                 step="${slider.step}" 
-                 value="${value}">
-        `;
-        
-        wrapper.appendChild(controlRow);
-
-        const sliderInput = controlRow.querySelector('input');
-        sliderInput.addEventListener('input', (e) => {
-          const newVal = parseFloat(e.target.value);
-          slidersState[slider.id] = newVal;
-          
-          const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
-          document.getElementById(`val_${slider.id}`).textContent = valDisplay;
-          
-          updateConsole();
-          runSimulation();
-        });
-      });
-    }
-
-    function updateConsole() {
-      const codeContainer = document.getElementById('consoleCode');
-      const text = presetsConfig[activePreset].code(slidersState);
-      
-      const lines = text.split('\n').map(line => {
-        const parts = line.split(':');
-        if (parts.length > 1) {
-          return `<div class="console-line"><span>${parts[0]}:</span>${parts[1]}</div>`;
-        }
-        return `<div class="console-line">${line}</div>`;
-      }).join('');
-
-      codeContainer.innerHTML = lines;
-    }
-
-    function runSimulation() {
-      if (!channels.ha) return;
-
-      const width = 400;
-      const height = 400;
-      const totalPixels = width * height;
-      const outputData = ctx.createImageData(width, height);
-      const out = outputData.data;
-
-      const s = slidersState;
-      const ha = channels.ha;
-      const sii = channels.sii;
-      const oiii = channels.oiii;
-      const starless = channels.starless;
-      const stars = channels.stars;
-      const original = channels.original;
-
-      if (activePreset === 'sho') {
-        const sii_red = s.sho_sii_red;
-        const ha_green = s.sho_ha_green;
-        
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i];
-          const s_val = sii[i];
-          const o_val = oiii[i];
-
-          out[i]     = s_val * sii_red + h_val * (1 - sii_red);
-          out[i + 1] = h_val * ha_green + o_val * (1 - ha_green);
-          out[i + 2] = o_val;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'hoo') {
-        const ha_blue = s.hoo_ha_blue;
-        
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i];
-          const o_val = oiii[i];
-
-          out[i]     = h_val;
-          out[i + 1] = o_val;
-          out[i + 2] = o_val * (1 - ha_blue) + h_val * ha_blue;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'foraxx') {
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i] / 255;
-          const o_val = oiii[i] / 255;
-
-          const product = h_val * o_val;
-          const inv_product = 1.0 - product;
-          const mix = Math.pow(product, inv_product);
-
-          const r_val = h_val;
-          const g_val = mix * h_val + (1.0 - mix) * o_val;
-          const b_val = o_val;
-
-          out[i]     = Math.min(255, Math.max(0, r_val * 255));
-          out[i + 1] = Math.min(255, Math.max(0, g_val * 255 * 1.05));
-          out[i + 2] = Math.min(255, Math.max(0, b_val * 255));
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'stars_add') {
-        const factor = s.stars_add_factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = Math.min(255, starless[i] + stars[i] * factor);
-          out[i + 1] = Math.min(255, starless[i + 1] + stars[i + 1] * factor);
-          out[i + 2] = Math.min(255, starless[i + 2] + stars[i + 2] * factor);
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'stars_reduce') {
-        const factor = s.stars_reduce_factor;
-        const inv_factor = 1.0 - factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = original[i] * factor + starless[i] * inv_factor;
-          out[i + 1] = original[i + 1] * factor + starless[i + 1] * inv_factor;
-          out[i + 2] = original[i + 2] * factor + starless[i + 2] * inv_factor;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'ha_rgb') {
-        const factor = s.ha_rgb_factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = Math.min(255, original[i] + ha[i] * factor);
-          out[i + 1] = original[i + 1];
-          out[i + 2] = original[i + 2];
-          out[i + 3] = 255;
-        }
-      }
-
-      ctx.putImageData(outputData, 0, 0);
-    }
-
-    // ----------------------------------------------------
-    // LIBRARY MASTER-DETAIL ENGINE
-    // ----------------------------------------------------
-    let activeFormulaId = null;
-    let filteredFormulas = [...formulasDb];
 
     function initLibrary() {
       const searchInput = document.getElementById('librarySearchInput');
@@ -1116,12 +925,30 @@
         filterLibrary(e.target.value);
       });
 
+      // Set copy button listener for the simulator console
+      document.getElementById('copyConsoleBtn').addEventListener('click', () => {
+        const formula = formulasDb.find(f => f.id === activeFormulaId);
+        if (!formula) return;
+        const text = getGeneratedConsoleCode(formula);
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('copyConsoleBtn');
+          btn.textContent = "¡Copiado!";
+          setTimeout(() => {
+            btn.textContent = "Copiar todo";
+          }, 1500);
+        });
+      });
+
       // Load initial layout
       renderLibraryList();
       if (formulasDb.length > 0) {
-        selectFormula(formulasDb[0].id);
+        // Initially load "Paleta Hubble (SHO) - Clásica"
+        const shoClassic = formulasDb.find(f => f.id === 'sho_hub') || formulasDb[0];
+        selectFormula(shoClassic.id);
       }
     }
+
+    let filteredFormulas = [...formulasDb];
 
     function filterLibrary(query) {
       const cleanQuery = query.toLowerCase().trim();
@@ -1136,7 +963,6 @@
       }
       renderLibraryList();
       
-      // Auto select first match if active selection disappeared
       if (filteredFormulas.length > 0) {
         const stillExists = filteredFormulas.some(f => f.id === activeFormulaId);
         if (!stillExists) {
@@ -1146,7 +972,6 @@
         renderEmptyDetails();
       }
     }
-
     function renderLibraryList() {
       const container = document.getElementById('formulaMasterPanel');
       container.innerHTML = '';
@@ -1160,30 +985,93 @@
         return;
       }
 
-      filteredFormulas.forEach(formula => {
-        const item = document.createElement('button');
-        item.className = `formula-list-item ${formula.id === activeFormulaId ? 'active' : ''}`;
-        item.innerHTML = `
-          <span class="formula-list-item-category">${formula.category}</span>
-          <span class="formula-list-item-title">${formula.name}</span>
-        `;
-        item.addEventListener('click', () => selectFormula(formula.id));
-        container.appendChild(item);
+      // Group filtered formulas by category
+      const groups = {};
+      filteredFormulas.forEach(f => {
+        if (!groups[f.category]) groups[f.category] = [];
+        groups[f.category].push(f);
+      });
+
+      const categoryOrder = [
+        'Paleta Banda Estrecha',
+        'Combinación LRGB / Banda Estrecha',
+        'Operaciones con Estrellas',
+        'Máscaras de Color',
+        'Matemáticas y Modos de Fusión',
+        'Utilidades y Limpieza'
+      ];
+
+      // Helper function to render a single group
+      function renderGroup(categoryName, items) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'category-group';
+        
+        const header = document.createElement('div');
+        header.className = 'category-group-header';
+        header.textContent = categoryName;
+        groupDiv.appendChild(header);
+        
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'category-group-items';
+        
+        items.forEach(formula => {
+          const button = document.createElement('button');
+          button.className = `formula-list-item ${formula.id === activeFormulaId ? 'active' : ''}`;
+          button.setAttribute('data-id', formula.id);
+          button.innerHTML = `
+            <span class="formula-list-item-title">${formula.name}</span>
+          `;
+          button.addEventListener('click', () => selectFormula(formula.id));
+          itemsContainer.appendChild(button);
+        });
+        
+        groupDiv.appendChild(itemsContainer);
+        container.appendChild(groupDiv);
+      }
+
+      // Render group headers and items in fixed order
+      categoryOrder.forEach(categoryName => {
+        const items = groups[categoryName];
+        if (items && items.length > 0) {
+          renderGroup(categoryName, items);
+        }
+      });
+
+      // Render any remaining categories not listed in categoryOrder
+      Object.entries(groups).forEach(([categoryName, items]) => {
+        if (!categoryOrder.includes(categoryName) && items && items.length > 0) {
+          renderGroup(categoryName, items);
+        }
       });
     }
 
     function selectFormula(id) {
       activeFormulaId = id;
       
-      // Update active state in master list
+      // Update active state in master list using data-id attribute
       document.querySelectorAll('.formula-list-item').forEach(item => {
-        item.classList.remove('active');
+        if (item.getAttribute('data-id') === id) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
       });
-      // Find list items and highlight the selected one
-      const listItems = document.getElementById('formulaMasterPanel').children;
-      const index = filteredFormulas.findIndex(f => f.id === id);
-      if (index !== -1 && listItems[index]) {
-        listItems[index].classList.add('active');
+
+      const formula = formulasDb.find(f => f.id === id);
+      if (formula) {
+        document.getElementById('activeFormulaTitle').textContent = formula.name;
+        
+        // Initialize dynamic sliders values in state
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            slidersState[slider.id] = slider.value;
+          });
+        }
+        
+        renderSliders(formula);
+        renderInputPreviews(formula.sources);
+        updateConsole(formula);
+        runSimulation();
       }
 
       renderDetails();
@@ -1208,7 +1096,6 @@
         return;
       }
 
-      // Generate code HTML
       let codeLines = "";
       if (formula.rgb) {
         codeLines = `<div class="detail-code-line"><strong>RGB:</strong> ${formula.rgb}</div>`;
@@ -1235,8 +1122,8 @@
         
         <div class="detail-actions">
           <button class="btn-action" id="btnCopyDetails">Copiar Fórmula</button>
-          <button class="btn-action btn-primary-action" id="btnLoadDetails" ${formula.preset ? '' : 'disabled'}>
-            ${formula.preset ? 'Cargar en Simulador' : 'No simulable'}
+          <button class="btn-action btn-primary-action" id="btnLoadDetails">
+            Cargar en Simulador
           </button>
         </div>
       `;
@@ -1264,32 +1151,531 @@
       });
 
       // Load preset in simulator event
-      if (formula.preset) {
-        document.getElementById('btnLoadDetails').addEventListener('click', () => {
-          // Adjust state sliders if the loaded formula has specific values
-          if (formula.sho_sii_red !== undefined) slidersState.sho_sii_red = formula.sho_sii_red;
-          if (formula.sho_ha_green !== undefined) slidersState.sho_ha_green = formula.sho_ha_green;
-          if (formula.hoo_ha_blue !== undefined) slidersState.hoo_ha_blue = formula.hoo_ha_blue;
-          if (formula.stars_add_factor !== undefined) slidersState.stars_add_factor = formula.stars_add_factor;
-          if (formula.stars_reduce_factor !== undefined) slidersState.stars_reduce_factor = formula.stars_reduce_factor;
-          if (formula.ha_rgb_factor !== undefined) slidersState.ha_rgb_factor = formula.ha_rgb_factor;
+      document.getElementById('btnLoadDetails').addEventListener('click', () => {
+        selectFormula(formula.id);
+        if (window.innerWidth < 992) {
+          document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
 
-          setPreset(formula.preset);
+    // Render sliders dynamically based on formula setup
+    function renderSliders(formula) {
+      const wrapper = document.getElementById('slidersWrapper');
+      wrapper.innerHTML = '';
+      
+      if (!formula.sliders || formula.sliders.length === 0) {
+        return;
+      }
+      
+      formula.sliders.forEach(slider => {
+        const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+        const controlRow = document.createElement('div');
+        controlRow.className = 'controls-group';
+        const displayVal = slider.unit === '%' ? Math.round(val * 100) + '%' : val.toFixed(2);
 
-          // Smooth scroll to simulator on mobile
-          if (window.innerWidth < 992) {
-            document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
-          }
+        controlRow.innerHTML = `
+          <div class="control-label-row">
+            <span class="control-title">${slider.label}</span>
+            <span class="control-val" id="val_${slider.id}">${displayVal}</span>
+          </div>
+          <input type="range" 
+                 class="pm-slider" 
+                 id="slider_${slider.id}" 
+                 min="${slider.min}" 
+                 max="${slider.max}" 
+                 step="${slider.step}" 
+                 value="${val}">
+        `;
+        
+        wrapper.appendChild(controlRow);
+
+        const sliderInput = controlRow.querySelector('input');
+        sliderInput.addEventListener('input', (e) => {
+          const newVal = parseFloat(e.target.value);
+          slidersState[slider.id] = newVal;
+          
+          const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
+          document.getElementById(`val_${slider.id}`).textContent = valDisplay;
+          
+          updateConsole(formula);
+          runSimulation();
         });
+      });
+    }
+
+    function drawChannelToCanvas(channelKey, canvasEl) {
+      const ctx = canvasEl.getContext('2d');
+      const width = canvasEl.width;
+      const height = canvasEl.height;
+      const imgData = ctx.createImageData(width, height);
+      const out = imgData.data;
+      const src = channels[channelKey];
+      
+      if (!src) return;
+      
+      const scaleX = 400 / width;
+      const scaleY = 400 / height;
+      
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const srcX = Math.floor(x * scaleX);
+          const srcY = Math.floor(y * scaleY);
+          const srcIdx = (srcY * 400 + srcX) * 4;
+          const dstIdx = (y * width + x) * 4;
+          
+          out[dstIdx]     = src[srcIdx];
+          out[dstIdx + 1] = src[srcIdx + 1];
+          out[dstIdx + 2] = src[srcIdx + 2];
+          out[dstIdx + 3] = src[srcIdx + 3];
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    function renderInputPreviews(sourceKeys) {
+      const grid = document.getElementById('inputsPreviewGrid');
+      const inputsArea = document.getElementById('inputsArea');
+      grid.innerHTML = '';
+      
+      if (!sourceKeys || sourceKeys.length === 0) {
+        inputsArea.style.display = 'none';
+        return;
+      }
+      
+      inputsArea.style.display = 'block';
+      
+      sourceKeys.forEach(key => {
+        const box = document.createElement('div');
+        box.className = 'input-box';
+        
+        const canvasEl = document.createElement('canvas');
+        canvasEl.className = 'input-canvas';
+        canvasEl.width = 120;
+        canvasEl.height = 120;
+        
+        const label = document.createElement('span');
+        label.className = 'input-label';
+        
+        const labelsMap = {
+          ha: 'H-alpha',
+          sii: 'SII',
+          oiii: 'OIII',
+          starless: 'Sin Estrellas',
+          stars: 'Estrellas',
+          original: 'Imagen Original'
+        };
+        
+        label.textContent = labelsMap[key] || key;
+        
+        box.appendChild(canvasEl);
+        box.appendChild(label);
+        grid.appendChild(box);
+        
+        drawChannelToCanvas(key, canvasEl);
+      });
+    }
+
+    // Dynamic equation text resolver based on sliders
+    function getGeneratedConsoleCode(formula) {
+      if (formula.rgb) {
+        let code = formula.rgb;
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+            code = code.replace(new RegExp(`\\b${slider.id}\\b|\\bUmbral\\b|\\bPedestal\\b|\\bBajo\\b|\\bAlto\\b|\\bm\\b`, 'g'), val.toFixed(2));
+          });
+        }
+        return `RGB: ${code}`;
+      } else {
+        let r = formula.r;
+        let g = formula.g;
+        let b = formula.b;
+        
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+            const rep = val.toFixed(2);
+            // Replace standalone variables
+            r = r.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+            g = g.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+            b = b.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+          });
+        }
+        return `R: ${r}\nG: ${g}\nB: ${b}`;
       }
     }
 
-    // Toggle Night Vision
-    const nightmodeToggle = document.getElementById('nightmode-toggle');
-    nightmodeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('night-vision');
-      const isNight = document.body.classList.contains('night-vision');
-      localStorage.setItem('night-vision', isNight ? 'enabled' : 'disabled');
+    function updateConsole(formula) {
+      const codeContainer = document.getElementById('consoleCode');
+      const text = getGeneratedConsoleCode(formula);
+      
+      const lines = text.split('\n').map(line => {
+        const parts = line.split(':');
+        if (parts.length > 1) {
+          return `<div class="console-line"><span>${parts[0]}:</span>${parts[1]}</div>`;
+        }
+        return `<div class="console-line">${line}</div>`;
+      }).join('');
+
+      codeContainer.innerHTML = lines;
+    }
+
+    // Pixel Processing engine
+    function runSimulation() {
+      if (!channels.ha || !activeFormulaId) return;
+
+      const width = 400;
+      const height = 400;
+      const totalPixels = width * height;
+      const outputData = ctx.createImageData(width, height);
+      const out = outputData.data;
+
+      const formula = formulasDb.find(f => f.id === activeFormulaId);
+      if (!formula) return;
+
+      const imgA = formula.sources && formula.sources[0] ? channels[formula.sources[0]] : null;
+      const imgB = formula.sources && formula.sources[1] ? channels[formula.sources[1]] : null;
+
+      // Extract current slider values
+      const s = {};
+      if (formula.sliders) {
+        formula.sliders.forEach(slider => {
+          s[slider.id] = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+        });
+      }
+
+      const type = formula.renderType;
+
+      if (type === 'narrowband_blend') {
+        const rChan = channels[formula.r_chan];
+        const gChan = channels[formula.g_chan];
+        const bChan = channels[formula.b_chan];
+        
+        const k_r = s.k_r !== undefined ? s.k_r : (s.k_sii !== undefined ? s.k_sii : 1.0);
+        const k_g = s.k_g !== undefined ? s.k_g : (s.k_ha !== undefined ? s.k_ha : 1.0);
+        const k_b = s.k_b !== undefined ? s.k_b : (s.k_blue !== undefined ? s.k_blue : 0.0);
+        
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_val = rChan[i];
+          const g_val = gChan[i];
+          const b_val = bChan[i];
+
+          out[i]     = r_val * k_r + g_val * (1.0 - k_r);
+          out[i + 1] = g_val * k_g + b_val * (1.0 - k_g);
+          out[i + 2] = b_val * (1.0 - k_b) + r_val * k_b;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'foraxx') {
+        const haChan = channels['ha'];
+        const oiiiChan = channels['oiii'];
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const h_val = haChan[i] / 255;
+          const o_val = oiiiChan[i] / 255;
+
+          const product = h_val * o_val;
+          const inv_product = 1.0 - product;
+          const mix = Math.pow(product, inv_product);
+
+          const r_val = h_val;
+          const g_val = mix * h_val + (1.0 - mix) * o_val;
+          const b_val = o_val;
+
+          out[i]     = Math.min(255, Math.max(0, r_val * 255));
+          out[i + 1] = Math.min(255, Math.max(0, g_val * 255 * 1.05));
+          out[i + 2] = Math.min(255, Math.max(0, b_val * 255));
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'stars_add') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = Math.min(255, imgA[i + 1] + imgB[i + 1] * k);
+          out[i + 2] = Math.min(255, imgA[i + 2] + imgB[i + 2] * k);
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'stars_reduce') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        const inv_k = 1.0 - k;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] * k + imgB[i] * inv_k;
+          out[i + 1] = imgA[i + 1] * k + imgB[i + 1] * inv_k;
+          out[i + 2] = imgA[i + 2] * k + imgB[i + 2] * inv_k;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'ha_rgb') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'oiii_blue') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i];
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = Math.min(255, imgA[i + 2] + imgB[i] * k);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'oiii_green') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i];
+          out[i + 1] = Math.min(255, imgA[i + 1] + imgB[i] * k);
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'sii_red') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_screen') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = imgA[i] + imgB[i] - (imgA[i] * imgB[i] / 255);
+          const g_blend = imgA[i + 1] + imgB[i + 1] - (imgA[i + 1] * imgB[i + 1] / 255);
+          const b_blend = imgA[i + 2] + imgB[i + 2] - (imgA[i + 2] * imgB[i + 2] / 255);
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_mult') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = (imgA[i] * imgB[i]) / 255;
+          const g_blend = (imgA[i + 1] * imgB[i + 1]) / 255;
+          const b_blend = (imgA[i + 2] * imgB[i + 2]) / 255;
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_overlay') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = imgA[i] < 128 ? (2 * imgA[i] * imgB[i]) / 255 : 255 - 2 * (255 - imgA[i]) * (255 - imgB[i]) / 255;
+          const g_blend = imgA[i + 1] < 128 ? (2 * imgA[i + 1] * imgB[i + 1]) / 255 : 255 - 2 * (255 - imgA[i + 1]) * (255 - imgB[i + 1]) / 255;
+          const b_blend = imgA[i + 2] < 128 ? (2 * imgA[i + 2] * imgB[i + 2]) / 255 : 255 - 2 * (255 - imgA[i + 2]) * (255 - imgB[i + 2]) / 255;
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_diff') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = Math.abs(imgA[i] - imgB[i]);
+          const g_blend = Math.abs(imgA[i + 1] - imgB[i + 1]);
+          const b_blend = Math.abs(imgA[i + 2] - imgB[i + 2]);
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_lighten') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(imgA[i], imgB[i]);
+          out[i + 1] = Math.max(imgA[i + 1], imgB[i + 1]);
+          out[i + 2] = Math.max(imgA[i + 2], imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_darken') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(imgA[i], imgB[i]);
+          out[i + 1] = Math.min(imgA[i + 1], imgB[i + 1]);
+          out[i + 2] = Math.min(imgA[i + 2], imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_average') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = (imgA[i] + imgB[i]) / 2;
+          out[i + 1] = (imgA[i + 1] + imgB[i + 1]) / 2;
+          out[i + 2] = (imgA[i + 2] + imgB[i + 2]) / 2;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'mask_color') {
+        const maskColor = formula.id.includes('red') ? 'r' : formula.id.includes('green') ? 'g' : formula.id.includes('blue') ? 'b' : formula.id.includes('cyan') ? 'c' : formula.id.includes('magenta') ? 'm' : 'y';
+        const v2 = formula.id.includes('v2');
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r = imgA[i];
+          const g = imgA[i + 1];
+          const b = imgA[i + 2];
+          let val = 0;
+          if (!v2) {
+            if (maskColor === 'r') val = r - Math.max(g, b);
+            else if (maskColor === 'g') val = g - Math.max(r, b);
+            else if (maskColor === 'b') val = b - Math.max(r, g);
+            else if (maskColor === 'c') val = Math.min(g, b) - r;
+            else if (maskColor === 'm') val = Math.min(r, b) - g;
+            else if (maskColor === 'y') val = Math.min(r, g) - b;
+          } else {
+            if (maskColor === 'r') val = r > g && r > b ? r - Math.max(g, b) : 0;
+            else if (maskColor === 'g') val = g > r && g > b ? g - Math.max(r, b) : 0;
+            else if (maskColor === 'b') val = b > r && b > g ? b - Math.max(r, g) : 0;
+            else if (maskColor === 'c') val = g > r && b > r ? Math.min(g, b) - r : 0;
+            else if (maskColor === 'm') val = r > g && b > g ? Math.min(r, b) - g : 0;
+            else if (maskColor === 'y') val = r > b && g > b ? Math.min(r, g) - b : 0;
+          }
+          val = Math.max(0, val);
+          out[i]     = val;
+          out[i + 1] = val;
+          out[i + 2] = val;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_invert') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = 255 - imgA[i];
+          out[i + 1] = 255 - imgA[i + 1];
+          out[i + 2] = 255 - imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_clip_high') {
+        const threshold = s.threshold !== undefined ? s.threshold : 0.95;
+        const t_val = threshold * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] > t_val ? t_val : imgA[i];
+          out[i + 1] = imgA[i + 1] > t_val ? t_val : imgA[i + 1];
+          out[i + 2] = imgA[i + 2] > t_val ? t_val : imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_clip_low') {
+        const threshold = s.threshold !== undefined ? s.threshold : 0.05;
+        const t_val = threshold * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] < t_val ? t_val : imgA[i];
+          out[i + 1] = imgA[i + 1] < t_val ? t_val : imgA[i + 1];
+          out[i + 2] = imgA[i + 2] < t_val ? t_val : imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_bg_flatten') {
+        const pedestal = s.pedestal !== undefined ? s.pedestal : 0.1;
+        const p_val = pedestal * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(0, Math.min(255, imgA[i] - 30 + p_val));
+          out[i + 1] = Math.max(0, Math.min(255, imgA[i + 1] - 30 + p_val));
+          out[i + 2] = Math.max(0, Math.min(255, imgA[i + 2] - 30 + p_val));
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_hotpixel') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          if (imgA[i] > 230 && imgA[i + 1] < 100) {
+            out[i]     = 30;
+            out[i + 1] = 30;
+            out[i + 2] = 30;
+          } else {
+            out[i]     = imgA[i];
+            out[i + 1] = imgA[i + 1];
+            out[i + 2] = imgA[i + 2];
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_syn_lum') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const l = 0.2126 * imgA[i] + 0.7152 * imgA[i + 1] + 0.0722 * imgA[i + 2];
+          out[i]     = l;
+          out[i + 1] = l;
+          out[i + 2] = l;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_syn_lum_eq') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const l = (imgA[i] + imgA[i + 1] + imgA[i + 2]) / 3;
+          out[i]     = l;
+          out[i + 1] = l;
+          out[i + 2] = l;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_range_mask') {
+        const low = s.low !== undefined ? s.low : 0.1;
+        const high = s.high !== undefined ? s.high : 0.8;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const val = (imgA[i] + imgA[i + 1] + imgA[i + 2]) / (3 * 255);
+          let out_val = 0;
+          if (val > low && val < high) {
+            out_val = (val - low) / (high - low);
+          }
+          out[i]     = out_val * 255;
+          out[i + 1] = out_val * 255;
+          out[i + 2] = out_val * 255;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_lin_fit') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i + 1] * 0.95 + imgA[i] * 0.05;
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 1] * 1.02 + imgA[i + 2] * 0.02;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_mtf_stretch') {
+        const m = s.m !== undefined ? s.m : 0.05;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const val_r = imgA[i] / 255;
+          const val_g = imgA[i + 1] / 255;
+          const val_b = imgA[i + 2] / 255;
+          
+          const out_r = (val_r * m) / ((m - 1) * val_r + 1);
+          const out_g = (val_g * m) / ((m - 1) * val_g + 1);
+          const out_b = (val_b * m) / ((m - 1) * val_b + 1);
+          
+          out[i]     = out_r * 255;
+          out[i + 1] = out_g * 255;
+          out[i + 2] = out_b * 255;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_star_extract') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(0, imgA[i] - imgB[i]);
+          out[i + 1] = Math.max(0, imgA[i + 1] - imgB[i + 1]);
+          out[i + 2] = Math.max(0, imgA[i + 2] - imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+
+      ctx.putImageData(outputData, 0, 0);
+    }
+
+    // Set page interactive events
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Night Vision
+      const nightmodeToggle = document.getElementById('nightmode-toggle');
+      nightmodeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('night-vision');
+        const isNight = document.body.classList.contains('night-vision');
+        localStorage.setItem('night-vision', isNight ? 'enabled' : 'disabled');
+      });
     });
   </script>
 </body>

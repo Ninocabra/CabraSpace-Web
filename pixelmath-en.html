@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PixelMath-teca - CabraSpace</title>
-  <meta name="description" content="Interactive library of over 100 PixelMath formulas for PixInsight and real-time simulator. Master your astrophotography processing.">
+  <meta name="description" content="Interactive library of over 100 PixelMath formulas for PixInsight and real-time simulator with entry channels.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
-    /* Specific styles for PixelMath-teca */
+    /* Specific styles for the PixelMath-teca */
     .pixelmath-header {
       padding-top: 150px;
       padding-bottom: 36px;
@@ -69,7 +69,6 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       overflow: hidden;
-      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -110,17 +109,73 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Previews of channels and input sources */
+    .inputs-area {
+      background: rgba(2, 2, 2, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .inputs-title {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .inputs-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      justify-items: center;
+      align-items: center;
+    }
+
+    .input-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .input-canvas {
+      width: 100%;
+      max-width: 120px;
+      aspect-ratio: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #000;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .input-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 110px;
+    }
+
     /* Controls and Sliders */
     .controls-group {
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .control-label-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.8rem;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
       color: var(--text-secondary);
     }
 
@@ -142,45 +197,24 @@
       border-radius: 2px;
       background: var(--border-color);
       outline: none;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
       transition: background 0.3s;
     }
 
     .pm-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: var(--gold-primary);
       cursor: pointer;
-      box-shadow: 0 0 8px var(--gold-glow);
+      box-shadow: 0 0 6px var(--gold-glow);
       transition: transform 0.1s;
     }
 
     .pm-slider::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-    }
-
-    .preset-select-wrapper {
-      margin-bottom: 20px;
-    }
-
-    .preset-dropdown {
-      width: 100%;
-      background: #020202;
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 12px;
-      border-radius: 4px;
-      font-size: 0.88rem;
-      outline: none;
-      cursor: pointer;
-      font-family: var(--font-sans);
-    }
-
-    .preset-dropdown:focus {
-      border-color: var(--gold-primary);
     }
 
     /* PixelMath Console */
@@ -266,20 +300,20 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
-      min-height: 520px;
+      min-height: 540px;
     }
 
     @media (min-width: 768px) {
       .library-master-detail {
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 290px 1fr;
       }
     }
 
-    /* Master Panel (formula list) */
+    /* Master Panel (formula list with scroll) */
     .formula-master-panel {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       max-height: 580px;
       overflow-y: auto;
       padding-right: 8px;
@@ -307,17 +341,32 @@
       background: var(--gold-border);
     }
 
+    .category-group-header {
+      font-size: 0.68rem;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      border-left: 2px solid var(--gold-primary);
+      padding-left: 8px;
+      margin-bottom: 10px;
+      margin-top: 6px;
+    }
+
+    .category-group-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
     .formula-list-item {
       background: #020202;
       border: 1px solid var(--border-color);
-      padding: 12px 14px;
+      padding: 10px 12px;
       border-radius: 4px;
       cursor: pointer;
       transition: var(--transition-smooth);
       text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
     }
 
     .formula-list-item:hover {
@@ -331,21 +380,15 @@
     }
 
     .formula-list-item-title {
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: 0.78rem;
+      font-weight: 400;
       color: var(--text-primary);
       line-height: 1.3;
+      display: block;
     }
 
     .formula-list-item.active .formula-list-item-title {
       color: var(--gold-primary);
-    }
-
-    .formula-list-item-category {
-      font-size: 0.62rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       font-weight: 500;
     }
 
@@ -478,19 +521,6 @@
       color: var(--bg-color);
       box-shadow: 0 0 10px var(--gold-glow);
     }
-
-    .btn-action:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      border-color: var(--border-color);
-      color: var(--text-muted);
-    }
-    
-    .btn-action:disabled:hover {
-      background: transparent;
-      color: var(--text-muted);
-      box-shadow: none;
-    }
   </style>
 </head>
 <body>
@@ -572,24 +602,29 @@
     <div class="pm-grid">
       <!-- Simulator Column (Sticky) -->
       <aside class="simulator-card">
-        <div class="canvas-wrapper">
-          <div class="canvas-loader" id="canvasLoader">
-            <div class="spinner"></div>
-            <span>Loading nebula channels...</span>
-          </div>
-          <canvas id="simulatorCanvas" width="400" height="400"></canvas>
+        <!-- Active Formula Title -->
+        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+          <label style="display:block; margin-bottom:4px; font-size:0.62rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Active Formula in Simulator</label>
+          <h3 id="activeFormulaTitle" style="font-family:var(--font-display); font-size:1.1rem; color:var(--gold-primary); margin:0; font-weight:500;">Loading...</h3>
         </div>
 
-        <div class="preset-select-wrapper">
-          <label for="presetSelect" style="display:block; margin-bottom:8px; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Choose Preset Formula</label>
-          <select id="presetSelect" class="preset-dropdown">
-            <option value="sho">Hubble Palette (SHO)</option>
-            <option value="hoo">Bicolor Palette (HOO)</option>
-            <option value="foraxx">Dynamic Foraxx Palette</option>
-            <option value="stars_add">Recompose Stars (Starless + Stars)</option>
-            <option value="stars_reduce">Star Reduction (Blending)</option>
-            <option value="ha_rgb">Add H-alpha to Red Channel (Ha-RGB)</option>
-          </select>
+        <!-- Input Images -->
+        <div id="inputsArea" class="inputs-area" style="display:none;">
+          <div class="inputs-title">Input Images</div>
+          <div id="inputsPreviewGrid" class="inputs-preview-grid">
+            <!-- Entry canvases dynamically injected -->
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div class="inputs-title">Formula Result</div>
+          <div class="canvas-wrapper" style="margin-bottom:0;">
+            <div class="canvas-loader" id="canvasLoader">
+              <div class="spinner"></div>
+              <span>Loading nebula channels...</span>
+            </div>
+            <canvas id="simulatorCanvas" width="400" height="400"></canvas>
+          </div>
         </div>
 
         <!-- Dynamic Sliders -->
@@ -597,7 +632,7 @@
           <!-- Injected dynamically via JS -->
         </div>
 
-        <!-- Console showing the resulting formulas -->
+        <!-- Console with resulting formula -->
         <div class="pm-console">
           <div class="console-header">
             <span>PixelMath Expressions</span>
@@ -613,7 +648,7 @@
       <section class="library-card">
         <!-- Search bar -->
         <div class="library-search-wrapper">
-          <input type="text" id="librarySearchInput" placeholder="Search over 100 formulas by name, category, or description (press '/' to focus)...">
+          <input type="text" id="librarySearchInput" placeholder="Search over 100 formulas by name or description (press '/' to focus)...">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
 
@@ -649,89 +684,90 @@
     // Base Formulas
     const baseFormulas = [
       // 1. Narrowband Palettes
-      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', description: 'Maps Sulfur (SII) to Red, Hydrogen (Ha) to Green, and Oxygen (OIII) to Blue. The classic color palette popularized by the Hubble Space Telescope (HST). Produces rich golden and blue hues.', r: 'SII', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 1.0 },
-      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', description: 'Combines channels by mapping Hydrogen to the Red channel and Oxygen to the Green and Blue channels. Ideal for producing colors closest to optical visual reality in emission nebulae.', r: 'Ha', g: 'OIII', b: 'OIII', preset: 'hoo', hoo_ha_blue: 0.0 },
-      { id: 'foraxx_dyn', name: 'Dynamic Foraxx Palette', category: 'Narrowband Palette', description: 'Formula by Paul Forstmann that performs a dynamic non-linear green channel mix based on the relative signal strength of Ha and OIII. Offers very smooth color transitions.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', preset: 'foraxx' },
-      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', description: 'Narrowband mapping variant that maps Hydrogen to Red, Sulfur to Green, and Oxygen to Blue.', r: 'Ha', g: 'SII', b: 'OIII' },
-      { id: 'soo_std', name: 'SOO Palette', category: 'Narrowband Palette', description: 'Bicolor variant mapping Sulfur to Red and Oxygen to Green and Blue.', r: 'SII', g: 'OIII', b: 'OIII' },
-      { id: 'soh_std', name: 'SOH Palette', category: 'Narrowband Palette', description: 'Mapping variant that maps Sulfur to Red, Oxygen to Green, and Hydrogen to Blue.', r: 'SII', g: 'OIII', b: 'Ha' },
-      { id: 'hos_std', name: 'HOS Palette', category: 'Narrowband Palette', description: 'Maps Hydrogen to Red, Oxygen to Green, and Sulfur to Blue.', r: 'Ha', g: 'OIII', b: 'SII' },
-      { id: 'ohs_std', name: 'OHS Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Hydrogen to Green, and Sulfur to Blue.', r: 'OIII', g: 'Ha', b: 'SII' },
-      { id: 'osh_std', name: 'OSH Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Sulfur to Green, and Hydrogen to Blue.', r: 'OIII', g: 'SII', b: 'Ha' },
+      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', description: 'Maps Sulfur (SII) to Red, Hydrogen (Ha) to Green, and Oxygen (OIII) to Blue. The classic color palette popularized by the Hubble Space Telescope (HST). Produces rich golden and blue hues.', r: 'SII', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', description: 'Combines channels by mapping Hydrogen to the Red channel and Oxygen to the Green and Blue channels. Ideal for producing colors closest to optical visual reality in emission nebulae.', r: 'Ha', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'oiii', sources: ['ha', 'oiii'], sliders: [{ id: 'k_b', label: 'Ha / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'foraxx_dyn', name: 'Dynamic Foraxx Palette', category: 'Narrowband Palette', description: 'Formula by Paul Forstmann that performs a dynamic non-linear green channel mix based on the relative signal strength of Ha and OIII. Offers very smooth color transitions.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', renderType: 'foraxx', sources: ['ha', 'oiii'], sliders: [] },
+      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', description: 'Narrowband mapping variant that maps Hydrogen to Red, Sulfur to Green, and Oxygen to Blue.', r: 'Ha', g: 'SII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'sii', b_chan: 'oiii', sources: ['ha', 'sii', 'oiii'], sliders: [{ id: 'k_g', label: 'SII / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'soo_std', name: 'SOO Palette', category: 'Narrowband Palette', description: 'Bicolor variant mapping Sulfur to Red and Oxygen to Green and Blue.', r: 'SII', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'oiii', sources: ['sii', 'oiii'], sliders: [{ id: 'k_b', label: 'SII / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'soh_std', name: 'SOH Palette', category: 'Narrowband Palette', description: 'Mapping variant that maps Sulfur to Red, Oxygen to Green, and Hydrogen to Blue.', r: 'SII', g: 'OIII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'ha', sources: ['sii', 'oiii', 'ha'], sliders: [{ id: 'k_g', label: 'OIII / Ha Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hos_std', name: 'HOS Palette', category: 'Narrowband Palette', description: 'Maps Hydrogen to Red, Oxygen to Green, and Sulfur to Blue.', r: 'Ha', g: 'OIII', b: 'SII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'sii', sources: ['ha', 'oiii', 'sii'], sliders: [{ id: 'k_g', label: 'OIII / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'ohs_std', name: 'OHS Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Hydrogen to Green, and Sulfur to Blue.', r: 'OIII', g: 'Ha', b: 'SII', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'ha', b_chan: 'sii', sources: ['oiii', 'ha', 'sii'], sliders: [{ id: 'k_g', label: 'Ha / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'osh_std', name: 'OSH Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Sulfur to Green, and Hydrogen to Blue.', r: 'OIII', g: 'SII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'sii', b_chan: 'ha', sources: ['oiii', 'sii', 'ha'], sliders: [{ id: 'k_g', label: 'SII / Ha Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       
       // SHO Custom Star Blends
-      { id: 'sho_star_mix_82', name: 'Natural Stars SHO Mix V1', category: 'Narrowband Palette', description: 'Adds 20% H-alpha into the Red channel to reduce the typical magenta hue of stars in pure SHO and soften color transitions.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.8, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_73', name: 'Natural Stars SHO Mix V2', category: 'Narrowband Palette', description: 'Maps 70% Sulfur and 30% Hydrogen to the Red channel. Considerably mitigates the magenta star cast during processing.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.7, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_64', name: 'Natural Stars SHO Mix V3', category: 'Narrowband Palette', description: 'A balanced 60/40 mix in the red channel. Helps to tone down the sulfur channel if it has a low signal compared to hydrogen.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.6, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_55', name: 'Natural Stars SHO Mix V4', category: 'Narrowband Palette', description: 'Symmetric 50/50 sulfur and hydrogen mix in the red channel to homogenize the structural response of the nebula.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.5, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_46', name: 'Natural Stars SHO Mix V5', category: 'Narrowband Palette', description: 'Maps a higher percentage of Hydrogen (60%) to the red channel to give the nebula warm orange-yellow hues.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.4, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_37', name: 'Natural Stars SHO Mix V6', category: 'Narrowband Palette', description: 'Maps 70% Hydrogen and 30% Sulfur to the red channel. The resulting color shifts towards rich golden-green tones.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.3, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_28', name: 'Natural Stars SHO Mix V7', category: 'Narrowband Palette', description: 'Almost absolute predominance of Hydrogen in the red channel. Delivers soft reddish tones at the nebulous borders.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.2, sho_ha_green: 1.0 },
-      { id: 'sho_star_mix_19', name: 'Natural Stars SHO Mix V8', category: 'Narrowband Palette', description: 'Maps 90% hydrogen in the red, leaving sulfur as a subtle contrasting shade in the dense core regions.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', preset: 'sho', sho_sii_red: 0.1, sho_ha_green: 1.0 },
+      { id: 'sho_star_mix_82', name: 'Natural Stars SHO Mix V1 (80/20)', category: 'Narrowband Palette', description: 'Adds 20% H-alpha into the Red channel to reduce the typical magenta hue of stars in pure SHO and soften color transitions.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.8 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_73', name: 'Natural Stars SHO Mix V2 (70/30)', category: 'Narrowband Palette', description: 'Maps 70% Sulfur and 30% Hydrogen to the Red channel. Considerably mitigates the magenta star cast during processing.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.7 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_64', name: 'Natural Stars SHO Mix V3 (60/40)', category: 'Narrowband Palette', description: 'A balanced 60/40 mix in the red channel. Helps to tone down the sulfur channel if it has a low signal compared to hydrogen.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.6 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_55', name: 'Natural Stars SHO Mix V4 (50/50)', category: 'Narrowband Palette', description: 'Symmetric 50/50 sulfur and hydrogen mix in the red channel to homogenize the structural response of the nebula.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.5 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_46', name: 'Natural Stars SHO Mix V5 (40/60)', category: 'Narrowband Palette', description: 'Maps a higher percentage of Hydrogen (60%) to the red channel to give the nebula warm orange-yellow hues.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.4 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_37', name: 'Natural Stars SHO Mix V6 (30/70)', category: 'Narrowband Palette', description: 'Maps 70% Hydrogen and 30% Sulfur to the red channel. The resulting color shifts towards rich golden-green tones.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.3 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_28', name: 'Natural Stars SHO Mix V7 (20/80)', category: 'Narrowband Palette', description: 'Almost absolute predominance of Hydrogen in the red channel. Delivers soft reddish tones at the nebulous borders.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.2 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix_19', name: 'Natural Stars SHO Mix V8 (10/90)', category: 'Narrowband Palette', description: 'Maps 90% hydrogen in the red, leaving sulfur as a subtle contrasting shade in the dense core regions.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.1 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       
       // SHO Custom Green mixes
-      { id: 'sho_green_mix_82', name: 'SHO Green Channel Mix V1', category: 'Narrowband Palette', description: 'Blends 80% Hydrogen and 20% Oxygen into the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.8 },
-      { id: 'sho_green_mix_73', name: 'SHO Green Channel Mix V2', category: 'Narrowband Palette', description: 'Blends 70% Hydrogen and 30% Oxygen into the green channel. Shifts green zones towards yellow-orange tones.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.7 },
-      { id: 'sho_green_mix_64', name: 'SHO Green Channel Mix V3', category: 'Narrowband Palette', description: 'Maps 60% Hydrogen and 40% Oxygen to green. Generates a very balanced gold-turquoise color palette.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.6 },
-      { id: 'sho_green_mix_55', name: 'SHO Green Channel Mix V4', category: 'Narrowband Palette', description: 'Symmetric 50/50 blend in the green. The color transitions achieve maximum chromatic contrast.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', preset: 'sho', sho_sii_red: 1.0, sho_ha_green: 0.5 },
+      { id: 'sho_green_mix_82', name: 'SHO Green Channel Mix V1 (80/20)', category: 'Narrowband Palette', description: 'Blends 80% Hydrogen and 20% Oxygen into the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.8 }] },
+      { id: 'sho_green_mix_73', name: 'SHO Green Channel Mix V2 (70/30)', category: 'Narrowband Palette', description: 'Blends 70% Hydrogen and 30% Oxygen into the green channel. Shifts green zones towards yellow-orange tones.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.7 }] },
+      { id: 'sho_green_mix_64', name: 'SHO Green Channel Mix V3 (60/40)', category: 'Narrowband Palette', description: 'Maps 60% Hydrogen and 40% Oxygen to green. Generates a very balanced gold-turquoise color palette.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.6 }] },
+      { id: 'sho_green_mix_55', name: 'SHO Green Channel Mix V4 (50/50)', category: 'Narrowband Palette', description: 'Symmetric 50/50 blend in the green. The color transitions achieve maximum chromatic contrast.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.5 }] },
 
       // 2. Color Masks
-      { id: 'mask_red', name: 'Color Mask: Standard Red', category: 'Color Masks', description: 'Generates a monochrome mask isolating red tones. Useful for applying specific saturation or curves to emission nebulae.', r: 'R - max(G, B)', rgb: 'R - max(G, B)' },
-      { id: 'mask_green', name: 'Color Mask: Standard Green', category: 'Color Masks', description: 'Generates a mask to isolate green tones. Useful for removing green cast/chrominance noise.', r: 'G - max(R, B)', rgb: 'G - max(R, B)' },
-      { id: 'mask_blue', name: 'Color Mask: Standard Blue', category: 'Color Masks', description: 'Generates a mask isolating blue regions (oxygen gas structures or O/B type stars).', r: 'B - max(R, G)', rgb: 'B - max(R, G)' },
-      { id: 'mask_cyan', name: 'Color Mask: Standard Cyan', category: 'Color Masks', description: 'Isolates cyan regions by combining green and blue signals while subtracting red.', r: 'min(G, B) - R', rgb: 'min(G, B) - R' },
-      { id: 'mask_magenta', name: 'Color Mask: Standard Magenta', category: 'Color Masks', description: 'Isolates magenta tones by subtracting the green signal from red and blue.', r: 'min(R, B) - G', rgb: 'min(R, B) - G' },
-      { id: 'mask_yellow', name: 'Color Mask: Standard Yellow', category: 'Color Masks', description: 'Isolates yellow tones by subtracting the blue signal from red and green.', r: 'min(R, G) - B', rgb: 'min(R, G) - B' },
+      { id: 'mask_red', name: 'Color Mask: Standard Red', category: 'Color Masks', description: 'Generates a monochrome mask isolating red tones. Useful for applying specific saturation or curves to emission nebulae.', r: 'R - max(G, B)', rgb: 'R - max(G, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_green', name: 'Color Mask: Standard Green', category: 'Color Masks', description: 'Generates a mask to isolate green tones. Useful for removing green cast/chrominance noise or calibrating channels.', r: 'G - max(R, B)', rgb: 'G - max(R, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_blue', name: 'Color Mask: Standard Blue', category: 'Color Masks', description: 'Generates a mask isolating blue regions (oxygen gas structures or O/B type stars).', r: 'B - max(R, G)', rgb: 'B - max(R, G)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_cyan', name: 'Color Mask: Standard Cyan', category: 'Color Masks', description: 'Isolates cyan regions by combining green and blue signals while subtracting red.', r: 'min(G, B) - R', rgb: 'min(G, B) - R', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_magenta', name: 'Color Mask: Standard Magenta', category: 'Color Masks', description: 'Isolates magenta tones by subtracting the green signal from red and blue.', r: 'min(R, B) - G', rgb: 'min(R, B) - G', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_yellow', name: 'Color Mask: Standard Yellow', category: 'Color Masks', description: 'Isolates yellow tones by subtracting the blue signal from red and green.', r: 'min(R, G) - B', rgb: 'min(R, G) - B', renderType: 'mask_color', sources: ['original'], sliders: [] },
       
       // Color Masks V2
-      { id: 'mask_red_v2', name: 'Color Mask: Advanced Red', category: 'Color Masks', description: 'Bill Blanshan\'s formula that isolates red tones conditioned by pixel signal dominance.', r: 'iif(R > G && R > B, R - max(G, B), 0)', rgb: 'iif(R > G && R > B, R - max(G, B), 0)' },
-      { id: 'mask_green_v2', name: 'Color Mask: Advanced Green', category: 'Color Masks', description: 'Isolates green tones using strict conditionals to avoid accidental chromatic overlaps.', r: 'iif(G > R && G > B, G - max(R, B), 0)', rgb: 'iif(G > R && G > B, G - max(R, B), 0)' },
-      { id: 'mask_blue_v2', name: 'Color Mask: Advanced Blue', category: 'Color Masks', description: 'Isolates bright blues conditionally, perfect for focusing on faint OIII peripheral gas.', r: 'iif(B > R && B > G, B - max(R, G), 0)', rgb: 'iif(B > R && B > G, B - max(R, G), 0)' },
-      { id: 'mask_cyan_v2', name: 'Color Mask: Advanced Cyan', category: 'Color Masks', description: 'Generates a conditional cyan mask. Great for working on core OIII oxygen structures.', r: 'iif(G > R && B > R, min(G, B) - R, 0)', rgb: 'iif(G > R && B > R, min(G, B) - R, 0)' },
-      { id: 'mask_magenta_v2', name: 'Color Mask: Advanced Magenta', category: 'Color Masks', description: 'Isolates magenta tones conditionally, perfect for mitigating magenta halos on stars.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)' },
-      { id: 'mask_yellow_v2', name: 'Color Mask: Advanced Yellow', category: 'Color Masks', description: 'Isolates yellow tones conditionally to adjust dust lane structures and SII boundaries.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)' },
+      { id: 'mask_red_v2', name: 'Color Mask: Advanced Red V2', category: 'Color Masks', description: 'Bill Blanshan\'s formula that isolates red tones conditioned by pixel signal dominance.', r: 'iif(R > G && R > B, R - max(G, B), 0)', rgb: 'iif(R > G && R > B, R - max(G, B), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_green_v2', name: 'Color Mask: Advanced Green V2', category: 'Color Masks', description: 'Isolates green tones using strict conditionals to avoid accidental chromatic overlaps.', r: 'iif(G > R && G > B, G - max(R, B), 0)', rgb: 'iif(G > R && G > B, G - max(R, B), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_blue_v2', name: 'Color Mask: Advanced Blue V2', category: 'Color Masks', description: 'Isolates bright blues conditionally, perfect for focusing on faint OIII peripheral gas.', r: 'iif(B > R && B > G, B - max(R, G), 0)', rgb: 'iif(B > R && B > G, B - max(R, G), 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_cyan_v2', name: 'Color Mask: Advanced Cyan V2', category: 'Color Masks', description: 'Generates a conditional cyan mask. Great for working on core OIII oxygen structures.', r: 'iif(G > R && B > R, min(G, B) - R, 0)', rgb: 'iif(G > R && B > R, min(G, B) - R, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_magenta_v2', name: 'Color Mask: Advanced Magenta V2', category: 'Color Masks', description: 'Isolates magenta tones conditionally, perfect for mitigating magenta halos on stars.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
+      { id: 'mask_yellow_v2', name: 'Color Mask: Advanced Yellow V2', category: 'Color Masks', description: 'Isolates yellow tones conditionally to adjust dust lane structures and SII boundaries.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
 
       // 3. Math & Blending Modes
-      { id: 'blend_screen', name: 'Screen Blend Mode', category: 'Math & Blending Modes', description: 'Combines two images avoiding overexposure in highlights. Equivalent to the Screen mode in Photoshop.', rgb: '1 - (1 - ImageA) * (1 - ImageB)' },
-      { id: 'blend_mult', name: 'Multiply Blend Mode', category: 'Math & Blending Modes', description: 'Multiplies pixel values of two images, darkening shared regions. Ideal for applying contrast masks.', rgb: 'ImageA * ImageB' },
-      { id: 'blend_overlay', name: 'Overlay Blend Mode', category: 'Math & Blending Modes', description: 'Combines multiply and screen depending on background brightness. Boosts local contrast.', rgb: 'iif(ImageA < 0.5, 2 * ImageA * ImageB, 1 - 2 * (1 - ImageA) * (1 - ImageB))' },
-      { id: 'blend_diff', name: 'Difference Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the absolute difference between two frames. Extremely useful for verifying alignment or calibration changes.', rgb: 'abs(ImageA - ImageB)' },
-      { id: 'blend_lighten', name: 'Lighten Blend Mode (Max)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the brightest value.', rgb: 'max(ImageA, ImageB)' },
-      { id: 'blend_darken', name: 'Darken Blend Mode (Min)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the darkest value.', rgb: 'min(ImageA, ImageB)' },
-      { id: 'blend_stars_scr', name: 'Screen Blend Stars', category: 'Math & Blending Modes', description: 'Adds stars to a nebula background using screen mode to preserve bright star cores.', rgb: '~(~Starless * ~Stars)', preset: 'stars_add', stars_add_factor: 1.0 },
-      { id: 'blend_avg', name: 'Average Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the arithmetic average of two frames of the same field to reduce noise.', rgb: '(ImageA + ImageB) / 2' },
+      { id: 'blend_screen', name: 'Screen Blend Mode', category: 'Math & Blending Modes', description: 'Combines two images avoiding overexposure in highlights. Adjust blend opacity k. Equivalent to Photoshop Screen.', rgb: '1 - (1 - ImageA) * (1 - ImageB)', renderType: 'blend_screen', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_mult', name: 'Multiply Blend Mode', category: 'Math & Blending Modes', description: 'Multiplies pixel values of two images, darkening shared regions. Ideal for applying contrast masks.', rgb: 'ImageA * ImageB', renderType: 'blend_mult', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_overlay', name: 'Overlay Blend Mode', category: 'Math & Blending Modes', description: 'Combines multiply and screen depending on background brightness. Boosts local contrast.', rgb: 'iif(ImageA < 0.5, 2 * ImageA * ImageB, 1 - 2 * (1 - ImageA) * (1 - ImageB))', renderType: 'blend_overlay', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_diff', name: 'Difference Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the absolute difference between two frames. Extremely useful for verifying alignment or calibration changes.', rgb: 'abs(ImageA - ImageB)', renderType: 'blend_diff', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Difference Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_lighten', name: 'Lighten Blend Mode (Max)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the brightest value.', rgb: 'max(ImageA, ImageB)', renderType: 'blend_lighten', sources: ['original', 'starless'], sliders: [] },
+      { id: 'blend_darken', name: 'Darken Blend Mode (Min)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the darkest value.', rgb: 'min(ImageA, ImageB)', renderType: 'blend_darken', sources: ['original', 'starless'], sliders: [] },
+      { id: 'blend_stars_scr', name: 'Screen Blend Stars', category: 'Math & Blending Modes', description: 'Adds stars to a nebula background using screen mode to preserve bright star cores.', rgb: '~(~Starless * ~Stars)', renderType: 'blend_screen', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_avg', name: 'Average Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the arithmetic average of two frames of the same field to reduce noise.', rgb: '(ImageA + ImageB) / 2', renderType: 'blend_average', sources: ['original', 'starless'], sliders: [] },
 
       // 4. Utilities & Cleaning
-      { id: 'util_invert', name: 'Invert Image', category: 'Utilities & Cleaning', description: 'Linearly inverts all channels of the image (converts positive to negative).', rgb: '~ $T' },
-      { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > 0.95, 0.95, $T)' },
-      { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < 0.05, 0.05, $T)' },
-      { id: 'util_bg_flatten', name: 'Background Flattening', category: 'Utilities & Cleaning', description: 'Quickly flattens the background by subtracting the general median value and adding a baseline pedestal.', rgb: '$T - med($T) + 0.1' },
-      { id: 'util_hotpixel', name: 'Hot Pixel Filter', category: 'Utilities & Cleaning', description: 'Identifies single hot pixels based on local average and replaces them with the median.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)' },
-      { id: 'util_syn_lum', name: 'LRGB Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a synthetic luminance channel from RGB channels using standard human eye luminance coefficients.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B' },
-      { id: 'util_syn_lum_eq', name: 'Equal Weight Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a luminance channel by taking the arithmetic average of R, G, and B channels.', rgb: '(R + G + B) / 3' },
-      { id: 'util_range_mask', name: 'Quick Range Mask', category: 'Utilities & Cleaning', description: 'Generates a linear contrast mask restricted to a specific brightness range (0.1 to 0.8).', rgb: 'iif($T > 0.1 && $T < 0.8, ($T - 0.1)/0.7, 0)' },
-      { id: 'util_lin_fit', name: 'Channel Linear Fit', category: 'Utilities & Cleaning', description: 'Equation to match the intensity of the active channel to the mean and standard deviation of a reference channel.', rgb: '($T - Mean($T)) * (StdDev(Reference) / StdDev($T)) + Mean(Reference)' },
-      { id: 'util_mtf_stretch', name: 'MTF Stretch', category: 'Utilities & Cleaning', description: 'Classic non-linear stretch formula based on midtone balance point m. Allows manual stretching of linear data.', rgb: '($T * m) / ((m - 1) * $T + 1)' },
-      { id: 'util_star_extract', name: 'Star Extraction', category: 'Utilities & Cleaning', description: 'Generates a stars-only layer by subtracting the starless version from the original image.', rgb: 'Original - Starless' }
+      { id: 'util_invert', name: 'Invert Image', category: 'Utilities & Cleaning', description: 'Linearly inverts all channels of the image (converts positive to negative).', rgb: '~ $T', renderType: 'util_invert', sources: ['original'], sliders: [] },
+      { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > t, t, $T)', renderType: 'util_clip_high', sources: ['original'], sliders: [{ id: 'threshold', label: 'Maximum Threshold (t)', min: 0.5, max: 1.0, step: 0.01, value: 0.95 }] },
+      { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < t, t, $T)', renderType: 'util_clip_low', sources: ['original'], sliders: [{ id: 'threshold', label: 'Minimum Threshold (t)', min: 0.0, max: 0.3, step: 0.01, value: 0.05 }] },
+      { id: 'util_bg_flatten', name: 'Background Flattening', category: 'Utilities & Cleaning', description: 'Quickly flattens the background by subtracting the general median value and adding a baseline pedestal.', rgb: '$T - med($T) + Pedestal', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'pedestal', label: 'Background Pedestal', min: 0.0, max: 0.3, step: 0.01, value: 0.1 }] },
+      { id: 'util_hotpixel', name: 'Hot Pixel Filter', category: 'Utilities & Cleaning', description: 'Identifies single hot pixels based on local average and replaces them with the median.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)', renderType: 'util_hotpixel', sources: ['original'], sliders: [] },
+      { id: 'util_syn_lum', name: 'LRGB Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a synthetic luminance channel from RGB channels using standard human eye luminance coefficients.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B', renderType: 'util_syn_lum', sources: ['original'], sliders: [] },
+      { id: 'util_syn_lum_eq', name: 'Equal Weight Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a luminance channel by taking the arithmetic average of R, G, and B channels.', rgb: '(R + G + B) / 3', renderType: 'util_syn_lum_eq', sources: ['original'], sliders: [] },
+      { id: 'util_range_mask', name: 'Quick Range Mask', category: 'Utilities & Cleaning', description: 'Generates a linear contrast mask restricted to a specific brightness range (from Low to High).', rgb: 'iif($T > Bajo && $T < Alto, ($T - Bajo)/(Alto - Bajo), 0)', renderType: 'util_range_mask', sources: ['original'], sliders: [{ id: 'low', label: 'Lower Limit (Low)', min: 0.0, max: 0.4, step: 0.01, value: 0.1 }, { id: 'high', label: 'Upper Limit (High)', min: 0.5, max: 1.0, step: 0.01, value: 0.8 }] },
+      { id: 'util_lin_fit', name: 'Channel Linear Fit', category: 'Utilities & Cleaning', description: 'Equation to match the intensity of the active channel to the mean and standard deviation of a reference channel.', rgb: '($T - Mean($T)) * (StdDev(Ref) / StdDev($T)) + Mean(Ref)', renderType: 'util_lin_fit', sources: ['original'], sliders: [] },
+      { id: 'util_mtf_stretch', name: 'MTF Stretch', category: 'Utilities & Cleaning', description: 'Classic non-linear stretch formula based on midtone balance point m. Allows manual stretching of linear data.', rgb: '($T * m) / ((m - 1) * $T + 1)', renderType: 'util_mtf_stretch', sources: ['original'], sliders: [{ id: 'm', label: 'Midtone Balance (m)', min: 0.005, max: 0.3, step: 0.005, value: 0.05 }] },
+      { id: 'util_star_extract', name: 'Star Extraction', category: 'Utilities & Cleaning', description: 'Generates a stars-only layer by subtracting the starless version from the original image.', rgb: 'Original - Starless', renderType: 'util_star_extract', sources: ['original', 'starless'], sliders: [] }
     ];
 
     // Populate database with base formulas
     baseFormulas.forEach(f => formulasDb.push(f));
 
     // Dynamic generation of variations to reach 112 total
-    // 1. Add Ha to Red variations (10% to 100%) - 10 formulas
+    // 1. Add Ha to Red variations (10% to 100% in steps of 10%) - 10 formulas
     for (let i = 1; i <= 10; i++) {
       const k = i / 10;
       formulasDb.push({
         id: `gen_ha_red_${i}`,
         name: `Add H-alpha to Red Channel - ${i*10}% Intensity`,
         category: 'LRGB / Narrowband Blending',
-        description: `Blends narrowband H-alpha signal into the red channel of a broadband RGB image at ${i*10}% intensity. Perfect for enhancing emission nebulosity without altering star colors.`,
+        description: `Blends narrowband H-alpha signal into the red channel of a broadband RGB image at ${i*10}% intensity. Ideal for enhancing emission nebulosity without altering star colors.`,
         r: `RGB_R + ${k.toFixed(1)} * Ha`,
         g: 'RGB_G',
         b: 'RGB_B',
-        preset: 'ha_rgb',
-        ha_rgb_factor: k
+        renderType: 'ha_rgb',
+        sources: ['original', 'ha'],
+        sliders: [{ id: 'k', label: 'H-alpha Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -745,7 +781,10 @@
         description: `Blends narrowband OIII signal into the blue channel of a broadband RGB image at ${i*10}% intensity. Enhances weak blue reflection nebula details.`,
         r: 'RGB_R',
         g: 'RGB_G',
-        b: `RGB_B + ${k.toFixed(1)} * OIII`
+        b: `RGB_B + ${k.toFixed(1)} * OIII`,
+        renderType: 'oiii_blue',
+        sources: ['original', 'oiii'],
+        sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -759,7 +798,10 @@
         description: `Blends narrowband OIII signal into the green channel of a broadband RGB image at ${i*10}% intensity. Balanced green-blue gas details.`,
         r: 'RGB_R',
         g: `RGB_G + ${k.toFixed(1)} * OIII`,
-        b: 'RGB_B'
+        b: 'RGB_B',
+        renderType: 'oiii_green',
+        sources: ['original', 'oiii'],
+        sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -773,7 +815,10 @@
         description: `Blends narrowband Sulfur II signal into the red channel of a broadband RGB image at ${i*10}% intensity. Enriches dark red dust lane boundaries.`,
         r: `RGB_R + ${k.toFixed(1)} * SII`,
         g: 'RGB_G',
-        b: 'RGB_B'
+        b: 'RGB_B',
+        renderType: 'sii_red',
+        sources: ['original', 'sii'],
+        sliders: [{ id: 'k', label: 'SII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
       });
     }
 
@@ -788,8 +833,9 @@
         r: `Starless + ${k.toFixed(1)} * Stars`,
         g: `Starless + ${k.toFixed(1)} * Stars`,
         b: `Starless + ${k.toFixed(1)} * Stars`,
-        preset: 'stars_add',
-        stars_add_factor: k
+        renderType: 'stars_add',
+        sources: ['starless', 'stars'],
+        sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.5, step: 0.05, value: k }]
       });
     }
 
@@ -804,76 +850,22 @@
         r: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
         g: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
         b: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
-        preset: 'stars_reduce',
-        stars_reduce_factor: k
+        renderType: 'stars_reduce',
+        sources: ['original', 'starless'],
+        sliders: [{ id: 'k', label: 'Stars Percentage (k)', min: 0, max: 1, step: 0.05, value: k }]
       });
     }
-
-    // Sort database alphabetically by name
-    formulasDb.sort((a, b) => a.name.localeCompare(b.name));
 
     // ----------------------------------------------------
     // SIMULATOR STATE & ENGINE
     // ----------------------------------------------------
-    let activePreset = 'sho';
+    let activeFormulaId = null;
     const channels = {};
     const canvas = document.getElementById('simulatorCanvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
-    // Sliders values
-    const slidersState = {
-      sho_sii_red: 0.8,
-      sho_ha_green: 1.0,
-      hoo_ha_blue: 0.15,
-      stars_add_factor: 0.8,
-      stars_reduce_factor: 0.4,
-      ha_rgb_factor: 0.6
-    };
-
-    // UI Configuration for Presets in Simulator
-    const presetsConfig = {
-      sho: {
-        title: "Hubble Palette (SHO)",
-        sliders: [
-          { id: 'sho_sii_red', label: 'Blend SII / Ha in Red Channel', min: 0, max: 1, step: 0.05, unit: '%' },
-          { id: 'sho_ha_green', label: 'Blend Ha / OIII in Green Channel', min: 0, max: 1, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R: ${s.sho_sii_red.toFixed(2)} * SII + ${(1-s.sho_sii_red).toFixed(2)} * Ha\nG: ${s.sho_ha_green.toFixed(2)} * Ha + ${(1-s.sho_ha_green).toFixed(2)} * OIII\nB: OIII`
-      },
-      hoo: {
-        title: "Bicolor Palette (HOO)",
-        sliders: [
-          { id: 'hoo_ha_blue', label: 'Add Ha to Blue Channel', min: 0, max: 0.5, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R: Ha\nG: OIII\nB: ${(1-s.hoo_ha_blue).toFixed(2)} * OIII + ${s.hoo_ha_blue.toFixed(2)} * Ha`
-      },
-      foraxx: {
-        title: "Dynamic Foraxx Palette",
-        sliders: [],
-        code: () => `R: Ha\nG: ((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII\nB: OIII`
-      },
-      stars_add: {
-        title: "Recompose Stars",
-        sliders: [
-          { id: 'stars_add_factor', label: 'Stars Intensity (k)', min: 0, max: 1.5, step: 0.05, unit: '' }
-        ],
-        code: (s) => `R/G/B: Starless + ${s.stars_add_factor.toFixed(2)} * Stars`
-      },
-      stars_reduce: {
-        title: "Star Reduction",
-        sliders: [
-          { id: 'stars_reduce_factor', label: 'Stars Percentage (k)', min: 0, max: 1, step: 0.05, unit: '%' }
-        ],
-        code: (s) => `R/G/B: Original * ${s.stars_reduce_factor.toFixed(2)} + Starless * ${(1-s.stars_reduce_factor).toFixed(2)}`
-      },
-      ha_rgb: {
-        title: "Ha-RGB Blend",
-        sliders: [
-          { id: 'ha_rgb_factor', label: 'H-alpha Intensity (k)', min: 0, max: 1.2, step: 0.05, unit: '' }
-        ],
-        code: (s) => `R: RGB_R + ${s.ha_rgb_factor.toFixed(2)} * Ha\nG: RGB_G\nB: RGB_B`
-      }
-    };
+    // Sliders dynamic state values (instantiated on preset load)
+    const slidersState = {};
 
     // Load monochrome channel images
     const imagesToLoad = {
@@ -906,7 +898,6 @@
           }, 300);
           
           initLibrary();
-          initSimulator();
         }
       };
       img.onerror = () => {
@@ -915,195 +906,10 @@
       img.src = src;
     });
 
-    function initSimulator() {
-      const presetSelect = document.getElementById('presetSelect');
-      presetSelect.addEventListener('change', (e) => {
-        setPreset(e.target.value);
-      });
-
-      document.getElementById('copyConsoleBtn').addEventListener('click', () => {
-        const text = presetsConfig[activePreset].code(slidersState);
-        navigator.clipboard.writeText(text).then(() => {
-          const btn = document.getElementById('copyConsoleBtn');
-          btn.textContent = "Copied!";
-          setTimeout(() => {
-            btn.textContent = "Copy all";
-          }, 1500);
-        });
-      });
-
-      setPreset('sho');
-    }
-
-    function setPreset(presetName) {
-      activePreset = presetName;
-      document.getElementById('presetSelect').value = presetName;
-      renderSliders();
-      updateConsole();
-      runSimulation();
-    }
-
-    function renderSliders() {
-      const wrapper = document.getElementById('slidersWrapper');
-      wrapper.innerHTML = '';
-      
-      const config = presetsConfig[activePreset];
-      config.sliders.forEach(slider => {
-        const value = slidersState[slider.id];
-        const controlRow = document.createElement('div');
-        controlRow.className = 'controls-group';
-        const displayVal = slider.unit === '%' ? Math.round(value * 100) + '%' : value.toFixed(2);
-
-        controlRow.innerHTML = `
-          <div class="control-label-row">
-            <span class="control-title">${slider.label}</span>
-            <span class="control-val" id="val_${slider.id}">${displayVal}</span>
-          </div>
-          <input type="range" 
-                 class="pm-slider" 
-                 id="${slider.id}" 
-                 min="${slider.min}" 
-                 max="${slider.max}" 
-                 step="${slider.step}" 
-                 value="${value}">
-        `;
-        
-        wrapper.appendChild(controlRow);
-
-        const sliderInput = controlRow.querySelector('input');
-        sliderInput.addEventListener('input', (e) => {
-          const newVal = parseFloat(e.target.value);
-          slidersState[slider.id] = newVal;
-          
-          const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
-          document.getElementById(`val_${slider.id}`).textContent = valDisplay;
-          
-          updateConsole();
-          runSimulation();
-        });
-      });
-    }
-
-    function updateConsole() {
-      const codeContainer = document.getElementById('consoleCode');
-      const text = presetsConfig[activePreset].code(slidersState);
-      
-      const lines = text.split('\n').map(line => {
-        const parts = line.split(':');
-        if (parts.length > 1) {
-          return `<div class="console-line"><span>${parts[0]}:</span>${parts[1]}</div>`;
-        }
-        return `<div class="console-line">${line}</div>`;
-      }).join('');
-
-      codeContainer.innerHTML = lines;
-    }
-
-    function runSimulation() {
-      if (!channels.ha) return;
-
-      const width = 400;
-      const height = 400;
-      const totalPixels = width * height;
-      const outputData = ctx.createImageData(width, height);
-      const out = outputData.data;
-
-      const s = slidersState;
-      const ha = channels.ha;
-      const sii = channels.sii;
-      const oiii = channels.oiii;
-      const starless = channels.starless;
-      const stars = channels.stars;
-      const original = channels.original;
-
-      if (activePreset === 'sho') {
-        const sii_red = s.sho_sii_red;
-        const ha_green = s.sho_ha_green;
-        
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i];
-          const s_val = sii[i];
-          const o_val = oiii[i];
-
-          out[i]     = s_val * sii_red + h_val * (1 - sii_red);
-          out[i + 1] = h_val * ha_green + o_val * (1 - ha_green);
-          out[i + 2] = o_val;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'hoo') {
-        const ha_blue = s.hoo_ha_blue;
-        
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i];
-          const o_val = oiii[i];
-
-          out[i]     = h_val;
-          out[i + 1] = o_val;
-          out[i + 2] = o_val * (1 - ha_blue) + h_val * ha_blue;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'foraxx') {
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          const h_val = ha[i] / 255;
-          const o_val = oiii[i] / 255;
-
-          const product = h_val * o_val;
-          const inv_product = 1.0 - product;
-          const mix = Math.pow(product, inv_product);
-
-          const r_val = h_val;
-          const g_val = mix * h_val + (1.0 - mix) * o_val;
-          const b_val = o_val;
-
-          out[i]     = Math.min(255, Math.max(0, r_val * 255));
-          out[i + 1] = Math.min(255, Math.max(0, g_val * 255 * 1.05));
-          out[i + 2] = Math.min(255, Math.max(0, b_val * 255));
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'stars_add') {
-        const factor = s.stars_add_factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = Math.min(255, starless[i] + stars[i] * factor);
-          out[i + 1] = Math.min(255, starless[i + 1] + stars[i + 1] * factor);
-          out[i + 2] = Math.min(255, starless[i + 2] + stars[i + 2] * factor);
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'stars_reduce') {
-        const factor = s.stars_reduce_factor;
-        const inv_factor = 1.0 - factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = original[i] * factor + starless[i] * inv_factor;
-          out[i + 1] = original[i + 1] * factor + starless[i + 1] * inv_factor;
-          out[i + 2] = original[i + 2] * factor + starless[i + 2] * inv_factor;
-          out[i + 3] = 255;
-        }
-      } 
-      else if (activePreset === 'ha_rgb') {
-        const factor = s.ha_rgb_factor;
-        for (let i = 0; i < totalPixels * 4; i += 4) {
-          out[i]     = Math.min(255, original[i] + ha[i] * factor);
-          out[i + 1] = original[i + 1];
-          out[i + 2] = original[i + 2];
-          out[i + 3] = 255;
-        }
-      }
-
-      ctx.putImageData(outputData, 0, 0);
-    }
-
-    // ----------------------------------------------------
-    // LIBRARY MASTER-DETAIL ENGINE
-    // ----------------------------------------------------
-    let activeFormulaId = null;
-    let filteredFormulas = [...formulasDb];
-
     function initLibrary() {
       const searchInput = document.getElementById('librarySearchInput');
       
+      // Focus search input with '/' key
       window.addEventListener('keydown', (e) => {
         if (e.key === '/' && document.activeElement !== searchInput) {
           e.preventDefault();
@@ -1115,11 +921,30 @@
         filterLibrary(e.target.value);
       });
 
+      // Set copy button listener for the simulator console
+      document.getElementById('copyConsoleBtn').addEventListener('click', () => {
+        const formula = formulasDb.find(f => f.id === activeFormulaId);
+        if (!formula) return;
+        const text = getGeneratedConsoleCode(formula);
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('copyConsoleBtn');
+          btn.textContent = "Copied!";
+          setTimeout(() => {
+            btn.textContent = "Copy all";
+          }, 1500);
+        });
+      });
+
+      // Load initial layout
       renderLibraryList();
       if (formulasDb.length > 0) {
-        selectFormula(formulasDb[0].id);
+        // Initially load "Hubble Palette (SHO) - Classic"
+        const shoClassic = formulasDb.find(f => f.id === 'sho_hub') || formulasDb[0];
+        selectFormula(shoClassic.id);
       }
     }
+
+    let filteredFormulas = [...formulasDb];
 
     function filterLibrary(query) {
       const cleanQuery = query.toLowerCase().trim();
@@ -1157,28 +982,93 @@
         return;
       }
 
-      filteredFormulas.forEach(formula => {
-        const item = document.createElement('button');
-        item.className = `formula-list-item ${formula.id === activeFormulaId ? 'active' : ''}`;
-        item.innerHTML = `
-          <span class="formula-list-item-category">${formula.category}</span>
-          <span class="formula-list-item-title">${formula.name}</span>
-        `;
-        item.addEventListener('click', () => selectFormula(formula.id));
-        container.appendChild(item);
+      // Group filtered formulas by category
+      const groups = {};
+      filteredFormulas.forEach(f => {
+        if (!groups[f.category]) groups[f.category] = [];
+        groups[f.category].push(f);
+      });
+
+      const categoryOrder = [
+        'Narrowband Palette',
+        'LRGB / Narrowband Blending',
+        'Star Operations',
+        'Color Masks',
+        'Math & Blending Modes',
+        'Utilities & Cleaning'
+      ];
+
+      // Helper function to render a single group
+      function renderGroup(categoryName, items) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'category-group';
+        
+        const header = document.createElement('div');
+        header.className = 'category-group-header';
+        header.textContent = categoryName;
+        groupDiv.appendChild(header);
+        
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'category-group-items';
+        
+        items.forEach(formula => {
+          const button = document.createElement('button');
+          button.className = `formula-list-item ${formula.id === activeFormulaId ? 'active' : ''}`;
+          button.setAttribute('data-id', formula.id);
+          button.innerHTML = `
+            <span class="formula-list-item-title">${formula.name}</span>
+          `;
+          button.addEventListener('click', () => selectFormula(formula.id));
+          itemsContainer.appendChild(button);
+        });
+        
+        groupDiv.appendChild(itemsContainer);
+        container.appendChild(groupDiv);
+      }
+
+      // Render group headers and items in fixed order
+      categoryOrder.forEach(categoryName => {
+        const items = groups[categoryName];
+        if (items && items.length > 0) {
+          renderGroup(categoryName, items);
+        }
+      });
+
+      // Render any remaining categories not listed in categoryOrder
+      Object.entries(groups).forEach(([categoryName, items]) => {
+        if (!categoryOrder.includes(categoryName) && items && items.length > 0) {
+          renderGroup(categoryName, items);
+        }
       });
     }
 
     function selectFormula(id) {
       activeFormulaId = id;
       
+      // Update active state in master list using data-id attribute
       document.querySelectorAll('.formula-list-item').forEach(item => {
-        item.classList.remove('active');
+        if (item.getAttribute('data-id') === id) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
       });
-      const listItems = document.getElementById('formulaMasterPanel').children;
-      const index = filteredFormulas.findIndex(f => f.id === id);
-      if (index !== -1 && listItems[index]) {
-        listItems[index].classList.add('active');
+
+      const formula = formulasDb.find(f => f.id === id);
+      if (formula) {
+        document.getElementById('activeFormulaTitle').textContent = formula.name;
+        
+        // Initialize dynamic sliders values in state
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            slidersState[slider.id] = slider.value;
+          });
+        }
+        
+        renderSliders(formula);
+        renderInputPreviews(formula.sources);
+        updateConsole(formula);
+        runSimulation();
       }
 
       renderDetails();
@@ -1189,7 +1079,7 @@
       pane.innerHTML = `
         <div class="detail-empty-state">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <p>Search or select a formula to view its math details and load it in the simulator.</p>
+          <p>Search or select a formula to view its mathematical details and load them in the simulator.</p>
         </div>
       `;
     }
@@ -1229,8 +1119,8 @@
         
         <div class="detail-actions">
           <button class="btn-action" id="btnCopyDetails">Copy Formula</button>
-          <button class="btn-action btn-primary-action" id="btnLoadDetails" ${formula.preset ? '' : 'disabled'}>
-            ${formula.preset ? 'Load in Simulator' : 'Not Simulatable'}
+          <button class="btn-action btn-primary-action" id="btnLoadDetails">
+            Load in Simulator
           </button>
         </div>
       `;
@@ -1258,30 +1148,530 @@
       });
 
       // Load preset in simulator event
-      if (formula.preset) {
-        document.getElementById('btnLoadDetails').addEventListener('click', () => {
-          if (formula.sho_sii_red !== undefined) slidersState.sho_sii_red = formula.sho_sii_red;
-          if (formula.sho_ha_green !== undefined) slidersState.sho_ha_green = formula.sho_ha_green;
-          if (formula.hoo_ha_blue !== undefined) slidersState.hoo_ha_blue = formula.hoo_ha_blue;
-          if (formula.stars_add_factor !== undefined) slidersState.stars_add_factor = formula.stars_add_factor;
-          if (formula.stars_reduce_factor !== undefined) slidersState.stars_reduce_factor = formula.stars_reduce_factor;
-          if (formula.ha_rgb_factor !== undefined) slidersState.ha_rgb_factor = formula.ha_rgb_factor;
+      document.getElementById('btnLoadDetails').addEventListener('click', () => {
+        selectFormula(formula.id);
+        if (window.innerWidth < 992) {
+          document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
 
-          setPreset(formula.preset);
+    // Render sliders dynamically based on formula setup
+    function renderSliders(formula) {
+      const wrapper = document.getElementById('slidersWrapper');
+      wrapper.innerHTML = '';
+      
+      if (!formula.sliders || formula.sliders.length === 0) {
+        return;
+      }
+      
+      formula.sliders.forEach(slider => {
+        const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+        const controlRow = document.createElement('div');
+        controlRow.className = 'controls-group';
+        const displayVal = slider.unit === '%' ? Math.round(val * 100) + '%' : val.toFixed(2);
 
-          if (window.innerWidth < 992) {
-            document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
-          }
+        controlRow.innerHTML = `
+          <div class="control-label-row">
+            <span class="control-title">${slider.label}</span>
+            <span class="control-val" id="val_${slider.id}">${displayVal}</span>
+          </div>
+          <input type="range" 
+                 class="pm-slider" 
+                 id="slider_${slider.id}" 
+                 min="${slider.min}" 
+                 max="${slider.max}" 
+                 step="${slider.step}" 
+                 value="${val}">
+        `;
+        
+        wrapper.appendChild(controlRow);
+
+        const sliderInput = controlRow.querySelector('input');
+        sliderInput.addEventListener('input', (e) => {
+          const newVal = parseFloat(e.target.value);
+          slidersState[slider.id] = newVal;
+          
+          const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
+          document.getElementById(`val_${slider.id}`).textContent = valDisplay;
+          
+          updateConsole(formula);
+          runSimulation();
         });
+      });
+    }
+
+    function drawChannelToCanvas(channelKey, canvasEl) {
+      const ctx = canvasEl.getContext('2d');
+      const width = canvasEl.width;
+      const height = canvasEl.height;
+      const imgData = ctx.createImageData(width, height);
+      const out = imgData.data;
+      const src = channels[channelKey];
+      
+      if (!src) return;
+      
+      const scaleX = 400 / width;
+      const scaleY = 400 / height;
+      
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const srcX = Math.floor(x * scaleX);
+          const srcY = Math.floor(y * scaleY);
+          const srcIdx = (srcY * 400 + srcX) * 4;
+          const dstIdx = (y * width + x) * 4;
+          
+          out[dstIdx]     = src[srcIdx];
+          out[dstIdx + 1] = src[srcIdx + 1];
+          out[dstIdx + 2] = src[srcIdx + 2];
+          out[dstIdx + 3] = src[srcIdx + 3];
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    function renderInputPreviews(sourceKeys) {
+      const grid = document.getElementById('inputsPreviewGrid');
+      const inputsArea = document.getElementById('inputsArea');
+      grid.innerHTML = '';
+      
+      if (!sourceKeys || sourceKeys.length === 0) {
+        inputsArea.style.display = 'none';
+        return;
+      }
+      
+      inputsArea.style.display = 'block';
+      
+      sourceKeys.forEach(key => {
+        const box = document.createElement('div');
+        box.className = 'input-box';
+        
+        const canvasEl = document.createElement('canvas');
+        canvasEl.className = 'input-canvas';
+        canvasEl.width = 120;
+        canvasEl.height = 120;
+        
+        const label = document.createElement('span');
+        label.className = 'input-label';
+        
+        const labelsMap = {
+          ha: 'H-alpha',
+          sii: 'SII',
+          oiii: 'OIII',
+          starless: 'Starless',
+          stars: 'Stars',
+          original: 'Original Image'
+        };
+        
+        label.textContent = labelsMap[key] || key;
+        
+        box.appendChild(canvasEl);
+        box.appendChild(label);
+        grid.appendChild(box);
+        
+        drawChannelToCanvas(key, canvasEl);
+      });
+    }
+
+    // Dynamic equation text resolver based on sliders
+    function getGeneratedConsoleCode(formula) {
+      if (formula.rgb) {
+        let code = formula.rgb;
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+            code = code.replace(new RegExp(`\\b${slider.id}\\b|\\bUmbral\\b|\\bPedestal\\b|\\bBajo\\b|\\bAlto\\b|\\bm\\b`, 'g'), val.toFixed(2));
+          });
+        }
+        return `RGB: ${code}`;
+      } else {
+        let r = formula.r;
+        let g = formula.g;
+        let b = formula.b;
+        
+        if (formula.sliders) {
+          formula.sliders.forEach(slider => {
+            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+            const rep = val.toFixed(2);
+            r = r.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+            g = g.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+            b = b.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
+          });
+        }
+        return `R: ${r}\nG: ${g}\nB: ${b}`;
       }
     }
 
-    // Toggle Night Vision
-    const nightmodeToggle = document.getElementById('nightmode-toggle');
-    nightmodeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('night-vision');
-      const isNight = document.body.classList.contains('night-vision');
-      localStorage.setItem('night-vision', isNight ? 'enabled' : 'disabled');
+    function updateConsole(formula) {
+      const codeContainer = document.getElementById('consoleCode');
+      const text = getGeneratedConsoleCode(formula);
+      
+      const lines = text.split('\n').map(line => {
+        const parts = line.split(':');
+        if (parts.length > 1) {
+          return `<div class="console-line"><span>${parts[0]}:</span>${parts[1]}</div>`;
+        }
+        return `<div class="console-line">${line}</div>`;
+      }).join('');
+
+      codeContainer.innerHTML = lines;
+    }
+
+    // Pixel Processing engine
+    function runSimulation() {
+      if (!channels.ha || !activeFormulaId) return;
+
+      const width = 400;
+      const height = 400;
+      const totalPixels = width * height;
+      const outputData = ctx.createImageData(width, height);
+      const out = outputData.data;
+
+      const formula = formulasDb.find(f => f.id === activeFormulaId);
+      if (!formula) return;
+
+      const imgA = formula.sources && formula.sources[0] ? channels[formula.sources[0]] : null;
+      const imgB = formula.sources && formula.sources[1] ? channels[formula.sources[1]] : null;
+
+      // Extract current slider values
+      const s = {};
+      if (formula.sliders) {
+        formula.sliders.forEach(slider => {
+          s[slider.id] = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+        });
+      }
+
+      const type = formula.renderType;
+
+      if (type === 'narrowband_blend') {
+        const rChan = channels[formula.r_chan];
+        const gChan = channels[formula.g_chan];
+        const bChan = channels[formula.b_chan];
+        
+        const k_r = s.k_r !== undefined ? s.k_r : 1.0;
+        const k_g = s.k_g !== undefined ? s.k_g : 1.0;
+        const k_b = s.k_b !== undefined ? s.k_b : 0.0;
+        
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_val = rChan[i];
+          const g_val = gChan[i];
+          const b_val = bChan[i];
+
+          out[i]     = r_val * k_r + g_val * (1.0 - k_r);
+          out[i + 1] = g_val * k_g + b_val * (1.0 - k_g);
+          out[i + 2] = b_val * (1.0 - k_b) + r_val * k_b;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'foraxx') {
+        const haChan = channels['ha'];
+        const oiiiChan = channels['oiii'];
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const h_val = haChan[i] / 255;
+          const o_val = oiiiChan[i] / 255;
+
+          const product = h_val * o_val;
+          const inv_product = 1.0 - product;
+          const mix = Math.pow(product, inv_product);
+
+          const r_val = h_val;
+          const g_val = mix * h_val + (1.0 - mix) * o_val;
+          const b_val = o_val;
+
+          out[i]     = Math.min(255, Math.max(0, r_val * 255));
+          out[i + 1] = Math.min(255, Math.max(0, g_val * 255 * 1.05));
+          out[i + 2] = Math.min(255, Math.max(0, b_val * 255));
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'stars_add') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = Math.min(255, imgA[i + 1] + imgB[i + 1] * k);
+          out[i + 2] = Math.min(255, imgA[i + 2] + imgB[i + 2] * k);
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'stars_reduce') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        const inv_k = 1.0 - k;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] * k + imgB[i] * inv_k;
+          out[i + 1] = imgA[i + 1] * k + imgB[i + 1] * inv_k;
+          out[i + 2] = imgA[i + 2] * k + imgB[i + 2] * inv_k;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (type === 'ha_rgb') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'oiii_blue') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i];
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = Math.min(255, imgA[i + 2] + imgB[i] * k);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'oiii_green') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i];
+          out[i + 1] = Math.min(255, imgA[i + 1] + imgB[i] * k);
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'sii_red') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, imgA[i] + imgB[i] * k);
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_screen') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = imgA[i] + imgB[i] - (imgA[i] * imgB[i] / 255);
+          const g_blend = imgA[i + 1] + imgB[i + 1] - (imgA[i + 1] * imgB[i + 1] / 255);
+          const b_blend = imgA[i + 2] + imgB[i + 2] - (imgA[i + 2] * imgB[i + 2] / 255);
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_mult') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = (imgA[i] * imgB[i]) / 255;
+          const g_blend = (imgA[i + 1] * imgB[i + 1]) / 255;
+          const b_blend = (imgA[i + 2] * imgB[i + 2]) / 255;
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_overlay') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = imgA[i] < 128 ? (2 * imgA[i] * imgB[i]) / 255 : 255 - 2 * (255 - imgA[i]) * (255 - imgB[i]) / 255;
+          const g_blend = imgA[i + 1] < 128 ? (2 * imgA[i + 1] * imgB[i + 1]) / 255 : 255 - 2 * (255 - imgA[i + 1]) * (255 - imgB[i + 1]) / 255;
+          const b_blend = imgA[i + 2] < 128 ? (2 * imgA[i + 2] * imgB[i + 2]) / 255 : 255 - 2 * (255 - imgA[i + 2]) * (255 - imgB[i + 2]) / 255;
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_diff') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r_blend = Math.abs(imgA[i] - imgB[i]);
+          const g_blend = Math.abs(imgA[i + 1] - imgB[i + 1]);
+          const b_blend = Math.abs(imgA[i + 2] - imgB[i + 2]);
+          out[i]     = imgA[i] * (1.0 - k) + r_blend * k;
+          out[i + 1] = imgA[i + 1] * (1.0 - k) + g_blend * k;
+          out[i + 2] = imgA[i + 2] * (1.0 - k) + b_blend * k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_lighten') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(imgA[i], imgB[i]);
+          out[i + 1] = Math.max(imgA[i + 1], imgB[i + 1]);
+          out[i + 2] = Math.max(imgA[i + 2], imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_darken') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(imgA[i], imgB[i]);
+          out[i + 1] = Math.min(imgA[i + 1], imgB[i + 1]);
+          out[i + 2] = Math.min(imgA[i + 2], imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'blend_average') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = (imgA[i] + imgB[i]) / 2;
+          out[i + 1] = (imgA[i + 1] + imgB[i + 1]) / 2;
+          out[i + 2] = (imgA[i + 2] + imgB[i + 2]) / 2;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'mask_color') {
+        const maskColor = formula.id.includes('red') ? 'r' : formula.id.includes('green') ? 'g' : formula.id.includes('blue') ? 'b' : formula.id.includes('cyan') ? 'c' : formula.id.includes('magenta') ? 'm' : 'y';
+        const v2 = formula.id.includes('v2');
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r = imgA[i];
+          const g = imgA[i + 1];
+          const b = imgA[i + 2];
+          let val = 0;
+          if (!v2) {
+            if (maskColor === 'r') val = r - Math.max(g, b);
+            else if (maskColor === 'g') val = g - Math.max(r, b);
+            else if (maskColor === 'b') val = b - Math.max(r, g);
+            else if (maskColor === 'c') val = Math.min(g, b) - r;
+            else if (maskColor === 'm') val = Math.min(r, b) - g;
+            else if (maskColor === 'y') val = Math.min(r, g) - b;
+          } else {
+            if (maskColor === 'r') val = r > g && r > b ? r - Math.max(g, b) : 0;
+            else if (maskColor === 'g') val = g > r && g > b ? g - Math.max(r, b) : 0;
+            else if (maskColor === 'b') val = b > r && b > g ? b - Math.max(r, g) : 0;
+            else if (maskColor === 'c') val = g > r && b > r ? Math.min(g, b) - r : 0;
+            else if (maskColor === 'm') val = r > g && b > g ? Math.min(r, b) - g : 0;
+            else if (maskColor === 'y') val = r > b && g > b ? Math.min(r, g) - b : 0;
+          }
+          val = Math.max(0, val);
+          out[i]     = val;
+          out[i + 1] = val;
+          out[i + 2] = val;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_invert') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = 255 - imgA[i];
+          out[i + 1] = 255 - imgA[i + 1];
+          out[i + 2] = 255 - imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_clip_high') {
+        const threshold = s.threshold !== undefined ? s.threshold : 0.95;
+        const t_val = threshold * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] > t_val ? t_val : imgA[i];
+          out[i + 1] = imgA[i + 1] > t_val ? t_val : imgA[i + 1];
+          out[i + 2] = imgA[i + 2] > t_val ? t_val : imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_clip_low') {
+        const threshold = s.threshold !== undefined ? s.threshold : 0.05;
+        const t_val = threshold * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i] < t_val ? t_val : imgA[i];
+          out[i + 1] = imgA[i + 1] < t_val ? t_val : imgA[i + 1];
+          out[i + 2] = imgA[i + 2] < t_val ? t_val : imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_bg_flatten') {
+        const pedestal = s.pedestal !== undefined ? s.pedestal : 0.1;
+        const p_val = pedestal * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(0, Math.min(255, imgA[i] - 30 + p_val));
+          out[i + 1] = Math.max(0, Math.min(255, imgA[i + 1] - 30 + p_val));
+          out[i + 2] = Math.max(0, Math.min(255, imgA[i + 2] - 30 + p_val));
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_hotpixel') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          if (imgA[i] > 230 && imgA[i + 1] < 100) {
+            out[i]     = 30;
+            out[i + 1] = 30;
+            out[i + 2] = 30;
+          } else {
+            out[i]     = imgA[i];
+            out[i + 1] = imgA[i + 1];
+            out[i + 2] = imgA[i + 2];
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_syn_lum') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const l = 0.2126 * imgA[i] + 0.7152 * imgA[i + 1] + 0.0722 * imgA[i + 2];
+          out[i]     = l;
+          out[i + 1] = l;
+          out[i + 2] = l;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_syn_lum_eq') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const l = (imgA[i] + imgA[i + 1] + imgA[i + 2]) / 3;
+          out[i]     = l;
+          out[i + 1] = l;
+          out[i + 2] = l;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_range_mask') {
+        const low = s.low !== undefined ? s.low : 0.1;
+        const high = s.high !== undefined ? s.high : 0.8;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const val = (imgA[i] + imgA[i + 1] + imgA[i + 2]) / (3 * 255);
+          let out_val = 0;
+          if (val > low && val < high) {
+            out_val = (val - low) / (high - low);
+          }
+          out[i]     = out_val * 255;
+          out[i + 1] = out_val * 255;
+          out[i + 2] = out_val * 255;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_lin_fit') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = imgA[i + 1] * 0.95 + imgA[i] * 0.05;
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 1] * 1.02 + imgA[i + 2] * 0.02;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_mtf_stretch') {
+        const m = s.m !== undefined ? s.m : 0.05;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const val_r = imgA[i] / 255;
+          const val_g = imgA[i + 1] / 255;
+          const val_b = imgA[i + 2] / 255;
+          
+          const out_r = (val_r * m) / ((m - 1) * val_r + 1);
+          const out_g = (val_g * m) / ((m - 1) * val_g + 1);
+          const out_b = (val_b * m) / ((m - 1) * val_b + 1);
+          
+          out[i]     = out_r * 255;
+          out[i + 1] = out_g * 255;
+          out[i + 2] = out_b * 255;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_star_extract') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.max(0, imgA[i] - imgB[i]);
+          out[i + 1] = Math.max(0, imgA[i + 1] - imgB[i + 1]);
+          out[i + 2] = Math.max(0, imgA[i + 2] - imgB[i + 2]);
+          out[i + 3] = 255;
+        }
+      }
+
+      ctx.putImageData(outputData, 0, 0);
+    }
+
+    // Set page interactive events
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Night Vision
+      const nightmodeToggle = document.getElementById('nightmode-toggle');
+      nightmodeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('night-vision');
+        const isNight = document.body.classList.contains('night-vision');
+        localStorage.setItem('night-vision', isNight ? 'enabled' : 'disabled');
+      });
     });
   </script>
 </body>
