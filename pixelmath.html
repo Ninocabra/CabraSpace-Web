@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelMath-teca - CabraSpace</title>
+  <meta name="description" content="Biblioteca interactiva de fórmulas PixelMath para PixInsight y simulador en tiempo real. Domina el procesado de astrofotografía.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Estilos específicos para la PixelMath-teca */
+    .pixelmath-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .pm-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .pm-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .pm-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-bottom: 60px;
+      align-items: start;
+    }
+
+    @media (min-width: 992px) {
+      .pm-grid {
+        grid-template-columns: 460px 1fr;
+      }
+    }
+
+    /* Card de simulación */
+    .simulator-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: sticky;
+      top: 100px;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #simulatorCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    .canvas-loader {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 2, 2, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      gap: 12px;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(207, 171, 74, 0.2);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Controles y Sliders */
+    .controls-group {
+      margin-bottom: 20px;
+    }
+
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .control-title {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .control-val {
+      font-family: monospace;
+      color: var(--gold-primary);
+    }
+
+    .pm-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-color);
+      outline: none;
+      margin-bottom: 16px;
+      transition: background 0.3s;
+    }
+
+    .pm-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--gold-glow);
+      transition: transform 0.1s;
+    }
+
+    .pm-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .preset-select-wrapper {
+      margin-bottom: 20px;
+    }
+
+    .preset-dropdown {
+      width: 100%;
+      background: #020202;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+
+    .preset-dropdown:focus {
+      border-color: var(--gold-primary);
+    }
+
+    /* Consola PixelMath */
+    .pm-console {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #e0e0e0;
+      position: relative;
+    }
+
+    .console-header {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .console-line {
+      margin-bottom: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .console-line span {
+      color: var(--gold-primary);
+    }
+
+    /* Listado de fórmulas */
+    .formulas-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .formula-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .formula-card:hover {
+      border-color: var(--gold-border);
+      box-shadow: 0 10px 25px rgba(207, 171, 74, 0.03);
+    }
+
+    .formula-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      gap: 16px;
+    }
+
+    .formula-badge {
+      font-size: 0.65rem;
+      background: rgba(207, 171, 74, 0.05);
+      border: 1px solid var(--gold-border);
+      color: var(--gold-primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .formula-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: 0.03em;
+    }
+
+    .formula-description {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      font-weight: 300;
+      margin-bottom: 18px;
+    }
+
+    .formula-code-box {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .formula-code-title {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .formula-code-line {
+      margin-bottom: 4px;
+      color: #e0e0e0;
+    }
+
+    .formula-code-line strong {
+      color: var(--gold-primary);
+      font-weight: normal;
+    }
+
+    .formula-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-action {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-action:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.02);
+    }
+
+    .btn-action.btn-primary-action {
+      border-color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.05);
+      color: var(--gold-primary);
+    }
+
+    .btn-action.btn-primary-action:hover {
+      background: var(--gold-primary);
+      color: var(--bg-color);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+  </style>
+</head>
+<body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Novedades <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
+            <li><a href="novedades.html" class="dropdown-item">PixInsight</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle active">Recursos PixInsight <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath.html" class="dropdown-item active">PixelMath-teca</a></li>
+                <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
+              </ul>
+            </li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="dropdown-item">Mapa de Contaminación ↗</a></li>
+                <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="index.html#youtube" class="nav-link">YouTube</a></li>
+        <li><a href="index.html#support" class="nav-link">Apóyame</a></li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="lang-switcher">
+          <a href="pixelmath.html" class="lang-link active">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="pixelmath-en.html" class="lang-link">EN</a>
+        </div>
+        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <section class="pixelmath-header">
+      <h1 class="pm-title">La PixelMath-teca</h1>
+      <p class="pm-subtitle">
+        Una biblioteca interactiva con las ecuaciones PixelMath más utilizadas en PixInsight. Experimenta con las mezclas en nuestro simulador en tiempo real y copia las fórmulas directamente a tu procesado.
+      </p>
+    </section>
+
+    <div class="pm-grid">
+      <!-- Columna simulador (Sticky) -->
+      <aside class="simulator-card">
+        <div class="canvas-wrapper">
+          <div class="canvas-loader" id="canvasLoader">
+            <div class="spinner"></div>
+            <span>Cargando canales de la nebulosa...</span>
+          </div>
+          <canvas id="simulatorCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <div class="preset-select-wrapper">
+          <label for="presetSelect" style="display:block; margin-bottom:8px; font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Elegir Ajuste Preestablecido</label>
+          <select id="presetSelect" class="preset-dropdown">
+            <option value="sho">Paleta Hubble (SHO)</option>
+            <option value="hoo">Paleta Bicolor (HOO)</option>
+            <option value="foraxx">Paleta Dinámica Foraxx</option>
+            <option value="stars_add">Recomponer Estrellas (Starless + Stars)</option>
+            <option value="stars_reduce">Reducción de Estrellas (Blending)</option>
+            <option value="ha_rgb">Añadir H-alpha al Canal Rojo (Ha-RGB)</option>
+          </select>
+        </div>
+
+        <!-- Sliders Dinámicos -->
+        <div class="controls-group" id="slidersWrapper">
+          <!-- Se inyectan dinámicamente mediante JS -->
+        </div>
+
+        <!-- Consola con la fórmula resultante -->
+        <div class="pm-console">
+          <div class="console-header">
+            <span>PixelMath Expresiones</span>
+            <span style="color:var(--gold-primary); font-family:var(--font-sans); cursor:pointer;" id="copyConsoleBtn">Copiar todo</span>
+          </div>
+          <div id="consoleCode">
+            <!-- Se inyecta dinámicamente -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Columna biblioteca de fórmulas -->
+      <section class="formulas-container">
+        <!-- Fórmula 1: SHO -->
+        <article class="formula-card" data-preset="sho">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Paleta Hubble Clásica (SHO)</h2>
+            <span class="formula-badge">Banda Estrecha</span>
+          </div>
+          <p class="formula-description">
+            Combina los tres canales de banda estrecha asignando el Azufre (SII) al color rojo, el Hidrógeno (Ha) al verde y el Oxígeno (OIII) al azul. Destaca por sus característicos tonos dorados, verdes y turquesas. Es la paleta usada por el telescopio espacial Hubble.
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Independientes)</div>
+            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">SII</span></div>
+            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">Ha</span></div>
+            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="sho">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="sho">Cargar en Simulador</button>
+          </div>
+        </article>
+
+        <!-- Fórmula 2: HOO -->
+        <article class="formula-card" data-preset="hoo">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Paleta Bicolor Natural (HOO)</h2>
+            <span class="formula-badge">Banda Dual / OSC</span>
+          </div>
+          <p class="formula-description">
+            Ideal para astrofotografías capturadas con cámaras de color y filtros de banda estrecha duales (ej. L-eXtreme). Asigna el Hidrógeno (Ha) al canal rojo y el Oxígeno (OIII) a los canales verde y azul. Produce colores similares a la visión humana natural, con nebulosas de color rojo brillante y zonas de gas oxígeno azulado.
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Independientes)</div>
+            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">Ha</span></div>
+            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">OIII</span></div>
+            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="hoo">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="hoo">Cargar en Simulador</button>
+          </div>
+        </article>
+
+        <!-- Fórmula 3: Foraxx -->
+        <article class="formula-card" data-preset="foraxx">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Paleta Dinámica Foraxx</h2>
+            <span class="formula-badge">Banda Estrecha / Dual</span>
+          </div>
+          <p class="formula-description">
+            Creada por Paul Forstmann, es una paleta HOO/SHO modificada que calcula mezclas no lineales dinámicas basadas en la fuerza relativa de la señal de cada canal. Permite obtener transiciones de color extremadamente suaves entre las zonas cargadas de H-alpha (rojo/dorado) y las de Oxígeno (azul/turquesa).
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Independientes)</div>
+            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">Ha</span></div>
+            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">((OIII*Ha)^~(OIII*Ha))*Ha + ~((OIII*Ha)^~(OIII*Ha))*OIII</span></div>
+            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">OIII</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="foraxx">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="foraxx">Cargar en Simulador</button>
+          </div>
+        </article>
+
+        <!-- Fórmula 4: Starless + Stars -->
+        <article class="formula-card" data-preset="stars_add">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Recomposición (Starless + Stars)</h2>
+            <span class="formula-badge">Utilidades</span>
+          </div>
+          <p class="formula-description">
+            Una vez procesado el fondo de la nebulosa sin estrellas (ej. tras aplicar StarNet o StarXTerminator) y las estrellas por separado, esta fórmula sirve para volver a sumar las estrellas a la imagen final.
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Enlace Único)</div>
+            <div class="formula-code-line"><strong>RGB:</strong> <span class="formula-rgb-code">Starless + Stars</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="stars_add">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="stars_add">Cargar en Simulador</button>
+          </div>
+        </article>
+
+        <!-- Fórmula 5: Reducción de Estrellas -->
+        <article class="formula-card" data-preset="stars_reduce">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Reducción de Estrellas por Mezcla</h2>
+            <span class="formula-badge">Procesado</span>
+          </div>
+          <p class="formula-description">
+            Combina de manera proporcional la imagen con estrellas original y la versión sin estrellas. Controlando el porcentaje de mezcla (k), puedes reducir la prominencia y el brillo de las estrellas para que no eclipsen los detalles finos de la nebulosa.
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Enlace Único)</div>
+            <div class="formula-code-line"><strong>RGB:</strong> <span class="formula-rgb-code">Original * k + Starless * (1 - k)</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="stars_reduce">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="stars_reduce">Cargar en Simulador</button>
+          </div>
+        </article>
+
+        <!-- Fórmula 6: Ha-RGB -->
+        <article class="formula-card" data-preset="ha_rgb">
+          <div class="formula-card-header">
+            <h2 class="formula-title">Añadir H-alpha a Banda Ancha (Ha-RGB)</h2>
+            <span class="formula-badge">Combinación LRGB</span>
+          </div>
+          <p class="formula-description">
+            Suma señal pura de H-alpha capturada en banda estrecha al canal rojo de una toma RGB tradicional. Esto potencia significativamente el contraste y los detalles de las nubes rojas de emisión sin alterar el balance cromático de las estrellas.
+          </p>
+          <div class="formula-code-box">
+            <div class="formula-code-title">Expresiones PixInsight (RGB Independientes)</div>
+            <div class="formula-code-line"><strong>R:</strong> <span class="formula-r-code">RGB_R + k * Ha</span></div>
+            <div class="formula-code-line"><strong>G:</strong> <span class="formula-g-code">RGB_G</span></div>
+            <div class="formula-code-line"><strong>B:</strong> <span class="formula-b-code">RGB_B</span></div>
+          </div>
+          <div class="formula-actions">
+            <button class="btn-action btn-copy-card" data-target="ha_rgb">Copiar Fórmula</button>
+            <button class="btn-action btn-primary-action btn-load-preset" data-preset="ha_rgb">Cargar en Simulador</button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background:#020202; border-top:1px solid var(--border-color); padding: 40px 0; font-size:0.85rem; color:var(--text-muted); text-align:center;">
+    <div class="container">
+      <p>&copy; 2026 CabraSpace. Desarrollado para la comunidad de astrofotografía.</p>
+    </div>
+  </footer>
+
+  <!-- Simulator Engine JS -->
+  <script>
+    // State of the simulator
+    let activePreset = 'sho';
+    const channels = {};
+    const canvas = document.getElementById('simulatorCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    
+    // Sliders state values (keys map to slider IDs)
+    const slidersState = {
+      sho_sii_red: 0.8,
+      sho_ha_green: 1.0,
+      hoo_ha_blue: 0.15,
+      stars_add_factor: 0.8,
+      stars_reduce_factor: 0.4,
+      ha_rgb_factor: 0.6
+    };
+
+    // UI Configuration for Presets
+    const presetsConfig = {
+      sho: {
+        title: "Paleta Hubble (SHO)",
+        sliders: [
+          { id: 'sho_sii_red', label: 'Mezcla SII / Ha en Canal Rojo', min: 0, max: 1, step: 0.05, unit: '%' },
+          { id: 'sho_ha_green', label: 'Mezcla Ha / OIII en Canal Verde', min: 0, max: 1, step: 0.05, unit: '%' }
+        ],
+        code: (s) => `R: ${s.sho_sii_red.toFixed(2)} * SII + ${(1-s.sho_sii_red).toFixed(2)} * Ha\nG: ${s.sho_ha_green.toFixed(2)} * Ha + ${(1-s.sho_ha_green).toFixed(2)} * OIII\nB: OIII`
+      },
+      hoo: {
+        title: "Paleta Bicolor (HOO)",
+        sliders: [
+          { id: 'hoo_ha_blue', label: 'Añadir Ha al Canal Azul', min: 0, max: 0.5, step: 0.05, unit: '%' }
+        ],
+        code: (s) => `R: Ha\nG: OIII\nB: ${(1-s.hoo_ha_blue).toFixed(2)} * OIII + ${s.hoo_ha_blue.toFixed(2)} * Ha`
+      },
+      foraxx: {
+        title: "Paleta Dinámica Foraxx",
+        sliders: [],
+        code: () => `R: Ha\nG: ((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII\nB: OIII`
+      },
+      stars_add: {
+        title: "Recomponer Estrellas",
+        sliders: [
+          { id: 'stars_add_factor', label: 'Intensidad de Estrellas (k)', min: 0, max: 1.5, step: 0.05, unit: '' }
+        ],
+        code: (s) => `R/G/B: Starless + ${s.stars_add_factor.toFixed(2)} * Stars`
+      },
+      stars_reduce: {
+        title: "Reducción de Estrellas",
+        sliders: [
+          { id: 'stars_reduce_factor', label: 'Porcentaje de Estrellas (k)', min: 0, max: 1, step: 0.05, unit: '%' }
+        ],
+        code: (s) => `R/G/B: Original * ${s.stars_reduce_factor.toFixed(2)} + Starless * ${(1-s.stars_reduce_factor).toFixed(2)}`
+      },
+      ha_rgb: {
+        title: "Ha-RGB",
+        sliders: [
+          { id: 'ha_rgb_factor', label: 'Intensidad H-alpha (k)', min: 0, max: 1.2, step: 0.05, unit: '' }
+        ],
+        code: (s) => `R: RGB_R + ${s.ha_rgb_factor.toFixed(2)} * Ha\nG: RGB_G\nB: RGB_B`
+      }
+    };
+
+    // Load assets
+    const imagesToLoad = {
+      ha: 'nebula_ha.png',
+      sii: 'nebula_sii.png',
+      oiii: 'nebula_oiii.png',
+      starless: 'nebula_starless.png',
+      stars: 'nebula_stars.png',
+      original: 'nebula_original.png'
+    };
+
+    let loadedCount = 0;
+    const totalToLoad = Object.keys(imagesToLoad).length;
+
+    Object.entries(imagesToLoad).forEach(([key, src]) => {
+      const img = new Image();
+      img.onload = () => {
+        // Draw to offscreen canvas to extract pixel data
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = 400;
+        offCanvas.height = 400;
+        const offCtx = offCanvas.getContext('2d');
+        offCtx.drawImage(img, 0, 0, 400, 400);
+        
+        // Save raw image data
+        channels[key] = offCtx.getImageData(0, 0, 400, 400).data;
+        
+        loadedCount++;
+        if (loadedCount === totalToLoad) {
+          // Hide loader and initialize simulator
+          document.getElementById('canvasLoader').style.opacity = 0;
+          setTimeout(() => {
+            document.getElementById('canvasLoader').style.display = 'none';
+          }, 300);
+          
+          initSimulator();
+        }
+      };
+      img.onerror = (e) => {
+        console.error("Error loading sample image:", src);
+      };
+      img.src = src;
+    });
+
+    function initSimulator() {
+      // Set dropdown listener
+      const presetSelect = document.getElementById('presetSelect');
+      presetSelect.addEventListener('change', (e) => {
+        setPreset(e.target.value);
+      });
+
+      // Set copy button listener
+      document.getElementById('copyConsoleBtn').addEventListener('click', () => {
+        const text = presetsConfig[activePreset].code(slidersState);
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById('copyConsoleBtn');
+          btn.textContent = "¡Copiado!";
+          setTimeout(() => {
+            btn.textContent = "Copiar todo";
+          }, 1500);
+        });
+      });
+
+      // Load initial preset
+      setPreset('sho');
+    }
+
+    function setPreset(presetName) {
+      activePreset = presetName;
+      document.getElementById('presetSelect').value = presetName;
+      
+      // Highlight card in list
+      document.querySelectorAll('.formula-card').forEach(card => {
+        card.style.borderColor = card.dataset.preset === presetName ? 'var(--gold-primary)' : 'var(--border-color)';
+      });
+
+      renderSliders();
+      updateConsole();
+      runSimulation();
+    }
+
+    function renderSliders() {
+      const wrapper = document.getElementById('slidersWrapper');
+      wrapper.innerHTML = '';
+      
+      const config = presetsConfig[activePreset];
+      config.sliders.forEach(slider => {
+        const value = slidersState[slider.id];
+        
+        const controlRow = document.createElement('div');
+        controlRow.className = 'controls-group';
+        
+        const displayVal = slider.unit === '%' ? Math.round(value * 100) + '%' : value.toFixed(2);
+
+        controlRow.innerHTML = `
+          <div class="control-label-row">
+            <span class="control-title">${slider.label}</span>
+            <span class="control-val" id="val_${slider.id}">${displayVal}</span>
+          </div>
+          <input type="range" 
+                 class="pm-slider" 
+                 id="${slider.id}" 
+                 min="${slider.min}" 
+                 max="${slider.max}" 
+                 step="${slider.step}" 
+                 value="${value}">
+        `;
+        
+        wrapper.appendChild(controlRow);
+
+        // Add event listener to slider
+        const sliderInput = controlRow.querySelector('input');
+        sliderInput.addEventListener('input', (e) => {
+          const newVal = parseFloat(e.target.value);
+          slidersState[slider.id] = newVal;
+          
+          // Update display value text
+          const valDisplay = slider.unit === '%' ? Math.round(newVal * 100) + '%' : newVal.toFixed(2);
+          document.getElementById(`val_${slider.id}`).textContent = valDisplay;
+          
+          updateConsole();
+          runSimulation();
+        });
+      });
+    }
+
+    function updateConsole() {
+      const codeContainer = document.getElementById('consoleCode');
+      const text = presetsConfig[activePreset].code(slidersState);
+      
+      // Format console output beautifully
+      const lines = text.split('\n').map(line => {
+        const parts = line.split(':');
+        if (parts.length > 1) {
+          return `<div class="console-line"><span>${parts[0]}:</span>${parts[1]}</div>`;
+        }
+        return `<div class="console-line">${line}</div>`;
+      }).join('');
+
+      codeContainer.innerHTML = lines;
+    }
+
+    function runSimulation() {
+      if (!channels.ha) return; // Images not fully loaded yet
+
+      const width = 400;
+      const height = 400;
+      const totalPixels = width * height;
+      
+      const outputData = ctx.createImageData(width, height);
+      const out = outputData.data;
+
+      // Extract current variables
+      const s = slidersState;
+
+      // Access channel pixels
+      const ha = channels.ha;
+      const sii = channels.sii;
+      const oiii = channels.oiii;
+      const starless = channels.starless;
+      const stars = channels.stars;
+      const original = channels.original;
+
+      if (activePreset === 'sho') {
+        const sii_red = s.sho_sii_red;
+        const ha_green = s.sho_ha_green;
+        
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          // Monochrome values (red channel represents intensity)
+          const h_val = ha[i];
+          const s_val = sii[i];
+          const o_val = oiii[i];
+
+          // SHO Blend formulas
+          out[i]     = s_val * sii_red + h_val * (1 - sii_red);        // Red channel
+          out[i + 1] = h_val * ha_green + o_val * (1 - ha_green);     // Green channel
+          out[i + 2] = o_val;                                         // Blue channel
+          out[i + 3] = 255;                                           // Alpha
+        }
+      } 
+      else if (activePreset === 'hoo') {
+        const ha_blue = s.hoo_ha_blue;
+        
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const h_val = ha[i];
+          const o_val = oiii[i];
+
+          out[i]     = h_val;
+          out[i + 1] = o_val;
+          out[i + 2] = o_val * (1 - ha_blue) + h_val * ha_blue;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (activePreset === 'foraxx') {
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const h_val = ha[i] / 255;
+          const o_val = oiii[i] / 255;
+
+          // Paul Forstmann Foraxx approximation
+          const product = h_val * o_val;
+          const inv_product = 1.0 - product;
+          // Dynamic mix value
+          const mix = Math.pow(product, inv_product);
+
+          const r_val = h_val;
+          const g_val = mix * h_val + (1.0 - mix) * o_val;
+          const b_val = o_val;
+
+          out[i]     = Math.min(255, Math.max(0, r_val * 255));
+          out[i + 1] = Math.min(255, Math.max(0, g_val * 255 * 1.05)); // Slight green boost
+          out[i + 2] = Math.min(255, Math.max(0, b_val * 255));
+          out[i + 3] = 255;
+        }
+      } 
+      else if (activePreset === 'stars_add') {
+        const factor = s.stars_add_factor;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = Math.min(255, starless[i] + stars[i] * factor);
+          out[i + 1] = Math.min(255, starless[i + 1] + stars[i + 1] * factor);
+          out[i + 2] = Math.min(255, starless[i + 2] + stars[i + 2] * factor);
+          out[i + 3] = 255;
+        }
+      } 
+      else if (activePreset === 'stars_reduce') {
+        const factor = s.stars_reduce_factor;
+        const inv_factor = 1.0 - factor;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          out[i]     = original[i] * factor + starless[i] * inv_factor;
+          out[i + 1] = original[i + 1] * factor + starless[i + 1] * inv_factor;
+          out[i + 2] = original[i + 2] * factor + starless[i + 2] * inv_factor;
+          out[i + 3] = 255;
+        }
+      } 
+      else if (activePreset === 'ha_rgb') {
+        const factor = s.ha_rgb_factor;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          // Add Ha signal only to Red channel of the original image
+          out[i]     = Math.min(255, original[i] + ha[i] * factor);
+          out[i + 1] = original[i + 1];
+          out[i + 2] = original[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+
+      ctx.putImageData(outputData, 0, 0);
+    }
+
+    // Set page interactive events
+    document.addEventListener('DOMContentLoaded', () => {
+      // Buttons inside cards
+      document.querySelectorAll('.btn-load-preset').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const preset = e.target.dataset.preset;
+          setPreset(preset);
+          // Scroll smoothly to simulator on mobile
+          if (window.innerWidth < 992) {
+            document.querySelector('.simulator-card').scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+
+      document.querySelectorAll('.btn-copy-card').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const targetPreset = e.target.dataset.target;
+          // Extract text from the corresponding card's code box
+          const card = document.querySelector(`.formula-card[data-preset="${targetPreset}"]`);
+          const rCode = card.querySelector('.formula-r-code')?.textContent || '';
+          const gCode = card.querySelector('.formula-g-code')?.textContent || '';
+          const bCode = card.querySelector('.formula-b-code')?.textContent || '';
+          const rgbCode = card.querySelector('.formula-rgb-code')?.textContent || '';
+          
+          let text = "";
+          if (rgbCode) {
+            text = `RGB: ${rgbCode}`;
+          } else {
+            text = `R: ${rCode}\nG: ${gCode}\nB: ${bCode}`;
+          }
+          
+          navigator.clipboard.writeText(text).then(() => {
+            const originalText = e.target.textContent;
+            e.target.textContent = "¡Copiado!";
+            e.target.style.borderColor = "var(--gold-primary)";
+            e.target.style.color = "var(--gold-primary)";
+            
+            setTimeout(() => {
+              e.target.textContent = originalText;
+              e.target.style.borderColor = "";
+              e.target.style.color = "";
+            }, 1500);
+          });
+        });
+      });
+    });
+
+    // Night Mode Toggle logic (copied from index.js for standalone stability)
+    const nightmodeToggle = document.getElementById('nightmode-toggle');
+    nightmodeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('night-vision');
+      const isNight = document.body.classList.contains('night-vision');
+      localStorage.setItem('night-vision', isNight ? 'enabled' : 'disabled');
+    });
+  </script>
+</body>
+</html>
