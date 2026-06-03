@@ -64,7 +64,18 @@ SOURCES = [
     {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True},
     {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True},
     {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True},
-    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True}
+    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True},
+    {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True},
+    {"name": "Pegasus Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbrUkaBOELOQywEUvdiJGyA", "is_youtube": True},
+    {"name": "Player One Astronomy (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGJbQ-wBD1lqVhNMqCbWoMA", "is_youtube": True},
+    {"name": "PrimaLuceLab (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCeXafWw7n66SysjmrfRsLjg", "is_youtube": True},
+    {"name": "Celestron (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCSZErIkrEARb28wBG3wRXow", "is_youtube": True},
+    {"name": "Sky-Watcher USA (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCp6O7O6Nt3Fg7UQXvnq6WcQ", "is_youtube": True},
+    {"name": "Explore Scientific (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4AR7eOxPBo7UHoJOZcgrTQ", "is_youtube": True},
+    {"name": "William Optics (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_YbaZ47wZNSLu_JQl9djKg", "is_youtube": True},
+    {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True},
+    {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True},
+    {"name": "Lunt Solar Systems (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIP-sBB1PuiKgRqJB_iJ9kg", "is_youtube": True}
 ]
 
 GITHUB_REPOS = [
