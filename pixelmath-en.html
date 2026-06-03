@@ -141,6 +141,49 @@
       align-items: center;
       gap: 6px;
       width: 100%;
+      position: relative;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px dashed transparent;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-box:hover {
+      background: rgba(212, 175, 55, 0.05);
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .input-box.drag-over {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+
+    .input-box::after {
+      content: "Drag or click";
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 10px);
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: var(--gold-primary);
+      font-size: 0.55rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      z-index: 10;
+    }
+
+    .input-box:hover::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
     }
 
     .input-canvas {
@@ -152,6 +195,25 @@
       background: #000;
       display: block;
       image-rendering: pixelated;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-canvas.upload-success {
+      animation: pulse-gold 0.8s ease-out;
+    }
+
+    @keyframes pulse-gold {
+      0% {
+        box-shadow: 0 0 0 0px rgba(212, 175, 55, 0.7);
+        border-color: var(--gold-primary);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+        border-color: var(--gold-primary);
+      }
+      100% {
+        box-shadow: 0 0 0 0px rgba(212, 175, 55, 0);
+      }
     }
 
     .input-label {
@@ -964,6 +1026,9 @@
         renderInputPreviews(formula.sources);
         updateConsole(formula);
         runSimulation();
+        
+        // Start fantasy animation!
+        startSlidersAnimation(formula);
       }
 
       renderDetails();
@@ -1078,6 +1143,13 @@
         wrapper.appendChild(controlRow);
 
         const sliderInput = controlRow.querySelector('input');
+        
+        // Stop animation on user manual input
+        const stopAnim = () => stopSliderAnimation(slider.id);
+        sliderInput.addEventListener('input', stopAnim);
+        sliderInput.addEventListener('mousedown', stopAnim);
+        sliderInput.addEventListener('touchstart', stopAnim);
+        
         sliderInput.addEventListener('input', (e) => {
           const newVal = parseFloat(e.target.value);
           slidersState[slider.id] = newVal;
@@ -1157,11 +1229,47 @@
         
         box.appendChild(canvasEl);
         box.appendChild(label);
-        grid.appendChild(box);
         
+        // Hidden file input selector
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        box.appendChild(fileInput);
+
+        // Click handler to open file explorer
+        box.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          handleCustomImageUpload(key, file, canvasEl);
+        });
+
+        // Drag & Drop handlers
+        box.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          box.classList.add('drag-over');
+        });
+
+        box.addEventListener('dragleave', () => {
+          box.classList.remove('drag-over');
+        });
+
+        box.addEventListener('drop', (e) => {
+          e.preventDefault();
+          box.classList.remove('drag-over');
+          const file = e.dataTransfer.files[0];
+          handleCustomImageUpload(key, file, canvasEl);
+        });
+
+        grid.appendChild(box);
         drawChannelToCanvas(key, canvasEl);
       });
     }
+
+
 
         // Helper to evaluate and replace slider variables in formulas
     function replaceVariables(expr, formula) {
@@ -1231,6 +1339,130 @@
         detailCodeBox.innerHTML = `<div class="detail-code-title">Fórmula para PixInsight</div>` + detailLines;
       }
     }
+
+    let activeSliderAnims = {};
+
+    function startSlidersAnimation(formula) {
+      // Clear any previous slider animations
+      Object.keys(activeSliderAnims).forEach(id => {
+        cancelAnimationFrame(activeSliderAnims[id]);
+      });
+      activeSliderAnims = {};
+
+      if (!formula.sliders || formula.sliders.length === 0) return;
+
+      const duration = 2500; // Animation duration in milliseconds
+      const startTime = performance.now();
+
+      formula.sliders.forEach(slider => {
+        const sliderId = slider.id;
+        const domSlider = document.getElementById(`slider_${sliderId}`);
+        if (!domSlider) return;
+
+        const defaultValue = slider.value;
+        const min = slider.min;
+        const max = slider.max;
+        const range = max - min;
+
+        // Oscillate starting at default, going to max, to min, and returning to default
+        const amplitudeMax = max - defaultValue;
+        const amplitudeMin = defaultValue - min;
+
+        function animate(now) {
+          const elapsed = now - startTime;
+          const progress = elapsed / duration;
+
+          if (progress >= 1.0) {
+            slidersState[sliderId] = defaultValue;
+            domSlider.value = defaultValue;
+            const valDisplay = slider.unit === '%' ? Math.round(defaultValue * 100) + '%' : defaultValue.toFixed(2);
+            const valEl = document.getElementById(`val_${sliderId}`);
+            if (valEl) valEl.textContent = valDisplay;
+            
+            updateConsole(formula);
+            runSimulation();
+            delete activeSliderAnims[sliderId];
+            return;
+          }
+
+          const sine = Math.sin(progress * 3 * Math.PI);
+          let currentVal;
+          if (sine >= 0) {
+            currentVal = defaultValue + sine * amplitudeMax;
+          } else {
+            currentVal = defaultValue + sine * amplitudeMin;
+          }
+
+          currentVal = Math.min(max, Math.max(min, currentVal));
+
+          slidersState[sliderId] = currentVal;
+          domSlider.value = currentVal;
+          const valDisplay = slider.unit === '%' ? Math.round(currentVal * 100) + '%' : currentVal.toFixed(2);
+          const valEl = document.getElementById(`val_${sliderId}`);
+          if (valEl) valEl.textContent = valDisplay;
+
+          updateConsole(formula);
+          runSimulation();
+
+          activeSliderAnims[sliderId] = requestAnimationFrame(animate);
+        }
+
+        activeSliderAnims[sliderId] = requestAnimationFrame(animate);
+      });
+    }
+
+    function stopSliderAnimation(sliderId) {
+      if (activeSliderAnims[sliderId]) {
+        cancelAnimationFrame(activeSliderAnims[sliderId]);
+        delete activeSliderAnims[sliderId];
+      }
+    }
+
+    function handleCustomImageUpload(key, file, canvasEl) {
+      if (!file || !file.type.startsWith('image/')) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = 400;
+          offCanvas.height = 400;
+          const offCtx = offCanvas.getContext('2d');
+          offCtx.drawImage(img, 0, 0, 400, 400);
+          const imgData = offCtx.getImageData(0, 0, 400, 400);
+          const data = imgData.data;
+
+          // Convert to grayscale if it is a monochrome channel (i.e. not 'original')
+          if (key !== 'original') {
+            for (let i = 0; i < data.length; i += 4) {
+              const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+              data[i]     = gray;
+              data[i + 1] = gray;
+              data[i + 2] = gray;
+            }
+          }
+
+          // Override local channel buffer
+          channels[key] = data;
+
+          // Redraw this input canvas
+          drawChannelToCanvas(key, canvasEl);
+
+          // Rerun active simulation
+          runSimulation();
+
+          // Gold glow success feedback
+          canvasEl.classList.remove('upload-success');
+          void canvasEl.offsetWidth; // reflow trigger
+          canvasEl.classList.add('upload-success');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+
 
 
 
