@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Últimas Novedades PixInsight - CabraSpace</title>
-  <meta name="description" content="Base de datos de conocimiento interactiva con las últimas novedades, scripts, procesos y tutoriales sobre PixInsight.">
+  <title>Base de Datos de Equipamiento - CabraSpace</title>
+  <meta name="description" content="Base de datos de conocimiento interactiva con las últimas novedades, revisiones, lanzamientos y software de equipamiento de astrofotografía.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
@@ -360,7 +360,7 @@
       <ul class="nav-menu">
         <li><a href="index.html" class="nav-link">Inicio</a></li>
         <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Astrofotografía <span class="arrow">▾</span></a>
+          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
               <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
@@ -370,7 +370,7 @@
                 <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
               </ul>
             </li>
-            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
+            <li><a href="equipamiento.html" class="dropdown-item active">Equipamiento</a></li>
             <li><a href="#" class="dropdown-item">Contaminación Lumínica</a></li>
           </ul>
         </li>
@@ -380,9 +380,9 @@
 
       <div style="display: flex; align-items: center; gap: 16px;">
         <div class="lang-switcher">
-          <a href="novedades.html" class="lang-link active">ES</a>
+          <a href="equipamiento.html" class="lang-link active">ES</a>
           <span class="lang-separator">|</span>
-          <a href="novedades-en.html" class="lang-link">EN</a>
+          <a href="equipamiento-en.html" class="lang-link">EN</a>
         </div>
         <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
       </div>
@@ -392,9 +392,9 @@
   <!-- Main Section -->
   <main class="container">
     <section class="database-header">
-      <h1 class="db-title">Últimas Novedades PixInsight</h1>
+      <h1 class="db-title">Equipamiento de Astrofotografía</h1>
       <p class="db-subtitle">
-        Una base de datos de conocimiento inteligente y autoactualizada. Filtra y busca las últimas actualizaciones del software oficial, scripts comunitarios, novedades y tutoriales.
+        Una base de datos de conocimiento inteligente y autoactualizada. Filtra y busca análisis, novedades de marcas oficiales, reviews de divulgadores y actualizaciones de software/firmware.
       </p>
     </section>
 
@@ -404,7 +404,7 @@
         <!-- Search Input -->
         <div class="search-row">
           <div class="search-input-wrapper">
-            <input type="text" class="search-input" id="searchInput" placeholder="Buscar actualizaciones, scripts, procesos (presiona '/' para enfocar)...">
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar telescopios, cámaras, monturas, accesorios, software (presiona '/' para enfocar)...">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span class="keyboard-hint">/</span>
           </div>
@@ -417,10 +417,11 @@
             <div class="filter-label">Categorías</div>
             <div class="category-buttons" id="categoryButtons">
               <button class="category-btn active" data-category="TODOS">Todos</button>
-              <button class="category-btn" data-category="SOFTWARE">Software</button>
-              <button class="category-btn" data-category="SCRIPTS">Scripts</button>
-              <button class="category-btn" data-category="TALLERES">Talleres</button>
-              <button class="category-btn" data-category="COMUNIDAD">Comunidad</button>
+              <button class="category-btn" data-category="TELESCOPIOS">Telescopios</button>
+              <button class="category-btn" data-category="CÁMARAS">Cámaras</button>
+              <button class="category-btn" data-category="MONTURAS">Monturas</button>
+              <button class="category-btn" data-category="ACCESORIOS">Accesorios</button>
+              <button class="category-btn" data-category="SOFTWARE">Software / Firmware</button>
             </div>
           </div>
 
@@ -437,7 +438,7 @@
 
     <!-- Results count bar -->
     <div class="results-info-bar">
-      <span class="results-count" id="resultsCount">Cargando base de conocimiento...</span>
+      <span class="results-count" id="resultsCount">Cargando base de datos...</span>
       <span class="clear-filters-link" id="clearFiltersBtn" onclick="clearFilters()">Restablecer filtros</span>
     </div>
 
@@ -523,7 +524,7 @@
 
     async function loadDatabase() {
       try {
-        const response = await fetch('novedades.json');
+        const response = await fetch('equipamiento.json');
         newsData = await response.json();
         
         // Render tags cloud initially from all data
@@ -534,7 +535,7 @@
         document.getElementById('newsContainer').innerHTML = `
           <div class="empty-state">
             <h3>Error al cargar los datos</h3>
-            <p>No se pudo conectar a la base de datos de novedades. Por favor, inténtelo de nuevo más tarde.</p>
+            <p>No se pudo conectar a la base de datos de equipamiento. Por favor, inténtelo de nuevo más tarde.</p>
           </div>
         `;
         document.getElementById('resultsCount').textContent = 'Error';
@@ -647,13 +648,13 @@
       }
 
       // Update counter text
-      resultsCountEl.textContent = `${filtered.length} novedades encontradas`;
+      resultsCountEl.textContent = `${filtered.length} productos o revisiones encontradas`;
 
       // Render cards
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>No se encontraron novedades</h3>
+            <h3>No se encontraron resultados</h3>
             <p>Prueba a cambiar los términos de búsqueda o a restablecer los filtros activos.</p>
           </div>
         `;

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Últimas Novedades PixInsight - CabraSpace</title>
-  <meta name="description" content="Base de datos de conocimiento interactiva con las últimas novedades, scripts, procesos y tutoriales sobre PixInsight.">
+  <title>Equipment Database - CabraSpace</title>
+  <meta name="description" content="Interactive and self-updating knowledge base containing the latest astrophotography equipment news, reviews, releases, and software updates.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
-    /* Estilos específicos para la Base de Conocimiento */
+    /* Knowledge Base Custom Styles */
     .database-header {
       padding-top: 150px;
       padding-bottom: 36px;
@@ -352,39 +352,39 @@
   <!-- Header / Navigation -->
   <header id="navbar">
     <div class="container nav-container">
-      <a href="index.html" class="logo-link">
+      <a href="en.html" class="logo-link">
         <img src="logo.png" alt="CabraSpace Logo">
         <span>CabraSpace</span>
       </a>
       
       <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li><a href="en.html" class="nav-link">Home</a></li>
         <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Astrofotografía <span class="arrow">▾</span></a>
+          <a href="#" class="nav-link dropdown-toggle active">Astrophotography <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
+              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
                 <li><a href="#" class="dropdown-item">CabraScripts</a></li>
-                <li><a href="novedades.html" class="dropdown-item">Últimas Novedades</a></li>
-                <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
+                <li><a href="novedades-en.html" class="dropdown-item">Latest News</a></li>
+                <li><a href="#" class="dropdown-item">YouTube Courses</a></li>
               </ul>
             </li>
-            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
-            <li><a href="#" class="dropdown-item">Contaminación Lumínica</a></li>
+            <li><a href="equipamiento-en.html" class="dropdown-item active">Equipment</a></li>
+            <li><a href="#" class="dropdown-item">Light Pollution</a></li>
           </ul>
         </li>
-        <li><a href="index.html#youtube" class="nav-link">YouTube</a></li>
-        <li><a href="index.html#support" class="nav-link">Apóyame</a></li>
+        <li><a href="en.html#youtube" class="nav-link">YouTube</a></li>
+        <li><a href="en.html#support" class="nav-link">Support Me</a></li>
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
         <div class="lang-switcher">
-          <a href="novedades.html" class="lang-link active">ES</a>
+          <a href="equipamiento.html" class="lang-link">ES</a>
           <span class="lang-separator">|</span>
-          <a href="novedades-en.html" class="lang-link">EN</a>
+          <a href="equipamiento-en.html" class="lang-link active">EN</a>
         </div>
-        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+        <a href="en.html#newsletter" class="nav-cta hidden">Subscribe</a>
       </div>
     </div>
   </header>
@@ -392,9 +392,9 @@
   <!-- Main Section -->
   <main class="container">
     <section class="database-header">
-      <h1 class="db-title">Últimas Novedades PixInsight</h1>
+      <h1 class="db-title">Equipment Database</h1>
       <p class="db-subtitle">
-        Una base de datos de conocimiento inteligente y autoactualizada. Filtra y busca las últimas actualizaciones del software oficial, scripts comunitarios, novedades y tutoriales.
+        An interactive, self-updating knowledge base. Filter and search gear releases from official brands, educator reviews, and capture software/firmware updates.
       </p>
     </section>
 
@@ -404,29 +404,30 @@
         <!-- Search Input -->
         <div class="search-row">
           <div class="search-input-wrapper">
-            <input type="text" class="search-input" id="searchInput" placeholder="Buscar actualizaciones, scripts, procesos (presiona '/' para enfocar)...">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search telescopes, cameras, mounts, accessories, software (press '/' to focus)...">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span class="keyboard-hint">/</span>
           </div>
         </div>
 
-        <!-- Categorías y Tags -->
+        <!-- Categories & Tags -->
         <div class="filters-row">
-          <!-- Categorías -->
+          <!-- Categories -->
           <div>
-            <div class="filter-label">Categorías</div>
+            <div class="filter-label">Categories</div>
             <div class="category-buttons" id="categoryButtons">
-              <button class="category-btn active" data-category="TODOS">Todos</button>
-              <button class="category-btn" data-category="SOFTWARE">Software</button>
-              <button class="category-btn" data-category="SCRIPTS">Scripts</button>
-              <button class="category-btn" data-category="TALLERES">Talleres</button>
-              <button class="category-btn" data-category="COMUNIDAD">Comunidad</button>
+              <button class="category-btn active" data-category="ALL">All</button>
+              <button class="category-btn" data-category="TELESCOPES">Telescopes</button>
+              <button class="category-btn" data-category="CAMERAS">Cameras</button>
+              <button class="category-btn" data-category="MOUNTS">Mounts</button>
+              <button class="category-btn" data-category="ACCESSORIES">Accessories</button>
+              <button class="category-btn" data-category="SOFTWARE">Software / Firmware</button>
             </div>
           </div>
 
           <!-- Tags Cloud -->
           <div>
-            <div class="filter-label">Etiquetas comunes</div>
+            <div class="filter-label">Common tags</div>
             <div class="tags-container" id="tagsContainer">
               <!-- Loading tags dynamically -->
             </div>
@@ -437,8 +438,8 @@
 
     <!-- Results count bar -->
     <div class="results-info-bar">
-      <span class="results-count" id="resultsCount">Cargando base de conocimiento...</span>
-      <span class="clear-filters-link" id="clearFiltersBtn" onclick="clearFilters()">Restablecer filtros</span>
+      <span class="results-count" id="resultsCount">Loading database...</span>
+      <span class="clear-filters-link" id="clearFiltersBtn" onclick="clearFilters()">Reset filters</span>
     </div>
 
     <!-- Results Grid -->
@@ -450,14 +451,14 @@
   <!-- Footer -->
   <footer>
     <div class="container footer-container">
-      <a href="index.html" class="footer-logo">
+      <a href="en.html" class="footer-logo">
         <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
         <span>CabraSpace.com</span>
       </a>
-      <span class="copyright">© 2026 CabraSpace. Todos los derechos reservados.</span>
+      <span class="copyright">© 2026 CabraSpace. All rights reserved.</span>
       <ul class="footer-links">
         <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contacto</a></li>
+        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contact</a></li>
       </ul>
     </div>
   </footer>
@@ -465,7 +466,7 @@
   <!-- Script for Page Interactions and Data Binding -->
   <script>
     let newsData = [];
-    let activeCategory = 'TODOS';
+    let activeCategory = 'ALL';
     let activeTag = null;
     let searchQuery = '';
 
@@ -523,7 +524,7 @@
 
     async function loadDatabase() {
       try {
-        const response = await fetch('novedades.json');
+        const response = await fetch('equipamiento.json');
         newsData = await response.json();
         
         // Render tags cloud initially from all data
@@ -533,8 +534,8 @@
         console.error("Error loading database:", err);
         document.getElementById('newsContainer').innerHTML = `
           <div class="empty-state">
-            <h3>Error al cargar los datos</h3>
-            <p>No se pudo conectar a la base de datos de novedades. Por favor, inténtelo de nuevo más tarde.</p>
+            <h3>Error loading database</h3>
+            <p>Could not connect to the equipment database. Please try again later.</p>
           </div>
         `;
         document.getElementById('resultsCount').textContent = 'Error';
@@ -576,7 +577,7 @@
     }
 
     function clearFilters() {
-      activeCategory = 'TODOS';
+      activeCategory = 'ALL';
       activeTag = null;
       searchQuery = '';
       
@@ -586,7 +587,7 @@
       const catButtons = document.querySelectorAll('.category-btn');
       catButtons.forEach(btn => {
         btn.classList.remove('active');
-        if (btn.getAttribute('data-category') === 'TODOS') btn.classList.add('active');
+        if (btn.getAttribute('data-category') === 'ALL') btn.classList.add('active');
       });
 
       const tagButtons = document.querySelectorAll('.tag-btn');
@@ -616,7 +617,7 @@
       // Filter logic
       const filtered = newsData.filter(item => {
         // 1. Category filter
-        if (activeCategory !== 'TODOS' && item.category_es !== activeCategory) {
+        if (activeCategory !== 'ALL' && item.category_en !== activeCategory) {
           return false;
         }
 
@@ -627,8 +628,8 @@
 
         // 3. Search query filter
         if (searchQuery) {
-          const title = (item.title_es || '').toLowerCase();
-          const summary = (item.summary_es || '').toLowerCase();
+          const title = (item.title_en || '').toLowerCase();
+          const summary = (item.summary_en || '').toLowerCase();
           const tagsStr = (item.tags || []).join(' ').toLowerCase();
           
           if (!title.includes(searchQuery) && !summary.includes(searchQuery) && !tagsStr.includes(searchQuery)) {
@@ -640,21 +641,21 @@
       });
 
       // Update clear filter button visibility
-      if (activeCategory !== 'TODOS' || activeTag !== null || searchQuery !== '') {
+      if (activeCategory !== 'ALL' || activeTag !== null || searchQuery !== '') {
         clearBtn.style.display = 'inline-block';
       } else {
         clearBtn.style.display = 'none';
       }
 
       // Update counter text
-      resultsCountEl.textContent = `${filtered.length} novedades encontradas`;
+      resultsCountEl.textContent = `${filtered.length} products or reviews found`;
 
       // Render cards
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>No se encontraron novedades</h3>
-            <p>Prueba a cambiar los términos de búsqueda o a restablecer los filtros activos.</p>
+            <h3>No results found</h3>
+            <p>Try changing search terms or resetting the active filters.</p>
           </div>
         `;
         return;
@@ -673,16 +674,16 @@
               <div>
                 <div class="card-meta">
                   <span class="card-date">${dateStr}</span>
-                  <span class="card-category">${item.category_es}</span>
+                  <span class="card-category">${item.category_en}</span>
                 </div>
-                <h3>${item.title_es}</h3>
-                <p style="margin-top: 10px; min-height: auto;">${item.summary_es}</p>
+                <h3>${item.title_en}</h3>
+                <p style="margin-top: 10px; min-height: auto;">${item.summary_en}</p>
                 <div class="card-tags">
                   ${tagsHtml}
                 </div>
               </div>
               <div>
-                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-link">Ver Recurso ↗</a>
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-link">View Resource ↗</a>
               </div>
             </div>
           </div>
