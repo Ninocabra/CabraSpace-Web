@@ -1084,8 +1084,8 @@ body.night-vision .video-thumbnail-bg:hover {
 /* Nightmode Toggle Button in Navbar */
 .nightmode-btn {
   background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-primary);
   width: 36px;
   height: 36px;
   display: flex;
