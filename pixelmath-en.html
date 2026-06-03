@@ -682,33 +682,19 @@
     const formulasDb = [];
 
     // Base Formulas
-    const baseFormulas = [
+        const baseFormulas = [
       // 1. Narrowband Palettes
-      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', description: 'Maps Sulfur (SII) to Red, Hydrogen (Ha) to Green, and Oxygen (OIII) to Blue. The classic color palette popularized by the Hubble Space Telescope (HST). Produces rich golden and blue hues.', r: 'SII', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', description: 'Combines channels by mapping Hydrogen to the Red channel and Oxygen to the Green and Blue channels. Ideal for producing colors closest to optical visual reality in emission nebulae.', r: 'Ha', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'oiii', sources: ['ha', 'oiii'], sliders: [{ id: 'k_b', label: 'Ha / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', description: 'Maps Sulfur (SII) to Red, Hydrogen (Ha) to Green, and Oxygen (OIII) to Blue. The classic color palette popularized by the Hubble Space Telescope (HST). Produces rich golden and blue hues.', r: 'k_r * SII + (1 - k_r) * Ha', g: 'k_g * Ha + (1 - k_g) * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', description: 'Combines channels by mapping Hydrogen to the Red channel and Oxygen to the Green and Blue channels. Ideal for producing colors closest to optical visual reality in emission nebulae.', r: 'Ha', g: 'OIII', b: '(1 - k_b) * OIII + k_b * Ha', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'oiii', sources: ['ha', 'oiii'], sliders: [{ id: 'k_b', label: 'Ha / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
       { id: 'foraxx_dyn', name: 'Dynamic Foraxx Palette', category: 'Narrowband Palette', description: 'Formula by Paul Forstmann that performs a dynamic non-linear green channel mix based on the relative signal strength of Ha and OIII. Offers very smooth color transitions.', r: 'Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', renderType: 'foraxx', sources: ['ha', 'oiii'], sliders: [] },
-      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', description: 'Narrowband mapping variant that maps Hydrogen to Red, Sulfur to Green, and Oxygen to Blue.', r: 'Ha', g: 'SII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'sii', b_chan: 'oiii', sources: ['ha', 'sii', 'oiii'], sliders: [{ id: 'k_g', label: 'SII / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'soo_std', name: 'SOO Palette', category: 'Narrowband Palette', description: 'Bicolor variant mapping Sulfur to Red and Oxygen to Green and Blue.', r: 'SII', g: 'OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'oiii', sources: ['sii', 'oiii'], sliders: [{ id: 'k_b', label: 'SII / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
+      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', description: 'Narrowband mapping variant that maps Hydrogen to Red, Sulfur to Green, and Oxygen to Blue.', r: 'Ha', g: 'k_g * SII + (1 - k_g) * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'sii', b_chan: 'oiii', sources: ['ha', 'sii', 'oiii'], sliders: [{ id: 'k_g', label: 'SII / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'soo_std', name: 'SOO Palette', category: 'Narrowband Palette', description: 'Bicolor variant mapping Sulfur to Red and Oxygen to Green and Blue.', r: 'SII', g: 'OIII', b: '(1 - k_b) * OIII + k_b * SII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'oiii', sources: ['sii', 'oiii'], sliders: [{ id: 'k_b', label: 'SII / OIII Mix in Blue Channel', min: 0, max: 0.5, step: 0.05, value: 0.0 }] },
       { id: 'soh_std', name: 'SOH Palette', category: 'Narrowband Palette', description: 'Mapping variant that maps Sulfur to Red, Oxygen to Green, and Hydrogen to Blue.', r: 'SII', g: 'OIII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'oiii', b_chan: 'ha', sources: ['sii', 'oiii', 'ha'], sliders: [{ id: 'k_g', label: 'OIII / Ha Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'hos_std', name: 'HOS Palette', category: 'Narrowband Palette', description: 'Maps Hydrogen to Red, Oxygen to Green, and Sulfur to Blue.', r: 'Ha', g: 'OIII', b: 'SII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'sii', sources: ['ha', 'oiii', 'sii'], sliders: [{ id: 'k_g', label: 'OIII / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'ohs_std', name: 'OHS Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Hydrogen to Green, and Sulfur to Blue.', r: 'OIII', g: 'Ha', b: 'SII', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'ha', b_chan: 'sii', sources: ['oiii', 'ha', 'sii'], sliders: [{ id: 'k_g', label: 'Ha / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'osh_std', name: 'OSH Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Sulfur to Green, and Hydrogen to Blue.', r: 'OIII', g: 'SII', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'sii', b_chan: 'ha', sources: ['oiii', 'sii', 'ha'], sliders: [{ id: 'k_g', label: 'SII / Ha Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      
-      // SHO Custom Star Blends
-      { id: 'sho_star_mix_82', name: 'Natural Stars SHO Mix V1 (80/20)', category: 'Narrowband Palette', description: 'Adds 20% H-alpha into the Red channel to reduce the typical magenta hue of stars in pure SHO and soften color transitions.', r: '0.8 * SII + 0.2 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.8 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_73', name: 'Natural Stars SHO Mix V2 (70/30)', category: 'Narrowband Palette', description: 'Maps 70% Sulfur and 30% Hydrogen to the Red channel. Considerably mitigates the magenta star cast during processing.', r: '0.7 * SII + 0.3 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.7 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_64', name: 'Natural Stars SHO Mix V3 (60/40)', category: 'Narrowband Palette', description: 'A balanced 60/40 mix in the red channel. Helps to tone down the sulfur channel if it has a low signal compared to hydrogen.', r: '0.6 * SII + 0.4 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.6 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_55', name: 'Natural Stars SHO Mix V4 (50/50)', category: 'Narrowband Palette', description: 'Symmetric 50/50 sulfur and hydrogen mix in the red channel to homogenize the structural response of the nebula.', r: '0.5 * SII + 0.5 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.5 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_46', name: 'Natural Stars SHO Mix V5 (40/60)', category: 'Narrowband Palette', description: 'Maps a higher percentage of Hydrogen (60%) to the red channel to give the nebula warm orange-yellow hues.', r: '0.4 * SII + 0.6 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.4 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_37', name: 'Natural Stars SHO Mix V6 (30/70)', category: 'Narrowband Palette', description: 'Maps 70% Hydrogen and 30% Sulfur to the red channel. The resulting color shifts towards rich golden-green tones.', r: '0.3 * SII + 0.7 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.3 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_28', name: 'Natural Stars SHO Mix V7 (20/80)', category: 'Narrowband Palette', description: 'Almost absolute predominance of Hydrogen in the red channel. Delivers soft reddish tones at the nebulous borders.', r: '0.2 * SII + 0.8 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.2 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'sho_star_mix_19', name: 'Natural Stars SHO Mix V8 (10/90)', category: 'Narrowband Palette', description: 'Maps 90% hydrogen in the red, leaving sulfur as a subtle contrasting shade in the dense core regions.', r: '0.1 * SII + 0.9 * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.1 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      
-      // SHO Custom Green mixes
-      { id: 'sho_green_mix_82', name: 'SHO Green Channel Mix V1 (80/20)', category: 'Narrowband Palette', description: 'Blends 80% Hydrogen and 20% Oxygen into the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: '0.8 * Ha + 0.2 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.8 }] },
-      { id: 'sho_green_mix_73', name: 'SHO Green Channel Mix V2 (70/30)', category: 'Narrowband Palette', description: 'Blends 70% Hydrogen and 30% Oxygen into the green channel. Shifts green zones towards yellow-orange tones.', r: 'SII', g: '0.7 * Ha + 0.3 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.7 }] },
-      { id: 'sho_green_mix_64', name: 'SHO Green Channel Mix V3 (60/40)', category: 'Narrowband Palette', description: 'Maps 60% Hydrogen and 40% Oxygen to green. Generates a very balanced gold-turquoise color palette.', r: 'SII', g: '0.6 * Ha + 0.4 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.6 }] },
-      { id: 'sho_green_mix_55', name: 'SHO Green Channel Mix V4 (50/50)', category: 'Narrowband Palette', description: 'Symmetric 50/50 blend in the green. The color transitions achieve maximum chromatic contrast.', r: 'SII', g: '0.5 * Ha + 0.5 * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.5 }] },
+      { id: 'hos_std', name: 'HOS Palette', category: 'Narrowband Palette', description: 'Maps Hydrogen to Red, Oxygen to Green, and Sulfur to Blue.', r: 'Ha', g: 'k_g * OIII + (1 - k_g) * SII', b: 'SII', renderType: 'narrowband_blend', r_chan: 'ha', g_chan: 'oiii', b_chan: 'sii', sources: ['ha', 'oiii', 'sii'], sliders: [{ id: 'k_g', label: 'OIII / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'ohs_std', name: 'OHS Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Hydrogen to Green, and Sulfur to Blue.', r: 'OIII', g: 'k_g * Ha + (1 - k_g) * SII', b: 'SII', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'ha', b_chan: 'sii', sources: ['oiii', 'ha', 'sii'], sliders: [{ id: 'k_g', label: 'Ha / SII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'osh_std', name: 'OSH Palette', category: 'Narrowband Palette', description: 'Maps Oxygen to Red, Sulfur to Green, and Hydrogen to Blue.', r: 'OIII', g: 'k_g * SII + (1 - k_g) * Ha', b: 'Ha', renderType: 'narrowband_blend', r_chan: 'oiii', g_chan: 'sii', b_chan: 'ha', sources: ['oiii', 'sii', 'ha'], sliders: [{ id: 'k_g', label: 'SII / Ha Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_star_mix', name: 'Natural Stars SHO Mix', category: 'Narrowband Palette', description: 'Blends Sulfur and Hydrogen in the Red channel to reduce the typical magenta hue of stars in pure SHO and soften color transitions.', r: 'k_r * SII + (1 - k_r) * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 0.8 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'sho_green_mix', name: 'SHO Green Channel Mix', category: 'Narrowband Palette', description: 'Blends Hydrogen and Oxygen in the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: 'k_g * Ha + (1 - k_g) * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.8 }] },
 
       // 2. Color Masks
       { id: 'mask_red', name: 'Color Mask: Standard Red', category: 'Color Masks', description: 'Generates a monochrome mask isolating red tones. Useful for applying specific saturation or curves to emission nebulae.', r: 'R - max(G, B)', rgb: 'R - max(G, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
@@ -726,26 +712,36 @@
       { id: 'mask_magenta_v2', name: 'Color Mask: Advanced Magenta V2', category: 'Color Masks', description: 'Isolates magenta tones conditionally, perfect for mitigating magenta halos on stars.', r: 'iif(R > G && B > G, min(R, B) - G, 0)', rgb: 'iif(R > G && B > G, min(R, B) - G, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
       { id: 'mask_yellow_v2', name: 'Color Mask: Advanced Yellow V2', category: 'Color Masks', description: 'Isolates yellow tones conditionally to adjust dust lane structures and SII boundaries.', r: 'iif(R > B && G > B, min(R, G) - B, 0)', rgb: 'iif(R > B && G > B, min(R, G) - B, 0)', renderType: 'mask_color', sources: ['original'], sliders: [] },
 
-      // 3. Math & Blending Modes
-      { id: 'blend_screen', name: 'Screen Blend Mode', category: 'Math & Blending Modes', description: 'Combines two images avoiding overexposure in highlights. Adjust blend opacity k. Equivalent to Photoshop Screen.', rgb: '1 - (1 - ImageA) * (1 - ImageB)', renderType: 'blend_screen', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'blend_mult', name: 'Multiply Blend Mode', category: 'Math & Blending Modes', description: 'Multiplies pixel values of two images, darkening shared regions. Ideal for applying contrast masks.', rgb: 'ImageA * ImageB', renderType: 'blend_mult', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'blend_overlay', name: 'Overlay Blend Mode', category: 'Math & Blending Modes', description: 'Combines multiply and screen depending on background brightness. Boosts local contrast.', rgb: 'iif(ImageA < 0.5, 2 * ImageA * ImageB, 1 - 2 * (1 - ImageA) * (1 - ImageB))', renderType: 'blend_overlay', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
-      { id: 'blend_diff', name: 'Difference Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the absolute difference between two frames. Extremely useful for verifying alignment or calibration changes.', rgb: 'abs(ImageA - ImageB)', renderType: 'blend_diff', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Difference Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      // 3. LRGB / Narrowband Blending
+      { id: 'ha_red', name: 'Add H-alpha to Red Channel', category: 'LRGB / Narrowband Blending', description: 'Blends narrowband H-alpha signal into the red channel of a broadband RGB image. Ideal for enhancing emission nebulosity without altering star colors.', r: 'RGB_R + k * Ha', g: 'RGB_G', b: 'RGB_B', renderType: 'ha_rgb', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'H-alpha Intensity (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
+      { id: 'oiii_blue', name: 'Add OIII to Blue Channel', category: 'LRGB / Narrowband Blending', description: 'Blends narrowband OIII signal into the blue channel of a broadband RGB image. Enhances weak blue reflection nebula details.', r: 'RGB_R', g: 'RGB_G', b: 'RGB_B + k * OIII', renderType: 'oiii_blue', sources: ['original', 'oiii'], sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
+      { id: 'oiii_green', name: 'Add OIII to Green Channel', category: 'LRGB / Narrowband Blending', description: 'Blends narrowband OIII signal into the green channel of a broadband RGB image. Balanced green-blue gas details.', r: 'RGB_R', g: 'RGB_G + k * OIII', b: 'RGB_B', renderType: 'oiii_green', sources: ['original', 'oiii'], sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
+      { id: 'sii_red', name: 'Add SII to Red Channel', category: 'LRGB / Narrowband Blending', description: 'Blends narrowband Sulfur II signal into the red channel of a broadband RGB image. Enriches dark red dust lane boundaries.', r: 'RGB_R + k * SII', g: 'RGB_G', b: 'RGB_B', renderType: 'sii_red', sources: ['original', 'sii'], sliders: [{ id: 'k', label: 'SII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
+
+      // 4. Star Operations
+      { id: 'stars_recompose', name: 'Recompose Stars', category: 'Star Operations', description: 'Adds stars back to the starless background nebula, setting the resulting stars brightness. Helps to manage star dominance over the background.', r: 'Starless + k * Stars', g: 'Starless + k * Stars', b: 'Starless + k * Stars', renderType: 'stars_add', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.5, step: 0.05, value: 1.0 }] },
+      { id: 'stars_reduction', name: 'Star Reduction', category: 'Star Operations', description: 'Attenuates stars proportionally, keeping only a percentage of the original star signal and blending the rest with the starless background.', r: 'Original * k + Starless * (1 - k)', g: 'Original * k + Starless * (1 - k)', b: 'Original * k + Starless * (1 - k)', renderType: 'stars_reduce', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Stars Percentage (k)', min: 0, max: 1, step: 0.05, value: 0.5 }] },
+
+      // 5. Math & Blending Modes
+      { id: 'blend_screen', name: 'Screen Blend Mode', category: 'Math & Blending Modes', description: 'Combines two images avoiding overexposure in highlights. Adjust blend opacity k. Equivalent to Photoshop Screen.', rgb: 'ImageA * (1 - k) + (1 - (1 - ImageA) * (1 - ImageB)) * k', renderType: 'blend_screen', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_mult', name: 'Multiply Blend Mode', category: 'Math & Blending Modes', description: 'Multiplies pixel values of two images, darkening shared regions. Ideal for applying contrast masks.', rgb: 'ImageA * (1 - k) + (ImageA * ImageB) * k', renderType: 'blend_mult', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_overlay', name: 'Overlay Blend Mode', category: 'Math & Blending Modes', description: 'Combines multiply and screen depending on background brightness. Boosts local contrast.', rgb: 'ImageA * (1 - k) + (iif(ImageA < 0.5, 2 * ImageA * ImageB, 1 - 2 * (1 - ImageA) * (1 - ImageB))) * k', renderType: 'blend_overlay', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Blend Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_diff', name: 'Difference Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the absolute difference between two frames. Extremely useful for verifying alignment or calibration changes.', rgb: 'ImageA * (1 - k) + abs(ImageA - ImageB) * k', renderType: 'blend_diff', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Difference Opacity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       { id: 'blend_lighten', name: 'Lighten Blend Mode (Max)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the brightest value.', rgb: 'max(ImageA, ImageB)', renderType: 'blend_lighten', sources: ['original', 'starless'], sliders: [] },
       { id: 'blend_darken', name: 'Darken Blend Mode (Min)', category: 'Math & Blending Modes', description: 'Compares both images pixel by pixel and keeps the darkest value.', rgb: 'min(ImageA, ImageB)', renderType: 'blend_darken', sources: ['original', 'starless'], sliders: [] },
-      { id: 'blend_stars_scr', name: 'Screen Blend Stars', category: 'Math & Blending Modes', description: 'Adds stars to a nebula background using screen mode to preserve bright star cores.', rgb: '~(~Starless * ~Stars)', renderType: 'blend_screen', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'blend_stars_scr', name: 'Screen Blend Stars', category: 'Math & Blending Modes', description: 'Adds stars to a nebula background using screen mode to preserve bright star cores.', rgb: 'Starless * (1 - k) + (~(~Starless * ~Stars)) * k', renderType: 'blend_screen', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       { id: 'blend_avg', name: 'Average Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the arithmetic average of two frames of the same field to reduce noise.', rgb: '(ImageA + ImageB) / 2', renderType: 'blend_average', sources: ['original', 'starless'], sliders: [] },
 
-      // 4. Utilities & Cleaning
+      // 6. Utilities & Cleaning
       { id: 'util_invert', name: 'Invert Image', category: 'Utilities & Cleaning', description: 'Linearly inverts all channels of the image (converts positive to negative).', rgb: '~ $T', renderType: 'util_invert', sources: ['original'], sliders: [] },
-      { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > t, t, $T)', renderType: 'util_clip_high', sources: ['original'], sliders: [{ id: 'threshold', label: 'Maximum Threshold (t)', min: 0.5, max: 1.0, step: 0.01, value: 0.95 }] },
-      { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < t, t, $T)', renderType: 'util_clip_low', sources: ['original'], sliders: [{ id: 'threshold', label: 'Minimum Threshold (t)', min: 0.0, max: 0.3, step: 0.01, value: 0.05 }] },
-      { id: 'util_bg_flatten', name: 'Background Flattening', category: 'Utilities & Cleaning', description: 'Quickly flattens the background by subtracting the general median value and adding a baseline pedestal.', rgb: '$T - med($T) + Pedestal', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'pedestal', label: 'Background Pedestal', min: 0.0, max: 0.3, step: 0.01, value: 0.1 }] },
+      { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > threshold, threshold, $T)', renderType: 'util_clip_high', sources: ['original'], sliders: [{ id: 'threshold', label: 'Maximum Threshold (t)', min: 0.5, max: 1.0, step: 0.01, value: 0.95 }] },
+      { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < threshold, threshold, $T)', renderType: 'util_clip_low', sources: ['original'], sliders: [{ id: 'threshold', label: 'Minimum Threshold (t)', min: 0.0, max: 0.3, step: 0.01, value: 0.05 }] },
+      { id: 'util_bg_flatten', name: 'Background Flattening', category: 'Utilities & Cleaning', description: 'Quickly flattens the background by subtracting the general median value and adding a baseline pedestal.', rgb: '$T - med($T) + pedestal', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'pedestal', label: 'Background Pedestal', min: 0.0, max: 0.3, step: 0.01, value: 0.1 }] },
       { id: 'util_hotpixel', name: 'Hot Pixel Filter', category: 'Utilities & Cleaning', description: 'Identifies single hot pixels based on local average and replaces them with the median.', rgb: 'iif($T > 0.9 && $T > mean($T)*4, med($T), $T)', renderType: 'util_hotpixel', sources: ['original'], sliders: [] },
       { id: 'util_syn_lum', name: 'LRGB Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a synthetic luminance channel from RGB channels using standard human eye luminance coefficients.', rgb: '0.2126 * R + 0.7152 * G + 0.0722 * B', renderType: 'util_syn_lum', sources: ['original'], sliders: [] },
       { id: 'util_syn_lum_eq', name: 'Equal Weight Synthetic Luminance', category: 'Utilities & Cleaning', description: 'Generates a luminance channel by taking the arithmetic average of R, G, and B channels.', rgb: '(R + G + B) / 3', renderType: 'util_syn_lum_eq', sources: ['original'], sliders: [] },
-      { id: 'util_range_mask', name: 'Quick Range Mask', category: 'Utilities & Cleaning', description: 'Generates a linear contrast mask restricted to a specific brightness range (from Low to High).', rgb: 'iif($T > Bajo && $T < Alto, ($T - Bajo)/(Alto - Bajo), 0)', renderType: 'util_range_mask', sources: ['original'], sliders: [{ id: 'low', label: 'Lower Limit (Low)', min: 0.0, max: 0.4, step: 0.01, value: 0.1 }, { id: 'high', label: 'Upper Limit (High)', min: 0.5, max: 1.0, step: 0.01, value: 0.8 }] },
-      { id: 'util_lin_fit', name: 'Channel Linear Fit', category: 'Utilities & Cleaning', description: 'Equation to match the intensity of the active channel to the mean and standard deviation of a reference channel.', rgb: '($T - Mean($T)) * (StdDev(Ref) / StdDev($T)) + Mean(Ref)', renderType: 'util_lin_fit', sources: ['original'], sliders: [] },
+      { id: 'util_range_mask', name: 'Quick Range Mask', category: 'Utilities & Cleaning', description: 'Generates a linear contrast mask restricted to a specific brightness range (from Low to High).', rgb: 'iif($T > low && $T < high, ($T - low)/(high - low), 0)', renderType: 'util_range_mask', sources: ['original'], sliders: [{ id: 'low', label: 'Lower Limit (Low)', min: 0.0, max: 0.4, step: 0.01, value: 0.1 }, { id: 'high', label: 'Upper Limit (High)', min: 0.5, max: 1.0, step: 0.01, value: 0.8 }] },
+      { id: 'util_lin_fit', name: 'Channel Linear Fit', category: 'Utilities & Cleaning', description: 'Equation to match the intensity of the active channel to the mean and standard deviation of a reference channel.', rgb: '($T - mean($T)) * (stddev(Ref) / stddev($T)) + mean(Ref)', renderType: 'util_lin_fit', sources: ['original'], sliders: [] },
       { id: 'util_mtf_stretch', name: 'MTF Stretch', category: 'Utilities & Cleaning', description: 'Classic non-linear stretch formula based on midtone balance point m. Allows manual stretching of linear data.', rgb: '($T * m) / ((m - 1) * $T + 1)', renderType: 'util_mtf_stretch', sources: ['original'], sliders: [{ id: 'm', label: 'Midtone Balance (m)', min: 0.005, max: 0.3, step: 0.005, value: 0.05 }] },
       { id: 'util_star_extract', name: 'Star Extraction', category: 'Utilities & Cleaning', description: 'Generates a stars-only layer by subtracting the starless version from the original image.', rgb: 'Original - Starless', renderType: 'util_star_extract', sources: ['original', 'starless'], sliders: [] }
     ];
@@ -753,108 +749,7 @@
     // Populate database with base formulas
     baseFormulas.forEach(f => formulasDb.push(f));
 
-    // Dynamic generation of variations to reach 112 total
-    // 1. Add Ha to Red variations (10% to 100% in steps of 10%) - 10 formulas
-    for (let i = 1; i <= 10; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_ha_red_${i}`,
-        name: `Add H-alpha to Red Channel - ${i*10}% Intensity`,
-        category: 'LRGB / Narrowband Blending',
-        description: `Blends narrowband H-alpha signal into the red channel of a broadband RGB image at ${i*10}% intensity. Ideal for enhancing emission nebulosity without altering star colors.`,
-        r: `RGB_R + ${k.toFixed(1)} * Ha`,
-        g: 'RGB_G',
-        b: 'RGB_B',
-        renderType: 'ha_rgb',
-        sources: ['original', 'ha'],
-        sliders: [{ id: 'k', label: 'H-alpha Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
-      });
-    }
 
-    // 2. Add OIII to Blue variations (10% to 100%) - 10 formulas
-    for (let i = 1; i <= 10; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_oiii_blue_${i}`,
-        name: `Add OIII to Blue Channel - ${i*10}% Intensity`,
-        category: 'LRGB / Narrowband Blending',
-        description: `Blends narrowband OIII signal into the blue channel of a broadband RGB image at ${i*10}% intensity. Enhances weak blue reflection nebula details.`,
-        r: 'RGB_R',
-        g: 'RGB_G',
-        b: `RGB_B + ${k.toFixed(1)} * OIII`,
-        renderType: 'oiii_blue',
-        sources: ['original', 'oiii'],
-        sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
-      });
-    }
-
-    // 3. Add OIII to Green variations (10% to 100%) - 10 formulas
-    for (let i = 1; i <= 10; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_oiii_green_${i}`,
-        name: `Add OIII to Green Channel - ${i*10}% Intensity`,
-        category: 'LRGB / Narrowband Blending',
-        description: `Blends narrowband OIII signal into the green channel of a broadband RGB image at ${i*10}% intensity. Balanced green-blue gas details.`,
-        r: 'RGB_R',
-        g: `RGB_G + ${k.toFixed(1)} * OIII`,
-        b: 'RGB_B',
-        renderType: 'oiii_green',
-        sources: ['original', 'oiii'],
-        sliders: [{ id: 'k', label: 'OIII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
-      });
-    }
-
-    // 4. Add SII to Red variations (10% to 100%) - 10 formulas
-    for (let i = 1; i <= 10; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_sii_red_${i}`,
-        name: `Add SII to Red Channel - ${i*10}% Intensity`,
-        category: 'LRGB / Narrowband Blending',
-        description: `Blends narrowband Sulfur II signal into the red channel of a broadband RGB image at ${i*10}% intensity. Enriches dark red dust lane boundaries.`,
-        r: `RGB_R + ${k.toFixed(1)} * SII`,
-        g: 'RGB_G',
-        b: 'RGB_B',
-        renderType: 'sii_red',
-        sources: ['original', 'sii'],
-        sliders: [{ id: 'k', label: 'SII Intensity (k)', min: 0, max: 1.2, step: 0.05, value: k }]
-      });
-    }
-
-    // 5. Recompose Stars (Starless + Stars) (50% to 150%) - 11 formulas
-    for (let i = 5; i <= 15; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_stars_add_${i}`,
-        name: `Recompose Stars - Stars Brightness at ${i*10}%`,
-        category: 'Star Operations',
-        description: `Adds stars back to the starless background nebula, setting the resulting stars brightness to ${i*10}% of the original. Helps to manage star dominance over the background.`,
-        r: `Starless + ${k.toFixed(1)} * Stars`,
-        g: `Starless + ${k.toFixed(1)} * Stars`,
-        b: `Starless + ${k.toFixed(1)} * Stars`,
-        renderType: 'stars_add',
-        sources: ['starless', 'stars'],
-        sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.5, step: 0.05, value: k }]
-      });
-    }
-
-    // 6. Star Reduction variations (10% to 90%) - 9 formulas
-    for (let i = 1; i <= 9; i++) {
-      const k = i / 10;
-      formulasDb.push({
-        id: `gen_stars_reduce_${i}`,
-        name: `Star Reduction - Keep ${i*10}% Stars`,
-        category: 'Star Operations',
-        description: `Attenuates stars proportionally, keeping only ${i*10}% of the original star signal and blending the rest with the starless background.`,
-        r: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
-        g: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
-        b: `Original * ${k.toFixed(1)} + Starless * ${(1-k).toFixed(1)}`,
-        renderType: 'stars_reduce',
-        sources: ['original', 'starless'],
-        sliders: [{ id: 'k', label: 'Stars Percentage (k)', min: 0, max: 1, step: 0.05, value: k }]
-      });
-    }
 
     // ----------------------------------------------------
     // SIMULATOR STATE & ENGINE
@@ -1125,14 +1020,9 @@
         </div>
       `;
 
-      // Copy formula event
+            // Copy formula event
       document.getElementById('btnCopyDetails').addEventListener('click', () => {
-        let text = "";
-        if (formula.rgb) {
-          text = `RGB: ${formula.rgb}`;
-        } else {
-          text = `R: ${formula.r}\nG: ${formula.g}\nB: ${formula.b}`;
-        }
+        const text = getGeneratedConsoleCode(formula);
 
         navigator.clipboard.writeText(text).then(() => {
           const btn = document.getElementById('btnCopyDetails');
@@ -1273,31 +1163,39 @@
       });
     }
 
+        // Helper to evaluate and replace slider variables in formulas
+    function replaceVariables(expr, formula) {
+      if (!expr) return "";
+      let result = expr;
+      if (formula.sliders) {
+        // First handle composite expressions like (1 - var) to avoid matching 'var' first
+        formula.sliders.forEach(slider => {
+          const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+          const repVal = val.toFixed(2);
+          const invVal = (1 - val).toFixed(2);
+          
+          result = result.replace(new RegExp(`\\(1\\s*-\\s*${slider.id}\\)`, 'g'), invVal);
+          result = result.replace(new RegExp(`1\\s*-\\s*${slider.id}`, 'g'), invVal);
+        });
+
+        // Then replace direct variables
+        formula.sliders.forEach(slider => {
+          const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
+          const repVal = val.toFixed(2);
+          result = result.replace(new RegExp(`\\b${slider.id}\\b`, 'g'), repVal);
+        });
+      }
+      return result;
+    }
+
     // Dynamic equation text resolver based on sliders
     function getGeneratedConsoleCode(formula) {
       if (formula.rgb) {
-        let code = formula.rgb;
-        if (formula.sliders) {
-          formula.sliders.forEach(slider => {
-            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
-            code = code.replace(new RegExp(`\\b${slider.id}\\b|\\bUmbral\\b|\\bPedestal\\b|\\bBajo\\b|\\bAlto\\b|\\bm\\b`, 'g'), val.toFixed(2));
-          });
-        }
-        return `RGB: ${code}`;
+        return `RGB: ${replaceVariables(formula.rgb, formula)}`;
       } else {
-        let r = formula.r;
-        let g = formula.g;
-        let b = formula.b;
-        
-        if (formula.sliders) {
-          formula.sliders.forEach(slider => {
-            const val = slidersState[slider.id] !== undefined ? slidersState[slider.id] : slider.value;
-            const rep = val.toFixed(2);
-            r = r.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
-            g = g.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
-            b = b.replace(new RegExp(`\\b${slider.id}\\b|\\bk_sii\\b|\\bk_ha\\b|\\bk_blue\\b|\\bk\\b`, 'g'), rep);
-          });
-        }
+        const r = replaceVariables(formula.r, formula);
+        const g = replaceVariables(formula.g, formula);
+        const b = replaceVariables(formula.b, formula);
         return `R: ${r}\nG: ${g}\nB: ${b}`;
       }
     }
@@ -1315,7 +1213,26 @@
       }).join('');
 
       codeContainer.innerHTML = lines;
+
+      // Update detail code box in real-time if it exists
+      const detailCodeBox = document.querySelector('.formula-detail-pane .detail-code-box');
+      if (detailCodeBox) {
+        let detailLines = "";
+        text.split('\n').forEach(line => {
+          const colonIdx = line.indexOf(':');
+          if (colonIdx !== -1) {
+            const channel = line.substring(0, colonIdx).trim();
+            const expr = line.substring(colonIdx + 1).trim();
+            detailLines += `<div class="detail-code-line"><strong>${channel}:</strong> ${expr}</div>`;
+          } else {
+            detailLines += `<div class="detail-code-line">${line}</div>`;
+          }
+        });
+        detailCodeBox.innerHTML = `<div class="detail-code-title">Fórmula para PixInsight</div>` + detailLines;
+      }
     }
+
+
 
     // Pixel Processing engine
     function runSimulation() {
