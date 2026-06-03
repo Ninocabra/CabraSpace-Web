@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latest PixInsight Updates - CabraSpace</title>
+  <meta name="description" content="Interactive and self-updating knowledge database containing the latest updates, scripts, processes, and tutorials on PixInsight.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Knowledge Base Custom Styles */
+    .database-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .db-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .db-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .search-filter-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle spotlight inside filter card */
+    .search-filter-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(300px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(207, 171, 74, 0.06), transparent 80%);
+      z-index: 0;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .search-filter-card:hover::before {
+      opacity: 1;
+    }
+
+    .search-filter-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-input-wrapper svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input {
+      width: 100%;
+      background: #020202;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 14px 18px 14px 48px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 15px rgba(207, 171, 74, 0.05);
+    }
+
+    .search-input:focus + svg {
+      color: var(--gold-primary);
+    }
+
+    .keyboard-hint {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      background: #0c0c0e;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      pointer-events: none;
+      display: none;
+      font-family: monospace;
+    }
+
+    @media (min-width: 768px) {
+      .keyboard-hint {
+        display: block;
+      }
+    }
+
+    .filters-row {
+      margin-top: 24px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+    }
+
+    .filter-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .category-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .category-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .category-btn:hover {
+      border-color: var(--gold-border);
+      color: var(--gold-primary);
+    }
+
+    .category-btn.active {
+      background: var(--gold-primary);
+      border-color: var(--gold-primary);
+      color: var(--bg-color);
+      font-weight: 600;
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-btn {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .tag-btn:hover {
+      border-color: var(--gold-border);
+      color: var(--gold-primary);
+    }
+
+    .tag-btn.active {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.08);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.05);
+    }
+
+    .results-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .results-count {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .clear-filters-link {
+      font-size: 0.72rem;
+      color: var(--gold-primary);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--gold-border);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: var(--transition-smooth);
+      display: none;
+    }
+
+    .clear-filters-link:hover {
+      color: var(--gold-light);
+      border-bottom-color: var(--gold-light);
+    }
+
+    .db-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      margin-bottom: 80px;
+    }
+
+    @media (min-width: 768px) {
+      .db-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .news-card {
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .card-date {
+      color: var(--text-muted);
+    }
+
+    .card-category {
+      color: var(--gold-primary);
+      border: 1px solid var(--gold-border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(207, 171, 74, 0.03);
+      text-transform: uppercase;
+      font-size: 0.65rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card-tag {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      background: #020202;
+      border: 1px solid var(--border-color);
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .card-tag:hover {
+      color: var(--gold-primary);
+      border-color: var(--gold-border);
+      background: rgba(207, 171, 74, 0.04);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 24px;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+      background: #070708;
+    }
+
+    .empty-state h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="en.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="en.html" class="nav-link">Home</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="novedades-en.html" class="dropdown-item">Latest News</a></li>
+                <li><a href="#" class="dropdown-item">YouTube Courses</a></li>
+              </ul>
+            </li>
+            <li><a href="#" class="dropdown-item">Light Pollution</a></li>
+          </ul>
+        </li>
+        <li><a href="en.html#youtube" class="nav-link">YouTube</a></li>
+        <li><a href="en.html#support" class="nav-link">Support Me</a></li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="lang-switcher">
+          <a href="novedades.html" class="lang-link">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="novedades-en.html" class="lang-link active">EN</a>
+        </div>
+        <a href="en.html#newsletter" class="nav-cta hidden">Subscribe</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="container">
+    <section class="database-header">
+      <h1 class="db-title">Latest PixInsight Updates</h1>
+      <p class="db-subtitle">
+        An interactive, self-updating knowledge base. Filter and search the latest updates from official software releases, community scripts, news, and guides.
+      </p>
+    </section>
+
+    <!-- Search and Filters Card -->
+    <section class="search-filter-card" id="filterCard">
+      <div class="search-filter-content">
+        <!-- Search Input -->
+        <div class="search-row">
+          <div class="search-input-wrapper">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search updates, scripts, processes (press '/' to focus)...">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span class="keyboard-hint">/</span>
+          </div>
+        </div>
+
+        <!-- Categories & Tags -->
+        <div class="filters-row">
+          <!-- Categories -->
+          <div>
+            <div class="filter-label">Categories</div>
+            <div class="category-buttons" id="categoryButtons">
+              <button class="category-btn active" data-category="ALL">All</button>
+              <button class="category-btn" data-category="SOFTWARE">Software</button>
+              <button class="category-btn" data-category="SCRIPTS">Scripts</button>
+              <button class="category-btn" data-category="WORKSHOPS">Workshops</button>
+              <button class="category-btn" data-category="COMMUNITY">Community</button>
+            </div>
+          </div>
+
+          <!-- Tags Cloud -->
+          <div>
+            <div class="filter-label">Common tags</div>
+            <div class="tags-container" id="tagsContainer">
+              <!-- Loading tags dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results count bar -->
+    <div class="results-info-bar">
+      <span class="results-count" id="resultsCount">Loading knowledge database...</span>
+      <span class="clear-filters-link" id="clearFiltersBtn" onclick="clearFilters()">Reset filters</span>
+    </div>
+
+    <!-- Results Grid -->
+    <section class="db-grid" id="newsContainer">
+      <!-- Loading state -->
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <a href="en.html" class="footer-logo">
+        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace.com</span>
+      </a>
+      <span class="copyright">© 2026 CabraSpace. All rights reserved.</span>
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Script for Page Interactions and Data Binding -->
+  <script>
+    let newsData = [];
+    let activeCategory = 'ALL';
+    let activeTag = null;
+    let searchQuery = '';
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Fetch JSON Database
+      loadDatabase();
+
+      // 2. Set search inputs handlers
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.trim().toLowerCase();
+        renderNews();
+      });
+
+      // Keyboard shortcut to focus search ('/')
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+
+      // 3. Category Buttons Click handlers
+      const catButtons = document.querySelectorAll('.category-btn');
+      catButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeCategory = btn.getAttribute('data-category');
+          renderNews();
+        });
+      });
+
+      // 4. Spotlight tracking on search card
+      const filterCard = document.getElementById('filterCard');
+      filterCard.addEventListener('mousemove', e => {
+        const rect = filterCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        filterCard.style.setProperty('--mouse-x', `${x}px`);
+        filterCard.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      // 5. Shrink navbar on scroll
+      const header = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    });
+
+    async function loadDatabase() {
+      try {
+        const response = await fetch('novedades.json');
+        newsData = await response.json();
+        
+        // Render tags cloud initially from all data
+        buildTagsCloud();
+        renderNews();
+      } catch (err) {
+        console.error("Error loading database:", err);
+        document.getElementById('newsContainer').innerHTML = `
+          <div class="empty-state">
+            <h3>Error loading database</h3>
+            <p>Could not connect to the updates database. Please try again later.</p>
+          </div>
+        `;
+        document.getElementById('resultsCount').textContent = 'Error';
+      }
+    }
+
+    function buildTagsCloud() {
+      const allTags = new Set();
+      newsData.forEach(item => {
+        if (item.tags && Array.isArray(item.tags)) {
+          item.tags.forEach(t => allTags.add(t));
+        }
+      });
+
+      const tagsContainer = document.getElementById('tagsContainer');
+      tagsContainer.innerHTML = '';
+
+      Array.from(allTags).sort().forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-btn';
+        btn.textContent = tag;
+        btn.addEventListener('click', () => toggleTag(tag, btn));
+        tagsContainer.appendChild(btn);
+      });
+    }
+
+    function toggleTag(tag, element) {
+      const tagButtons = document.querySelectorAll('.tag-btn');
+      
+      if (activeTag === tag) {
+        activeTag = null;
+        element.classList.remove('active');
+      } else {
+        activeTag = tag;
+        tagButtons.forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+      }
+      renderNews();
+    }
+
+    function clearFilters() {
+      activeCategory = 'ALL';
+      activeTag = null;
+      searchQuery = '';
+      
+      // Reset inputs UI
+      document.getElementById('searchInput').value = '';
+      
+      const catButtons = document.querySelectorAll('.category-btn');
+      catButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-category') === 'ALL') btn.classList.add('active');
+      });
+
+      const tagButtons = document.querySelectorAll('.tag-btn');
+      tagButtons.forEach(btn => btn.classList.remove('active'));
+
+      renderNews();
+    }
+
+    function initSpotlightForNewsCards() {
+      const cards = document.querySelectorAll('.news-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+    }
+
+    function renderNews() {
+      const container = document.getElementById('newsContainer');
+      const resultsCountEl = document.getElementById('resultsCount');
+      const clearBtn = document.getElementById('clearFiltersBtn');
+      
+      // Filter logic
+      const filtered = newsData.filter(item => {
+        // 1. Category filter
+        if (activeCategory !== 'ALL' && item.category_en !== activeCategory) {
+          return false;
+        }
+
+        // 2. Tag filter
+        if (activeTag && (!item.tags || !item.tags.includes(activeTag))) {
+          return false;
+        }
+
+        // 3. Search query filter
+        if (searchQuery) {
+          const title = (item.title_en || '').toLowerCase();
+          const summary = (item.summary_en || '').toLowerCase();
+          const tagsStr = (item.tags || []).join(' ').toLowerCase();
+          
+          if (!title.includes(searchQuery) && !summary.includes(searchQuery) && !tagsStr.includes(searchQuery)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      // Update clear filter button visibility
+      if (activeCategory !== 'ALL' || activeTag !== null || searchQuery !== '') {
+        clearBtn.style.display = 'inline-block';
+      } else {
+        clearBtn.style.display = 'none';
+      }
+
+      // Update counter text
+      resultsCountEl.textContent = `${filtered.length} updates found`;
+
+      // Render cards
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No updates found</h3>
+            <p>Try changing search terms or resetting the active filters.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        const dateStr = item.date;
+        const tagsHtml = (item.tags || []).map(tag => {
+          const isActive = activeTag === tag ? 'style="border-color: var(--gold-primary); color: var(--gold-primary);"' : '';
+          return `<span class="card-tag" ${isActive} onclick="triggerTagFilter('${tag}')">${tag}</span>`;
+        }).join('');
+
+        return `
+          <div class="feature-card news-card">
+            <div class="feature-card-content news-card-content" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div class="card-meta">
+                  <span class="card-date">${dateStr}</span>
+                  <span class="card-category">${item.category_en}</span>
+                </div>
+                <h3>${item.title_en}</h3>
+                <p style="margin-top: 10px; min-height: auto;">${item.summary_en}</p>
+                <div class="card-tags">
+                  ${tagsHtml}
+                </div>
+              </div>
+              <div>
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-link">View Resource ↗</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Enable spotlight glows on new elements
+      initSpotlightForNewsCards();
+    }
+
+    // Helper to click tags inside cards and filter
+    window.triggerTagFilter = function(tag) {
+      const tagButtons = document.querySelectorAll('.tag-btn');
+      tagButtons.forEach(btn => {
+        if (btn.textContent === tag) {
+          toggleTag(tag, btn);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

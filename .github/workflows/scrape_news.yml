@@ -1,0 +1,44 @@
+name: Scrape PixInsight News
+
+on:
+  schedule:
+    # Run daily at 04:00 AM UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    # Allow manual triggering from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Run Scraper
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: python tools/scraper.py
+
+    - name: Commit and push changes if updated
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Check if there are changes to novedades.json
+        if git status --porcelain | grep -q "novedades.json"; then
+          echo "Changes detected in novedades.json. Committing..."
+          git add novedades.json
+          git commit -m "Auto-update: Aggregated latest PixInsight updates [skip ci]"
+          git push
+        else
+          echo "No changes in novedades.json. Skipping commit."
+        fi
