@@ -1347,20 +1347,28 @@
       }
     }
 
-    let activeSliderAnims = {};
+    let activeFormulaAnimId = null;
+    let sliderAnimTimeoutId = null;
+    let animatingSliders = {};
 
     function startSlidersAnimation(formula) {
-      // Clear any previous slider animations
-      Object.keys(activeSliderAnims).forEach(id => {
-        cancelAnimationFrame(activeSliderAnims[id]);
-      });
-      activeSliderAnims = {};
+      // Clear any pending timeout
+      if (sliderAnimTimeoutId) {
+        clearTimeout(sliderAnimTimeoutId);
+        sliderAnimTimeoutId = null;
+      }
+
+      // Clear any active animation frame
+      if (activeFormulaAnimId) {
+        cancelAnimationFrame(activeFormulaAnimId);
+        activeFormulaAnimId = null;
+      }
+
+      animatingSliders = {};
 
       if (!formula.sliders || formula.sliders.length === 0) return;
 
-      const duration = 10000; // Animation duration in milliseconds (10 seconds)
-      const startTime = performance.now();
-
+      // Populate sliders to animate
       formula.sliders.forEach(slider => {
         const sliderId = slider.id;
         const domSlider = document.getElementById(`slider_${sliderId}`);
@@ -1369,59 +1377,83 @@
         const defaultValue = slider.value;
         const min = slider.min;
         const max = slider.max;
-        const range = max - min;
 
-        // Oscillate starting at default, going to max, to min, and returning to default
-        const amplitudeMax = max - defaultValue;
-        const amplitudeMin = defaultValue - min;
+        animatingSliders[sliderId] = {
+          slider: slider,
+          domSlider: domSlider,
+          defaultValue: defaultValue,
+          min: min,
+          max: max,
+          amplitudeMax: max - defaultValue,
+          amplitudeMin: defaultValue - min
+        };
+      });
 
-        function animate(now) {
+      const duration = 10000; // Animation duration in milliseconds (10 seconds)
+
+      // Start the animation with a small delay of 0.15 seconds (150ms) to ensure smooth layout transitions
+      sliderAnimTimeoutId = setTimeout(() => {
+        sliderAnimTimeoutId = null;
+        const startTime = performance.now();
+
+        function tick(now) {
           const elapsed = now - startTime;
           const progress = elapsed / duration;
 
-          if (progress >= 1.0) {
-            slidersState[sliderId] = defaultValue;
-            domSlider.value = defaultValue;
-            const valDisplay = slider.unit === '%' ? Math.round(defaultValue * 100) + '%' : defaultValue.toFixed(2);
+          let hasAnyAnimating = false;
+
+          Object.keys(animatingSliders).forEach(sliderId => {
+            const data = animatingSliders[sliderId];
+            if (!data) return;
+
+            const { slider, domSlider, defaultValue, min, max, amplitudeMax, amplitudeMin } = data;
+
+            if (progress >= 1.0) {
+              slidersState[sliderId] = defaultValue;
+              domSlider.value = defaultValue;
+              const valDisplay = slider.unit === '%' ? Math.round(defaultValue * 100) + '%' : defaultValue.toFixed(2);
+              const valEl = document.getElementById(`val_${sliderId}`);
+              if (valEl) valEl.textContent = valDisplay;
+              delete animatingSliders[sliderId];
+              return;
+            }
+
+            hasAnyAnimating = true;
+
+            const sine = Math.sin(progress * 3 * Math.PI);
+            let currentVal;
+            if (sine >= 0) {
+              currentVal = defaultValue + sine * amplitudeMax;
+            } else {
+              currentVal = defaultValue + sine * amplitudeMin;
+            }
+
+            currentVal = Math.min(max, Math.max(min, currentVal));
+
+            slidersState[sliderId] = currentVal;
+            domSlider.value = currentVal;
+            const valDisplay = slider.unit === '%' ? Math.round(currentVal * 100) + '%' : currentVal.toFixed(2);
             const valEl = document.getElementById(`val_${sliderId}`);
             if (valEl) valEl.textContent = valDisplay;
-            
+          });
+
+          if (hasAnyAnimating) {
+            // Update visual state and run simulation EXACTLY ONCE per frame!
             updateConsole(formula);
             runSimulation();
-            delete activeSliderAnims[sliderId];
-            return;
-          }
-
-          const sine = Math.sin(progress * 3 * Math.PI);
-          let currentVal;
-          if (sine >= 0) {
-            currentVal = defaultValue + sine * amplitudeMax;
+            activeFormulaAnimId = requestAnimationFrame(tick);
           } else {
-            currentVal = defaultValue + sine * amplitudeMin;
+            activeFormulaAnimId = null;
           }
-
-          currentVal = Math.min(max, Math.max(min, currentVal));
-
-          slidersState[sliderId] = currentVal;
-          domSlider.value = currentVal;
-          const valDisplay = slider.unit === '%' ? Math.round(currentVal * 100) + '%' : currentVal.toFixed(2);
-          const valEl = document.getElementById(`val_${sliderId}`);
-          if (valEl) valEl.textContent = valDisplay;
-
-          updateConsole(formula);
-          runSimulation();
-
-          activeSliderAnims[sliderId] = requestAnimationFrame(animate);
         }
 
-        activeSliderAnims[sliderId] = requestAnimationFrame(animate);
-      });
+        activeFormulaAnimId = requestAnimationFrame(tick);
+      }, 150);
     }
 
     function stopSliderAnimation(sliderId) {
-      if (activeSliderAnims[sliderId]) {
-        cancelAnimationFrame(activeSliderAnims[sliderId]);
-        delete activeSliderAnims[sliderId];
+      if (animatingSliders[sliderId]) {
+        delete animatingSliders[sliderId];
       }
     }
 
