@@ -121,6 +121,8 @@ def fetch_feed_items(source_info):
                 if link_el is None:
                     link_el = entry.find('atom:link', ns)
                 link = link_el.attrib.get('href', '').strip() if link_el is not None else ""
+                if "stargazerslounge.com/topic/" in link:
+                    link = link.split('?')[0]
                 
                 pub_date_el = entry.find('atom:published', ns)
                 if pub_date_el is None:
@@ -150,6 +152,8 @@ def fetch_feed_items(source_info):
                 for item in items:
                     title = item.find('title').text.strip() if item.find('title') is not None and item.find('title').text else ""
                     link = item.find('link').text.strip() if item.find('link') is not None and item.find('link').text else ""
+                    if "stargazerslounge.com/topic/" in link:
+                        link = link.split('?')[0]
                     pub_date_str = item.find('pubDate').text.strip() if item.find('pubDate') is not None and item.find('pubDate').text else ""
                     
                     try:
@@ -635,8 +639,13 @@ def main():
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
     
-    # Filter out duplicates
-    new_candidates = [c for c in candidates if c['url'] not in existing_ids]
+    # Filter out duplicates (both against existing database and within the current run candidates)
+    seen_urls_this_run = set()
+    new_candidates = []
+    for c in candidates:
+        if c['url'] not in existing_ids and c['url'] not in seen_urls_this_run:
+            new_candidates.append(c)
+            seen_urls_this_run.add(c['url'])
     print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)}")
     
     if not new_candidates:
