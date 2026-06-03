@@ -69,7 +69,8 @@ GITHUB_REPOS = [
     {"name": "N.I.N.A.", "repo": "isbeorn/nina", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
     {"name": "PHD2 Guiding", "repo": "OpenPHDGuiding/phd2", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
     {"name": "INDI Library", "repo": "indilib/indi", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
-    {"name": "Stellarium", "repo": "Stellarium/stellarium", "category_es": "SOFTWARE", "category_en": "SOFTWARE"}
+    {"name": "Stellarium", "repo": "Stellarium/stellarium", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
+    {"name": "SetiAstro SAS", "repo": "setiastro/setiastrosuite", "category_es": "SOFTWARE", "category_en": "SOFTWARE"}
 ]
 
 GITLAB_REPOS = [
@@ -478,7 +479,7 @@ if not FABRICANTES:
         "ZWO", "Pegasus Astro", "Player One", "PrimaLuceLab", "Planewave", 
         "William Optics", "Celestron", "Sky-Watcher", "Skywatcher", "Explore Scientific", 
         "Lunt Solar Systems", "Askar", "Sharpstar", "Svbony", "QHY", "Meade", 
-        "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab"
+        "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab", "MLAstro"
     ]
 
 if not PALABRAS_CLAVE:
@@ -486,7 +487,8 @@ if not PALABRAS_CLAVE:
         "telescope", "refractor", "newtonian", "mount", "camera", "filter", "sensor", 
         "optics", "software", "firmware", "nina", "asiair", "indi", "ekos", "focuser", 
         "rotator", "flattener", "reducer", "guiding", "guide scope", "review", 
-        "unboxing", "setup", "seestar", "vespera", "stellina", "accessory", "accessories"
+        "unboxing", "setup", "seestar", "vespera", "stellina", "accessory", "accessories",
+        "firecapture", "sharpcap", "autostakkert", "pixinsight"
     ]
 
 def check_relevance_fallback(title):
