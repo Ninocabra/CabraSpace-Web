@@ -1,0 +1,43 @@
+name: Scraper de Noticias y Equipamiento
+
+on:
+  schedule:
+    # Ejecutar cada hora (en el minuto 15 para evitar picos de carga)
+    - cron: '15 * * * *'
+  workflow_dispatch:
+    # Permite lanzarlo manualmente desde GitHub si hace falta
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Necesario para hacer git push
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar scraper de novedades PixInsight
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python tools/scraper.py
+
+      - name: Ejecutar scraper de equipamiento
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python tools/scraper_equipment.py
+
+      - name: Publicar cambios si hay novedades
+        run: |
+          git config user.name "CabraSpace Bot"
+          git config user.email "ninocabra@gmail.com"
+          git add novedades.json equipamiento.json
+          git diff --staged --quiet || git commit -m "🤖 Actualización automática de noticias [$(date +'%Y-%m-%d %H:%M')]"
+          git push
