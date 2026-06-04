@@ -31,52 +31,55 @@ MAX_DB_SIZE = 150         # Keep DB file size balanced
 # Scraping Sources
 SOURCES = [
     # Manufacturer Feeds (RSS/Atom)
-    {"name": "ZWO", "url": "https://www.zwoastro.com/feed/", "is_youtube": False},
-    {"name": "Pegasus Astro", "url": "https://pegasusastro.com/feed/", "is_youtube": False},
-    {"name": "Player One Astronomy", "url": "https://player-one-astronomy.com/feed/", "is_youtube": False},
-    {"name": "PrimaLuceLab", "url": "https://www.primalucelab.com/blog/feed/", "is_youtube": False},
-    {"name": "Planewave", "url": "https://planewave.com/feed/", "is_youtube": False},
-    {"name": "William Optics", "url": "https://williamoptics.com/blogs/news.atom", "is_youtube": False},
-    {"name": "Celestron", "url": "https://www.celestron.com/blogs/news.atom", "is_youtube": False},
-    {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False},
-    {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False},
-    {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False},
-    {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False},
-    {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False},
-    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False},
+    {"name": "ZWO", "url": "https://www.zwoastro.com/feed/", "is_youtube": False, "is_mfg": True},
+    {"name": "Pegasus Astro", "url": "https://pegasusastro.com/feed/", "is_youtube": False, "is_mfg": True},
+    {"name": "Player One Astronomy", "url": "https://player-one-astronomy.com/feed/", "is_youtube": False, "is_mfg": True},
+    {"name": "PrimaLuceLab", "url": "https://www.primalucelab.com/blog/feed/", "is_youtube": False, "is_mfg": True},
+    {"name": "Planewave", "url": "https://planewave.com/feed/", "is_youtube": False, "is_mfg": True},
+    {"name": "William Optics", "url": "https://williamoptics.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Celestron", "url": "https://www.celestron.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False, "is_mfg": False},
+    {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False, "is_mfg": False},
+    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False},
     
-    # YouTube Channel Feeds
-    {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True},
-    {"name": "Cuiv, The Lazy Geek", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ5qRydYf3lMJ9A63cvsSEA", "is_youtube": True},
-    {"name": "The Space Koala", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCToyE26Iy4-gwi4BowKWClQ", "is_youtube": True},
-    {"name": "SetiAstro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCHeW7wuxfjhMmymXC9KqIbg", "is_youtube": True},
-    {"name": "Patriot Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyf4zn4wd-W4FnBwV98-jXw", "is_youtube": True},
-    {"name": "Utah Desert Remote Observatories", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAP_JNj5koMchEFXnhirwnQ", "is_youtube": True},
-    {"name": "Lukomatico", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBTXZYuFWQ6lx51L4GeY0Lw", "is_youtube": True},
-    {"name": "TAIC", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCiR5AmROq4YcXF8hCxxZQ-g", "is_youtube": True},
-    {"name": "View into Space", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW1F7nyBqtNTzaSWcrpx9LQ", "is_youtube": True},
-    {"name": "Nebula Photos", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO_gBdHekc74feh0bWqKJ1Q", "is_youtube": True},
-    {"name": "Astro Academy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC56nUa0BeuHUsE3TM0MCpFg", "is_youtube": True},
-    {"name": "Natural Portraits", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQrYBVmH3Gz9IO5ryXIGhdw", "is_youtube": True},
-    {"name": "Astrocitas", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7DwcTu__SZs1a65W99SFA", "is_youtube": True},
-    {"name": "Astrotivissa", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIOTjw9A7ckpkCEbdowmV_g", "is_youtube": True},
-    {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True},
-    {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True},
-    {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True},
-    {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True},
-    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True},
-    {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True},
-    {"name": "Pegasus Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbrUkaBOELOQywEUvdiJGyA", "is_youtube": True},
-    {"name": "Player One Astronomy (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGJbQ-wBD1lqVhNMqCbWoMA", "is_youtube": True},
-    {"name": "PrimaLuceLab (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCeXafWw7n66SysjmrfRsLjg", "is_youtube": True},
-    {"name": "Celestron (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCSZErIkrEARb28wBG3wRXow", "is_youtube": True},
-    {"name": "Sky-Watcher USA (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCp6O7O6Nt3Fg7UQXvnq6WcQ", "is_youtube": True},
-    {"name": "Explore Scientific (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4AR7eOxPBo7UHoJOZcgrTQ", "is_youtube": True},
-    {"name": "William Optics (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_YbaZ47wZNSLu_JQl9djKg", "is_youtube": True},
-    {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True},
-    {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True},
-    {"name": "Lunt Solar Systems (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIP-sBB1PuiKgRqJB_iJ9kg", "is_youtube": True}
+    # YouTube Channel Feeds (Independent Creators)
+    {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True, "is_mfg": False},
+    {"name": "Cuiv, The Lazy Geek", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ5qRydYf3lMJ9A63cvsSEA", "is_youtube": True, "is_mfg": False},
+    {"name": "The Space Koala", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCToyE26Iy4-gwi4BowKWClQ", "is_youtube": True, "is_mfg": False},
+    {"name": "SetiAstro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCHeW7wuxfjhMmymXC9KqIbg", "is_youtube": True, "is_mfg": False},
+    {"name": "Patriot Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyf4zn4wd-W4FnBwV98-jXw", "is_youtube": True, "is_mfg": False},
+    {"name": "Utah Desert Remote Observatories", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAP_JNj5koMchEFXnhirwnQ", "is_youtube": True, "is_mfg": False},
+    {"name": "Lukomatico", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBTXZYuFWQ6lx51L4GeY0Lw", "is_youtube": True, "is_mfg": False},
+    {"name": "TAIC", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCiR5AmROq4YcXF8hCxxZQ-g", "is_youtube": True, "is_mfg": False},
+    {"name": "View into Space", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW1F7nyBqtNTzaSWcrpx9LQ", "is_youtube": True, "is_mfg": False},
+    {"name": "Nebula Photos", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO_gBdHekc74feh0bWqKJ1Q", "is_youtube": True, "is_mfg": False},
+    {"name": "Astro Academy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC56nUa0BeuHUsE3TM0MCpFg", "is_youtube": True, "is_mfg": False},
+    {"name": "Natural Portraits", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQrYBVmH3Gz9IO5ryXIGhdw", "is_youtube": True, "is_mfg": False},
+    {"name": "Astrocitas", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7DwcTu__SZs1a65W99SFA", "is_youtube": True, "is_mfg": False},
+    {"name": "Astrotivissa", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIOTjw9A7ckpkCEbdowmV_g", "is_youtube": True, "is_mfg": False},
+    {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True, "is_mfg": False},
+    {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True, "is_mfg": False},
+    {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True, "is_mfg": False},
+    
+    # YouTube Channel Feeds (Manufacturers / Brands)
+    {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},
+    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True, "is_mfg": True},
+    {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True, "is_mfg": True},
+    {"name": "Pegasus Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbrUkaBOELOQywEUvdiJGyA", "is_youtube": True, "is_mfg": True},
+    {"name": "Player One Astronomy (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGJbQ-wBD1lqVhNMqCbWoMA", "is_youtube": True, "is_mfg": True},
+    {"name": "PrimaLuceLab (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCeXafWw7n66SysjmrfRsLjg", "is_youtube": True, "is_mfg": True},
+    {"name": "Celestron (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCSZErIkrEARb28wBG3wRXow", "is_youtube": True, "is_mfg": True},
+    {"name": "Sky-Watcher USA (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCp6O7O6Nt3Fg7UQXvnq6WcQ", "is_youtube": True, "is_mfg": True},
+    {"name": "Explore Scientific (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4AR7eOxPBo7UHoJOZcgrTQ", "is_youtube": True, "is_mfg": True},
+    {"name": "William Optics (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_YbaZ47wZNSLu_JQl9djKg", "is_youtube": True, "is_mfg": True},
+    {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True, "is_mfg": True},
+    {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True, "is_mfg": True},
+    {"name": "Lunt Solar Systems (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIP-sBB1PuiKgRqJB_iJ9kg", "is_youtube": True, "is_mfg": True}
 ]
+
 
 GITHUB_REPOS = [
     {"name": "N.I.N.A.", "repo": "isbeorn/nina", "category_es": "SOFTWARE", "category_en": "SOFTWARE"},
@@ -141,7 +144,8 @@ def fetch_feed_items(source_info):
                         "url": link,
                         "date": date_formatted,
                         "source": author,
-                        "is_youtube": is_youtube
+                        "is_youtube": is_youtube,
+                        "is_mfg": source_info.get("is_mfg", False)
                     })
                     
         # RSS 2.0 Feed
@@ -170,7 +174,8 @@ def fetch_feed_items(source_info):
                             "url": link,
                             "date": date_formatted,
                             "source": source_info["name"],
-                            "is_youtube": is_youtube
+                            "is_youtube": is_youtube,
+                            "is_mfg": source_info.get("is_mfg", False)
                         })
         return results
     except Exception as e:
@@ -207,6 +212,7 @@ def fetch_github_release(repo_info):
                 "date": date_formatted,
                 "source": f"GitHub Releases ({repo_info['name']})",
                 "is_youtube": False,
+                "is_mfg": True,
                 "body_content": body
             }
     except Exception as e:
@@ -246,6 +252,7 @@ def fetch_gitlab_release(repo_info):
                 "date": date_formatted,
                 "source": f"GitLab Releases ({repo_info['name']})",
                 "is_youtube": False,
+                "is_mfg": True,
                 "body_content": description
             }
     except Exception as e:
@@ -646,7 +653,13 @@ def main():
         if c['url'] not in existing_ids and c['url'] not in seen_urls_this_run:
             new_candidates.append(c)
             seen_urls_this_run.add(c['url'])
-    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)}")
+            
+    # Partition into manufacturers/official releases vs others to avoid starvation of vendor updates
+    new_mfg_candidates = [c for c in new_candidates if c.get('is_mfg', False)]
+    new_other_candidates = [c for c in new_candidates if not c.get('is_mfg', False)]
+    new_candidates = new_mfg_candidates + new_other_candidates
+    
+    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)} (Manufacturers/Official: {len(new_mfg_candidates)}, Others: {len(new_other_candidates)})")
     
     if not new_candidates:
         print("No new updates. Database is up to date.")
@@ -660,8 +673,8 @@ def main():
             print("Reached processing limit for this run.")
             break
             
-        # Check if candidate is from a manufacturer feed (not YouTube and not Stargazers Lounge)
-        is_mfg = not item['is_youtube'] and item['source'] != "Stargazers Lounge"
+        # Check if candidate is from a manufacturer feed
+        is_mfg = item.get('is_mfg', False)
         
         # Pre-filter YouTube and forum candidates using keyword check to save Gemini API quota and avoid rate limits
         if not is_mfg and not check_relevance_fallback(item['title']):
