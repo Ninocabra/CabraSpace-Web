@@ -1,5 +1,233 @@
 [
   {
+    "id": "https://www.youtube.com/shorts/ZqKNXP2nL2E",
+    "title_es": "Anuncio y Descuento de Galactic Kiwi para PixInsight",
+    "title_en": "Galactic Kiwi Announcement and Discount for PixInsight",
+    "summary_es": "Este breve anuncio promocional de Astrotivissa presenta el recurso 'Galactic Kiwi', un método o conjunto de scripts para el procesamiento de astrofotografías en PixInsight. El video ofrece un código de descuento para su adquisición, dirigido a mejorar los flujos de trabajo de edición.",
+    "summary_en": "This short promotional announcement from Astrotivissa introduces the 'Galactic Kiwi' resource, a method or set of scripts for astrophotography processing in PixInsight. The video offers a discount code for its acquisition, aimed at enhancing editing workflows.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2026-05-04",
+    "url": "https://www.youtube.com/shorts/ZqKNXP2nL2E",
+    "tags": [
+      "Galactic Kiwi",
+      "PixInsight",
+      "Script",
+      "Procesado",
+      "Workflow",
+      "Descuento"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=m77gBSqQJTE",
+    "title_es": "Demostración de PiMagic Studio para PixInsight y AstroMagic para Photoshop",
+    "title_en": "Demo of PiMagic Studio for PixInsight and AstroMagic for Photoshop",
+    "summary_es": "Este video demuestra el uso de PiMagic Studio, un conjunto de scripts para PixInsight que automatizan y simplifican el procesamiento de astrofotografía. Muestra cómo integrar PiMagic Studio en el flujo de trabajo de PixInsight y cómo AstroMagic para Photoshop ofrece funcionalidades similares.",
+    "summary_en": "This video demonstrates PiMagic Studio, a set of scripts for PixInsight that automate and simplify astrophotography processing. It shows how to integrate PiMagic Studio into the PixInsight workflow, and how AstroMagic for Photoshop offers similar functionality.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2026-01-13",
+    "url": "https://www.youtube.com/watch?v=m77gBSqQJTE",
+    "tags": [
+      "PiMagic Studio",
+      "AstroMagic",
+      "Scripts",
+      "Workflow",
+      "Automation",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=oPkPvBTRKng",
+    "title_es": "Estiramiento avanzado en PixInsight | Stretch Wars 2026",
+    "title_en": "Advanced Stretching in PixInsight | Stretch Wars 2026",
+    "summary_es": "En este tutorial, Patriot Astro compara varios métodos de estiramiento en PixInsight, incluyendo STF, Arcsinh, GHS y máscaras de luminosidad. Se muestran flujos de trabajo para revelar detalles en nebulosas y galaxias, con ajustes prácticos de parámetros.",
+    "summary_en": "In this tutorial, Patriot Astro compares several stretching methods in PixInsight, including STF, Arcsinh, GHS, and luminance masks. It demonstrates workflows to reveal details in nebulae and galaxies, with practical parameter adjustments.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-01-01",
+    "url": "https://www.youtube.com/watch?v=oPkPvBTRKng",
+    "tags": [
+      "STF",
+      "Arcsinh",
+      "GHS",
+      "Streching",
+      "Tutorial",
+      "Luminance Masks"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1q09pbc/installing_pixinsight_on_another_personal_computer/",
+    "title_es": "Instalación de PixInsight en otro ordenador personal",
+    "title_en": "Installing PixInsight on Another Personal Computer",
+    "summary_es": "Este recurso aborda el proceso de instalar el software PixInsight en un ordenador personal adicional. Generalmente, estas discusiones cubren aspectos relacionados con la gestión de licencias o el uso en múltiples dispositivos bajo una misma licencia.",
+    "summary_en": "This resource discusses the process of installing PixInsight software on an additional personal computer. Such discussions typically cover aspects related to license management or multi-device usage under a single license.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2025-12-31",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1q09pbc/installing_pixinsight_on_another_personal_computer/",
+    "tags": [
+      "PixInsight",
+      "Installation",
+      "Licensing",
+      "Software",
+      "Multiple Computers",
+      "Activation"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=nkcohxTI1FE",
+    "title_es": "Manteniendo la Consistencia en Banda Estrecha",
+    "title_en": "Being Narrowband Consistent",
+    "summary_es": "Adam Block presenta técnicas avanzadas para mantener consistencia en la combinación de datos de banda estrecha (SHO), utilizando herramientas de PixInsight como PixelMath y máscaras. El tutorial aborda cómo corregir diferencias de fondo y alinear las intensidades entre canales para obtener resultados naturales.",
+    "summary_en": "Adam Block demonstrates advanced techniques for maintaining consistency when combining narrowband data (SHO), using PixInsight tools like PixelMath and masks. The tutorial covers correcting background differences and aligning channel intensities for natural-looking results.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-12-27",
+    "url": "https://www.youtube.com/watch?v=nkcohxTI1FE",
+    "tags": [
+      "PixelMath",
+      "Narrowband",
+      "SHO",
+      "Masks",
+      "Adam Block",
+      "Combination"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1pip9hf/pixinsight_scripts/",
+    "title_es": "Scripts de PixInsight: Discusión y recursos en Reddit",
+    "title_en": "PixInsight Scripts: Discussion and Resources on Reddit",
+    "summary_es": "Recopilación de discusiones y recursos sobre scripts personalizados para PixInsight en el subreddit r/pixinsight. Se cubren temas como instalación, creación y uso de scripts para optimizar flujos de trabajo de procesamiento astrofotográfico.",
+    "summary_en": "A collection of discussions and resources about custom scripts for PixInsight from the r/pixinsight subreddit. Topics include installation, creation, and usage of scripts to optimize astrophotography processing workflows.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-12-10",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1pip9hf/pixinsight_scripts/",
+    "tags": [
+      "Scripts",
+      "Reddit",
+      "Community",
+      "Workflow",
+      "Tutorial",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1pgo4np/complex_pixinsight/",
+    "title_es": "PixInsight Complejo: Discusiones de Procesamiento Avanzado",
+    "title_en": "Complex PixInsight: Advanced Processing Discussions",
+    "summary_es": "Un hilo de la comunidad de Reddit donde se discuten técnicas avanzadas de procesamiento en PixInsight, incluyendo el uso de scripts y procesos para manejar imágenes complejas. Los usuarios comparten flujos de trabajo y soluciones a problemas comunes en el apilamiento y mejora de datos astronómicos.",
+    "summary_en": "A Reddit community thread discussing advanced PixInsight processing techniques, including the use of scripts and processes to handle complex images. Users share workflows and solutions to common issues in stacking and enhancing astronomical data.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-12-07",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1pgo4np/complex_pixinsight/",
+    "tags": [
+      "Advanced Processing",
+      "Workflow",
+      "Scripts",
+      "Noise Reduction",
+      "Debayering",
+      "Reddit"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1p93lm3/any_ideas_why_this_is_happening_after_denoising/",
+    "title_es": "Problemas tras eliminar ruido cromático con NoiseXTerminator",
+    "title_en": "Issues after denoising chrominance noise with NoiseXTerminator",
+    "summary_es": "El usuario informa de artefactos o patrones extraños tras aplicar NoiseXTerminator para reducir ruido cromático. Se discuten posibles causas como configuración incorrecta del máscara de ruido cromático o necesidad de combinar con otras herramientas de denoising.",
+    "summary_en": "User reports artifacts or strange patterns after applying NoiseXTerminator for chrominance noise reduction. Possible causes discussed include incorrect chrominance mask settings or need to combine with other denoising tools.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-11-28",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1p93lm3/any_ideas_why_this_is_happening_after_denoising/",
+    "tags": [
+      "NoiseXTerminator",
+      "denoising",
+      "chrominance",
+      "artifacts",
+      "troubleshooting",
+      "reddit"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1p79quh/whats_everyone_doing_to_save_and_process_data/",
+    "title_es": "Estrategias para procesar datos de múltiples noches en PixInsight",
+    "title_en": "Tips for Combining and Processing Multi-Night Data in PixInsight",
+    "summary_es": "Recurso comunitario que discute métodos para manejar datos de múltiples sesiones de captura en PixInsight. Incluye consejos sobre calibración, integración y uso de scripts como WeightedBatchPreprocessing para optimizar el flujo de trabajo.",
+    "summary_en": "A community discussion on Reddit about best practices for combining and processing astrophotography data captured over multiple nights using PixInsight. Topics include calibration strategies, integration options, and leveraging scripts like WeightedBatchPreprocessing.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-11-26",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1p79quh/whats_everyone_doing_to_save_and_process_data/",
+    "tags": [
+      "Multi-Night Data",
+      "WeightedBatchPreprocessing",
+      "Integration",
+      "Calibration",
+      "Workflow",
+      "Reddit"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=IxWNfcDnJSI",
+    "title_es": "Tutorial de procesamiento OSC con Setiastro Suite Pro Noviembre 2025",
+    "title_en": "Setiastro Suite Pro OSC Processing Tutorial November 2025",
+    "summary_es": "Este tutorial actualizado muestra el flujo de trabajo completo de procesamiento de imágenes OSC (cámara de un solo disparo a color) utilizando Setiastro Suite Pro en PixInsight. Incluye pasos detallados sobre calibración, alineación, apilado y realce de imágenes con las últimas actualizaciones del software.",
+    "summary_en": "This updated tutorial demonstrates the complete OSC (one-shot color) image processing workflow using Setiastro Suite Pro in PixInsight. It includes detailed steps on calibration, alignment, stacking, and image enhancement with the latest software updates.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2025-11-15",
+    "url": "https://www.youtube.com/watch?v=IxWNfcDnJSI",
+    "tags": [
+      "Setiastro Suite Pro",
+      "OSC",
+      "Processing",
+      "Tutorial",
+      "PixInsight",
+      "Updates"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=HxnWeaH7Tqc",
+    "title_es": "Animación de cometas en PixInsight",
+    "title_en": "Comet Animation in PixInsight",
+    "summary_es": "Adam Block enseña cómo crear animaciones de cometas usando PixInsight. El tutorial cubre el apilado de imágenes de cometas, registro con estrellas y cometas, y la creación de secuencias animadas.",
+    "summary_en": "Adam Block teaches how to create comet animations using PixInsight. The tutorial covers stacking comet images, registering with stars and comets, and creating animated sequences.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-10-31",
+    "url": "https://www.youtube.com/watch?v=HxnWeaH7Tqc",
+    "tags": [
+      "Comet",
+      "Animation",
+      "Stacking",
+      "Registration",
+      "Tutorial",
+      "Adam Block"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=rfmWigz66v0",
+    "title_es": "Diagramas H-R con un solo clic en PixInsight",
+    "title_en": "One Click Science: H-R Diagrams in PixInsight",
+    "summary_es": "Adam Block enseña cómo generar diagramas Hertzsprung-Russell directamente en PixInsight utilizando datos de catálogos estelares y herramientas de anotación. Incluye el uso de scripts para identificar tipos espectrales y magnitudes absolutas.",
+    "summary_en": "Adam Block teaches how to generate Hertzsprung-Russell diagrams directly in PixInsight using star catalog data and annotation tools. Includes the use of scripts to identify spectral types and absolute magnitudes.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-10-13",
+    "url": "https://www.youtube.com/watch?v=rfmWigz66v0",
+    "tags": [
+      "H-R Diagram",
+      "Annotation",
+      "Scripts",
+      "Star Catalogs",
+      "PixInsight Tutorial",
+      "Scientific Imaging"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=tUyFbiqrGLI",
     "title_es": "Procesado de la Nebulosa del Corazón SHO+RGB",
     "title_en": "Heart Nebula SHO+RGB Processing",
