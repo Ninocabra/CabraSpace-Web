@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astro Forecast - CabraSpace</title>
+  <meta name="description" content="Planifica tus noches de astrofotografía y observación con el pronóstico de calidad de cielo inteligente de NightVis, integrado en CabraSpace.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Estilos específicos para Astro Forecast */
+    .forecast-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .fc-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .fc-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .forecast-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 32px;
+      margin-bottom: 80px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .forecast-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(300px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(207, 171, 74, 0.06), transparent 80%);
+      z-index: 0;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .forecast-card:hover::before {
+      opacity: 1;
+    }
+
+    .forecast-card-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    .attribution-banner {
+      background: rgba(207, 171, 74, 0.04);
+      border-left: 3px solid var(--gold-primary);
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .attribution-banner p {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .attribution-banner strong {
+      color: var(--gold-primary);
+    }
+
+    .attribution-banner a {
+      color: var(--gold-primary);
+      text-decoration: underline;
+      transition: var(--transition-smooth);
+    }
+
+    .attribution-banner a:hover {
+      color: var(--gold-light);
+    }
+
+    .iframe-wrapper {
+      position: relative;
+      width: 100%;
+      height: 900px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      background: #020202;
+    }
+
+    .forecast-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Novedades <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
+            <li><a href="novedades.html" class="dropdown-item">PixInsight</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="astroforecast.html" class="dropdown-item active">Astro Forecast</a></li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath.html" class="dropdown-item">PixelMath-teca</a></li>
+                <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
+              </ul>
+            </li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="dropdown-item">Mapa de Contaminación ↗</a></li>
+                <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="lang-switcher">
+          <a href="astroforecast.html" class="lang-link active">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="astroforecast-en.html" class="lang-link">EN</a>
+        </div>
+        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="container">
+    <section class="forecast-header">
+      <h1 class="fc-title">Astro Forecast</h1>
+      <p class="fc-subtitle">
+        Planifica tu noche de astrofotografía evaluando la cobertura de nubes, seeing, transparencia y fases lunares con un cálculo inteligente de viabilidad.
+      </p>
+    </section>
+
+    <!-- Interactive Map & Forecast Card -->
+    <section class="forecast-card" id="forecastCard">
+      <div class="forecast-card-content">
+        <!-- NightVis Attribution Banner -->
+        <div class="attribution-banner">
+          <p>
+            <strong>Integración e Información:</strong> Esta sección incorpora la plataforma web de previsión de cielo profundo y planetario de <strong><a href="https://nightvis.space" target="_blank" rel="noopener noreferrer">NightVis.space</a></strong>. Todos los recursos, mapas, datos del tiempo y fórmulas de puntuación matemática pertenecen a la plataforma original de NightVis. ¡Esperamos que os sea de gran utilidad para planificar vuestras salidas astronómicas!
+          </p>
+        </div>
+
+        <!-- Embedded NightVis app -->
+        <div class="iframe-wrapper">
+          <iframe src="https://nightvis.space" title="NightVis Astro Forecast App" class="forecast-iframe"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <a href="index.html" class="footer-logo">
+        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace.com</span>
+      </a>
+      <span class="copyright">© 2026 CabraSpace. Todos los derechos reservados.</span>
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contacto</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Spotlight tracking on forecast card
+      const forecastCard = document.getElementById('forecastCard');
+      forecastCard.addEventListener('mousemove', e => {
+        const rect = forecastCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        forecastCard.style.setProperty('--mouse-x', `${x}px`);
+        forecastCard.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      // Shrink navbar on scroll
+      const header = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+
+      // Toggle Modo Noche
+      const nightToggle = document.getElementById('nightmode-toggle');
+      if (nightToggle) {
+        nightToggle.addEventListener('click', () => {
+          document.body.classList.toggle('night-vision');
+          if (document.body.classList.contains('night-vision')) {
+            localStorage.setItem('night-vision', 'enabled');
+          } else {
+            localStorage.setItem('night-vision', 'disabled');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
