@@ -371,10 +371,10 @@ def process_fallback(item):
         
     return {
         "id": item['url'],
-        "title_es": f"[Auto] {item['title']} ({item['source']})",
+        "title_es": f"{item['title']} ({item['source']})",
         "title_en": f"{item['title']} ({item['source']})",
-        "summary_es": f"Actualización o tutorial de {item['source']} sobre astrofotografía: '{item['title']}'. Por favor, configure GEMINI_API_KEY en GitHub para habilitar traducciones automáticas.",
-        "summary_en": f"Update or tutorial from {item['source']} covering astrophotography: '{item['title']}'. Configure GEMINI_API_KEY in GitHub to enable automated AI summaries.",
+        "summary_es": f"Actualización o tutorial de {item['source']}: '{item['title']}'.",
+        "summary_en": f"Update or tutorial from {item['source']}: '{item['title']}'.",
         "category_es": category_es,
         "category_en": category_en,
         "date": item['date'],

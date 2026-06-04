@@ -588,10 +588,10 @@ def process_fallback(item):
         
     return {
         "id": item['url'],
-        "title_es": f"[Auto] {item['title']} ({item['source']})",
+        "title_es": f"{item['title']} ({item['source']})",
         "title_en": f"{item['title']} ({item['source']})",
-        "summary_es": f"Actualización o revisión de equipamiento de {item['source']}: '{item['title']}'. Por favor, configure GEMINI_API_KEY en GitHub para habilitar traducciones automáticas.",
-        "summary_en": f"Equipment update or review from {item['source']}: '{item['title']}'. Configure GEMINI_API_KEY in GitHub to enable automated AI summaries.",
+        "summary_es": f"Actualización o revisión de equipamiento de {item['source']}: '{item['title']}'.",
+        "summary_en": f"Equipment update or review from {item['source']}: '{item['title']}'.",
         "category_es": category_es,
         "category_en": category_en,
         "date": item['date'],
