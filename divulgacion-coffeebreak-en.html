@@ -651,38 +651,8 @@
 
   <!-- Main Grid Content -->
   <main class="container divulgacion-grid">
-    <!-- Left Column (Analogy and Player) -->
+    <!-- Left Column (Player) -->
     <section>
-      <!-- The SNR Analogy -->
-      <article class="premium-glass-card">
-        <h2 class="section-headline">The Concept: Signal and Noise</h2>
-        <div class="snr-analogy-text">
-          <p>
-            The title of this podcast perfectly represents the technical and philosophical core of space science and, in a very special way, of our practical passion for astrophotography.
-          </p>
-          <div class="snr-blocks">
-            <div class="snr-box">
-              <h3 class="snr-box-title">In Astrophotography</h3>
-              <p class="snr-box-desc">
-                Processing in PixInsight is a constant battle for <strong>Signal-to-Noise Ratio (SNR)</strong>. We calibrate and stack frames to mitigate thermal noise and CMOS sensor read noise, with the sole purpose of revealing the faint electromagnetic signal of ancient photons coming from emission nebulae or distant spiral galaxies.
-              </p>
-            </div>
-            <div class="snr-box">
-              <h3 class="snr-box-title">In Astrophysics</h3>
-              <p class="snr-box-desc">
-                Cutting-edge science operates under the same principle. Scientists and astrophysicists analyze terabytes of raw data from ground-based observatories and space telescopes like the James Webb. Their task is to program algorithms capable of discriminating true cosmological signals from instrumental disturbances and background noise.
-              </p>
-            </div>
-          </div>
-          <p style="margin-top: 20px; font-weight: 300;">
-            The podcast <strong>Coffee Break: Señal y Ruido</strong> represents the perfect bridge between the technical tools we use at CabraSpace (such as the PixelMath-teca or PixInsight) and the pure physical-scientific understanding of the processes occurring in the celestial objects we capture in our deep-sky photos.
-          </p>
-          <p style="margin-top: 15px; font-size: 0.85rem; color: var(--gold-primary); font-weight: 400; border-left: 2px solid var(--gold-primary); padding-left: 10px;">
-            Note: This podcast is broadcast in Spanish, but serves as an outstanding conceptual and research resource for scientific papers and discoveries worldwide.
-          </p>
-        </div>
-      </article>
-
       <!-- Embedded Podcast Player -->
       <article class="premium-glass-card">
         <h2 class="section-headline">Episode Player</h2>
@@ -702,17 +672,17 @@
           <a href="https://xn--sealyruido-u9a.com/" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-main">
             Official Website ↗
           </a>
-          <a href="https://www.youtube.com/@CoffeeBreakPodcast" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+          <a href="https://www.youtube.com/@podcastcoffeebreak" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M23.498 6.163c-.272-1.022-1.074-1.826-2.099-2.099C19.558 3.5 12 3.5 12 3.5s-7.558 0-9.399.564C1.576 4.327.774 5.131.502 6.163 0 8.01 0 12 0 12s0 3.99.502 5.837c.272 1.022 1.074 1.826 2.099 2.099C4.442 20.5 12 20.5 12 20.5s7.558 0 9.399-.564c1.025-.273 1.827-1.077 2.099-2.099C24 15.99 24 12 24 12s0-3.99-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            Live on YouTube ↗
+            YouTube Channel ↗
           </a>
-          <a href="https://www.ivoox.com/podcast-coffee-break-senal-ruido_sq_f1174620_1.html" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+          <a href="https://www.ivoox.com/podcast-coffee-break-senal-ruido_sq_f1172891_1.html" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
             iVoox ↗
           </a>
-          <a href="https://open.spotify.com/show/47h23U3c0qCyp3mXb8i4U0" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+          <a href="https://open.spotify.com/show/5FpBuACKsfTWSptjLjbG8Y" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
             Spotify ↗
           </a>
-          <a href="https://podcasts.apple.com/es/podcast/coffee-break-se%C3%B1al-y-ruido/id974620579" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+          <a href="https://podcasts.apple.com/es/podcast/coffee-break-se%C3%B1al-y-ruido/id1028912310" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
             Apple Podcasts ↗
           </a>
         </div>
@@ -875,12 +845,30 @@
       const loadMoreWrapper = document.getElementById('load-more-wrapper');
       const loadMoreBtn = document.getElementById('load-more-btn');
 
+      function getEpNum(file) {
+        const m = file.match(/ep(\d+)/i);
+        return m ? parseInt(m[1], 10) : 0;
+      }
+
       if (categoriesTabs && explorerSearch && fragmentsGrid) {
         // Load database
         fetch('fragments_data.json')
           .then(response => response.json())
           .then(jsonData => {
-            explorerState.data = jsonData.groups;
+            // Sort from newest to oldest
+            const sortedData = {};
+            Object.keys(jsonData.groups).forEach(cat => {
+              const list = [...jsonData.groups[cat]];
+              list.sort((a, b) => {
+                const epA = getEpNum(a.file);
+                const epB = getEpNum(b.file);
+                if (epA !== epB) return epB - epA;
+                if (a.file !== b.file) return b.file.localeCompare(a.file);
+                return (b.time || 0) - (a.time || 0);
+              });
+              sortedData[cat] = list;
+            });
+            explorerState.data = sortedData;
             initExplorer();
           })
           .catch(err => {
