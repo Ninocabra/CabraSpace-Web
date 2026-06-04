@@ -346,7 +346,20 @@ def check_relevance_fallback(title):
         "processing", "editing", "masters of"
     ]
     title_lower = title.lower()
-    return any(k in title_lower for k in keywords)
+    
+    # Strip common non-indicative hashtags like #shorts and #short first
+    title_clean = title_lower.replace("#shorts", "").replace("#short", "")
+    
+    for k in keywords:
+        # Enforce word boundaries for very short keywords (<= 4 chars) to avoid false positives like #shorts matching sho
+        if len(k) <= 4:
+            if re.search(r'\b' + re.escape(k) + r'\b', title_clean):
+                return True
+        else:
+            if k in title_clean:
+                return True
+                
+    return False
 
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
