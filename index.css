@@ -76,7 +76,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  margin: 36px auto;
+  margin: 20px auto;
   width: 100%;
   max-width: 400px;
 }
@@ -207,8 +207,8 @@ header.scrolled {
 
 /* Hero Section */
 .hero {
-  padding-top: 160px;
-  padding-bottom: 24px;
+  padding-top: 150px;
+  padding-bottom: 12px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -323,12 +323,12 @@ header.scrolled {
 /* Logo Showcase Card (With a luxury gold frame and subtle drop shadow) */
 .logo-showcase-container {
   width: 100%;
-  max-width: 320px;
+  max-width: 250px;
   background: radial-gradient(circle, #212125 0%, #0c0c0e 100%);
   border: 1px solid var(--gold-border);
   border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 32px;
+  padding: 12px;
+  margin-bottom: 20px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
   position: relative;
   overflow: hidden;
@@ -338,7 +338,7 @@ header.scrolled {
 /* Double gold border inside the showcase container for a classic vintage framing */
 .logo-showcase-inner {
   border: 1px dashed var(--gold-border);
-  padding: 16px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,7 +351,7 @@ header.scrolled {
 
 .logo-img {
   width: 100%;
-  max-width: 240px;
+  max-width: 180px;
   height: auto;
   display: block;
   mix-blend-mode: screen;
