@@ -795,6 +795,8 @@
       { id: 'sho_star_mix', name: 'Mezcla SHO Estrellas Naturales', category: 'Paleta Banda Estrecha', description: 'Mezcla Azufre e Hidrógeno en el canal Rojo para reducir la tonalidad magenta en las estrellas típica del SHO puro y suavizar las transiciones cromáticas.', r: 'k_r * SII + (1 - k_r) * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 0.8 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
       { id: 'sho_green_mix', name: 'SHO Canal Verde Mix', category: 'Paleta Banda Estrecha', description: 'Mezcla Hidrógeno y Oxígeno en el canal verde para mitigar el tono verde dominante del hidrógeno.', r: 'SII', g: 'k_g * Ha + (1 - k_g) * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 0.8 }] },
       { id: 'sho_ha_red_boost', name: 'Paleta Hubble SHO con Inyección de Ha (Hubble SHO Ha-Red Boost)', category: 'Paleta Banda Estrecha', description: 'Mapeado Hubble clásico que inyecta una porción controlada de Hidrógeno en el canal Rojo para enriquecer y rellenar detalles dorados en áreas donde la señal de Azufre es extremadamente débil.', r: 'k * SII + (1 - k) * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k', label: 'Porcentaje de SII en canal Rojo (k)', min: 0.3, max: 1.0, step: 0.05, value: 0.70 }] },
+      { id: 'sho_dyn_cold', name: 'Paleta SHO Dinámica (The Coldest Nights)', category: 'Paleta Banda Estrecha', description: 'Mapeado dinámico no lineal donde la intensidad de Oxígeno regula dinámicamente la transición entre Azufre e Hidrógeno en el canal rojo, y equilibra el canal verde. Proporciona una separación de color excepcional.', r: '(OIII ^ ~OIII) * SII + ~(OIII ^ ~OIII) * Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', renderType: 'sho_dyn_cold', sources: ['sii', 'ha', 'oiii'], sliders: [] },
+
 
       // 2. Máscaras de Color
       { id: 'mask_red', name: 'Máscara: Rojo Estándar', category: 'Máscaras de Color', description: 'Genera una máscara monocromática aislando los tonos rojos. Útil para aplicar procesos de saturación específicos en nebulosas de emisión.', r: 'R - max(G, B)', rgb: 'R - max(G, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
@@ -820,6 +822,8 @@
       { id: 'oiii_blue', name: 'Añadir OIII al Canal Azul', category: 'Combinación LRGB / Banda Estrecha', description: 'Mezcla señal de Oxígeno III en banda estrecha al canal azul de una imagen RGB para potenciar reflejos de gas cian/azul.', r: 'RGB_R', g: 'RGB_G', b: 'RGB_B + k * OIII', renderType: 'oiii_blue', sources: ['original', 'oiii'], sliders: [{ id: 'k', label: 'Intensidad OIII (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
       { id: 'oiii_green', name: 'Añadir OIII al Canal Verde', category: 'Combinación LRGB / Banda Estrecha', description: 'Mezcla señal de Oxígeno III al canal verde RGB. Útil para equilibrar los detalles verdosos de la estructura gaseosa del OIII.', r: 'RGB_R', g: 'RGB_G + k * OIII', b: 'RGB_B', renderType: 'oiii_green', sources: ['original', 'oiii'], sliders: [{ id: 'k', label: 'Intensidad OIII (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
       { id: 'sii_red', name: 'Añadir SII al Canal Rojo', category: 'Combinación LRGB / Banda Estrecha', description: 'Mezcla señal de Azufre II (banda estrecha) en el canal rojo RGB para enriquecer las estructuras rojas de polvo denso.', r: 'RGB_R + k * SII', g: 'RGB_G', b: 'RGB_B', renderType: 'sii_red', sources: ['original', 'sii'], sliders: [{ id: 'k', label: 'Intensidad SII (k)', min: 0, max: 1.2, step: 0.05, value: 0.5 }] },
+      { id: 'ha_rgb_peris', name: 'Inyección de Ha con Conservación de Contraste (Método Vicent Peris)', category: 'Combinación LRGB / Banda Estrecha', description: 'Combina señal de Hidrógeno-alfa en el canal Rojo de forma selectiva, actuando únicamente en píxeles donde supera la mediana del fondo. Evita la pérdida de contraste de las estrellas y el fondo.', r: 'RGB_R + iif(Ha > med(Ha), (Ha - med(Ha)) * k, 0.0)', g: 'RGB_G', b: 'RGB_B', renderType: 'ha_rgb_peris', sources: ['original', 'ha'], sliders: [{ id: 'k', label: 'Intensidad Ha (k)', min: 0, max: 2.0, step: 0.05, value: 0.8 }] },
+
 
       // 4. Operaciones con Estrellas
       { id: 'stars_recompose', name: 'Recomponer Estrellas', category: 'Operaciones con Estrellas', description: 'Suma las estrellas procesadas al fondo sin estrellas (starless) ajustando el brillo general resultante de las estrellas. Permite regular la intensidad de las estrellas sobre el fondo de cielo.', r: 'Starless + k * Stars', g: 'Starless + k * Stars', b: 'Starless + k * Stars', renderType: 'stars_add', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Intensidad de Estrellas (k)', min: 0, max: 1.5, step: 0.05, value: 1.0 }] },
@@ -858,7 +862,11 @@
       { id: 'util_star_extract', name: 'Extracción de Estrellas', category: 'Utilidades y Limpieza', description: 'Genera una capa exclusiva de estrellas restando la versión sin estrellas de la imagen original.', rgb: 'Original - Starless', renderType: 'util_star_extract', sources: ['original', 'starless'], sliders: [] },
       { id: 'util_unsharp_mask', name: 'Máscara de Enfoque de Contraste Local (Unsharp Mask)', category: 'Utilidades y Limpieza', description: 'Resta la media local difusa del píxel para aislar los detalles de alta frecuencia (bordes y filamentos finos) y los suma multiplicados por una intensidad k, enfocando la imagen.', rgb: '$T + ($T - mean($T)) * k', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'k', label: 'Intensidad de Enfoque (k)', min: 0, max: 1.5, step: 0.05, value: 0.50 }] },
       { id: 'util_vignette_corr', name: 'Corrección de Viñeteo Sintético', category: 'Utilidades y Limpieza', description: 'Corrige el gradiente radial de viñeteo en las esquinas mediante una función parabólica matemática centrada en el canvas.', rgb: '$T / (1.0 - k * ((x() - 200)^2 + (y() - 200)^2) / 80000)', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'k', label: 'Intensidad de Corrección (k)', min: 0, max: 0.8, step: 0.05, value: 0.30 }] },
-      { id: 'util_noise_inject', name: 'Inyección de Ruido Fino Analógico', category: 'Utilidades y Limpieza', description: 'Inyecta una cantidad muy sutil de grano gaussiano uniforme para devolverle a la nebulosa un aspecto orgánico y texturizado tras reducciones de ruido agresivas.', rgb: '$T + noise() * k', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'k', label: 'Intensidad del Ruido (k)', min: 0, max: 0.05, step: 0.005, value: 0.01 }] }
+      { id: 'util_noise_inject', name: 'Inyección de Ruido Fino Analógico', category: 'Utilidades y Limpieza', description: 'Inyecta una cantidad muy sutil de grano gaussiano uniforme para devolverle a la nebulosa un aspecto orgánico y texturizado tras reducciones de ruido agresivas.', rgb: '$T + noise() * k', renderType: 'util_bg_flatten', sources: ['original'], sliders: [{ id: 'k', label: 'Intensidad del Ruido (k)', min: 0, max: 0.05, step: 0.005, value: 0.01 }] },
+      { id: 'scnr_green_math', name: 'Reducción de Ruido Verde Ajustable (SCNR Green)', category: 'Utilidades y Limpieza', description: 'Emulación matemática de SCNR para atenuar la dominante verdosa indeseada mediante una mezcla gradual regulada por el slider k.', r: 'R', g: 'iif(G > max(R, B), k * max(R, B) + (1 - k) * G, G)', b: 'B', renderType: 'scnr_green_math', sources: ['original'], sliders: [{ id: 'k', label: 'Fuerza de Reducción (k)', min: 0.0, max: 1.0, step: 0.05, value: 1.0 }] },
+      { id: 'util_sat_preserve', name: 'Control de Saturación con Conservación de Luminancia', category: 'Utilidades y Limpieza', description: 'Incrementa o disminuye la saturación de los colores del píxel conservando el brillo (luminancia) ponderado original. Evita dominantes grises o cambios en la exposición general.', r: 'L + (R - L) * k', g: 'L + (G - L) * k', b: 'L + (B - L) * k', renderType: 'util_sat_preserve', symbols: 'L = 0.2126 * R + 0.7152 * G + 0.0722 * B', sources: ['original'], sliders: [{ id: 'k', label: 'Factor de Saturación (k)', min: 0.0, max: 2.0, step: 0.05, value: 1.30 }] },
+      { id: 'util_asinh_stretch', name: 'Estirado Arcsinh Sintético (Arcsinh Stretch)', category: 'Utilidades y Limpieza', description: 'Aplica una función de seno hiperbólico inverso para estirar no linealmente la señal conservando las proporciones cromáticas y evitando que los núcleos estelares queden blancos.', rgb: 'asinh(k * $T) / asinh(k)', renderType: 'util_asinh_stretch', sources: ['original'], sliders: [{ id: 'k', label: 'Factor de Estirado (k)', min: 2, max: 100, step: 1, value: 10 }] },
+      { id: 'util_linear_gradient', name: 'Corrección de Gradiente Lineal de Fondo', category: 'Utilidades y Limpieza', description: 'Sustrae un gradiente de fondo lineal modelado en los ejes X e Y para corregir la contaminación lumínica o gradientes lunares.', rgb: 'max(0, $T - (k_x * (x() / w() - 0.5) + k_y * (y() / h() - 0.5)) + pedestal)', renderType: 'util_linear_gradient', sources: ['original'], sliders: [{ id: 'k_x', label: 'Inclinación X', min: -0.5, max: 0.5, step: 0.01, value: 0.0 }, { id: 'k_y', label: 'Inclinación Y', min: -0.5, max: 0.5, step: 0.01, value: 0.0 }, { id: 'pedestal', label: 'Ajuste Fondo', min: -0.1, max: 0.1, step: 0.005, value: 0.0 }] }
     ];
 
     // Populate database with base formulas
@@ -1926,6 +1934,100 @@
           out[i + 3] = 255;
         }
       }
+      else if (type === 'sho_dyn_cold') {
+        const siiChan = channels['sii'];
+        const haChan = channels['ha'];
+        const oiiiChan = channels['oiii'];
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const s_val = siiChan[i] / 255;
+          const h_val = haChan[i] / 255;
+          const o_val = oiiiChan[i] / 255;
+
+          const inv_o = 1.0 - o_val;
+          const r_blend = Math.pow(o_val, inv_o);
+          const r_out = r_blend * s_val + (1.0 - r_blend) * h_val;
+
+          const prod = h_val * o_val;
+          const inv_prod = 1.0 - prod;
+          const g_blend = Math.pow(prod, inv_prod);
+          const g_out = g_blend * h_val + (1.0 - g_blend) * o_val;
+
+          out[i]     = Math.min(255, Math.max(0, r_out * 255));
+          out[i + 1] = Math.min(255, Math.max(0, g_out * 255));
+          out[i + 2] = Math.min(255, Math.max(0, o_val * 255));
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'ha_rgb_peris') {
+        const k = s.k !== undefined ? s.k : 0.8;
+        const threshold = 20; 
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const ha_val = imgB[i];
+          const added = ha_val > threshold ? (ha_val - threshold) * k : 0;
+          out[i]     = Math.min(255, imgA[i] + added);
+          out[i + 1] = imgA[i + 1];
+          out[i + 2] = imgA[i + 2];
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'scnr_green_math') {
+        const k = s.k !== undefined ? s.k : 1.0;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r = imgA[i];
+          const g = imgA[i + 1];
+          const b = imgA[i + 2];
+          const max_rb = Math.max(r, b);
+          out[i]     = r;
+          out[i + 1] = g > max_rb ? max_rb * k + g * (1.0 - k) : g;
+          out[i + 2] = b;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_sat_preserve') {
+        const k = s.k !== undefined ? s.k : 1.30;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r = imgA[i];
+          const g = imgA[i + 1];
+          const b = imgA[i + 2];
+          const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          out[i]     = Math.max(0, Math.min(255, l + (r - l) * k));
+          out[i + 1] = Math.max(0, Math.min(255, l + (g - l) * k));
+          out[i + 2] = Math.max(0, Math.min(255, l + (b - l) * k));
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_asinh_stretch') {
+        const k = s.k !== undefined ? s.k : 10.0;
+        const denom = Math.asinh(k);
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const r = imgA[i] / 255;
+          const g = imgA[i + 1] / 255;
+          const b = imgA[i + 2] / 255;
+          out[i]     = (Math.asinh(k * r) / denom) * 255;
+          out[i + 1] = (Math.asinh(k * g) / denom) * 255;
+          out[i + 2] = (Math.asinh(k * b) / denom) * 255;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'util_linear_gradient') {
+        const k_x = s.k_x !== undefined ? s.k_x : 0.0;
+        const k_y = s.k_y !== undefined ? s.k_y : 0.0;
+        const pedestal = s.pedestal !== undefined ? s.pedestal : 0.0;
+        const p_val = pedestal * 255;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          const idx = i / 4;
+          const px = idx % width;
+          const py = Math.floor(idx / width);
+          const normX = px / width - 0.5;
+          const normY = py / height - 0.5;
+          const grad = (k_x * normX + k_y * normY) * 255;
+          out[i]     = Math.max(0, Math.min(255, imgA[i] - grad + p_val));
+          out[i + 1] = Math.max(0, Math.min(255, imgA[i + 1] - grad + p_val));
+          out[i + 2] = Math.max(0, Math.min(255, imgA[i + 2] - grad + p_val));
+          out[i + 3] = 255;
+        }
+      }
+
 
       ctx.putImageData(outputData, 0, 0);
     }
