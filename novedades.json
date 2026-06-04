@@ -1,5 +1,229 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=tUyFbiqrGLI",
+    "title_es": "Procesado de la Nebulosa del Corazón SHO+RGB",
+    "title_en": "Heart Nebula SHO+RGB Processing",
+    "summary_es": "Este recurso detalla un flujo de trabajo avanzado en PixInsight para combinar datos de banda estrecha SHO (Azufre-Hidrógeno-Oxígeno) y banda ancha RGB de la Nebulosa del Corazón. Se explican las técnicas clave para la calibración de color, reducción de ruido y estirado, así como los métodos específicos para integrar ambos conjuntos de datos y lograr una imagen compuesta final. Es un tutorial completo sobre cómo fusionar información espectral diversa para mejorar los detalles y el color en astrofotografía.",
+    "summary_en": "This resource details an advanced PixInsight workflow for combining narrowband SHO (Sulfur-Hydrogen-Oxygen) and broadband RGB data of the Heart Nebula. It explains key techniques for color calibration, noise reduction, and stretching, along with specific methods for integrating both datasets to achieve a final composite image. It's a comprehensive tutorial on merging diverse spectral information to enhance detail and color in astrophotography.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-04-08",
+    "url": "https://www.youtube.com/watch?v=tUyFbiqrGLI",
+    "tags": [
+      "SHO",
+      "RGB",
+      "Narrowband",
+      "PixInsight",
+      "Processing",
+      "HeartNebula"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1rflvy5/piadvisor_native_workspaceaware_llm_processing/",
+    "title_es": "PIAdvisor: Guía de Procesamiento por LLM con Conciencia del Espacio de Trabajo para PixInsight",
+    "title_en": "PIAdvisor: Native Workspace-Aware LLM Processing Guidance for PixInsight",
+    "summary_es": "Este recurso introduce PIAdvisor, una herramienta que integra un modelo de lenguaje grande (LLM) para ofrecer orientación de procesamiento directamente dentro de PixInsight. La característica clave es su capacidad para ser consciente del espacio de trabajo del usuario, proporcionando recomendaciones y asistencia adaptadas a las operaciones que se están realizando. Esto representa un avance para usuarios que buscan ayuda contextualizada durante sus flujos de trabajo de astrofotografía.",
+    "summary_en": "This resource introduces PIAdvisor, a tool that integrates a Large Language Model (LLM) to provide processing guidance directly within PixInsight. Its key feature is its ability to be workspace-aware, offering recommendations and assistance tailored to the operations being performed. This represents an advancement for users seeking contextualized help during their astrophotography workflows.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2026-02-26",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1rflvy5/piadvisor_native_workspaceaware_llm_processing/",
+    "tags": [
+      "PIAdvisor",
+      "LLM",
+      "Script",
+      "Guía",
+      "Procesamiento",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1rdecqm/is_something_wrong_with_pixinsight_web_site/",
+    "title_es": "¿Hay algún problema con la página web de PixInsight?",
+    "title_en": "Is there an issue with the PixInsight website?",
+    "summary_es": "Este recurso de Reddit aborda la pregunta sobre posibles problemas o inaccesibilidad del sitio web oficial de PixInsight. Es una discusión relevante para la comunidad de usuarios que buscan acceder al software o información.",
+    "summary_en": "This Reddit resource discusses potential issues or inaccessibility of the official PixInsight website. It's a relevant discussion for the user community seeking to access the software or information.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2026-02-24",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1rdecqm/is_something_wrong_with_pixinsight_web_site/",
+    "tags": [
+      "Website",
+      "Soporte",
+      "Comunidad",
+      "Problemas"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1qz07ru/im_trying_to_apply_these_process_icons_but_they/",
+    "title_es": "Problema al aplicar iconos de proceso en PixInsight",
+    "title_en": "Trouble Applying Process Icons in PixInsight",
+    "summary_es": "Un usuario en Reddit reporta que los iconos de proceso no se aplican al hacer doble clic o arrastrarlos a la imagen. Se discuten soluciones como verificar que la imagen esté activa, reiniciar PixInsight o revisar permisos de archivos.",
+    "summary_en": "A Reddit user reports that process icons do not apply when double-clicking or dragging onto an image. Solutions discussed include ensuring the image is active, restarting PixInsight, or checking file permissions.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2026-02-08",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1qz07ru/im_trying_to_apply_these_process_icons_but_they/",
+    "tags": [
+      "Process Icons",
+      "Troubleshooting",
+      "UI Issues",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=sRKF35v6S_I",
+    "title_es": "Procesado de la Nebulosa Pacman en PixInsight: Sencillo y Sorprendente",
+    "title_en": "Pacman Nebula Processing in PixInsight: Easy and Impressive",
+    "summary_es": "Este recurso es un tutorial de procesamiento de la Nebulosa Pacman utilizando PixInsight. Detalla una metodología sencilla para obtener resultados visualmente atractivos. Se centra en las herramientas y técnicas dentro del software para realzar la imagen de esta nebulosa.",
+    "summary_en": "This resource is a processing tutorial for the Pacman Nebula using PixInsight. It details a straightforward methodology to achieve visually appealing results. The video focuses on specific tools and techniques within the software to enhance the image of this nebula.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-02-07",
+    "url": "https://www.youtube.com/watch?v=sRKF35v6S_I",
+    "tags": [
+      "PixInsight",
+      "Nebulosa Pacman",
+      "Procesado",
+      "Tutorial",
+      "FlujoDeTrabajo",
+      "Astrofotografía"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=2J70fQJihzE",
+    "title_es": "Procesado de la Nebulosa Cabeza de Caballo en OSC con PiMagic Studio",
+    "title_en": "Processing the Horsehead Nebula One-Shot Color with PiMagic Studio",
+    "summary_es": "Este recurso presenta un flujo de trabajo completo en PixInsight para procesar imágenes de una sola toma a color (OSC) de la Nebulosa Cabeza de Caballo. Se detallan las técnicas y herramientas utilizadas dentro de PiMagic Studio para obtener resultados óptimos. El tutorial cubre desde la calibración básica hasta los pasos finales de estiramiento y mejora.",
+    "summary_en": "This resource presents a comprehensive PixInsight workflow for processing One-Shot Color (OSC) images of the Horsehead Nebula. It details the techniques and tools utilized within PiMagic Studio to achieve optimal results. The tutorial covers everything from basic calibration to final stretching and enhancement steps.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-02-07",
+    "url": "https://www.youtube.com/watch?v=2J70fQJihzE",
+    "tags": [
+      "OSC",
+      "Workflow",
+      "PixInsight",
+      "Tutorial",
+      "PiMagic Studio",
+      "Horsehead"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1qv6xpg/macbook_pro_m4_pro_with_24gb_ram_vs_m5_with_32gb/",
+    "title_es": "MacBook Pro M4 Pro con 24GB RAM vs M5 con 32GB RAM para PixInsight",
+    "title_en": "MacBook Pro M4 Pro vs M5 for PixInsight: RAM Comparison",
+    "summary_es": "Este recurso aborda la comparación entre dos configuraciones de MacBook Pro (M4 Pro con 24GB RAM y M5 con 32GB RAM) para determinar cuál es más adecuada para el procesamiento en PixInsight. Se discute la importancia de la memoria RAM en el rendimiento del software de astrofotografía. La conversación se centra en la optimización del hardware para flujos de trabajo específicos en PixInsight.",
+    "summary_en": "This resource compares two MacBook Pro configurations (M4 Pro with 24GB RAM vs M5 with 32GB RAM) to determine which is more suitable for PixInsight processing. It discusses the importance of RAM in the performance of astrophotography software. The conversation focuses on optimizing hardware for specific PixInsight workflows.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-02-03",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1qv6xpg/macbook_pro_m4_pro_with_24gb_ram_vs_m5_with_32gb/",
+    "tags": [
+      "Hardware",
+      "Rendimiento",
+      "Optimización",
+      "MacBook Pro",
+      "RAM",
+      "Software"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=bp6I8Uj-wNI",
+    "title_es": "Procesamiento de Andrómeda con PixInsight y Seestar S30 Pro",
+    "title_en": "Andromeda PixInsight Processing with Seestar S30 Pro",
+    "summary_es": "Este recurso detalla el flujo de trabajo en PixInsight para procesar imágenes de la galaxia de Andrómeda (M31) capturadas con el telescopio Seestar S30 Pro. Se exploran las herramientas y técnicas específicas dentro de PixInsight para optimizar la calidad de los datos obtenidos con este equipo.",
+    "summary_en": "This resource details the PixInsight workflow for processing images of the Andromeda galaxy (M31) captured with the Seestar S30 Pro telescope. It explores specific tools and techniques within PixInsight to optimize the quality of data obtained with this equipment.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-02-02",
+    "url": "https://www.youtube.com/watch?v=bp6I8Uj-wNI",
+    "tags": [
+      "PixInsight",
+      "Andromeda",
+      "Seestar S30 Pro",
+      "Procesamiento",
+      "Tutorial",
+      "Flujo de trabajo"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=G12Ny35ZLKc",
+    "title_es": "Explorando los Ajustes de SPCC",
+    "title_en": "Exploring SPCC Settings",
+    "summary_es": "Este recurso explora en profundidad los diversos ajustes del proceso SPCC (Spectrophotometric Color Calibration) en PixInsight. Se discute cómo cada parámetro afecta la calibración de color espectrofotométrica de imágenes astronómicas. La optimización de estos ajustes es crucial para lograr una representación de color precisa y natural en las astrofotografías.",
+    "summary_en": "This resource deeply explores the various settings of the SPCC (Spectrophotometric Color Calibration) process in PixInsight. It discusses how each parameter affects the spectrophotometric color calibration of astronomical images. Optimizing these settings is crucial for achieving an accurate and natural color representation in astrophotography.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-01-28",
+    "url": "https://www.youtube.com/watch?v=G12Ny35ZLKc",
+    "tags": [
+      "SPCC",
+      "Color Calibration",
+      "PixInsight",
+      "Astrophotography",
+      "Workflow",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=IvzLtpZlHME",
+    "title_es": "Tutorial de Procesado para Principiantes de M42 con SetiAstro Pro",
+    "title_en": "Beginner M42 Processing Tutorial with SetiAstro Pro",
+    "summary_es": "Este tutorial introduce a los principiantes al procesado de la Nebulosa de Orión (M42) utilizando el flujo de trabajo SetiAstro Pro en PixInsight. Detalla los pasos esenciales para obtener una imagen limpia y estéticamente agradable, enfocándose en técnicas básicas de calibración y estirado. Es una guía completa para aquellos que se inician en el procesamiento de imágenes astronómicas con PixInsight.",
+    "summary_en": "This tutorial guides beginners through processing the Orion Nebula (M42) using the SetiAstro Pro workflow in PixInsight. It covers essential steps to achieve a clean and aesthetically pleasing image, focusing on basic calibration and stretching techniques. It serves as a comprehensive guide for those new to astronomical image processing with PixInsight.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-01-19",
+    "url": "https://www.youtube.com/watch?v=IvzLtpZlHME",
+    "tags": [
+      "PixInsight",
+      "SetiAstro Pro",
+      "M42",
+      "Workflow",
+      "Processing",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=7ROtBql62sk",
+    "title_es": "Opciones de estiramiento en PixInsight con Warren Keller",
+    "title_en": "Stretching Options in PixInsight with Warren Keller",
+    "summary_es": "Este recurso detalla diversas opciones para el estiramiento de imágenes disponibles en PixInsight, presentado por el experto Warren Keller. Probablemente aborda herramientas como HistogramTransformation, GeneralizeHyperbolicStretch (GHS) y otras técnicas para realzar eficazmente los detalles en los datos de astrofotografía. Los espectadores aprenderán a aplicar estos métodos para obtener resultados óptimos en sus flujos de trabajo de PixInsight.",
+    "summary_en": "This resource details various image stretching options available within PixInsight, guided by expert Warren Keller. It likely covers tools such as HistogramTransformation, GeneralizeHyperbolicStretch (GHS), and other techniques to effectively bring out detail in astrophotography data. Viewers will learn how to apply these methods to achieve optimal results in their PixInsight workflows.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-01-19",
+    "url": "https://www.youtube.com/watch?v=7ROtBql62sk",
+    "tags": [
+      "PixInsight",
+      "Stretching",
+      "HistogramTransformation",
+      "GHS",
+      "Tutorial",
+      "Workflow"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=p5zZmO5w_iQ",
+    "title_es": "Procesamiento PixInsight de Orión: Guía para principiantes avanzados",
+    "title_en": "Beginner-Advanced PixInsight Orion Processing Guide",
+    "summary_es": "Tutorial detallado sobre procesamiento de la Nebulosa de Orión en PixInsight, orientado a usuarios principiantes pero con técnicas avanzadas como combinación de exposiciones cortas y largas, eliminación de gradientes, y ajustes de color con máscaras.",
+    "summary_en": "Detailed PixInsight tutorial for processing the Orion Nebula, aimed at beginners but covering advanced techniques such as HDR composition of short and long exposures, gradient removal (ABE/DynamicBackgroundExtraction), and color calibration with masks.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-01-15",
+    "url": "https://www.youtube.com/watch?v=p5zZmO5w_iQ",
+    "tags": [
+      "HDRComposition",
+      "ABE",
+      "DynamicBackgroundExtraction",
+      "MTF",
+      "HistogramTransformation",
+      "Orion Nebula"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=zpD_DTtQVlc",
     "title_es": "Procesamiento y preparación para impresión de las nebulosas Laguna y Trífida en SHO",
     "title_en": "Processing and Printing the Lagoon and Trifid Nebulae in SHO",
