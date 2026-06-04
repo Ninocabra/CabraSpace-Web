@@ -181,7 +181,8 @@ header.scrolled {
   transition: var(--transition-smooth);
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   color: var(--gold-primary);
 }
 

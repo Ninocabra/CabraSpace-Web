@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffee Break: Señal y Ruido - CabraSpace</title>
+  <meta name="description" content="Integration of the science outreach podcast Coffee Break: Señal y Ruido in CabraSpace, connecting astrophotography and astrophysics.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Specific styles for Outreach - Coffee Break */
+    .divulgacion-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .divulgacion-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .divulgacion-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .divulgacion-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      margin-bottom: 60px;
+      align-items: start;
+    }
+
+    @media (min-width: 992px) {
+      .divulgacion-grid {
+        grid-template-columns: 1.4fr 1fr;
+      }
+    }
+
+    /* Premium glass cards */
+    .premium-glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 36px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+      margin-bottom: 24px;
+    }
+
+    .premium-glass-card:hover {
+      border-color: var(--gold-border);
+      background: var(--bg-card-hover);
+      box-shadow: 0 20px 50px rgba(207, 171, 74, 0.02), 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .section-headline {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .snr-analogy-text {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .snr-blocks {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    @media (min-width: 576px) {
+      .snr-blocks {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .snr-box {
+      background: #020203;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 20px;
+    }
+
+    .snr-box-title {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gold-primary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .snr-box-desc {
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    /* Player Container */
+    .player-container {
+      margin-top: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #020203;
+    }
+
+    /* Sidebar info */
+    .podcast-sidebar {
+      background: #08080a;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: sticky;
+      top: 100px;
+    }
+
+    .sidebar-block {
+      margin-bottom: 32px;
+    }
+
+    .sidebar-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .sidebar-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Podcast links grid */
+    .podcast-links {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .podcast-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .btn-podcast-main {
+      background: var(--gold-primary);
+      color: var(--bg-color);
+      border: 1px solid var(--gold-primary);
+    }
+
+    .btn-podcast-main:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+
+    .btn-podcast-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid rgba(207, 171, 74, 0.3);
+    }
+
+    .btn-podcast-secondary:hover {
+      border-color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.03);
+    }
+
+    /* Hosts List */
+    .hosts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .host-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+
+    .host-avatar-placeholder {
+      width: 28px;
+      height: 28px;
+      background: #020203;
+      border: 1px solid var(--gold-border);
+      color: var(--gold-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .host-info {
+      line-height: 1.4;
+    }
+
+    .host-name {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .host-role {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="en.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="en.html" class="nav-link">Home</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
+            <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
+                <li><a href="#" class="dropdown-item">YouTube Courses</a></li>
+              </ul>
+            </li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="dropdown-item">Pollution Map ↗</a></li>
+                <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Outreach <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item active">Coffee Break: señal y ruido</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Night Mode" title="Astronomical Night Vision Mode">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="lang-switcher">
+          <a href="divulgacion-coffeebreak.html" class="lang-link">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="divulgacion-coffeebreak-en.html" class="lang-link active">EN</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="divulgacion-header container">
+    <h1 class="divulgacion-title">Coffee Break: Señal y Ruido</h1>
+    <p class="divulgacion-subtitle">
+      The weekly discussion panel reviewing the latest scientific news. The leading science podcast in Spanish covering astrophysics, cosmology, and space sciences.
+    </p>
+  </section>
+
+  <!-- Main Grid Content -->
+  <main class="container divulgacion-grid">
+    <!-- Left Column (Analogy and Player) -->
+    <section>
+      <!-- The SNR Analogy -->
+      <article class="premium-glass-card">
+        <h2 class="section-headline">The Concept: Signal and Noise</h2>
+        <div class="snr-analogy-text">
+          <p>
+            The title of this podcast perfectly represents the technical and philosophical core of space science and, in a very special way, of our practical passion for astrophotography.
+          </p>
+          <div class="snr-blocks">
+            <div class="snr-box">
+              <h3 class="snr-box-title">In Astrophotography</h3>
+              <p class="snr-box-desc">
+                Processing in PixInsight is a constant battle for <strong>Signal-to-Noise Ratio (SNR)</strong>. We calibrate and stack frames to mitigate thermal noise and CMOS sensor read noise, with the sole purpose of revealing the faint electromagnetic signal of ancient photons coming from emission nebulae or distant spiral galaxies.
+              </p>
+            </div>
+            <div class="snr-box">
+              <h3 class="snr-box-title">In Astrophysics</h3>
+              <p class="snr-box-desc">
+                Cutting-edge science operates under the same principle. Scientists and astrophysicists analyze terabytes of raw data from ground-based observatories and space telescopes like the James Webb. Their task is to program algorithms capable of discriminating true cosmological signals from instrumental disturbances and background noise.
+              </p>
+            </div>
+          </div>
+          <p style="margin-top: 20px; font-weight: 300;">
+            The podcast <strong>Coffee Break: Señal y Ruido</strong> represents the perfect bridge between the technical tools we use at CabraSpace (such as the PixelMath-teca or PixInsight) and the pure physical-scientific understanding of the processes occurring in the celestial objects we capture in our deep-sky photos.
+          </p>
+          <p style="margin-top: 15px; font-size: 0.85rem; color: var(--gold-primary); font-weight: 400; border-left: 2px solid var(--gold-primary); padding-left: 10px;">
+            Note: This podcast is broadcast in Spanish, but serves as an outstanding conceptual and research resource for scientific papers and discoveries worldwide.
+          </p>
+        </div>
+      </article>
+
+      <!-- Embedded Podcast Player -->
+      <article class="premium-glass-card">
+        <h2 class="section-headline">Episode Player</h2>
+        <div class="player-container">
+          <!-- Acast Embed Show Player -->
+          <iframe src="https://embed.acast.com/$/coffee-break-senal-y-ruido" width="100%" height="480" frameBorder="0" style="border:none; display:block;" title="Coffee Break Acast Player"></iframe>
+        </div>
+      </article>
+    </section>
+
+    <!-- Right Column (Sidebar & Listen Links) -->
+    <aside class="podcast-sidebar">
+      <!-- Listen On -->
+      <div class="sidebar-block">
+        <h3 class="sidebar-title">Listen On</h3>
+        <div class="podcast-links">
+          <a href="https://xn--sealyruido-u9a.com/" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-main">
+            Official Website ↗
+          </a>
+          <a href="https://www.youtube.com/@CoffeeBreakPodcast" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M23.498 6.163c-.272-1.022-1.074-1.826-2.099-2.099C19.558 3.5 12 3.5 12 3.5s-7.558 0-9.399.564C1.576 4.327.774 5.131.502 6.163 0 8.01 0 12 0 12s0 3.99.502 5.837c.272 1.022 1.074 1.826 2.099 2.099C4.442 20.5 12 20.5 12 20.5s7.558 0 9.399-.564c1.025-.273 1.827-1.077 2.099-2.099C24 15.99 24 12 24 12s0-3.99-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Live on YouTube ↗
+          </a>
+          <a href="https://www.ivoox.com/podcast-coffee-break-senal-ruido_sq_f1174620_1.html" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+            iVoox ↗
+          </a>
+          <a href="https://open.spotify.com/show/47h23U3c0qCyp3mXb8i4U0" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+            Spotify ↗
+          </a>
+          <a href="https://podcasts.apple.com/es/podcast/coffee-break-se%C3%B1al-y-ruido/id974620579" target="_blank" rel="noopener noreferrer" class="podcast-link-btn btn-podcast-secondary">
+            Apple Podcasts ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Regular Panelists -->
+      <div class="sidebar-block">
+        <h3 class="sidebar-title">Regular Panelists</h3>
+        <div class="hosts-list">
+          <div class="host-item">
+            <div class="host-avatar-placeholder">HN</div>
+            <div class="host-info">
+              <div class="host-name">Héctor Socas-Navarro</div>
+              <div class="host-role">Solar Physicist, Researcher at the IAC</div>
+            </div>
+          </div>
+          <div class="host-item">
+            <div class="host-avatar-placeholder">FV</div>
+            <div class="host-info">
+              <div class="host-name">Francis Villatoro</div>
+              <div class="host-role">Physicist & Computer Scientist, Professor at UMA</div>
+            </div>
+          </div>
+          <div class="host-item">
+            <div class="host-avatar-placeholder">AA</div>
+            <div class="host-info">
+              <div class="host-name">Alberto Aparici</div>
+              <div class="host-role">Theoretical Physicist & Science Communicator at IFIC</div>
+            </div>
+          </div>
+          <div class="host-item">
+            <div class="host-avatar-placeholder">GG</div>
+            <div class="host-info">
+              <div class="host-name">Gastón Giribet</div>
+              <div class="host-role">Theoretical Physicist, Professor at NYU</div>
+            </div>
+          </div>
+          <div class="host-item">
+            <div class="host-avatar-placeholder">BT</div>
+            <div class="host-info">
+              <div class="host-name">Borja Tosar</div>
+              <div class="host-role">Astronomer & Science Communicator</div>
+            </div>
+          </div>
+          <div class="host-item">
+            <div class="host-avatar-placeholder">IC</div>
+            <div class="host-info">
+              <div class="host-name">Ignacio Crespo</div>
+              <div class="host-role">Medical Doctor & Science Communicator ("SdeSalud")</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <a href="en.html" class="footer-logo">
+        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace.com</span>
+      </a>
+      <span class="copyright">© 2026 CabraSpace. All rights reserved.</span>
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+        <li><a href="#" onclick="alert('info@cabraspace.com')">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Modo Noche
+      const nightToggle = document.getElementById('nightmode-toggle');
+      if (nightToggle) {
+        nightToggle.addEventListener('click', () => {
+          document.body.classList.toggle('night-vision');
+          if (document.body.classList.contains('night-vision')) {
+            localStorage.setItem('night-vision', 'enabled');
+          } else {
+            localStorage.setItem('night-vision', 'disabled');
+          }
+        });
+      }
+    });
+  </script>
+  <script src="index.js"></script>
+</body>
+</html>
