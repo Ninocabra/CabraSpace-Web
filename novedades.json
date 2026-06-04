@@ -1,5 +1,232 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=zpD_DTtQVlc",
+    "title_es": "Procesamiento y preparación para impresión de las nebulosas Laguna y Trífida en SHO",
+    "title_en": "Processing and Printing the Lagoon and Trifid Nebulae in SHO",
+    "summary_es": "Este tutorial detallado presenta un flujo de trabajo completo para el procesamiento de datos astronómicos en la paleta SHO, centrándose en las nebulosas Laguna y Trífida. Se abordan las técnicas clave de PixInsight, desde la calibración inicial hasta los ajustes finales, con especial atención a la preparación de la imagen para su impresión física, incluyendo la gestión del color y la resolución.",
+    "summary_en": "This detailed tutorial presents a comprehensive workflow for processing astrophotography data in the SHO palette, focusing on the Lagoon and Trifid nebulae. It covers key PixInsight techniques from initial calibration to final adjustments, with a special emphasis on preparing the image for physical printing, including color management and resolution.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-04-21",
+    "url": "https://www.youtube.com/watch?v=zpD_DTtQVlc",
+    "tags": [
+      "SHO",
+      "Workflow",
+      "Procesamiento",
+      "Nebulosas",
+      "Impresión",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=hBZ2E87eKQ4",
+    "title_es": "Procesamiento de Banda Estrecha con Scripts de PixInsight",
+    "title_en": "Narrowband Processing with PixInsight Scripts",
+    "summary_es": "Tutorial en el que se muestra el procesamiento de datos de banda estrecha (SHO) utilizando scripts específicos de PixInsight. Se cubren técnicas de combinación de canales, aplicación de paletas de color y ajuste fino con herramientas como PixelMath y CurvesTransformation.",
+    "summary_en": "Tutorial demonstrating narrowband (SHO) data processing using PixInsight-specific scripts. Covers channel combination, color palette application, and fine-tuning with PixelMath and CurvesTransformation.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-04-20",
+    "url": "https://www.youtube.com/watch?v=hBZ2E87eKQ4",
+    "tags": [
+      "Narrowband",
+      "SHO",
+      "Scripts",
+      "PixelMath",
+      "CurvesTransformation",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/shorts/_35YFI5iu6I",
+    "title_es": "CELESTVIEW: Guía breve de PixInsight",
+    "title_en": "CELESTVIEW: A PixInsight Short Guide",
+    "summary_es": "Este video corto de Astrocitas presenta CELESTVIEW, una herramienta de PixInsight para la visualización celeste. Explica cómo usar esta funcionalidad para mejorar la orientación y planificación de sesiones de astrofotografía.",
+    "summary_en": "This short video by Astrocitas introduces CELESTVIEW, a PixInsight tool for celestial visualization. It explains how to use this feature to improve orientation and planning of astrophotography sessions.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-04-04",
+    "url": "https://www.youtube.com/shorts/_35YFI5iu6I",
+    "tags": [
+      "CELESTVIEW",
+      "PixInsight",
+      "visualización",
+      "planificación",
+      "tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=bDvCiRzP578",
+    "title_es": "Tutorial de PixInsight: Procesamiento completo de la Nebulosa Cabeza de Caballo con scripts de vanguardia",
+    "title_en": "PixInsight Tutorial: Full Horsehead Nebula Processing with Cutting-Edge Scripts",
+    "summary_es": "En este tutorial de PixInsight, se muestra el procesamiento completo de la Nebulosa Cabeza de Caballo utilizando scripts modernos y técnicas avanzadas. Incluye pasos como calibración, alineación, apilado y realce de detalles, destacando el uso de herramientas como BlurXTerminator, StarXTerminator y GeneralizedHyperbolicStretch (GHS).",
+    "summary_en": "This PixInsight tutorial demonstrates a full processing workflow for the Horsehead Nebula using cutting-edge scripts and advanced techniques. It covers calibration, alignment, stacking, and detail enhancement, with emphasis on tools like BlurXTerminator, StarXTerminator, and GeneralizedHyperbolicStretch (GHS).",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-29",
+    "url": "https://www.youtube.com/watch?v=bDvCiRzP578",
+    "tags": [
+      "BlurXTerminator",
+      "StarXTerminator",
+      "GHS",
+      "Horsehead Nebula",
+      "PixInsight",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1s2hkq5/pixinsight_gpu_acceleration_on_linux_with_amd/",
+    "title_es": "Guía de aceleración GPU en PixInsight para Linux con AMD ROCm",
+    "title_en": "PixInsight GPU Acceleration on Linux with AMD ROCm – Community Guide",
+    "summary_es": "Este recurso de la comunidad detalla cómo habilitar la aceleración GPU en PixInsight para Linux utilizando AMD ROCm. Cubre la configuración del controlador, la instalación de ROCm y la verificación del rendimiento, permitiendo un procesamiento más rápido con herramientas como BlurXTerminator y StarXTerminator.",
+    "summary_en": "This community guide details how to enable GPU acceleration in PixInsight on Linux using AMD ROCm. It covers driver setup, ROCm installation, and performance verification, enabling faster processing with tools like BlurXTerminator and StarXTerminator.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-03-24",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1s2hkq5/pixinsight_gpu_acceleration_on_linux_with_amd/",
+    "tags": [
+      "GPU Acceleration",
+      "AMD ROCm",
+      "Linux",
+      "BlurXTerminator",
+      "StarXTerminator",
+      "Configuration"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=l7oBFFUOkVg",
+    "title_es": "Procesando los Renacuajos en SHO con PixInsight",
+    "title_en": "Processing the Tadpoles Nebula in SHO with PixInsight",
+    "summary_es": "Este tutorial de PixInsight muestra el procesamiento completo de la Nebulosa de los Renacuajos (IC 410) en la paleta SHO, utilizando técnicas avanzadas como la combinación de canales, extracción del fondo, estiramientos no lineales y ajustes de color.",
+    "summary_en": "This PixInsight tutorial demonstrates the complete processing of the Tadpoles Nebula (IC 410) in the SHO palette, covering advanced techniques such as channel combination, background extraction, non-linear stretches, and color adjustments.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-23",
+    "url": "https://www.youtube.com/watch?v=l7oBFFUOkVg",
+    "tags": [
+      "SHO",
+      "Narrowband",
+      "PixInsight",
+      "Tutorial",
+      "IC 410",
+      "Color Combination"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=ZatCdiBYZM8",
+    "title_es": "SYQON Prism Deep - Una nueva era de reducción de ruido en PixInsight",
+    "title_en": "SYQON Prism Deep - A New Era of Denoising in PixInsight?",
+    "summary_es": "Este video analiza el script SYQON Prism Deep para PixInsight, un nuevo método de reducción de ruido basado en inteligencia artificial. Explica cómo funciona, compara con otras herramientas como NoiseXTerminator y muestra su aplicación práctica en una imagen astronómica.",
+    "summary_en": "This video reviews the SYQON Prism Deep script for PixInsight, a new AI-based denoising method. It explains how it works, compares it with tools like NoiseXTerminator, and demonstrates its practical application on an astronomical image.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2026-03-22",
+    "url": "https://www.youtube.com/watch?v=ZatCdiBYZM8",
+    "tags": [
+      "SYQON Prism Deep",
+      "Denoising",
+      "AI",
+      "NoiseXTerminator",
+      "Script",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=owV_1mjIZA0",
+    "title_es": "Procesamiento de M78 y el Bucle de Barnard con PiMagic V1",
+    "title_en": "Processing M78 and Barnard's Loop with PiMagic V1",
+    "summary_es": "Este tutorial detalla el uso de PiMagic V1 para el procesamiento de imágenes M78 y el Bucle de Barnard en PixInsight. Se cubren pasos clave como la calibración, registro, stacking y realce de estructuras de emisión y reflexión. Incluye técnicas específicas para mejorar detalles en regiones de nebulosidad oscura y brillante.",
+    "summary_en": "This tutorial details the use of PiMagic V1 for processing M78 and Barnard's Loop in PixInsight. Key steps include calibration, registration, stacking, and enhancing both emission and reflection nebulae structures. Specific techniques for improving details in dark and bright nebula regions are covered.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-17",
+    "url": "https://www.youtube.com/watch?v=owV_1mjIZA0",
+    "tags": [
+      "PiMagic",
+      "M78",
+      "Barnard's Loop",
+      "Nebula Processing",
+      "PixInsight",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=HoaZk5tdksA",
+    "title_es": "Procesamiento para Principiantes en PixInsight | 2026-03-15",
+    "title_en": "Beginner Processing in PixInsight | 2026-03-15",
+    "summary_es": "Este tutorial de TAIC guía a principiantes a través del flujo de trabajo básico de procesamiento en PixInsight. Cubre desde la calibración y apilamiento (WBPP) hasta la combinación de canales y estiramiento inicial.",
+    "summary_en": "This tutorial by TAIC guides beginners through the basic PixInsight processing workflow, covering calibration and stacking (WBPP) through channel combination and initial stretch.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-16",
+    "url": "https://www.youtube.com/watch?v=HoaZk5tdksA",
+    "tags": [
+      "PixInsight",
+      "WBPP",
+      "Beginner",
+      "Calibration",
+      "Stacking",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1rtxo3y/mcp_bridge_for_pixinsight_using_claude_code_to/",
+    "title_es": "Puente MCP para PixInsight: procesamiento ultrarrápido con Claude Code",
+    "title_en": "MCP Bridge for PixInsight: Light-Speed Frame Processing with Claude Code",
+    "summary_es": "Este recurso presenta un puente MCP (Model Context Protocol) que integra Claude Code con PixInsight, permitiendo automatizar y acelerar el procesamiento de frames. Se detalla cómo usar comandos de IA para aplicar procesos complejos como calibración, alineación e integración de forma ultrarrápida, reduciendo drásticamente el tiempo de flujo de trabajo.",
+    "summary_en": "This resource introduces an MCP (Model Context Protocol) bridge that integrates Claude Code with PixInsight, enabling automated and accelerated frame processing. It explains how to use AI commands to apply complex processes like calibration, alignment, and integration at light speed, drastically reducing workflow time.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-03-14",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1rtxo3y/mcp_bridge_for_pixinsight_using_claude_code_to/",
+    "tags": [
+      "MCP Bridge",
+      "Claude Code",
+      "Automation",
+      "Script",
+      "Workflow",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1rs797d/zwo_duoband_filter_and_pixinsight_spcc/",
+    "title_es": "Uso del filtro ZWO DuoBand con SPCC en PixInsight",
+    "title_en": "Using ZWO DuoBand Filter with SPCC in PixInsight",
+    "summary_es": "Este recurso explica cómo calibrar el color de imágenes tomadas con el filtro ZWO DuoBand utilizando la herramienta SPCC (Spectrophotometric Color Calibration) en PixInsight, que tradicionalmente requiere datos de filtros de banda estrecha. Se discuten técnicas para superar las limitaciones de SPCC con filtros de doble banda.",
+    "summary_en": "This resource explains how to color calibrate images taken with the ZWO DuoBand filter using SPCC (Spectrophotometric Color Calibration) in PixInsight, which traditionally requires narrowband filter data. Techniques to overcome SPCC limitations with dual-band filters are discussed.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-12",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1rs797d/zwo_duoband_filter_and_pixinsight_spcc/",
+    "tags": [
+      "SPCC",
+      "DuoBand",
+      "Color Calibration",
+      "Narrowband",
+      "Tutorial",
+      "PixInsight"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=juiZxIa5Pag",
+    "title_es": "Nebulosa Roseta en HOO con verde sintético",
+    "title_en": "Rosette Nebula HOO with Synthetic Green",
+    "summary_es": "Este tutorial de PixInsight enseña cómo procesar la Nebulosa Roseta en el esquema de color HOO, reemplazando la estrella verde sintética usando técnicas de combinación de canales y herramientas como PixelMath. Se cubren pasos de calibración, alineación, integración y mejora del color.",
+    "summary_en": "This PixInsight tutorial teaches how to process the Rosette Nebula in HOO color palette, replacing the synthetic green star using channel combination techniques and PixelMath. Covers calibration, alignment, integration and color enhancement steps.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-03-05",
+    "url": "https://www.youtube.com/watch?v=juiZxIa5Pag",
+    "tags": [
+      "HOO",
+      "Synthetic Green",
+      "PixelMath",
+      "ColorCombination",
+      "Narrowband",
+      "RosetteNebula"
+    ]
+  },
+  {
     "id": "https://www.reddit.com/r/pixinsight/comments/1toskho/pixinsight_194_update_and_gpu_acceleration/",
     "title_es": "Actualización PixInsight 1.9.4 y Aceleración por GPU",
     "title_en": "PixInsight 1.9.4 Update and GPU Acceleration",
