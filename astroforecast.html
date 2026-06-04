@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" style="height: 100%; overflow: hidden;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,103 +8,60 @@
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
-    /* Estilos específicos para Astro Forecast */
-    .forecast-header {
-      padding-top: 150px;
-      padding-bottom: 36px;
-      text-align: center;
-    }
-    
-    .fc-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 18px;
-    }
-
-    .fc-subtitle {
-      color: var(--text-secondary);
-      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
-      max-width: 650px;
-      margin: 0 auto;
-      font-weight: 300;
-      line-height: 1.6;
-    }
-
-    .forecast-card {
-      background: #070708;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 32px;
-      margin-bottom: 80px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-      position: relative;
+    html, body {
+      height: 100%;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
+      background: #020202;
     }
 
-    .forecast-card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      background: radial-gradient(300px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(207, 171, 74, 0.06), transparent 80%);
-      z-index: 0;
-      border-radius: 4px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .forecast-card:hover::before {
-      opacity: 1;
-    }
-
-    .forecast-card-content {
+    /* Contenedor principal a pantalla completa por debajo de la cabecera */
+    .forecast-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding-top: 76px; /* Altura de la cabecera fija */
+      box-sizing: border-box;
       position: relative;
       z-index: 10;
     }
 
-    .attribution-banner {
+    /* Barra de atribución superior estilizada y compacta */
+    .attribution-bar {
       background: rgba(207, 171, 74, 0.04);
-      border-left: 3px solid var(--gold-primary);
-      padding: 16px 20px;
-      margin-bottom: 28px;
-      border-radius: 0 4px 4px 0;
-    }
-
-    .attribution-banner p {
-      font-size: 0.88rem;
-      line-height: 1.5;
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 20px;
+      font-size: 0.78rem;
       color: var(--text-secondary);
-      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 20;
     }
 
-    .attribution-banner strong {
+    .attribution-bar strong {
       color: var(--gold-primary);
     }
 
-    .attribution-banner a {
+    .attribution-bar a {
       color: var(--gold-primary);
       text-decoration: underline;
       transition: var(--transition-smooth);
     }
 
-    .attribution-banner a:hover {
+    .attribution-bar a:hover {
       color: var(--gold-light);
     }
 
+    /* Contenedor del iframe para ocupar el resto de la pantalla */
     .iframe-wrapper {
-      position: relative;
+      flex: 1;
       width: 100%;
-      height: 900px;
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      height: 100%;
+      position: relative;
       background: #020202;
     }
 
@@ -112,6 +69,7 @@
       width: 100%;
       height: 100%;
       border: none;
+      display: block;
     }
   </style>
 </head>
@@ -181,70 +139,26 @@
     </div>
   </header>
 
-  <!-- Main Section -->
-  <main class="container">
-    <section class="forecast-header">
-      <h1 class="fc-title">Astro Forecast</h1>
-      <p class="fc-subtitle">
-        Planifica tu noche de astrofotografía evaluando la cobertura de nubes, seeing, transparencia y fases lunares con un cálculo inteligente de viabilidad.
-      </p>
-    </section>
-
-    <!-- Interactive Map & Forecast Card -->
-    <section class="forecast-card" id="forecastCard">
-      <div class="forecast-card-content">
-        <!-- NightVis Attribution Banner -->
-        <div class="attribution-banner">
-          <p>
-            <strong>Integración e Información:</strong> Esta sección incorpora la plataforma web de previsión de cielo profundo y planetario de <strong><a href="https://nightvis.space" target="_blank" rel="noopener noreferrer">NightVis.space</a></strong>. Todos los recursos, mapas, datos del tiempo y fórmulas de puntuación matemática pertenecen a la plataforma original de NightVis. ¡Esperamos que os sea de gran utilidad para planificar vuestras salidas astronómicas!
-          </p>
-        </div>
-
-        <!-- Embedded NightVis app -->
-        <div class="iframe-wrapper">
-          <iframe src="https://nightvis.space" title="NightVis Astro Forecast App" class="forecast-iframe"></iframe>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container footer-container">
-      <a href="index.html" class="footer-logo">
-        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
-        <span>CabraSpace.com</span>
-      </a>
-      <span class="copyright">© 2026 CabraSpace. Todos los derechos reservados.</span>
-      <ul class="footer-links">
-        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-        <li><a href="#" onclick="alert('cabra@cabraspace.com')">Contacto</a></li>
-      </ul>
+  <!-- Main Full-Screen Container -->
+  <div class="forecast-container">
+    <!-- Slim Attribution Bar -->
+    <div class="attribution-bar">
+      <span>
+        Previsión astronómica inteligente provista por <strong><a href="https://nightvis.space" target="_blank" rel="noopener noreferrer">NightVis.space</a></strong>
+      </span>
+      <span>
+        Datos meteorológicos de Open-Meteo y 7Timer!
+      </span>
     </div>
-  </footer>
+
+    <!-- Embedded NightVis application -->
+    <div class="iframe-wrapper">
+      <iframe src="https://nightvis.space" title="NightVis Astro Forecast App" class="forecast-iframe"></iframe>
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Spotlight tracking on forecast card
-      const forecastCard = document.getElementById('forecastCard');
-      forecastCard.addEventListener('mousemove', e => {
-        const rect = forecastCard.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        forecastCard.style.setProperty('--mouse-x', `${x}px`);
-        forecastCard.style.setProperty('--mouse-y', `${y}px`);
-      });
-
-      // Shrink navbar on scroll
-      const header = document.getElementById('navbar');
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 20) {
-          header.classList.add('scrolled');
-        } else {
-          header.classList.remove('scrolled');
-        }
-      });
-
       // Toggle Modo Noche
       const nightToggle = document.getElementById('nightmode-toggle');
       if (nightToggle) {
