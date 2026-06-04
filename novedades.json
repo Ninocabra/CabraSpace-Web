@@ -1,5 +1,227 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=j2FhI6i_3-A",
+    "title_es": "Trucos de mezcla de imágenes en PixInsight para Seestar",
+    "title_en": "Seestar PixInsight Process Fun | Image Blend Tricks",
+    "summary_es": "Este tutorial muestra técnicas de mezcla de imágenes en PixInsight para procesar datos del telescopio Seestar. Incluye métodos de combinación de exposiciones y uso de máscaras para mejorar detalles.",
+    "summary_en": "This tutorial shows image blending techniques in PixInsight for processing data from the Seestar telescope. It includes exposure combination methods and mask usage to enhance details.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-12-30",
+    "url": "https://www.youtube.com/watch?v=j2FhI6i_3-A",
+    "tags": [
+      "PixInsight",
+      "Image Blend",
+      "Seestar",
+      "Mask",
+      "Tutorial",
+      "Processing"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1ng03rv/new_script_llm_assistant_for_pixinsight/",
+    "title_es": "Nuevo Script: Asistente LLM para PixInsight",
+    "title_en": "New Script: LLM Assistant for PixInsight",
+    "summary_es": "Este recurso presenta un nuevo script para PixInsight que integra un asistente de lenguaje grande (LLM) para ayudar en el procesamiento de imágenes. El script permite consultar al LLM sobre técnicas de procesamiento, parámetros de herramientas y flujos de trabajo directamente desde PixInsight.",
+    "summary_en": "This resource introduces a new script for PixInsight that integrates a large language model (LLM) assistant to aid in image processing. The script allows querying the LLM about processing techniques, tool parameters, and workflows directly from within PixInsight.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2025-09-13",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1ng03rv/new_script_llm_assistant_for_pixinsight/",
+    "tags": [
+      "Script",
+      "LLM",
+      "AI Assistant",
+      "PixInsight",
+      "Tool"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-workshop.26250/",
+    "title_es": "Próximo Taller de Maestros de PixInsight",
+    "title_en": "Masters of PixInsight Next Workshop",
+    "summary_es": "Este recurso anuncia el próximo taller de 'Maestros de PixInsight', un evento diseñado para enseñar técnicas avanzadas de procesamiento de astrofotografía usando el software. El taller cubrirá herramientas específicas y flujos de trabajo detallados para mejorar la calidad de las imágenes.",
+    "summary_en": "This resource announces the upcoming 'Masters of PixInsight' workshop, an event designed to teach advanced astrophotography processing techniques using the software. The workshop will cover specific tools and detailed workflows to enhance image quality.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-09-12",
+    "url": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-workshop.26250/",
+    "tags": [
+      "PixInsight",
+      "Taller",
+      "Workshop",
+      "Procesado",
+      "Workflow",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/subframe-weighting-in-the-age-of-the-psf-signal-weight.26226/",
+    "title_es": "Ponderación de subcuadros en la era del peso de señal PSF",
+    "title_en": "Subframe Weighting in the Age of the PSF Signal Weight",
+    "summary_es": "Este recurso del foro de PixInsight analiza el método de peso de señal PSF para la ponderación de subcuadros, destacando su uso con el script SubframeSelector. Se discuten las ventajas de este enfoque basado en PSF frente a métodos tradicionales como ruido o FWHM, y se ofrecen recomendaciones para integraciones más precisas.",
+    "summary_en": "This PixInsight forum resource discusses the PSF Signal Weight method for subframe weighting, emphasizing its use with the SubframeSelector script. It highlights the advantages of this PSF-based approach over traditional noise or FWHM methods, providing recommendations for more accurate image integration.",
+    "category_es": "SCRIPTS",
+    "category_en": "SCRIPTS",
+    "date": "2025-09-06",
+    "url": "https://pixinsight.com/forum/index.php?threads/subframe-weighting-in-the-age-of-the-psf-signal-weight.26226/",
+    "tags": [
+      "SubframeSelector",
+      "PSF Signal Weight",
+      "Subframe Weighting",
+      "Integration",
+      "Script",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/amd-gpu-acceleration-for-tensorflow-2-x-based-apps-plugins.23321/",
+    "title_es": "Aceleración por GPU AMD para aplicaciones y plugins basados en TensorFlow 2.x",
+    "title_en": "AMD GPU Acceleration for TensorFlow 2.x based Apps/Plugins",
+    "summary_es": "Este hilo del foro de PixInsight explica cómo configurar la aceleración por GPU AMD (ROCm/DirectML) para plugins de PixInsight que dependen de TensorFlow 2.x, como BlurXTerminator, StarXTerminator o NoiseXTerminator. Incluye pasos detallados para instalar los controladores y librerías necesarias en Windows y Linux, además de consejos para optimizar el rendimiento.",
+    "summary_en": "This PixInsight forum thread details how to set up AMD GPU acceleration (ROCm/DirectML) for PixInsight plugins that rely on TensorFlow 2.x, such as BlurXTerminator, StarXTerminator, or NoiseXTerminator. It provides step-by-step instructions for installing required drivers and libraries on Windows and Linux, along with performance optimization tips.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2025-08-27",
+    "url": "https://pixinsight.com/forum/index.php?threads/amd-gpu-acceleration-for-tensorflow-2-x-based-apps-plugins.23321/",
+    "tags": [
+      "BlurXTerminator",
+      "StarXTerminator",
+      "NoiseXTerminator",
+      "AMD GPU",
+      "TensorFlow",
+      "ROCm"
+    ]
+  },
+  {
+    "id": "https://www.reddit.com/r/pixinsight/comments/1mw3evv/wbpp_failure_trying_to_process_30s_exposures_or/",
+    "title_es": "Fallo de WBPP al procesar exposiciones de 30 segundos o más",
+    "title_en": "WBPP Failure When Processing 30s or Longer Exposures",
+    "summary_es": "Este hilo de Reddit detalla un problema con el proceso Weighted Batch Preprocessing (WBPP) en PixInsight al tratar de calibrar y apilar exposiciones de 30 segundos o más. Los usuarios discuten posibles causas como frames de calibración faltantes, configuraciones incorrectas de pedestal o integración de baja relación señal-ruido, y ofrecen soluciones para resolver el fallo.",
+    "summary_en": "This Reddit thread details an issue with PixInsight's Weighted Batch Preprocessing (WBPP) when trying to calibrate and stack exposures of 30 seconds or longer. Users discuss potential causes such as missing calibration frames, incorrect pedestal settings, or low signal-to-noise ratio integration, and offer solutions to resolve the failure.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-08-21",
+    "url": "https://www.reddit.com/r/pixinsight/comments/1mw3evv/wbpp_failure_trying_to_process_30s_exposures_or/",
+    "tags": [
+      "WBPP",
+      "Calibration",
+      "Preprocessing",
+      "Troubleshooting",
+      "Integration",
+      "Reddit"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/preview-of-the-entire-main-image.26141/",
+    "title_es": "Vista previa de la imagen principal completa",
+    "title_en": "Preview of the Entire Main Image",
+    "summary_es": "Este hilo del foro de PixInsight discute cómo crear una vista previa que cubra toda la imagen principal para facilitar el procesamiento global. Incluye consejos sobre el uso de herramientas de vista previa y posibles scripts.",
+    "summary_en": "This forum thread discusses techniques to create a preview covering the entire main image in PixInsight, enabling global processing adjustments. It covers preview tools and potential scripts.",
+    "category_es": "COMUNIDAD",
+    "category_en": "COMMUNITY",
+    "date": "2025-08-20",
+    "url": "https://pixinsight.com/forum/index.php?threads/preview-of-the-entire-main-image.26141/",
+    "tags": [
+      "Preview",
+      "Global Processing",
+      "Forum Discussion",
+      "Tip"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/next-workshop-at-masters-of-pixinsight-photons-to-photos-31.26099/",
+    "title_es": "Próximo taller en Masters of PixInsight: Fotones a Fotos #31",
+    "title_en": "Next Workshop at Masters of PixInsight: Photons to Photos #31",
+    "summary_es": "Anuncio del próximo taller en vivo de Masters of PixInsight, donde se cubrirán técnicas avanzadas de procesamiento de imágenes astronómicas utilizando PixInsight.",
+    "summary_en": "Announcement of the upcoming live workshop by Masters of PixInsight, covering advanced astrophotography processing techniques using PixInsight.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-08-07",
+    "url": "https://pixinsight.com/forum/index.php?threads/next-workshop-at-masters-of-pixinsight-photons-to-photos-31.26099/",
+    "tags": [
+      "Workshop",
+      "PixInsight",
+      "Processing",
+      "Tutorial",
+      "Live Event"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-workshop-photons-to-photos-30.26007/",
+    "title_es": "Masters of PixInsight - Próximo Taller - Photons to Photos #30",
+    "title_en": "Masters of PixInsight - Next Workshop - Photons to Photos #30",
+    "summary_es": "Anuncio del próximo taller de Masters of PixInsight, detallando el evento Photons to Photos #30 donde se cubrirán técnicas avanzadas de procesamiento en PixInsight. Ideal para quienes buscan mejorar sus habilidades en integración, calibración y eliminación de gradientes.",
+    "summary_en": "Announcement of the upcoming Masters of PixInsight workshop, detailing the Photons to Photos #30 event covering advanced PixInsight processing techniques. Ideal for those looking to improve skills in integration, calibration, and gradient removal.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-07-16",
+    "url": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-workshop-photons-to-photos-30.26007/",
+    "tags": [
+      "Workshop",
+      "Tutorial",
+      "Photons to Photos",
+      "PixInsight",
+      "Advanced Processing"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-session.25892/",
+    "title_es": "Maestros de PixInsight - Próxima Sesión",
+    "title_en": "Masters of PixInsight - Next Session",
+    "summary_es": "Este recurso del foro de PixInsight anuncia la próxima sesión del evento 'Masters of PixInsight'. Ofrece una oportunidad para aprender técnicas avanzadas de procesamiento y flujos de trabajo con expertos en el software. Es una plataforma para profundizar en habilidades específicas de PixInsight.",
+    "summary_en": "This PixInsight forum resource announces the upcoming session of the 'Masters of PixInsight' event. It provides an opportunity to learn advanced processing techniques and workflows from software experts. It serves as a platform to deepen specific PixInsight skills.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-06-19",
+    "url": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-session.25892/",
+    "tags": [
+      "PixInsight",
+      "Workshop",
+      "Procesamiento",
+      "FlujoDeTrabajo",
+      "Técnicas",
+      "Comunidad"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-session-6-17.25852/",
+    "title_es": "Sesión de Masters of PixInsight el 17 de junio",
+    "title_en": "Masters of PixInsight Next Session June 17",
+    "summary_es": "Anuncio de la próxima sesión de Masters of PixInsight programada para el 17 de junio, donde se demostrarán técnicas avanzadas de procesamiento de imágenes astronómicas. El evento es organizado por la comunidad de PixInsight y cubre temas como workflows detallados y herramientas específicas del software.",
+    "summary_en": "Announcement of the upcoming Masters of PixInsight session scheduled for June 17, featuring advanced astrophotography processing techniques. The event is community-organized and covers detailed workflows and specific PixInsight tools.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-06-11",
+    "url": "https://pixinsight.com/forum/index.php?threads/masters-of-pixinsight-next-session-6-17.25852/",
+    "tags": [
+      "PixInsight",
+      "Workshop",
+      "Masters of PixInsight",
+      "Processing Techniques",
+      "Community",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://pixinsight.com/forum/index.php?threads/learning-pixinsight-any-quick-start-guide.25391/",
+    "title_es": "Guía de inicio rápido para PixInsight",
+    "title_en": "Quick Start Guide for PixInsight",
+    "summary_es": "Este hilo del foro de PixInsight proporciona una guía de inicio rápido para principiantes, cubriendo conceptos básicos y enlaces a tutoriales esenciales. Incluye recomendaciones de herramientas clave como calibración, apilado, y procesamiento de imágenes.",
+    "summary_en": "This forum thread offers a beginner’s quick start guide for PixInsight, covering basic concepts and links to essential tutorials. It includes recommendations on key tools for calibration, stacking, and image processing.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2025-05-26",
+    "url": "https://pixinsight.com/forum/index.php?threads/learning-pixinsight-any-quick-start-guide.25391/",
+    "tags": [
+      "Tutorial",
+      "Beginner",
+      "Quick Start",
+      "Processing",
+      "Guide"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/shorts/ZqKNXP2nL2E",
     "title_es": "Anuncio y Descuento de Galactic Kiwi para PixInsight",
     "title_en": "Galactic Kiwi Announcement and Discount for PixInsight",
