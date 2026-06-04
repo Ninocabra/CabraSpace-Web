@@ -949,6 +949,12 @@ footer {
   padding-left: 24px;
 }
 
+.dropdown-item.active {
+  color: var(--gold-primary) !important;
+  background-color: rgba(207, 171, 74, 0.06) !important;
+  font-weight: 600;
+}
+
 /* Multi-level Submenu */
 .dropdown-submenu {
   position: relative;
