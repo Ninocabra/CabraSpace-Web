@@ -253,7 +253,7 @@
     .db-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 28px;
+      gap: 16px;
       margin-bottom: 80px;
     }
 
@@ -263,8 +263,14 @@
       }
     }
 
+    @media (min-width: 1200px) {
+      .db-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
     .news-card {
-      min-height: 240px;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -297,26 +303,29 @@
     .card-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 18px;
-      margin-bottom: 18px;
+      gap: 4px;
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
     .card-tag {
-      font-size: 0.65rem;
-      color: var(--text-secondary);
-      background: #020202;
-      border: 1px solid var(--border-color);
-      padding: 2px 8px;
-      border-radius: 4px;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      padding: 0;
       cursor: pointer;
       transition: var(--transition-smooth);
     }
 
+    .card-tag:not(:last-child)::after {
+      content: ' ·';
+      margin-right: 2px;
+      color: var(--text-muted);
+    }
+
     .card-tag:hover {
       color: var(--gold-primary);
-      border-color: var(--gold-border);
-      background: rgba(207, 171, 74, 0.04);
     }
 
     .empty-state {
@@ -721,8 +730,11 @@
       // Update counter text
       resultsCountEl.textContent = `${filtered.length} products or reviews found`;
 
+      // Sort by date descending (newest first)
+      const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+
       // Render cards
-      if (filtered.length === 0) {
+      if (sorted.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <h3>No results found</h3>
@@ -732,15 +744,17 @@
         return;
       }
 
-      container.innerHTML = filtered.map(item => {
+      container.innerHTML = sorted.map(item => {
         const dateStr = item.date;
-        const tagsHtml = (item.tags || []).map(tag => {
-          const isActive = activeTag === tag ? 'style="border-color: var(--gold-primary); color: var(--gold-primary);"' : '';
+        const tagsHtml = (item.tags || []).slice(0, 6).map(tag => {
+          const isActive = activeTag === tag ? 'style="color: var(--gold-primary);"' : '';
           return `<span class="card-tag" ${isActive} onclick="triggerTagFilter('${tag}')">${tag}</span>`;
         }).join('');
 
         const titleHtml = highlightText(item.title_en, searchQuery);
-        const summaryHtml = highlightText(item.summary_en, searchQuery);
+        const rawSummary = item.summary_en || '';
+        const shortSummary = rawSummary.length > 120 ? rawSummary.slice(0, 120).trimEnd() + '…' : rawSummary;
+        const summaryHtml = highlightText(shortSummary, searchQuery);
 
         return `
           <div class="feature-card news-card">
@@ -750,15 +764,11 @@
                   <span class="card-date">${dateStr}</span>
                   <span class="card-category">${item.category_en}</span>
                 </div>
-                <h3>${titleHtml}</h3>
-                <p style="margin-top: 10px; min-height: auto;">${summaryHtml}</p>
-                <div class="card-tags">
-                  ${tagsHtml}
-                </div>
+                <h3 style="font-size:0.95rem; margin-bottom:6px;">${titleHtml}</h3>
+                <p style="margin-top:6px; font-size:0.8rem; line-height:1.4; color:var(--text-secondary);">${summaryHtml}</p>
+                <div class="card-tags">${tagsHtml}</div>
               </div>
-              <div>
-                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-link">View Resource ↗</a>
-              </div>
+              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-link" style="margin-top:10px;">View Resource ↗</a>
             </div>
           </div>
         `;
