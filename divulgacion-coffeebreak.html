@@ -255,6 +255,319 @@
       font-size: 0.75rem;
     }
 
+    /* Buscador Temático de Fragmentos */
+    .explorer-section {
+      grid-column: 1 / -1;
+      margin-top: 12px;
+    }
+
+    .explorer-intro {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      font-weight: 300;
+    }
+
+    /* Tabs / Categorías */
+    .categories-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .category-tab {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-tab:hover {
+      border-color: var(--gold-border);
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .category-tab.active {
+      background: rgba(207, 171, 74, 0.1);
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.05);
+    }
+
+    .category-count {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+
+    .category-tab.active .category-count {
+      background: rgba(207, 171, 74, 0.2);
+    }
+
+    /* Buscador Input */
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 30px;
+      max-width: 500px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #020203;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 14px 16px 14px 44px;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: var(--transition-smooth);
+      font-family: var(--font-sans);
+      box-sizing: border-box;
+    }
+
+    .search-input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.1);
+    }
+
+    .search-icon-svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus + .search-icon-svg {
+      color: var(--gold-primary);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      display: none;
+      line-height: 1;
+    }
+
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+    }
+
+    /* Grid de fragmentos */
+    .fragments-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    @media (min-width: 768px) {
+      .fragments-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .fragment-card {
+      background: #020203;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+      min-height: 170px;
+    }
+
+    .fragment-card:hover {
+      border-color: var(--gold-border);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .fragment-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .fragment-speaker-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fragment-avatar {
+      width: 24px;
+      height: 24px;
+      background: rgba(207, 171, 74, 0.05);
+      border: 1px solid var(--gold-border);
+      color: var(--gold-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .fragment-speaker {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .fragment-episode {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.05);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(207, 171, 74, 0.1);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .fragment-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 18px;
+      font-weight: 300;
+      flex-grow: 1;
+    }
+
+    .fragment-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+      margin-top: auto;
+      gap: 12px;
+    }
+
+    .fragment-keyword-badge {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .fragment-keyword-badge span {
+      color: var(--gold-primary);
+      font-weight: 500;
+    }
+
+    .fragment-listen-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition-smooth);
+      border: 1px solid rgba(207, 171, 74, 0.3);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .fragment-listen-btn:hover {
+      border-color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.05);
+      color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.1);
+    }
+
+    /* Paginación y Estados */
+    .load-more-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .load-more-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 12px 28px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .load-more-btn:hover:not(:disabled) {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.02);
+    }
+
+    .load-more-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .explorer-loading-state,
+    .explorer-empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 300;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+    }
+
+    .explorer-loading-spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin-loader 1s infinite linear;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin-loader {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
   </style>
 </head>
 <body>
@@ -451,6 +764,53 @@
         </div>
       </div>
     </aside>
+
+    <!-- Buscador Temático de Fragmentos (Categorías Científicas) -->
+    <section class="premium-glass-card explorer-section">
+      <h2 class="section-headline">Buscador Temático de Fragmentos</h2>
+      <p class="explorer-intro">
+        Explora fragmentos de audio específicos de las tertulias semanales de Coffee Break clasificados en 8 disciplinas científicas clave. Usa el buscador o filtra por categorías para acceder directamente al minuto de la explicación en el reproductor oficial.
+      </p>
+
+      <!-- Selector de Categorías -->
+      <div class="categories-container" id="categories-tabs">
+        <!-- Dinámico -->
+      </div>
+
+      <!-- Barra de Búsqueda -->
+      <div class="search-wrapper">
+        <input type="text" id="explorer-search" class="search-input" placeholder="Buscar fragmentos por término, locutor o tema..." autocomplete="off">
+        <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <button id="search-clear" class="search-clear-btn" title="Limpiar búsqueda">&times;</button>
+      </div>
+
+      <!-- Contenedor de Resultados -->
+      <div id="explorer-results">
+        <!-- Loading State -->
+        <div class="explorer-loading-state" id="explorer-loading">
+          <span class="explorer-loading-spinner"></span>
+          <p>Cargando base de datos científica (1777 fragmentos)...</p>
+        </div>
+
+        <!-- Grid de Fragmentos -->
+        <div class="fragments-grid" id="fragments-grid" style="display: none;">
+          <!-- Tarjetas Dinámicas -->
+        </div>
+
+        <!-- Estado Vacío -->
+        <div class="explorer-empty-state" id="explorer-empty" style="display: none;">
+          <p>No se encontraron fragmentos que coincidan con la búsqueda en esta categoría.</p>
+        </div>
+
+        <!-- Paginación / Cargar Más -->
+        <div class="load-more-container" id="load-more-wrapper" style="display: none;">
+          <button id="load-more-btn" class="load-more-btn">Cargar más fragmentos</button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
@@ -481,6 +841,211 @@
             localStorage.setItem('night-vision', 'disabled');
           }
         });
+      }
+
+      // Lógica del Buscador Temático de Coffee Break
+      const explorerState = {
+        data: null,
+        activeCategory: 'Mecánica Celeste y Astrometría',
+        searchQuery: '',
+        currentPage: 1,
+        pageSize: 20
+      };
+
+      const categoriesTabs = document.getElementById('categories-tabs');
+      const explorerSearch = document.getElementById('explorer-search');
+      const searchClear = document.getElementById('search-clear');
+      const fragmentsGrid = document.getElementById('fragments-grid');
+      const explorerLoading = document.getElementById('explorer-loading');
+      const explorerEmpty = document.getElementById('explorer-empty');
+      const loadMoreWrapper = document.getElementById('load-more-wrapper');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+
+      if (categoriesTabs && explorerSearch && fragmentsGrid) {
+        // Cargar base de datos
+        fetch('fragments_data.json')
+          .then(response => response.json())
+          .then(jsonData => {
+            explorerState.data = jsonData.groups;
+            initExplorer();
+          })
+          .catch(err => {
+            console.error("Error al cargar fragments_data.json:", err);
+            if (explorerLoading) {
+              explorerLoading.innerHTML = `<p style="color: #ff6b6b; padding: 20px 0;">Error al cargar la base de datos científica. Por favor, recarga la página.</p>`;
+            }
+          });
+      }
+
+      function initExplorer() {
+        if (explorerLoading) explorerLoading.style.display = 'none';
+        fragmentsGrid.style.display = 'grid';
+        
+        // Renderizar pestañas
+        renderTabs();
+        
+        // Renderizar primera categoría
+        renderActiveFragments();
+
+        // Eventos
+        explorerSearch.addEventListener('input', handleSearchInput);
+        searchClear.addEventListener('click', clearSearch);
+        loadMoreBtn.addEventListener('click', loadMore);
+      }
+
+      function renderTabs() {
+        categoriesTabs.innerHTML = '';
+        Object.keys(explorerState.data).forEach(catName => {
+          const count = explorerState.data[catName].length;
+          const tab = document.createElement('button');
+          tab.className = `category-tab ${catName === explorerState.activeCategory ? 'active' : ''}`;
+          tab.innerHTML = `
+            ${catName}
+            <span class="category-count">${count}</span>
+          `;
+          tab.addEventListener('click', () => {
+            if (explorerState.activeCategory !== catName) {
+              explorerState.activeCategory = catName;
+              explorerState.currentPage = 1;
+              
+              // Actualizar pestañas activas en el DOM
+              document.querySelectorAll('.category-tab').forEach(el => el.classList.remove('active'));
+              tab.classList.add('active');
+              
+              renderActiveFragments();
+            }
+          });
+          categoriesTabs.appendChild(tab);
+        });
+      }
+
+      function getFilteredFragments() {
+        const rawFragments = explorerState.data[explorerState.activeCategory] || [];
+        if (!explorerState.searchQuery) return rawFragments;
+
+        const query = normalizeString(explorerState.searchQuery);
+        return rawFragments.filter(frag => {
+          const label = normalizeString(frag.label_es || '');
+          const speaker = normalizeString(frag.speaker || '');
+          const sourceQuery = normalizeString(frag.source_query || '');
+          const file = normalizeString(frag.file || '');
+          
+          return label.includes(query) || 
+                 speaker.includes(query) || 
+                 sourceQuery.includes(query) || 
+                 file.includes(query);
+        });
+      }
+
+      function normalizeString(str) {
+        return str.toLowerCase()
+          .replace(/[áàäâ]/g, 'a')
+          .replace(/[éèëê]/g, 'e')
+          .replace(/[íìïî]/g, 'i')
+          .replace(/[óòöô]/g, 'o')
+          .replace(/[úùüû]/g, 'u')
+          .replace(/[^a-z0-9\s]/g, '');
+      }
+
+      function formatEpisode(file) {
+        let clean = file.replace(/^ep/, '');
+        clean = clean.replace(/_/g, '-');
+        if (/^\d+$/.test(clean)) {
+          clean = parseInt(clean, 10).toString();
+        }
+        return `Episodio ${clean}`;
+      }
+
+      function getInitials(name) {
+        return name.split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+      }
+
+      function renderActiveFragments() {
+        const filtered = getFilteredFragments();
+        const total = filtered.length;
+        const limit = explorerState.currentPage * explorerState.pageSize;
+        const paginated = filtered.slice(0, limit);
+
+        fragmentsGrid.innerHTML = '';
+
+        if (total === 0) {
+          fragmentsGrid.style.display = 'none';
+          explorerEmpty.style.display = 'block';
+          loadMoreWrapper.style.display = 'none';
+          return;
+        }
+
+        fragmentsGrid.style.display = 'grid';
+        explorerEmpty.style.display = 'none';
+
+        paginated.forEach(frag => {
+          const initials = getInitials(frag.speaker);
+          const formattedEp = formatEpisode(frag.file);
+          const cleanLink = 'https://cb.awebaos.org' + frag.hyperlink_es;
+
+          const card = document.createElement('div');
+          card.className = 'fragment-card';
+          card.innerHTML = `
+            <div>
+              <div class="fragment-meta">
+                <div class="fragment-speaker-info">
+                  <div class="fragment-avatar">${initials}</div>
+                  <span class="fragment-speaker">${frag.speaker}</span>
+                </div>
+                <span class="fragment-episode">${formattedEp}</span>
+              </div>
+              <p class="fragment-label">${frag.label_es}</p>
+            </div>
+            <div class="fragment-footer">
+              <span class="fragment-keyword-badge" title="${frag.source_query}">Buscado como: <span>${frag.source_query}</span></span>
+              <a href="${cleanLink}" target="_blank" rel="noopener noreferrer" class="fragment-listen-btn">
+                Escuchar fragmento ↗
+              </a>
+            </div>
+          `;
+          fragmentsGrid.appendChild(card);
+        });
+
+        if (limit < total) {
+          loadMoreWrapper.style.display = 'block';
+        } else {
+          loadMoreWrapper.style.display = 'none';
+        }
+      }
+
+      let searchTimeout;
+      function handleSearchInput(e) {
+        explorerState.searchQuery = e.target.value;
+        
+        if (explorerState.searchQuery) {
+          searchClear.style.display = 'block';
+        } else {
+          searchClear.style.display = 'none';
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          explorerState.currentPage = 1;
+          renderActiveFragments();
+        }, 150);
+      }
+
+      function clearSearch() {
+        explorerSearch.value = '';
+        explorerState.searchQuery = '';
+        searchClear.style.display = 'none';
+        explorerState.currentPage = 1;
+        renderActiveFragments();
+        explorerSearch.focus();
+      }
+
+      function loadMore() {
+        explorerState.currentPage++;
+        renderActiveFragments();
       }
     });
   </script>
