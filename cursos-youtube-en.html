@@ -6,6 +6,7 @@
   <title>YouTube PixInsight Courses - CabraSpace</title>
   <meta name="description" content="Learn astrophotography processing in PixInsight for free with our curated database of YouTube lessons ordered by difficulty level.">
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="support.css">
   <style>
     /* Specific styles for YouTube Courses Page */
     .courses-header {
@@ -254,70 +255,245 @@
       font-style: normal;
       font-weight: 500;
     }
+
+    /* Tabs / Categorías */
+    .categories-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .category-tab {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-tab:hover {
+      border-color: var(--gold-border);
+      color: var(--text-primary);
+      background: var(--bg-card-hover);
+    }
+
+    .category-tab.active {
+      background: rgba(207, 171, 74, 0.1);
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.05);
+    }
+
+    .category-count {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+
+    .category-tab.active .category-count {
+      background: rgba(207, 171, 74, 0.2);
+    }
+
+    /* Banner de información de búsqueda */
+    .search-info-banner {
+      background: rgba(207, 171, 74, 0.04);
+      border: 1px solid rgba(207, 171, 74, 0.12);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .search-info-banner strong {
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+    
+    .search-info-banner em {
+      color: var(--text-primary);
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    /* Buscador Input */
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 30px;
+      max-width: 500px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #020203;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 14px 16px 14px 44px;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: var(--transition-smooth);
+      font-family: var(--font-sans);
+      box-sizing: border-box;
+    }
+
+    .search-input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(207, 171, 74, 0.1);
+    }
+
+    .search-icon-svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus + .search-icon-svg {
+      color: var(--gold-primary);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      display: none;
+      line-height: 1;
+    }
+
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+    }
+
+    /* Paginación y Estados */
+    .load-more-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .load-more-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 12px 28px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .load-more-btn:hover:not(:disabled) {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.02);
+    }
+
+    .load-more-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
-<body class="astrophotography-page">
+<body>
+  <!-- FOUC Preventer for Night Mode -->
   <script>
-    // Night Mode Anti-Flicker
-    (function() {
-      const savedNightMode = localStorage.getItem('night-vision');
-      if (savedNightMode === 'enabled') {
-        document.body.classList.add('night-vision');
-      }
-    })();
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
   </script>
 
-  <!-- Top Navigation Bar -->
-  <header>
-    <div class="container header-container">
-      <a href="en.html" class="logo">
-        <img src="logo.png" style="height: 32px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="en.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
         <span>CabraSpace</span>
       </a>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="en.html" class="nav-link">Home</a></li>
-          <li class="dropdown">
-            <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
-              <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="nav-link dropdown-toggle active">Astrophotography <span class="arrow">▾</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
-              <li class="dropdown-submenu">
-                <a href="#" class="dropdown-item dropdown-toggle active">PixInsight Resources <span class="arrow">▸</span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
-                  <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
-                  <li><a href="cursos-youtube-en.html" class="dropdown-item active">YouTube Courses</a></li>
-                </ul>
-              </li>
-              <li class="dropdown-submenu">
-                <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="contaminacion-mapa-en.html" class="dropdown-item">Pollution Map</a></li>
-                  <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
-            <ul class="dropdown-menu">
-              <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-      <button class="nightmode-toggle" id="nightmode-toggle" title="Toggle night vision mode (red light)">
-        <svg class="night-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
+      
+      <ul class="nav-menu">
+        <li><a href="en.html" class="nav-link">Home</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
+            <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Astrophotography <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle active">PixInsight Resources <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
+                <li><a href="cursos-youtube-en.html" class="dropdown-item active">YouTube Courses</a></li>
+              </ul>
+            </li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="contaminacion-mapa-en.html" class="dropdown-item">Pollution Map</a></li>
+                <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="lang-switcher">
+          <a href="cursos-youtube.html" class="lang-link">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="cursos-youtube-en.html" class="lang-link active">EN</a>
+        </div>
+      </div>
     </div>
   </header>
 
