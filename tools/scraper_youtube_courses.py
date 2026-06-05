@@ -174,14 +174,90 @@ def process_with_gemini(video, api_key):
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
     
-    try:
-        with urllib.request.urlopen(req, timeout=15) as response:
-            res_data = json.loads(response.read().decode('utf-8'))
-        text_response = res_data['candidates'][0]['content']['parts'][0]['text']
-        return json.loads(text_response)
-    except Exception as e:
-        print(f"Gemini API call failed: {e}")
-        return None
+    max_retries = 3
+    retry_delay = 6.0
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+            text_response = res_data['candidates'][0]['content']['parts'][0]['text']
+            return json.loads(text_response)
+        except urllib.error.HTTPError as he:
+            if he.code in [429, 503, 504] and attempt < max_retries - 1:
+                print(f"Gemini API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"Error calling Gemini API for '{video['raw_title']}': {he}")
+                return None
+        except Exception as e:
+            print(f"Error calling Gemini API for '{video['raw_title']}': {e}")
+            return None
+
+def process_with_deepseek(video, api_key):
+    """Uses the DeepSeek API to translate, summarize, and classify difficulty level for a video."""
+    url = "https://api.deepseek.com/chat/completions"
+    
+    system_prompt = """You are an expert astrophotographer and PixInsight specialist.
+Analyze the following YouTube video about PixInsight:
+Verify if it is directly relevant to PixInsight processing, workflows, tools, scripts, or tutorials.
+If it is NOT relevant to PixInsight (e.g., camera reviews, general telescope setups, Photoshop, Siril, or NINA tutorials WITHOUT PixInsight context), mark relevant = false.
+If it is relevant, translate and clean the title to Spanish and English, translate/create a 2-3 sentence technical summary in both languages, and classify the difficulty level into one of: "PRINCIPIANTE", "MEDIO", or "AVANZADO".
+
+You MUST respond ONLY with a JSON object matching this schema:
+{
+  "relevant": boolean,
+  "title_es": "A clean, natural Spanish title (translated and adapted, no excessive emojis or YouTube clickbait)",
+  "title_en": "A refined, clean title in English",
+  "summary_es": "A technical summary in Spanish of 2-3 sentences explaining what this video teaches",
+  "summary_en": "A concise technical summary in English of 2-3 sentences",
+  "level": "PRINCIPIANTE" | "MEDIO" | "AVANZADO"
+}
+Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
+
+    user_prompt = f"""Title: "{video['raw_title']}"
+Author/Channel: "{video['author']}" """
+
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "response_format": {
+            "type": "json_object"
+        },
+        "stream": False
+    }
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    
+    max_retries = 3
+    retry_delay = 4.0
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+            text_response = res_data['choices'][0]['message']['content'].strip()
+            return json.loads(text_response)
+        except urllib.error.HTTPError as he:
+            if he.code in [429, 503, 504] and attempt < max_retries - 1:
+                print(f"DeepSeek API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                print(f"Error calling DeepSeek API for '{video['raw_title']}': {he}")
+                return None
+        except Exception as e:
+            print(f"Error calling DeepSeek API for '{video['raw_title']}': {e}")
+            return None
 
 def scrape_youtube_videos(query):
     encoded_query = urllib.parse.quote(query)
@@ -243,6 +319,10 @@ def main():
             print(f"Could not load cache: {e}")
 
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not gemini_key and not deepseek_key:
+        print("Warning: Neither GEMINI_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback mode.")
+
     all_raw_videos = []
     
     # Scrape each creator
@@ -302,16 +382,33 @@ def main():
             
         # 4. Process new video
         result = None
+        
+        # 4a. Try Gemini first
         if gemini_key:
             print(f"Processing new video via Gemini: '{video['raw_title']}' by {video['author']}...")
-            time.sleep(4.0) # Rate limit delay
             result = process_with_gemini(video, gemini_key)
-            if result and not result.get("relevant", False):
-                print(f"Gemini classified video as not relevant: '{video['raw_title']}'")
-                continue
+            time.sleep(6.0) # Rate limit delay for Gemini Free Tier
+            if result:
+                if not result.get("relevant", False):
+                    print(f"Gemini classified video as not relevant: '{video['raw_title']}'")
+                    continue
+            else:
+                print("Gemini failed. Will attempt failover to DeepSeek if key is available...")
                 
+        # 4b. Try DeepSeek if Gemini failed or was not tried
+        if result is None and deepseek_key:
+            print(f"Processing new video via DeepSeek: '{video['raw_title']}' by {video['author']}...")
+            result = process_with_deepseek(video, deepseek_key)
+            time.sleep(2.0) # Rate limit delay for DeepSeek
+            if result:
+                if not result.get("relevant", False):
+                    print(f"DeepSeek classified video as not relevant: '{video['raw_title']}'")
+                    continue
+            else:
+                print("DeepSeek failed as well.")
+                
+        # 4c. Local fallback if both APIs failed
         if not result:
-            # Local fallback
             print(f"Processing new video via Fallback: '{video['raw_title']}'...")
             result = local_fallback_classify(video['raw_title'], matched_creator['name'])
             if not result:
