@@ -28,6 +28,48 @@ DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "equipamiento
 MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
 MAX_DB_SIZE = 150         # Keep DB file size balanced
 
+# Load Centralized YouTubers/Creators
+TOOLS_DIR = os.path.dirname(__file__)
+CREATORES_FILE = os.path.join(TOOLS_DIR, "creadores.json")
+YOUTUBE_SOURCES = []
+if os.path.exists(CREATORES_FILE):
+    try:
+        with open(CREATORES_FILE, "r", encoding="utf-8") as f:
+            creators_data = json.load(f)
+            for c in creators_data:
+                YOUTUBE_SOURCES.append({
+                    "name": c["name"],
+                    "url": f"https://www.youtube.com/feeds/videos.xml?channel_id={c['channel_id']}",
+                    "is_youtube": True,
+                    "is_mfg": False
+                })
+    except Exception as e:
+        print(f"Error loading creadores.json: {e}")
+
+# Fallback default list if json file is missing
+if not YOUTUBE_SOURCES:
+    YOUTUBE_SOURCES = [
+        {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True, "is_mfg": False},
+        {"name": "Cuiv, The Lazy Geek", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ5qRydYf3lMJ9A63cvsSEA", "is_youtube": True, "is_mfg": False},
+        {"name": "The Space Koala", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCToyE26Iy4-gwi4BowKWClQ", "is_youtube": True, "is_mfg": False},
+        {"name": "SetiAstro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCHeW7wuxfjhMmymXC9KqIbg", "is_youtube": True, "is_mfg": False},
+        {"name": "Patriot Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyf4zn4wd-W4FnBwV98-jXw", "is_youtube": True, "is_mfg": False},
+        {"name": "Utah Desert Remote Observatories", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAP_JNj5koMchEFXnhirwnQ", "is_youtube": True, "is_mfg": False},
+        {"name": "Lukomatico", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBTXZYuFWQ6lx51L4GeY0Lw", "is_youtube": True, "is_mfg": False},
+        {"name": "TAIC", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCiR5AmROq4YcXF8hCxxZQ-g", "is_youtube": True, "is_mfg": False},
+        {"name": "View into Space", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW1F7nyBqtNTzaSWcrpx9LQ", "is_youtube": True, "is_mfg": False},
+        {"name": "Nebula Photos", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO_gBdHekc74feh0bWqKJ1Q", "is_youtube": True, "is_mfg": False},
+        {"name": "Astro Academy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC56nUa0BeuHUsE3TM0MCpFg", "is_youtube": True, "is_mfg": False},
+        {"name": "Natural Portraits", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQrYBVmH3Gz9IO5ryXIGhdw", "is_youtube": True, "is_mfg": False},
+        {"name": "Astrocitas", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7DwcTu__SZs1a65W99SFA", "is_youtube": True, "is_mfg": False},
+        {"name": "Astrotivissa", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIOTjw9A7ckpkCEbdowmV_g", "is_youtube": True, "is_mfg": False},
+        {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True, "is_mfg": False},
+        {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True, "is_mfg": False},
+        {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True, "is_mfg": False},
+        {"name": "Dylan O'Donnell", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCgOf4wBnoGg8WHHHr_h4otQ", "is_youtube": True, "is_mfg": False},
+        {"name": "Astrobackyard", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCn3npsPixgoi_xLdCg9J-LQ", "is_youtube": True, "is_mfg": False}
+    ]
+
 # Scraping Sources
 SOURCES = [
     # Manufacturer Feeds (RSS/Atom)
@@ -43,29 +85,8 @@ SOURCES = [
     {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
     {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False, "is_mfg": False},
     {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False, "is_mfg": False},
-    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False},
-    
-    # YouTube Channel Feeds (Independent Creators)
-    {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True, "is_mfg": False},
-    {"name": "Cuiv, The Lazy Geek", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ5qRydYf3lMJ9A63cvsSEA", "is_youtube": True, "is_mfg": False},
-    {"name": "The Space Koala", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCToyE26Iy4-gwi4BowKWClQ", "is_youtube": True, "is_mfg": False},
-    {"name": "SetiAstro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCHeW7wuxfjhMmymXC9KqIbg", "is_youtube": True, "is_mfg": False},
-    {"name": "Patriot Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCyf4zn4wd-W4FnBwV98-jXw", "is_youtube": True, "is_mfg": False},
-    {"name": "Utah Desert Remote Observatories", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAP_JNj5koMchEFXnhirwnQ", "is_youtube": True, "is_mfg": False},
-    {"name": "Lukomatico", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBTXZYuFWQ6lx51L4GeY0Lw", "is_youtube": True, "is_mfg": False},
-    {"name": "TAIC", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCiR5AmROq4YcXF8hCxxZQ-g", "is_youtube": True, "is_mfg": False},
-    {"name": "View into Space", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW1F7nyBqtNTzaSWcrpx9LQ", "is_youtube": True, "is_mfg": False},
-    {"name": "Nebula Photos", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO_gBdHekc74feh0bWqKJ1Q", "is_youtube": True, "is_mfg": False},
-    {"name": "Astro Academy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC56nUa0BeuHUsE3TM0MCpFg", "is_youtube": True, "is_mfg": False},
-    {"name": "Natural Portraits", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQrYBVmH3Gz9IO5ryXIGhdw", "is_youtube": True, "is_mfg": False},
-    {"name": "Astrocitas", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7DwcTu__SZs1a65W99SFA", "is_youtube": True, "is_mfg": False},
-    {"name": "Astrotivissa", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIOTjw9A7ckpkCEbdowmV_g", "is_youtube": True, "is_mfg": False},
-    {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True, "is_mfg": False},
-    {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True, "is_mfg": False},
-    {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True, "is_mfg": False},
-    {"name": "Dylan O'Donnell", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCgOf4wBnoGg8WHHHr_h4otQ", "is_youtube": True, "is_mfg": False},
-    {"name": "Astrobackyard", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCn3npsPixgoi_xLdCg9J-LQ", "is_youtube": True, "is_mfg": False},
-    
+    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False}
+] + YOUTUBE_SOURCES + [
     # YouTube Channel Feeds (Manufacturers / Brands)
     {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},
     {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True, "is_mfg": True},

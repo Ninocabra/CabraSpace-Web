@@ -10,27 +10,48 @@ import time
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-CREATORS = [
-    {"name": "Adam Block", "search": "Adam Block PixInsight", "owners": ["Adam Block"]},
-    {"name": "Cuiv, The Lazy Geek", "search": "Cuiv PixInsight", "owners": ["Cuiv, The Lazy Geek", "Cuiv"]},
-    {"name": "The Space Koala", "search": "The Space Koala PixInsight", "owners": ["The Space Koala"]},
-    {"name": "SetiAstro", "search": "SetiAstro PixInsight", "owners": ["SetiAstro"]},
-    {"name": "Patriot Astro", "search": "Patriot Astro PixInsight", "owners": ["Patriot Astro"]},
-    {"name": "Utah Desert Remote Observatories", "search": "Utah Desert Remote Observatories PixInsight", "owners": ["Utah Desert Remote Observatories", "Utah Desert Remote"]},
-    {"name": "Lukomatico", "search": "Lukomatico PixInsight", "owners": ["Lukomatico"]},
-    {"name": "TAIC", "search": "The Astro Imaging Channel PixInsight", "owners": ["The Astro Imaging Channel", "TAIC"]},
-    {"name": "View into Space", "search": "View into Space PixInsight", "owners": ["View into Space"]},
-    {"name": "Nebula Photos", "search": "Nebula Photos PixInsight", "owners": ["Nebula Photos"]},
-    {"name": "Astro Academy", "search": "Astro Academy PixInsight", "owners": ["Astro Academy", "AstroAcademy"]},
-    {"name": "Natural Portraits", "search": "Natural Portraits PixInsight", "owners": ["Natural Portraits"]},
-    {"name": "Astrocitas", "search": "Astrocitas PixInsight", "owners": ["Astrocitas"]},
-    {"name": "Astrotivissa", "search": "Astrotivissa PixInsight", "owners": ["Astrotivissa"]},
-    {"name": "Naztronomy", "search": "Naztronomy PixInsight", "owners": ["Naztronomy"]},
-    {"name": "Astrocity", "search": "Astrocity PixInsight", "owners": ["Astrocity", "Astrocity - Astrofotografía"]},
-    {"name": "Ed Ting", "search": "Ed Ting PixInsight", "owners": ["Ed Ting"]},
-    {"name": "Dylan O'Donnell", "search": "Dylan O'Donnell PixInsight", "owners": ["Dylan O'Donnell", "Dylan O’Donnell", "Dylan ODonnell"]},
-    {"name": "Astrobackyard", "search": "Astrobackyard PixInsight", "owners": ["Astrobackyard", "Astro Backyard"]}
-]
+# Load Centralized YouTubers/Creators
+TOOLS_DIR = os.path.dirname(__file__)
+CREATORES_FILE = os.path.join(TOOLS_DIR, "creadores.json")
+CREATORS = []
+
+if os.path.exists(CREATORES_FILE):
+    try:
+        with open(CREATORES_FILE, "r", encoding="utf-8") as f:
+            creators_data = json.load(f)
+            for c in creators_data:
+                CREATORS.append({
+                    "name": c["name"],
+                    "search": f"{c['name']} PixInsight",
+                    "owners": c["owners"]
+                })
+    except Exception as e:
+        print(f"Error loading creadores.json: {e}")
+
+# Fallback default list if json file is missing or empty
+if not CREATORS:
+    CREATORS = [
+        {"name": "Adam Block", "search": "Adam Block PixInsight", "owners": ["Adam Block"]},
+        {"name": "Cuiv, The Lazy Geek", "search": "Cuiv PixInsight", "owners": ["Cuiv, The Lazy Geek", "Cuiv"]},
+        {"name": "The Space Koala", "search": "The Space Koala PixInsight", "owners": ["The Space Koala"]},
+        {"name": "SetiAstro", "search": "SetiAstro PixInsight", "owners": ["SetiAstro"]},
+        {"name": "Patriot Astro", "search": "Patriot Astro PixInsight", "owners": ["Patriot Astro"]},
+        {"name": "Utah Desert Remote Observatories", "search": "Utah Desert Remote Observatories PixInsight", "owners": ["Utah Desert Remote Observatories", "Utah Desert Remote"]},
+        {"name": "Lukomatico", "search": "Lukomatico PixInsight", "owners": ["Lukomatico"]},
+        {"name": "TAIC", "search": "The Astro Imaging Channel PixInsight", "owners": ["The Astro Imaging Channel", "TAIC"]},
+        {"name": "View into Space", "search": "View into Space PixInsight", "owners": ["View into Space"]},
+        {"name": "Nebula Photos", "search": "Nebula Photos PixInsight", "owners": ["Nebula Photos"]},
+        {"name": "Astro Academy", "search": "Astro Academy PixInsight", "owners": ["Astro Academy", "AstroAcademy"]},
+        {"name": "Natural Portraits", "search": "Natural Portraits PixInsight", "owners": ["Natural Portraits"]},
+        {"name": "Astrocitas", "search": "Astrocitas PixInsight", "owners": ["Astrocitas"]},
+        {"name": "Astrotivissa", "search": "Astrotivissa PixInsight", "owners": ["Astrotivissa"]},
+        {"name": "Naztronomy", "search": "Naztronomy PixInsight", "owners": ["Naztronomy"]},
+        {"name": "Astrocity", "search": "Astrocity PixInsight", "owners": ["Astrocity", "Astrocity - Astrofotografía"]},
+        {"name": "Ed Ting", "search": "Ed Ting PixInsight", "owners": ["Ed Ting"]},
+        {"name": "Dylan O'Donnell", "search": "Dylan O'Donnell PixInsight", "owners": ["Dylan O'Donnell", "Dylan O’Donnell", "Dylan ODonnell"]},
+        {"name": "Astrobackyard", "search": "Astrobackyard PixInsight", "owners": ["Astrobackyard", "Astro Backyard"]}
+    ]
+
 
 def get_years_ago(text):
     text = text.lower()
