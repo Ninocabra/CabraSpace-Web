@@ -6,3 +6,9 @@ faq_clean.json
 fetched_queries_db.json
 matching_queries.json
 
+# Python bytecode caches
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
