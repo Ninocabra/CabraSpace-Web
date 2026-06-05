@@ -5,6 +5,9 @@ import json
 import os
 import sys
 import time
+import ssl
+
+ssl_context = ssl._create_unverified_context()
 
 # Ensure safe console printing
 if hasattr(sys.stdout, 'reconfigure'):
