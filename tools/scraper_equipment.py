@@ -63,6 +63,8 @@ SOURCES = [
     {"name": "Naztronomy", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5L9FO_dFC5ypLPDk1kwopQ", "is_youtube": True, "is_mfg": False},
     {"name": "Astrocity", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ-_45PTOmE3ukoWHvmmjoA", "is_youtube": True, "is_mfg": False},
     {"name": "Ed Ting", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCEQnX-WohTBNGBV5gdhAS5w", "is_youtube": True, "is_mfg": False},
+    {"name": "Dylan O'Donnell", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCgOf4wBnoGg8WHHHr_h4otQ", "is_youtube": True, "is_mfg": False},
+    {"name": "Astrobackyard", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCn3npsPixgoi_xLdCg9J-LQ", "is_youtube": True, "is_mfg": False},
     
     # YouTube Channel Feeds (Manufacturers / Brands)
     {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},

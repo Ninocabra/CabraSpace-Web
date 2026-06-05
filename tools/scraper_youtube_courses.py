@@ -27,7 +27,9 @@ CREATORS = [
     {"name": "Astrotivissa", "search": "Astrotivissa PixInsight", "owners": ["Astrotivissa"]},
     {"name": "Naztronomy", "search": "Naztronomy PixInsight", "owners": ["Naztronomy"]},
     {"name": "Astrocity", "search": "Astrocity PixInsight", "owners": ["Astrocity", "Astrocity - Astrofotografía"]},
-    {"name": "Ed Ting", "search": "Ed Ting PixInsight", "owners": ["Ed Ting"]}
+    {"name": "Ed Ting", "search": "Ed Ting PixInsight", "owners": ["Ed Ting"]},
+    {"name": "Dylan O'Donnell", "search": "Dylan O'Donnell PixInsight", "owners": ["Dylan O'Donnell", "Dylan O’Donnell", "Dylan ODonnell"]},
+    {"name": "Astrobackyard", "search": "Astrobackyard PixInsight", "owners": ["Astrobackyard", "Astro Backyard"]}
 ]
 
 def get_years_ago(text):
