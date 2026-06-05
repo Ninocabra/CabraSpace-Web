@@ -1,6 +1,9 @@
 name: Scraper de Noticias y Equipamiento
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Ejecutar cada hora (en el minuto 15 para evitar picos de carga)
     - cron: '15 * * * *'
