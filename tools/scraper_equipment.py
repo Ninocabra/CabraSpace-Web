@@ -659,11 +659,20 @@ def main():
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
     
-    # Filter out duplicates (both against existing database and within the current run candidates)
+    # Filter out duplicates and items older than 3 days (both against existing database and within the current run candidates)
+    current_date = datetime.now()
     seen_urls_this_run = set()
     new_candidates = []
     for c in candidates:
-        if c['url'] not in existing_ids and c['url'] not in seen_urls_this_run:
+        if c['url'] in existing_ids or c['url'] in seen_urls_this_run:
+            continue
+        try:
+            item_date = datetime.strptime(c['date'], "%Y-%m-%d")
+            days_diff = (current_date - item_date).days
+            if days_diff <= 3:
+                new_candidates.append(c)
+                seen_urls_this_run.add(c['url'])
+        except Exception:
             new_candidates.append(c)
             seen_urls_this_run.add(c['url'])
             

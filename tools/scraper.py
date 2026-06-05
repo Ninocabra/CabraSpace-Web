@@ -431,9 +431,21 @@ def main():
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
     
-    # Filter out duplicates
-    new_candidates = [c for c in candidates if c['url'] not in existing_ids]
-    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)}")
+    # Filter out duplicates and items older than 3 days
+    current_date = datetime.now()
+    new_candidates = []
+    for c in candidates:
+        if c['url'] in existing_ids:
+            continue
+        try:
+            item_date = datetime.strptime(c['date'], "%Y-%m-%d")
+            days_diff = (current_date - item_date).days
+            if days_diff <= 3:
+                new_candidates.append(c)
+        except Exception:
+            new_candidates.append(c)
+            
+    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates (<= 3 days): {len(new_candidates)}")
     
     if not new_candidates:
         print("No new updates. Database is up to date.")
