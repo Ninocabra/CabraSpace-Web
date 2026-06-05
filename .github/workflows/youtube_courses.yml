@@ -1,0 +1,36 @@
+name: Scraper de Cursos de YouTube
+
+on:
+  schedule:
+    # Ejecutar una vez al día a las 04:30 UTC (05:30 AM hora española de invierno, 06:30 AM en verano)
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    # Permite lanzarlo manualmente desde el panel de control de GitHub
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Requerido para publicar los cambios en la base de datos
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar scraper de cursos de YouTube
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python tools/scraper_youtube_courses.py
+
+      - name: Publicar cambios si hay actualizaciones
+        run: |
+          git config user.name "CabraSpace Bot"
+          git config user.email "ninocabra@gmail.com"
+          git add youtube_courses.json
+          git diff --staged --quiet || git commit -m "🤖 Actualización automática del catálogo de cursos de YouTube [$(date +'%Y-%m-%d %H:%M')]"
+          git push

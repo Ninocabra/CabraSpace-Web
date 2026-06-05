@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube PixInsight Courses - CabraSpace</title>
+  <meta name="description" content="Learn astrophotography processing in PixInsight for free with our curated database of YouTube lessons ordered by difficulty level.">
+  <link rel="stylesheet" href="index.css">
+  <style>
+    /* Specific styles for YouTube Courses Page */
+    .courses-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .courses-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .courses-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* Video Grid */
+    .videos-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      margin-top: 30px;
+      margin-bottom: 50px;
+    }
+
+    @media (min-width: 768px) {
+      .videos-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 992px) {
+      .videos-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .video-card {
+      background: #020203;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+      height: 100%;
+    }
+
+    .video-card:hover {
+      border-color: var(--gold-border);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .video-thumbnail-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      background: #000;
+      overflow: hidden;
+    }
+
+    .video-thumbnail {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition-smooth);
+    }
+
+    .video-card:hover .video-thumbnail {
+      transform: scale(1.05);
+    }
+
+    .video-length {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .video-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .video-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 2.8em;
+    }
+
+    .video-summary {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      font-weight: 300;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 4.5em;
+      flex-grow: 1;
+    }
+
+    .video-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .video-author {
+      font-weight: 600;
+      color: var(--gold-primary);
+    }
+
+    .video-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+    }
+
+    .video-views {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .video-level-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .video-level-badge.principiante {
+      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.1);
+      border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+
+    .video-level-badge.medio {
+      color: #3498db;
+      background: rgba(52, 152, 219, 0.1);
+      border: 1px solid rgba(52, 152, 219, 0.2);
+    }
+
+    .video-level-badge.avanzado {
+      color: #e74c3c;
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+
+    .video-play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+    }
+
+    .video-play-btn:hover {
+      color: var(--gold-primary);
+    }
+
+    /* Explorer structure overrides */
+    .explorer-loading-state {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-secondary);
+    }
+
+    .explorer-loading-spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(207, 171, 74, 0.1);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .explorer-empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .explorer-empty-state p {
+      font-size: 0.95rem;
+      font-weight: 300;
+    }
+
+    .explorer-empty-state em {
+      color: var(--gold-primary);
+      font-style: normal;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body class="astrophotography-page">
+  <script>
+    // Night Mode Anti-Flicker
+    (function() {
+      const savedNightMode = localStorage.getItem('night-vision');
+      if (savedNightMode === 'enabled') {
+        document.body.classList.add('night-vision');
+      }
+    })();
+  </script>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="container header-container">
+      <a href="en.html" class="logo">
+        <img src="logo.png" style="height: 32px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="en.html" class="nav-link">Home</a></li>
+          <li class="dropdown">
+            <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
+            <ul class="dropdown-menu">
+              <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
+              <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="nav-link dropdown-toggle active">Astrophotography <span class="arrow">▾</span></a>
+            <ul class="dropdown-menu">
+              <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
+              <li class="dropdown-submenu">
+                <a href="#" class="dropdown-item dropdown-toggle active">PixInsight Resources <span class="arrow">▸</span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
+                  <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
+                  <li><a href="cursos-youtube-en.html" class="dropdown-item active">YouTube Courses</a></li>
+                </ul>
+              </li>
+              <li class="dropdown-submenu">
+                <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="contaminacion-mapa-en.html" class="dropdown-item">Pollution Map</a></li>
+                  <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
+            <ul class="dropdown-menu">
+              <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <button class="nightmode-toggle" id="nightmode-toggle" title="Toggle night vision mode (red light)">
+        <svg class="night-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Section Header -->
+    <section class="courses-header">
+      <h1 class="courses-title">YouTube PixInsight Courses</h1>
+      <p class="courses-subtitle">
+        Learn how to master PixInsight for free. We have compiled and classified the best tutorials from the community's most influential astrophotographers into three difficulty levels.
+      </p>
+    </section>
+
+    <!-- Main Explorer Section -->
+    <section class="explorer-container">
+      
+      <!-- Difficulty Tabs -->
+      <div class="categories-container" id="level-tabs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Search Wrapper -->
+      <div class="search-wrapper">
+        <input type="text" id="courses-search" class="search-input" placeholder="Search by tool, technique, channel..." autocomplete="off">
+        <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <button id="search-clear" class="search-clear-btn" title="Clear search">&times;</button>
+      </div>
+
+      <!-- Search Info Banner -->
+      <div id="search-info-banner" class="search-info-banner" style="display: none;"></div>
+
+      <!-- Results Grid -->
+      <div id="explorer-results">
+        <!-- Loading State -->
+        <div class="explorer-loading-state" id="explorer-loading">
+          <span class="explorer-loading-spinner"></span>
+          <p>Loading catalog of free PixInsight lessons...</p>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="videos-grid" id="videos-grid" style="display: none;">
+          <!-- Dynamic -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="explorer-empty-state" id="explorer-empty" style="display: none;">
+          <p>No lessons found matching your search in this difficulty level.</p>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="load-more-container" id="load-more-wrapper" style="display: none;">
+          <button id="load-more-btn" class="load-more-btn">Load more lessons</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <a href="en.html" class="footer-logo">
+        <img src="logo.png" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
+        <span>CabraSpace.com</span>
+      </a>
+      <span class="copyright">© 2026 CabraSpace. All rights reserved.</span>
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+        <li><a href="#" onclick="alert('info@cabraspace.com')">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Night Mode
+      const nightToggle = document.getElementById('nightmode-toggle');
+      if (nightToggle) {
+        nightToggle.addEventListener('click', () => {
+          document.body.classList.toggle('night-vision');
+          if (document.body.classList.contains('night-vision')) {
+            localStorage.setItem('night-vision', 'enabled');
+          } else {
+            localStorage.setItem('night-vision', 'disabled');
+          }
+        });
+      }
+
+      // Explorer State and Interactivity
+      const explorerState = {
+        data: null,
+        activeLevel: 'PRINCIPIANTE',
+        searchQuery: '',
+        currentPage: 1,
+        pageSize: 12
+      };
+
+      const levelTabs = document.getElementById('level-tabs');
+      const coursesSearch = document.getElementById('courses-search');
+      const searchClear = document.getElementById('search-clear');
+      const videosGrid = document.getElementById('videos-grid');
+      const explorerLoading = document.getElementById('explorer-loading');
+      const explorerEmpty = document.getElementById('explorer-empty');
+      const loadMoreWrapper = document.getElementById('load-more-wrapper');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const searchInfoBanner = document.getElementById('search-info-banner');
+
+      const levelsConfig = {
+        'PRINCIPIANTE': 'Beginner',
+        'MEDIO': 'Intermediate',
+        'AVANZADO': 'Advanced'
+      };
+
+      // Load YouTube courses database
+      fetch('youtube_courses.json')
+        .then(response => response.json())
+        .then(jsonData => {
+          // Sort: first by most views (popular classics) and newer ones
+          jsonData.sort((a, b) => b.views - a.views);
+          explorerState.data = jsonData;
+          initExplorer();
+        })
+        .catch(err => {
+          console.error("Error loading youtube_courses.json:", err);
+          if (explorerLoading) {
+            explorerLoading.innerHTML = `<p style="color: #ff6b6b; padding: 20px 0;">The catalog is updating. Please reload the page in a few moments.</p>`;
+          }
+        });
+
+      function initExplorer() {
+        if (explorerLoading) explorerLoading.style.display = 'none';
+        videosGrid.style.display = 'grid';
+
+        renderTabs();
+        renderActiveVideos();
+
+        coursesSearch.addEventListener('input', handleSearchInput);
+        searchClear.addEventListener('click', clearSearch);
+        loadMoreBtn.addEventListener('click', loadMore);
+      }
+
+      function getMatchingCount(lvl) {
+        if (!explorerState.data) return 0;
+        const rawQuery = explorerState.searchQuery.trim();
+        const tokens = rawQuery.split(/\s+/).map(t => normalizeString(t)).filter(Boolean);
+
+        return explorerState.data.filter(video => {
+          if (video.level !== lvl) return false;
+          if (tokens.length === 0) return true;
+
+          const title = normalizeString(video.title_en || '');
+          const author = normalizeString(video.author || '');
+          const summary = normalizeString(video.summary_en || '');
+
+          return tokens.every(token => 
+            title.includes(token) || 
+            author.includes(token) || 
+            summary.includes(token)
+          );
+        }).length;
+      }
+
+      function renderTabs() {
+        levelTabs.innerHTML = '';
+        Object.keys(levelsConfig).forEach(lvl => {
+          const label = levelsConfig[lvl];
+          const count = getMatchingCount(lvl);
+          
+          const tab = document.createElement('button');
+          tab.className = `category-tab ${lvl === explorerState.activeLevel ? 'active' : ''}`;
+          tab.innerHTML = `
+            ${label}
+            <span class="category-count">${count}</span>
+          `;
+          tab.addEventListener('click', () => {
+            if (explorerState.activeLevel !== lvl) {
+              explorerState.activeLevel = lvl;
+              explorerState.currentPage = 1;
+              
+              document.querySelectorAll('#level-tabs .category-tab').forEach(el => el.classList.remove('active'));
+              tab.classList.add('active');
+              
+              renderActiveVideos();
+            }
+          });
+          levelTabs.appendChild(tab);
+        });
+      }
+
+      function getFilteredVideos() {
+        if (!explorerState.data) return [];
+        const rawQuery = explorerState.searchQuery.trim();
+        const tokens = rawQuery.split(/\s+/).map(t => normalizeString(t)).filter(Boolean);
+
+        return explorerState.data.filter(video => {
+          if (video.level !== explorerState.activeLevel) return false;
+          if (tokens.length === 0) return true;
+
+          const title = normalizeString(video.title_en || '');
+          const author = normalizeString(video.author || '');
+          const summary = normalizeString(video.summary_en || '');
+
+          return tokens.every(token => 
+            title.includes(token) || 
+            author.includes(token) || 
+            summary.includes(token)
+          );
+        });
+      }
+
+      function normalizeString(str) {
+        return str.toLowerCase()
+          .replace(/[áàäâ]/g, 'a')
+          .replace(/[éèëê]/g, 'e')
+          .replace(/[íìïî]/g, 'i')
+          .replace(/[óòöô]/g, 'o')
+          .replace(/[úùüû]/g, 'u')
+          .replace(/[ñÑ]/g, 'n')
+          .replace(/[^a-z0-9\s]/g, '');
+      }
+
+      function formatViews(num) {
+        if (!num) return '0 views';
+        if (num >= 1000000) {
+          return (num / 1000000).toFixed(1) + 'M views';
+        }
+        if (num >= 1000) {
+          return (num / 1000).toFixed(1) + 'K views';
+        }
+        return num + ' views';
+      }
+
+      function renderActiveVideos() {
+        const filtered = getFilteredVideos();
+        const total = filtered.length;
+        const limit = explorerState.currentPage * explorerState.pageSize;
+        const paginated = filtered.slice(0, limit);
+
+        // Update search banner
+        if (searchInfoBanner) {
+          if (explorerState.searchQuery.trim()) {
+            searchInfoBanner.innerHTML = `Found <strong>${total}</strong> lessons in this level for search "<em>${explorerState.searchQuery}</em>"`;
+            searchInfoBanner.style.display = 'block';
+          } else {
+            searchInfoBanner.style.display = 'none';
+          }
+        }
+
+        videosGrid.innerHTML = '';
+
+        if (total === 0) {
+          videosGrid.style.display = 'none';
+          if (explorerEmpty) {
+            explorerEmpty.style.display = 'block';
+            if (explorerState.searchQuery.trim()) {
+              explorerEmpty.innerHTML = `<p>No lessons found matching "<em>${explorerState.searchQuery}</em>" in this level.</p>`;
+            } else {
+              explorerEmpty.innerHTML = `<p>No lessons found in this difficulty level.</p>`;
+            }
+          }
+          loadMoreWrapper.style.display = 'none';
+          return;
+        }
+
+        videosGrid.style.display = 'grid';
+        if (explorerEmpty) explorerEmpty.style.display = 'none';
+
+        paginated.forEach(video => {
+          const hqThumb = `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`;
+          const formattedViewsStr = formatViews(video.views);
+          const lvlClass = video.level.toLowerCase();
+          const lvlLabel = levelsConfig[video.level];
+
+          const card = document.createElement('div');
+          card.className = 'video-card';
+          card.innerHTML = `
+            <div class="video-thumbnail-container">
+              <img src="${hqThumb}" class="video-thumbnail" alt="${video.title_en}" loading="lazy">
+              <span class="video-length">${video.length || 'N/A'}</span>
+            </div>
+            <div class="video-content">
+              <h3 class="video-title" title="${video.title_en}">${video.title_en}</h3>
+              <p class="video-summary" title="${video.summary_en}">${video.summary_en}</p>
+              <div class="video-meta-row">
+                <span class="video-author">${video.author}</span>
+                <span class="video-date">${video.published_relative || 'Recent'}</span>
+              </div>
+              <div class="video-footer">
+                <span class="video-views">${formattedViewsStr}</span>
+                <span class="video-level-badge ${lvlClass}">${lvlLabel}</span>
+                <a href="${video.url}" target="_blank" rel="noopener noreferrer" class="video-play-btn">
+                  Watch lesson ↗
+                </a>
+              </div>
+            </div>
+          `;
+          videosGrid.appendChild(card);
+        });
+
+        if (limit < total) {
+          loadMoreWrapper.style.display = 'block';
+        } else {
+          loadMoreWrapper.style.display = 'none';
+        }
+      }
+
+      let searchTimeout;
+      function handleSearchInput(e) {
+        explorerState.searchQuery = e.target.value;
+        
+        if (explorerState.searchQuery) {
+          searchClear.style.display = 'block';
+        } else {
+          searchClear.style.display = 'none';
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          explorerState.currentPage = 1;
+          renderActiveVideos();
+          renderTabs();
+        }, 150);
+      }
+
+      function clearSearch() {
+        coursesSearch.value = '';
+        explorerState.searchQuery = '';
+        searchClear.style.display = 'none';
+        explorerState.currentPage = 1;
+        renderActiveVideos();
+        renderTabs();
+        coursesSearch.focus();
+      }
+
+      function loadMore() {
+        explorerState.currentPage++;
+        renderActiveVideos();
+      }
+    });
+  </script>
+  <script src="index.js"></script>
+</body>
+</html>
