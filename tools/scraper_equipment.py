@@ -41,9 +41,6 @@ SOURCES = [
     {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
     {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
     {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-    {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False, "is_mfg": False},
-    {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False, "is_mfg": False},
-    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False},
     
     # YouTube Channel Feeds (Independent Creators)
     {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True, "is_mfg": False},
