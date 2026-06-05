@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # Ejecutar cada hora (en el minuto 15 para evitar picos de carga)
-    - cron: '15 * * * *'
+    # Ejecutar cada 3 horas (en el minuto 15 para evitar picos de carga)
+    - cron: '15 */3 * * *'
   workflow_dispatch:
     # Permite lanzarlo manualmente desde GitHub si hace falta
 
