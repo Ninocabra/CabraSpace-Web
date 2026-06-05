@@ -41,6 +41,9 @@ SOURCES = [
     {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
     {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
     {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+    {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False, "is_mfg": False},
+    {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False, "is_mfg": False},
+    {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False},
     
     # YouTube Channel Feeds (Independent Creators)
     {"name": "Adam Block", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCrN82DzPssKUZj2ltFz00VQ", "is_youtube": True, "is_mfg": False},
@@ -297,8 +300,17 @@ def process_with_gemini(item, api_key):
     {body_prompt}
     
     Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
-    *   If it is a general photo processing tutorial (e.g. "how to process M31 in Photoshop/PixInsight" without discussing specific equipment setup or gear), or if it is completely off-topic (like landscape photography, space science news, general vlogs), mark relevant = false.
-    *   If it is about hardware announcements, firmware releases, software updates for controlling astrophotography gear, or reviews/guides of telescopes, cameras, mounts, accessories (filters, focal reducers, etc.), mark relevant = true.
+    
+    CRITICAL FILTERING AND VALIDATION RULES:
+    1. STRICTLY REJECT ALL SELF-REFERENCED FORUM/REDDIT POSTS:
+       - Reject posts/threads where a user is showing off or sharing their personal equipment purchase, acquisition, or unboxing (e.g., "My new AM5 mount has arrived!", "Look at my new telescope setup", "Unboxing my new camera").
+       - Reject posts showcasing user-taken astrophotography images (e.g., "First light with my new camera", "NGC 7000 taken with my new telescope", "Testing my new mount on M31").
+       - Reject posts about custom DIY projects, 3D printing custom parts, custom DIY mounts, or personal telescope modifications unless they are commercialized, mass-produced products being launched.
+       - Reject posts that are general troubleshooting, support requests, or questions on how to use a product (e.g., "Why is my mount not guiding?", "Help with Seestar polar alignment").
+    2. ONLY ACCEPT COMMERCIAL RELEASES AND OFFICIAL NEWS:
+       - Only accept posts/threads about official new commercial product releases or announcements by manufacturers (e.g., ZWO, Celestron, Pegasus Astro, Sky-Watcher, Askar, Player One, etc.), legitimate product leaks/rumors of upcoming commercial gear, or professional/detailed reviews of newly released commercial gear.
+       - A thread/post is valid ONLY if it refers to a brand new commercial product that is being released to the market and discussed/referenced by other sources, NOT a single user's personal DIY build or personal purchase.
+    3. If the resource violates any rejection rule or does not contain general commercial new product announcement/news/reviews, mark relevant = false.
     
     Return the response as a JSON object matching the requested schema.
     """
@@ -407,8 +419,17 @@ def process_with_deepseek(item, api_key):
     system_prompt = """You are an expert astrophotographer and astrophotography equipment specialist.
 Analyze the provided resource (video, blog post, or forum topic).
 Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
-- If it is a general photo processing tutorial (e.g. "how to process M31 in Photoshop/PixInsight" without discussing specific equipment setup or gear), or if it is completely off-topic (like landscape photography, space science news, general vlogs), mark relevant = false.
-- If it is about hardware announcements, firmware releases, software updates for controlling astrophotography gear, or reviews/guides of telescopes, cameras, mounts, accessories (filters, focal reducers, etc.), mark relevant = true.
+
+CRITICAL FILTERING AND VALIDATION RULES:
+1. STRICTLY REJECT ALL SELF-REFERENCED FORUM/REDDIT POSTS:
+   - Reject posts/threads where a user is showing off or sharing their personal equipment purchase, acquisition, or unboxing (e.g., "My new AM5 mount has arrived!", "Look at my new telescope setup", "Unboxing my new camera").
+   - Reject posts showcasing user-taken astrophotography images (e.g., "First light with my new camera", "NGC 7000 taken with my new telescope", "Testing my new mount on M31").
+   - Reject posts about custom DIY projects, 3D printing custom parts, custom DIY mounts, or personal telescope modifications unless they are commercialized, mass-produced products being launched.
+   - Reject posts that are general troubleshooting, support requests, or questions on how to use a product (e.g., "Why is my mount not guiding?", "Help with Seestar polar alignment").
+2. ONLY ACCEPT COMMERCIAL RELEASES AND OFFICIAL NEWS:
+   - Only accept posts/threads about official new commercial product releases or announcements by manufacturers (e.g., ZWO, Celestron, Pegasus Astro, Sky-Watcher, Askar, Player One, etc.), legitimate product leaks/rumors of upcoming commercial gear, or professional/detailed reviews of newly released commercial gear.
+   - A thread/post is valid ONLY if it refers to a brand new commercial product that is being released to the market and discussed/referenced by other sources, NOT a single user's personal DIY build or personal purchase.
+3. If the resource violates any rejection rule or does not contain general commercial new product announcement/news/reviews, mark relevant = false.
 
 You MUST respond ONLY with a JSON object matching this schema:
 {
@@ -553,6 +574,24 @@ def check_relevance_fallback(title):
             
     return False
 
+def check_forum_relevance(title):
+    """Strict pre-filter for forum and Reddit posts to focus on new product announcements."""
+    title_lower = title.lower()
+    
+    # 1. Must contain a product or brand keyword
+    product_keywords = ["telescope", "telescopio", "mount", "montura", "camera", "cámara", "filter", "filtro", "focuser", "enfocador", "rotator", "rotador", "strainwave", "harmonic", "harmónico", "refractor", "eyepiece", "ocular"]
+    brand_keywords = [b.lower() for b in FABRICANTES]
+    
+    has_product_or_brand = any(k in title_lower for k in product_keywords) or any(b in title_lower for b in brand_keywords)
+    if not has_product_or_brand:
+        return False
+        
+    # 2. Must contain a 'new product' indicating keyword
+    new_keywords = ["new", "nuevo", "nueva", "release", "released", "lanzamiento", "lanzado", "announce", "announced", "anuncio", "anunciado", "unveil", "unveiled", "presenta", "presentado", "leak", "filtración", "filtrado", "rumor", "launch", "launching", "introducing", "introducción", "pre-order", "pre-venta", "preorder"]
+    
+    return any(k in title_lower for k in new_keywords)
+
+
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
     print(f"Fallback processing for item: {item['title']}")
@@ -694,11 +733,17 @@ def main():
             
         # Check if candidate is from a manufacturer feed
         is_mfg = item.get('is_mfg', False)
+        is_forum = item['source'] in ["Stargazers Lounge", "Reddit r/astrophotography", "Reddit r/telescopes"]
         
-        # Pre-filter YouTube and forum candidates using keyword check to save Gemini API quota and avoid rate limits
-        if not is_mfg and not check_relevance_fallback(item['title']):
-            print(f"Skipping off-topic candidate (pre-filtered): '{item['title']}' from {item['source']}")
-            continue
+        # Pre-filter candidates using keyword check to save Gemini API quota and avoid rate limits
+        if is_forum:
+            if not check_forum_relevance(item['title']):
+                print(f"Skipping off-topic forum candidate (pre-filtered): '{item['title']}' from {item['source']}")
+                continue
+        elif not is_mfg:
+            if not check_relevance_fallback(item['title']):
+                print(f"Skipping off-topic candidate (pre-filtered): '{item['title']}' from {item['source']}")
+                continue
             
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
