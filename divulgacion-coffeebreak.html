@@ -317,6 +317,30 @@
       background: rgba(207, 171, 74, 0.2);
     }
 
+    /* Banner de información de búsqueda */
+    .search-info-banner {
+      background: rgba(207, 171, 74, 0.04);
+      border: 1px solid rgba(207, 171, 74, 0.12);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .search-info-banner strong {
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+    
+    .search-info-banner em {
+      color: var(--text-primary);
+      font-style: normal;
+      font-weight: 500;
+    }
+
     /* Buscador Input */
     .search-wrapper {
       position: relative;
@@ -485,6 +509,20 @@
     .fragment-keyword-badge span {
       color: var(--gold-primary);
       font-weight: 500;
+    }
+
+    .fragment-category-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.06);
+      border: 1px solid rgba(207, 171, 74, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     .fragment-listen-btn {
@@ -760,6 +798,9 @@
         <button id="search-clear" class="search-clear-btn" title="Limpiar búsqueda">&times;</button>
       </div>
 
+      <!-- Banner de info de búsqueda -->
+      <div id="search-info-banner" class="search-info-banner" style="display: none;"></div>
+
       <!-- Contenedor de Resultados -->
       <div id="explorer-results">
         <!-- Loading State -->
@@ -819,7 +860,7 @@
       // Lógica del Buscador Temático de Coffee Break
       const explorerState = {
         data: null,
-        activeCategory: 'Mecánica Celeste y Astrometría',
+        activeCategory: 'Todos los temas',
         searchQuery: '',
         currentPage: 1,
         pageSize: 20
@@ -884,10 +925,70 @@
         loadMoreBtn.addEventListener('click', loadMore);
       }
 
+      function getAllUniqueFragments() {
+        const seen = new Set();
+        const allFrags = [];
+        if (!explorerState.data) return [];
+        Object.keys(explorerState.data).forEach(cat => {
+          explorerState.data[cat].forEach(frag => {
+            const key = `${frag.file}_${frag.time}_${frag.speaker}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              allFrags.push({
+                ...frag,
+                category: cat
+              });
+            }
+          });
+        });
+        // Ordenar cronológicamente descendente
+        allFrags.sort((a, b) => {
+          const epA = getEpNum(a.file);
+          const epB = getEpNum(b.file);
+          if (epA !== epB) return epB - epA;
+          if (a.file !== b.file) return b.file.localeCompare(a.file);
+          return (b.time || 0) - (a.time || 0);
+        });
+        return allFrags;
+      }
+
+      function getMatchingCount(catName) {
+        let rawFragments = [];
+        if (catName === 'Todos los temas') {
+          rawFragments = getAllUniqueFragments();
+        } else {
+          rawFragments = explorerState.data[catName] || [];
+        }
+
+        if (!explorerState.searchQuery) return rawFragments.length;
+
+        const rawQuery = explorerState.searchQuery.trim();
+        if (!rawQuery) return rawFragments.length;
+
+        const tokens = rawQuery.split(/\s+/).map(t => normalizeString(t)).filter(Boolean);
+        if (tokens.length === 0) return rawFragments.length;
+
+        return rawFragments.filter(frag => {
+          const label = normalizeString(frag.label_es || '');
+          const speaker = normalizeString(frag.speaker || '');
+          const sourceQuery = normalizeString(frag.source_query || '');
+          const file = normalizeString(frag.file || '');
+          
+          return tokens.every(token => 
+            label.includes(token) || 
+            speaker.includes(token) || 
+            sourceQuery.includes(token) || 
+            file.includes(token)
+          );
+        }).length;
+      }
+
       function renderTabs() {
         categoriesTabs.innerHTML = '';
-        Object.keys(explorerState.data).forEach(catName => {
-          const count = explorerState.data[catName].length;
+        const allCategories = ['Todos los temas', ...Object.keys(explorerState.data)];
+        
+        allCategories.forEach(catName => {
+          const count = getMatchingCount(catName);
           const tab = document.createElement('button');
           tab.className = `category-tab ${catName === explorerState.activeCategory ? 'active' : ''}`;
           tab.innerHTML = `
@@ -911,13 +1012,21 @@
       }
 
       function getFilteredFragments() {
-        const rawFragments = explorerState.data[explorerState.activeCategory] || [];
+        let rawFragments = [];
+        if (explorerState.activeCategory === 'Todos los temas') {
+          rawFragments = getAllUniqueFragments();
+        } else {
+          rawFragments = (explorerState.data[explorerState.activeCategory] || []).map(frag => ({
+            ...frag,
+            category: explorerState.activeCategory
+          }));
+        }
+
         if (!explorerState.searchQuery) return rawFragments;
 
         const rawQuery = explorerState.searchQuery.trim();
         if (!rawQuery) return rawFragments;
 
-        // Split by spaces to get individual tokens and normalize them
         const tokens = rawQuery.split(/\s+/).map(t => normalizeString(t)).filter(Boolean);
         if (tokens.length === 0) return rawFragments;
 
@@ -927,7 +1036,6 @@
           const sourceQuery = normalizeString(frag.source_query || '');
           const file = normalizeString(frag.file || '');
           
-          // Every token must be present in at least one of the fields
           return tokens.every(token => 
             label.includes(token) || 
             speaker.includes(token) || 
@@ -971,17 +1079,34 @@
         const limit = explorerState.currentPage * explorerState.pageSize;
         const paginated = filtered.slice(0, limit);
 
+        const searchInfoBanner = document.getElementById('search-info-banner');
+        if (searchInfoBanner) {
+          if (explorerState.searchQuery.trim()) {
+            searchInfoBanner.innerHTML = `Se han encontrado <strong>${total}</strong> fragmentos para la búsqueda "<em>${explorerState.searchQuery}</em>"`;
+            searchInfoBanner.style.display = 'block';
+          } else {
+            searchInfoBanner.style.display = 'none';
+          }
+        }
+
         fragmentsGrid.innerHTML = '';
 
         if (total === 0) {
           fragmentsGrid.style.display = 'none';
-          explorerEmpty.style.display = 'block';
+          if (explorerEmpty) {
+            explorerEmpty.style.display = 'block';
+            if (explorerState.searchQuery.trim()) {
+              explorerEmpty.innerHTML = `<p>No se encontraron fragmentos que coincidan con la búsqueda "<em>${explorerState.searchQuery}</em>".</p>`;
+            } else {
+              explorerEmpty.innerHTML = `<p>No se encontraron fragmentos en esta categoría.</p>`;
+            }
+          }
           loadMoreWrapper.style.display = 'none';
           return;
         }
 
         fragmentsGrid.style.display = 'grid';
-        explorerEmpty.style.display = 'none';
+        if (explorerEmpty) explorerEmpty.style.display = 'none';
 
         paginated.forEach(frag => {
           const initials = getInitials(frag.speaker);
@@ -999,6 +1124,7 @@
                 </div>
                 <span class="fragment-episode">${formattedEp}</span>
               </div>
+              ${frag.category && explorerState.activeCategory === 'Todos los temas' ? `<div class="fragment-category-badge" title="Disciplina original">${frag.category}</div>` : ''}
               <p class="fragment-label">${frag.label_es}</p>
             </div>
             <div class="fragment-footer">
@@ -1028,10 +1154,17 @@
           searchClear.style.display = 'none';
         }
 
+        // Si se empieza a buscar y no estamos en "Todos los temas", forzar esa pestaña
+        if (explorerState.searchQuery.trim() && explorerState.activeCategory !== 'Todos los temas') {
+          explorerState.activeCategory = 'Todos los temas';
+          renderTabs();
+        }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           explorerState.currentPage = 1;
           renderActiveFragments();
+          renderTabs();
         }, 150);
       }
 
@@ -1041,6 +1174,7 @@
         searchClear.style.display = 'none';
         explorerState.currentPage = 1;
         renderActiveFragments();
+        renderTabs();
         explorerSearch.focus();
       }
 
