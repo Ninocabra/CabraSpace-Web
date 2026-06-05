@@ -398,6 +398,84 @@ URL: {item['url']}"""
         return None
 
 
+def process_with_groq(item, api_key):
+    """Uses the Groq API (Llama 3.1 8B) to translate, summarize, and filter for relevance as fallback."""
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    system_prompt = """You are an expert astrophotographer and PixInsight specialist.
+Analyze the provided astrophotography resource.
+Decide if this resource is directly relevant to PixInsight processing, tutorials, workflows, script updates, or release news.
+- If it is about general telescope setup, camera sensors, or other software (e.g. Photoshop/Siril/N.I.N.A) WITHOUT direct PixInsight context, mark relevant = false.
+- If it teaches or details a PixInsight processing technique, tool (like BlurXTerminator, SPCC, GHS), or script, mark relevant = true.
+
+You MUST respond ONLY with a JSON object matching this schema:
+{
+  "relevant": boolean,
+  "title_es": "A clean, natural Spanish title (translated and adapted, no excessive emojis or YouTube clickbait)",
+  "title_en": "A refined, clean title in English",
+  "summary_es": "A technical summary in Spanish of 2-3 sentences detailing what this PixInsight resource teaches",
+  "summary_en": "A concise technical summary in English of 2-3 sentences",
+  "category_es": "SOFTWARE" | "SCRIPTS" | "TALLERES" | "COMUNIDAD",
+  "category_en": "SOFTWARE" | "SCRIPTS" | "WORKSHOPS" | "COMMUNITY",
+  "tags": ["array of up to 6 specific PixInsight keywords, e.g., BlurXTerminator, SPCC, GHS, SHO, LRGB, Tutorial"]
+}
+Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
+
+    user_prompt = f"""Title: "{item['title']}"
+Source/Creator: "{item['source']}"
+URL: {item['url']}"""
+
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "response_format": {
+            "type": "json_object"
+        },
+        "stream": False
+    }
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    
+    try:
+        # Use 15 seconds timeout
+        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            
+        text_response = res_data['choices'][0]['message']['content'].strip()
+        groq_result = json.loads(text_response)
+        
+        # Check relevance
+        if not groq_result.get('relevant', False):
+            print(f"Skipping off-topic resource (Groq): '{item['title']}' is not related to PixInsight.")
+            return {"skipped": True}
+            
+        processed_item = {
+            "id": item['url'],
+            "title_es": groq_result['title_es'],
+            "title_en": groq_result['title_en'],
+            "summary_es": groq_result['summary_es'],
+            "summary_en": groq_result['summary_en'],
+            "category_es": groq_result['category_es'],
+            "category_en": groq_result['category_en'],
+            "date": item['date'],
+            "url": item['url'],
+            "tags": groq_result['tags']
+        }
+        return processed_item
+        
+    except Exception as e:
+        print(f"Error calling Groq API for '{item['title']}': {e}")
+        return None
+
+
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
     print(f"Fallback processing for item: {item['title']}")
@@ -435,10 +513,11 @@ def process_fallback(item):
 def main():
     print("Starting Expanded PixInsight News Scraper...")
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    groq_key = os.environ.get("GROQ_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     
-    if not gemini_key and not deepseek_key:
-        print("Warning: Neither GEMINI_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
+    if not gemini_key and not groq_key and not deepseek_key:
+        print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
         
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
@@ -477,6 +556,9 @@ def main():
     processed_count = 0
     updates_to_add = []
     
+    gemini_disabled = False
+    groq_disabled = False
+    
     for item in new_candidates:
         if processed_count >= MAX_ITEMS_TO_PROCESS:
             print("Reached processing limit for this run.")
@@ -493,8 +575,8 @@ def main():
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
-        # 1. Try Gemini first
-        if gemini_key:
+        # 1. Try Gemini first if not disabled
+        if gemini_key and not gemini_disabled:
             import time
             print("Sleeping 6.0s to respect Gemini API rate limits...")
             time.sleep(6.0)
@@ -506,11 +588,25 @@ def main():
                 print(f"Gemini classified item as not relevant. Skipping.")
                 continue
                 
-            # If Gemini failed (returned None), we will try DeepSeek next if key exists
+            # If Gemini failed (returned None), disable it for the rest of the run
             if processed_item is None:
-                print("Gemini failed. Will attempt failover to DeepSeek if key is available...")
+                print("Gemini failed with a persistent error or rate limit. Disabling Gemini for this run.")
+                gemini_disabled = True
         
-        # 2. Try DeepSeek if Gemini was not tried, or if Gemini failed
+        # 2. Try Groq if Gemini failed or was not tried
+        if processed_item is None and groq_key and not groq_disabled:
+            print("Trying Groq API (Llama 3.1 8B)...")
+            processed_item = process_with_groq(item, groq_key)
+            
+            if processed_item and processed_item.get("skipped"):
+                print(f"Groq classified item as not relevant. Skipping.")
+                continue
+                
+            if processed_item is None:
+                print("Groq failed. Disabling Groq for this run.")
+                groq_disabled = True
+
+        # 3. Try DeepSeek if Gemini and Groq failed or were not tried
         if processed_item is None and deepseek_key:
             print("Trying DeepSeek API...")
             processed_item = process_with_deepseek(item, deepseek_key)
@@ -522,7 +618,7 @@ def main():
             if processed_item is None:
                 print("DeepSeek failed as well.")
                 
-        # 3. Fallback to local heuristic parsing if both APIs were tried and failed, or neither is configured
+        # 4. Fallback to local heuristic parsing if all APIs were tried and failed, or none are configured
         if processed_item is None:
             processed_item = process_fallback(item)
             

@@ -282,6 +282,64 @@ Author/Channel: "{video['author']}" """
             print(f"Error calling DeepSeek API for '{video['raw_title']}': {e}")
             return None
 
+
+def process_with_groq(video, api_key):
+    """Uses the Groq API (Llama 3.1 8B) to translate, summarize, and classify difficulty level for a video."""
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    system_prompt = """You are an expert astrophotographer and PixInsight specialist.
+Analyze the following YouTube video about PixInsight:
+Verify if it is directly relevant to PixInsight processing, workflows, tools, scripts, or tutorials.
+If it is NOT relevant to PixInsight (e.g., camera reviews, general telescope setups, Photoshop, Siril, or NINA tutorials WITHOUT PixInsight context), mark relevant = false.
+If it is relevant, translate and clean the title to Spanish and English, translate/create a 2-3 sentence technical summary in both languages, and classify the difficulty level into one of: "PRINCIPIANTE", "MEDIO", or "AVANZADO".
+
+You MUST respond ONLY with a JSON object matching this schema:
+{
+  "relevant": boolean,
+  "title_es": "A clean, natural Spanish title (translated and adapted, no excessive emojis or YouTube clickbait)",
+  "title_en": "A refined, clean title in English",
+  "summary_es": "A technical summary in Spanish of 2-3 sentences explaining what this video teaches",
+  "summary_en": "A concise technical summary in English of 2-3 sentences",
+  "level": "PRINCIPIANTE" | "MEDIO" | "AVANZADO"
+}
+Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
+
+    user_prompt = f"""Title: "{video['raw_title']}"
+Author/Channel: "{video['author']}" """
+
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "response_format": {
+            "type": "json_object"
+        },
+        "stream": False
+    }
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    
+    try:
+        # Use 15 seconds timeout
+        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            
+        text_response = res_data['choices'][0]['message']['content'].strip()
+        groq_result = json.loads(text_response)
+        return groq_result
+        
+    except Exception as e:
+        print(f"Error calling Groq API for '{video['raw_title']}': {e}")
+        return None
+
+
 def scrape_youtube_videos(query):
     encoded_query = urllib.parse.quote(query)
     url = f"https://www.youtube.com/results?search_query={encoded_query}"
@@ -342,9 +400,10 @@ def main():
             print(f"Could not load cache: {e}")
 
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    groq_key = os.environ.get("GROQ_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
-    if not gemini_key and not deepseek_key:
-        print("Warning: Neither GEMINI_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback mode.")
+    if not gemini_key and not groq_key and not deepseek_key:
+        print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback mode.")
 
     all_raw_videos = []
     
@@ -368,6 +427,9 @@ def main():
     
     processed_items = []
     skipped_count = 0
+    
+    gemini_disabled = False
+    groq_disabled = False
     
     for video_id, video in unique_videos.items():
         # Apply filters
@@ -406,8 +468,8 @@ def main():
         # 4. Process new video
         result = None
         
-        # 4a. Try Gemini first
-        if gemini_key:
+        # 4a. Try Gemini first if not disabled
+        if gemini_key and not gemini_disabled:
             print(f"Processing new video via Gemini: '{video['raw_title']}' by {video['author']}...")
             result = process_with_gemini(video, gemini_key)
             time.sleep(6.0) # Rate limit delay for Gemini Free Tier
@@ -416,9 +478,23 @@ def main():
                     print(f"Gemini classified video as not relevant: '{video['raw_title']}'")
                     continue
             else:
-                print("Gemini failed. Will attempt failover to DeepSeek if key is available...")
+                print("Gemini failed with a persistent error or rate limit. Disabling Gemini for this run.")
+                gemini_disabled = True
                 
-        # 4b. Try DeepSeek if Gemini failed or was not tried
+        # 4b. Try Groq if Gemini failed or was not tried
+        if result is None and groq_key and not groq_disabled:
+            print(f"Processing new video via Groq (Llama 3.1 8B): '{video['raw_title']}' by {video['author']}...")
+            result = process_with_groq(video, groq_key)
+            time.sleep(2.0) # Rate limit delay for Groq
+            if result:
+                if not result.get("relevant", False):
+                    print(f"Groq classified video as not relevant: '{video['raw_title']}'")
+                    continue
+            else:
+                print("Groq failed. Disabling Groq for this run.")
+                groq_disabled = True
+
+        # 4c. Try DeepSeek if Gemini and Groq failed or were not tried
         if result is None and deepseek_key:
             print(f"Processing new video via DeepSeek: '{video['raw_title']}' by {video['author']}...")
             result = process_with_deepseek(video, deepseek_key)
@@ -430,7 +506,7 @@ def main():
             else:
                 print("DeepSeek failed as well.")
                 
-        # 4c. Local fallback if both APIs failed
+        # 4d. Local fallback if all APIs failed
         if not result:
             print(f"Processing new video via Fallback: '{video['raw_title']}'...")
             result = local_fallback_classify(video['raw_title'], matched_creator['name'])

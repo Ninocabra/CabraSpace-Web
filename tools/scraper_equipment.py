@@ -528,6 +528,101 @@ URL: {item['url']}
         print(f"Error calling DeepSeek API for '{item['title']}': {e}")
         return None
 
+
+def process_with_groq(item, api_key):
+    """Uses the Groq API (Llama 3.1 8B) to translate, summarize, and filter equipment relevance as fallback."""
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    system_prompt = """You are an expert astrophotographer and astrophotography equipment specialist.
+Analyze the provided resource (video, blog post, or forum topic).
+Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
+
+CRITICAL FILTERING AND VALIDATION RULES:
+1. STRICTLY REJECT ALL SELF-REFERENCED FORUM/REDDIT POSTS:
+   - Reject posts/threads where a user is showing off or sharing their personal equipment purchase, acquisition, or unboxing (e.g., "My new AM5 mount has arrived!", "Look at my new telescope setup", "Unboxing my new camera").
+   - Reject posts showcasing user-taken astrophotography images (e.g., "First light with my new camera", "NGC 7000 taken with my new telescope", "Testing my new mount on M31").
+   - Reject posts about custom DIY projects, 3D printing custom parts, custom DIY mounts, or personal telescope modifications unless they are commercialized, mass-produced products being launched.
+   - Reject posts that are general troubleshooting, support requests, or questions on how to use a product (e.g., "Why is my mount not guiding?", "Help with Seestar polar alignment").
+2. ONLY ACCEPT COMMERCIAL RELEASES AND OFFICIAL NEWS:
+   - Only accept posts/threads about official new commercial product releases or announcements by manufacturers (e.g., ZWO, Celestron, Pegasus Astro, Sky-Watcher, Askar, Player One, etc.), legitimate product leaks/rumors of upcoming commercial gear, or professional/detailed reviews of newly released commercial gear.
+   - A thread/post is valid ONLY if it refers to a brand new commercial product that is being released to the market and discussed/referenced by other sources, NOT a single user's personal DIY build or personal purchase.
+3. If the resource violates any rejection rule or does not contain general commercial new product announcement/news/reviews, mark relevant = false.
+
+You MUST respond ONLY with a JSON object matching this schema:
+{
+  "relevant": boolean,
+  "title_es": "A clean, natural Spanish title (translated and adapted, no excessive emojis or YouTube clickbait)",
+  "title_en": "A refined, clean title in English",
+  "summary_es": "A technical summary in Spanish of 2-3 sentences detailing what this equipment, review, or update is about",
+  "summary_en": "A concise technical summary in English of 2-3 sentences",
+  "category_es": "TELESCOPIOS" | "CÁMARAS" | "MONTURAS" | "ACCESORIOS" | "SOFTWARE",
+  "category_en": "TELESCOPES" | "CAMERAS" | "MOUNTS" | "ACCESSORIES" | "SOFTWARE",
+  "tags": ["array of up to 6 specific equipment keywords, including the brand (e.g. ZWO, Pegasus, Sky-Watcher, Celestron) and product type"]
+}
+Do not include any explanation or markdown formatting (like ```json). Respond with the raw JSON object."""
+
+    body_content = item.get("body_content", "")
+    body_prompt = ""
+    if body_content:
+        body_trimmed = body_content[:1500] + "..." if len(body_content) > 1500 else body_content
+        body_prompt = f"\nRelease Notes / Details:\n{body_trimmed}\n"
+
+    user_prompt = f"""Title: "{item['title']}"
+Source/Creator: "{item['source']}"
+URL: {item['url']}
+{body_prompt}"""
+
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "response_format": {
+            "type": "json_object"
+        },
+        "stream": False
+    }
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    
+    try:
+        # Use 15 seconds timeout
+        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            
+        text_response = res_data['choices'][0]['message']['content'].strip()
+        groq_result = json.loads(text_response)
+        
+        # Check relevance
+        if not groq_result.get('relevant', False):
+            print(f"Skipping off-topic resource (Groq): '{item['title']}' is not related to astrophotography equipment.")
+            return {"skipped": True}
+            
+        processed_item = {
+            "id": item['url'],
+            "title_es": groq_result['title_es'],
+            "title_en": groq_result['title_en'],
+            "summary_es": groq_result['summary_es'],
+            "summary_en": groq_result['summary_en'],
+            "category_es": groq_result['category_es'],
+            "category_en": groq_result['category_en'],
+            "date": item['date'],
+            "url": item['url'],
+            "tags": groq_result['tags']
+        }
+        return processed_item
+        
+    except Exception as e:
+        print(f"Error calling Groq API for '{item['title']}': {e}")
+        return None
+
+
 # Load manufacturers and keywords from JSON files if available
 TOOLS_DIR = os.path.dirname(__file__)
 FABRICANTES_FILE = os.path.join(TOOLS_DIR, "fabricantes.json")
@@ -681,10 +776,11 @@ def process_fallback(item):
 def main():
     print("Starting Astrophotography Equipment News Scraper...")
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    groq_key = os.environ.get("GROQ_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     
-    if not gemini_key and not deepseek_key:
-        print("Warning: Neither GEMINI_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
+    if not gemini_key and not groq_key and not deepseek_key:
+        print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
         
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
@@ -749,6 +845,9 @@ def main():
     processed_count = 0
     updates_to_add = []
     
+    gemini_disabled = False
+    groq_disabled = False
+    
     for item in new_candidates:
         if processed_count >= MAX_ITEMS_TO_PROCESS:
             print("Reached processing limit for this run.")
@@ -771,8 +870,8 @@ def main():
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
-        # 1. Try Gemini first
-        if gemini_key:
+        # 1. Try Gemini first if not disabled
+        if gemini_key and not gemini_disabled:
             import time
             print("Sleeping 6.0s to respect Gemini API rate limits...")
             time.sleep(6.0)
@@ -784,11 +883,25 @@ def main():
                 print(f"Gemini classified item as not relevant. Skipping.")
                 continue
                 
-            # If Gemini failed (returned None), we will try DeepSeek next if key exists
+            # If Gemini failed (returned None), disable it for the rest of the run
             if processed_item is None:
-                print("Gemini failed. Will attempt failover to DeepSeek if key is available...")
+                print("Gemini failed with a persistent error or rate limit. Disabling Gemini for this run.")
+                gemini_disabled = True
         
-        # 2. Try DeepSeek if Gemini was not tried, or if Gemini failed
+        # 2. Try Groq if Gemini failed or was not tried
+        if processed_item is None and groq_key and not groq_disabled:
+            print("Trying Groq API (Llama 3.1 8B)...")
+            processed_item = process_with_groq(item, groq_key)
+            
+            if processed_item and processed_item.get("skipped"):
+                print(f"Groq classified item as not relevant. Skipping.")
+                continue
+                
+            if processed_item is None:
+                print("Groq failed. Disabling Groq for this run.")
+                groq_disabled = True
+
+        # 3. Try DeepSeek if Gemini and Groq failed or were not tried
         if processed_item is None and deepseek_key:
             print("Trying DeepSeek API...")
             processed_item = process_with_deepseek(item, deepseek_key)
@@ -800,7 +913,7 @@ def main():
             if processed_item is None:
                 print("DeepSeek failed as well.")
                 
-        # 3. Fallback to local heuristic parsing if both APIs were tried and failed, or neither is configured
+        # 4. Fallback to local heuristic parsing if all APIs were tried and failed, or none are configured
         if processed_item is None:
             processed_item = process_fallback(item)
             
