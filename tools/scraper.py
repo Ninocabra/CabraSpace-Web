@@ -229,35 +229,73 @@ def process_with_gemini(item, api_key):
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
     
-    try:
-        with urllib.request.urlopen(req) as response:
-            res_data = json.loads(response.read().decode('utf-8'))
+    import time
+    max_retries = 3
+    retry_delay = 6.0
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                
+            text_response = res_data['candidates'][0]['content']['parts'][0]['text']
+            gemini_result = json.loads(text_response)
             
-        text_response = res_data['candidates'][0]['content']['parts'][0]['text']
-        gemini_result = json.loads(text_response)
-        
-        # Check relevance
-        if not gemini_result.get('relevant', False):
-            print(f"Skipping off-topic resource: '{item['title']}' is not related to PixInsight.")
-            return {"skipped": True}
+            # Check relevance
+            if not gemini_result.get('relevant', False):
+                print(f"Skipping off-topic resource: '{item['title']}' is not related to PixInsight.")
+                return {"skipped": True}
+                
+            processed_item = {
+                "id": item['url'],
+                "title_es": gemini_result['title_es'],
+                "title_en": gemini_result['title_en'],
+                "summary_es": gemini_result['summary_es'],
+                "summary_en": gemini_result['summary_en'],
+                "category_es": gemini_result['category_es'],
+                "category_en": gemini_result['category_en'],
+                "date": item['date'],
+                "url": item['url'],
+                "tags": gemini_result['tags']
+            }
+            return processed_item
             
-        processed_item = {
-            "id": item['url'],
-            "title_es": gemini_result['title_es'],
-            "title_en": gemini_result['title_en'],
-            "summary_es": gemini_result['summary_es'],
-            "summary_en": gemini_result['summary_en'],
-            "category_es": gemini_result['category_es'],
-            "category_en": gemini_result['category_en'],
-            "date": item['date'],
-            "url": item['url'],
-            "tags": gemini_result['tags']
-        }
-        return processed_item
-        
-    except Exception as e:
-        print(f"Error calling Gemini API for '{item['title']}': {e}")
-        return None
+        except urllib.error.HTTPError as he:
+            if he.code in [429, 503, 504] and attempt < max_retries - 1:
+                print(f"Gemini API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"Error calling Gemini API for '{item['title']}': {he}")
+                return None
+        except Exception as e:
+            print(f"Error calling Gemini API for '{item['title']}': {e}")
+            return None
+
+def check_relevance_fallback(title):
+    """Rule-based relevance filter for fallback dry-run mode."""
+    keywords = [
+        "pixinsight", "workflow", "script", "process", "tutorial", 
+        "bxt", "sxt", "nxt", "blurxterminator", "starxterminator", "noisexterminator",
+        "cuda", "spcc", "narrowband", "sho", "hoo", "lrgb", "color calibration", 
+        "stretching", "drizzle", "subframe", "ghs", "gradient", "deconvolution",
+        "processing", "editing", "masters of"
+    ]
+    title_lower = title.lower()
+    
+    # Strip common non-indicative hashtags like #shorts and #short first
+    title_clean = title_lower.replace("#shorts", "").replace("#short", "")
+    
+    for k in keywords:
+        # Enforce word boundaries for very short keywords (<= 4 chars) to avoid false positives like #shorts matching sho
+        if len(k) <= 4:
+            if re.search(r'\b' + re.escape(k) + r'\b', title_clean):
+                return True
+        else:
+            if k in title_clean:
+                return True
+                
+    return False
 
 def process_with_deepseek(item, api_key):
     """Uses the DeepSeek API to translate, summarize, and filter for relevance as fallback."""
@@ -336,30 +374,6 @@ URL: {item['url']}"""
         print(f"Error calling DeepSeek API for '{item['title']}': {e}")
         return None
 
-def check_relevance_fallback(title):
-    """Rule-based relevance filter for fallback dry-run mode."""
-    keywords = [
-        "pixinsight", "workflow", "script", "process", "tutorial", 
-        "bxt", "sxt", "nxt", "blurxterminator", "starxterminator", "noisexterminator",
-        "cuda", "spcc", "narrowband", "sho", "hoo", "lrgb", "color calibration", 
-        "stretching", "drizzle", "subframe", "ghs", "gradient", "deconvolution",
-        "processing", "editing", "masters of"
-    ]
-    title_lower = title.lower()
-    
-    # Strip common non-indicative hashtags like #shorts and #short first
-    title_clean = title_lower.replace("#shorts", "").replace("#short", "")
-    
-    for k in keywords:
-        # Enforce word boundaries for very short keywords (<= 4 chars) to avoid false positives like #shorts matching sho
-        if len(k) <= 4:
-            if re.search(r'\b' + re.escape(k) + r'\b', title_clean):
-                return True
-        else:
-            if k in title_clean:
-                return True
-                
-    return False
 
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
@@ -447,8 +461,8 @@ def main():
         # 1. Try Gemini first
         if gemini_key:
             import time
-            print("Sleeping 4.5s to respect Gemini API rate limits...")
-            time.sleep(4.5)
+            print("Sleeping 6.0s to respect Gemini API rate limits...")
+            time.sleep(6.0)
             # Let Gemini process and check relevance
             processed_item = process_with_gemini(item, gemini_key)
             
