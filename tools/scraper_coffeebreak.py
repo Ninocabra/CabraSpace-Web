@@ -3,6 +3,7 @@ import requests
 import re
 import time
 import os
+import sys
 
 def main():
     print("Starting Coffee Break outreach scraper...")
@@ -11,7 +12,7 @@ def main():
     queries_file = "matching_queries.json"
     if not os.path.exists(queries_file):
         print(f"Error: {queries_file} not found!")
-        return
+        sys.exit(1)
         
     with open(queries_file, "r", encoding="utf-8") as f:
         queries_list = json.load(f)
