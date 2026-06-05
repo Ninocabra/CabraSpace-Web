@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro Forecast - CabraSpace</title>
-  <meta name="description" content="Planifica tus noches de astrofotografía y observación con el pronóstico de calidad de cielo inteligente de NightVis, integrado en CabraSpace.">
+  <title>Mapa de Contaminación Lumínica - CabraSpace</title>
+  <meta name="description" content="Consulta el mapa interactivo de contaminación lumínica de LightPollutionMap.info de forma integrada en CabraSpace para planificar tus noches de astrofotografía.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
@@ -17,7 +17,7 @@
     }
 
     /* Contenedor principal a pantalla completa por debajo de la cabecera */
-    .forecast-container {
+    .map-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -65,7 +65,7 @@
       background: #020202;
     }
 
-    .forecast-iframe {
+    .map-iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -105,7 +105,7 @@
         <li class="dropdown">
           <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="astroforecast.html" class="dropdown-item active">Astro Forecast</a></li>
+            <li><a href="astroforecast.html" class="dropdown-item">Astro Forecast</a></li>
             <li class="dropdown-submenu">
               <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
@@ -115,9 +115,9 @@
               </ul>
             </li>
             <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
+              <a href="#" class="dropdown-item dropdown-toggle active">Contaminación Lumínica <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
-                <li><a href="contaminacion-mapa.html" class="dropdown-item">Mapa de Contaminación</a></li>
+                <li><a href="contaminacion-mapa.html" class="dropdown-item active">Mapa de Contaminación</a></li>
                 <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
               </ul>
             </li>
@@ -136,9 +136,9 @@
           <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
         </button>
         <div class="lang-switcher">
-          <a href="astroforecast.html" class="lang-link active">ES</a>
+          <a href="contaminacion-mapa.html" class="lang-link active">ES</a>
           <span class="lang-separator">|</span>
-          <a href="astroforecast-en.html" class="lang-link">EN</a>
+          <a href="contaminacion-mapa-en.html" class="lang-link">EN</a>
         </div>
         <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
       </div>
@@ -146,20 +146,20 @@
   </header>
 
   <!-- Main Full-Screen Container -->
-  <div class="forecast-container">
+  <div class="map-container">
     <!-- Slim Attribution Bar -->
     <div class="attribution-bar">
       <span>
-        Previsión astronómica inteligente provista por <strong><a href="https://nightvis.space" target="_blank" rel="noopener noreferrer">NightVis.space</a></strong>
+        Mapa interactivo de contaminación lumínica provisto por <strong><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer">LightPollutionMap.info</a></strong>
       </span>
       <span>
-        Datos meteorológicos de Open-Meteo y 7Timer!
+        Datos satelitales del sensor VIIRS / DMSP
       </span>
     </div>
 
-    <!-- Embedded NightVis application -->
+    <!-- Embedded Light Pollution Map application -->
     <div class="iframe-wrapper">
-      <iframe src="https://nightvis.space" title="NightVis Astro Forecast App" class="forecast-iframe"></iframe>
+      <iframe src="https://www.lightpollutionmap.info/" title="Light Pollution Map App" class="map-iframe"></iframe>
     </div>
   </div>
 

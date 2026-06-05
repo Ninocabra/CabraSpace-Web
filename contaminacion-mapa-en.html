@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" style="height: 100%; overflow: hidden;">
+<html lang="en" style="height: 100%; overflow: hidden;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro Forecast - CabraSpace</title>
-  <meta name="description" content="Planifica tus noches de astrofotografía y observación con el pronóstico de calidad de cielo inteligente de NightVis, integrado en CabraSpace.">
+  <title>Light Pollution Map - CabraSpace</title>
+  <meta name="description" content="View the official LightPollutionMap.info interactive map integrated into CabraSpace to plan your astrophotography and observation nights.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
@@ -16,18 +16,18 @@
       background: #020202;
     }
 
-    /* Contenedor principal a pantalla completa por debajo de la cabecera */
-    .forecast-container {
+    /* Main full-screen container below the fixed header */
+    .map-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
-      padding-top: 76px; /* Altura de la cabecera fija */
+      padding-top: 76px; /* Height of the fixed header */
       box-sizing: border-box;
       position: relative;
       z-index: 10;
     }
 
-    /* Barra de atribución superior estilizada y compacta */
+    /* Styled and compact upper attribution bar */
     .attribution-bar {
       background: rgba(207, 171, 74, 0.04);
       border-bottom: 1px solid var(--border-color);
@@ -56,7 +56,7 @@
       color: var(--gold-light);
     }
 
-    /* Contenedor del iframe para ocupar el resto de la pantalla */
+    /* Container for the iframe to occupy the rest of the screen */
     .iframe-wrapper {
       flex: 1;
       width: 100%;
@@ -65,7 +65,7 @@
       background: #020202;
     }
 
-    .forecast-iframe {
+    .map-iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -88,78 +88,78 @@
   <!-- Header / Navigation -->
   <header id="navbar">
     <div class="container nav-container">
-      <a href="index.html" class="logo-link">
+      <a href="en.html" class="logo-link">
         <img src="logo.png" alt="CabraSpace Logo">
         <span>CabraSpace</span>
       </a>
       
       <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li><a href="en.html" class="nav-link">Home</a></li>
         <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Novedades <span class="arrow">▾</span></a>
+          <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
-            <li><a href="novedades.html" class="dropdown-item">PixInsight</a></li>
+            <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
+            <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
           </ul>
         </li>
         <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
+          <a href="#" class="nav-link dropdown-toggle active">Astrophotography <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="astroforecast.html" class="dropdown-item active">Astro Forecast</a></li>
+            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
             <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
+              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
-                <li><a href="cabrascripts.html" class="dropdown-item">CabraScripts</a></li>
-                <li><a href="pixelmath.html" class="dropdown-item">PixelMath-teca</a></li>
-                <li><a href="#" class="dropdown-item">Cursos Youtube</a></li>
+                <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
+                <li><a href="#" class="dropdown-item">YouTube Courses</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
+              <a href="#" class="dropdown-item dropdown-toggle active">Light Pollution <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
-                <li><a href="contaminacion-mapa.html" class="dropdown-item">Mapa de Contaminación</a></li>
-                <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
+                <li><a href="contaminacion-mapa-en.html" class="dropdown-item active">Light Pollution Map</a></li>
+                <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
               </ul>
             </li>
           </ul>
         </li>
         <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Divulgación <span class="arrow">▾</span></a>
+          <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="divulgacion-coffeebreak.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
+            <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
           </ul>
         </li>
       </ul>
 
       <div style="display: flex; align-items: center; gap: 16px;">
-        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Night Mode" title="Astronomical Night Vision Mode">
           <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
         </button>
         <div class="lang-switcher">
-          <a href="astroforecast.html" class="lang-link active">ES</a>
+          <a href="contaminacion-mapa.html" class="lang-link">ES</a>
           <span class="lang-separator">|</span>
-          <a href="astroforecast-en.html" class="lang-link">EN</a>
+          <a href="contaminacion-mapa-en.html" class="lang-link active">EN</a>
         </div>
-        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+        <a href="en.html#newsletter" class="nav-cta hidden">Subscribe</a>
       </div>
     </div>
   </header>
 
   <!-- Main Full-Screen Container -->
-  <div class="forecast-container">
+  <div class="map-container">
     <!-- Slim Attribution Bar -->
     <div class="attribution-bar">
       <span>
-        Previsión astronómica inteligente provista por <strong><a href="https://nightvis.space" target="_blank" rel="noopener noreferrer">NightVis.space</a></strong>
+        Interactive light pollution map provided by <strong><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer">LightPollutionMap.info</a></strong>
       </span>
       <span>
-        Datos meteorológicos de Open-Meteo y 7Timer!
+        VIIRS / DMSP satellite data
       </span>
     </div>
 
-    <!-- Embedded NightVis application -->
+    <!-- Embedded Light Pollution Map application -->
     <div class="iframe-wrapper">
-      <iframe src="https://nightvis.space" title="NightVis Astro Forecast App" class="forecast-iframe"></iframe>
+      <iframe src="https://www.lightpollutionmap.info/" title="Light Pollution Map App" class="map-iframe"></iframe>
     </div>
   </div>
 
