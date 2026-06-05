@@ -925,7 +925,12 @@
         const rawFragments = explorerState.data[explorerState.activeCategory] || [];
         if (!explorerState.searchQuery) return rawFragments;
 
-        const query = normalizeString(explorerState.searchQuery);
+        const rawQuery = explorerState.searchQuery.trim();
+        if (!rawQuery) return rawFragments;
+
+        const tokens = rawQuery.split(/\s+/).map(t => normalizeString(t)).filter(Boolean);
+        if (tokens.length === 0) return rawFragments;
+
         return rawFragments.filter(frag => {
           const labelEs = normalizeString(frag.label_es || '');
           const labelEn = normalizeString(frag.label_en || '');
@@ -933,11 +938,13 @@
           const sourceQuery = normalizeString(frag.source_query || '');
           const file = normalizeString(frag.file || '');
           
-          return labelEs.includes(query) || 
-                 labelEn.includes(query) || 
-                 speaker.includes(query) || 
-                 sourceQuery.includes(query) || 
-                 file.includes(query);
+          return tokens.every(token => 
+            labelEs.includes(token) || 
+            labelEn.includes(token) || 
+            speaker.includes(token) || 
+            sourceQuery.includes(token) || 
+            file.includes(token)
+          );
         });
       }
 
@@ -948,6 +955,7 @@
           .replace(/[íìïî]/g, 'i')
           .replace(/[óòöô]/g, 'o')
           .replace(/[úùüû]/g, 'u')
+          .replace(/[ñÑ]/g, 'n')
           .replace(/[^a-z0-9\s]/g, '');
       }
 
