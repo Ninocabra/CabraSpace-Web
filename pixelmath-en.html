@@ -845,6 +845,11 @@
       { id: 'blend_avg', name: 'Average Blend Mode', category: 'Math & Blending Modes', description: 'Calculates the arithmetic average of two frames of the same field to reduce noise.', rgb: '(ImageA + ImageB) / 2', renderType: 'blend_average', sources: ['original', 'starless'], sliders: [] },
 
       // 6. Utilities & Cleaning
+      { id: 'contrast_sine_s', name: 'Adjustable Sinusoidal S-Curve Contrast', category: 'Utilities & Cleaning', description: 'Enhances contrast by applying a smooth and organic sinusoidal S-curve on midtones, avoiding abrupt edges and harsh transitions in the nebulosity.', r: '$T - k * sin(2 * pi() * $T) / (2 * pi())', g: '$T - k * sin(2 * pi() * $T) / (2 * pi())', b: '$T - k * sin(2 * pi() * $T) / (2 * pi())', renderType: 'contrast_sine_s', sources: ['original'], sliders: [{ id: 'k', label: 'Contrast Intensity (k)', min: 0, max: 0.90, step: 0.05, value: 0.40 }] },
+      { id: 'contrast_protected_midtone', name: 'Protected Midtone Contrast', category: 'Utilities & Cleaning', description: 'Applies selective contrast to midtones while protecting the sky background (shadows) and bright stars (highlights) from saturation or clipping.', r: '$T + (($T - pivot) * k) * (1 - $T) * $T * 4', g: '$T + (($T - pivot) * k) * (1 - $T) * $T * 4', b: '$T + (($T - pivot) * k) * (1 - $T) * $T * 4', renderType: 'contrast_protected_midtone', sources: ['original'], sliders: [{ id: 'k', label: 'Contrast Gain (k)', min: 0, max: 2.0, step: 0.05, value: 0.60 }, { id: 'pivot', label: 'Pivot Point (pivot)', min: 0.05, max: 0.50, step: 0.01, value: 0.15 }] },
+      { id: 'contrast_tanh_s', name: 'Sigmoidal Hyperbolic Tangent S-Curve (tanh)', category: 'Utilities & Cleaning', description: 'Applies an adjustable sigmoid curve using the mathematical tanh function. Ideal for a punchy, analog-style contrast enhancement of nebulae.', r: '0.5 * (tanh(k * ($T - 0.5)) / tanh(k * 0.5) + 1)', g: '0.5 * (tanh(k * ($T - 0.5)) / tanh(k * 0.5) + 1)', b: '0.5 * (tanh(k * ($T - 0.5)) / tanh(k * 0.5) + 1)', renderType: 'contrast_tanh_s', sources: ['original'], sliders: [{ id: 'k', label: 'Slope Factor (k)', min: 1.0, max: 8.0, step: 0.1, value: 3.5 }] },
+      { id: 'contrast_overlay', name: 'Overlay Self-Contrast', category: 'Utilities & Cleaning', description: 'Applies the Overlay blend mode onto itself. Strongly increases midtone contrast and darkens the sky background.', r: '$T * (1 - k) + iif($T > 0.5, 1 - 2 * (1 - $T) * (1 - $T), 2 * $T * $T) * k', g: '$T * (1 - k) + iif($T > 0.5, 1 - 2 * (1 - $T) * (1 - $T), 2 * $T * $T) * k', b: '$T * (1 - k) + iif($T > 0.5, 1 - 2 * (1 - $T) * (1 - $T), 2 * $T * $T) * k', renderType: 'contrast_overlay', sources: ['original'], sliders: [{ id: 'k', label: 'Blend Intensity (k)', min: 0, max: 1.0, step: 0.05, value: 0.50 }] },
+      { id: 'contrast_soft_light', name: 'Soft Light Self-Contrast', category: 'Utilities & Cleaning', description: 'Applies the Soft Light blend mode onto itself. Enhances contrast in a very gradual and subtle way, ideal for faint nebulosity without blowing out details.', r: '$T * (1 - k) + iif($T > 0.5, 1 - (1 - $T) * (1 - ($T - 0.5)), $T * ($T + 0.5)) * k', g: '$T * (1 - k) + iif($T > 0.5, 1 - (1 - $T) * (1 - ($T - 0.5)), $T * ($T + 0.5)) * k', b: '$T * (1 - k) + iif($T > 0.5, 1 - (1 - $T) * (1 - ($T - 0.5)), $T * ($T + 0.5)) * k', renderType: 'contrast_soft_light', sources: ['original'], sliders: [{ id: 'k', label: 'Blend Intensity (k)', min: 0, max: 1.0, step: 0.05, value: 0.70 }] },
       { id: 'util_invert', name: 'Invert Image', category: 'Utilities & Cleaning', description: 'Linearly inverts all channels of the image (converts positive to negative).', rgb: '~ $T', renderType: 'util_invert', sources: ['original'], sliders: [] },
       { id: 'util_clip_high', name: 'Clip Highlights', category: 'Utilities & Cleaning', description: 'Sets a maximum brightness threshold to prevent star cores from bloating or saturating.', rgb: 'iif($T > threshold, threshold, $T)', renderType: 'util_clip_high', sources: ['original'], sliders: [{ id: 'threshold', label: 'Maximum Threshold (t)', min: 0.5, max: 1.0, step: 0.01, value: 0.95 }] },
       { id: 'util_clip_low', name: 'Clip Shadows', category: 'Utilities & Cleaning', description: 'Sets a minimum black floor to prevent negative pixel values after subtractions.', rgb: 'iif($T < threshold, threshold, $T)', renderType: 'util_clip_low', sources: ['original'], sliders: [{ id: 'threshold', label: 'Minimum Threshold (t)', min: 0.0, max: 0.3, step: 0.01, value: 0.05 }] },
@@ -1813,6 +1818,65 @@
           out[i]     = val;
           out[i + 1] = val;
           out[i + 2] = val;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'contrast_sine_s') {
+        const k = s.k !== undefined ? s.k : 0.4;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const val = imgA[i + c] / 255;
+            const out_val = val - k * Math.sin(2 * Math.PI * val) / (2 * Math.PI);
+            out[i + c] = Math.max(0, Math.min(255, out_val * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'contrast_protected_midtone') {
+        const k = s.k !== undefined ? s.k : 0.6;
+        const pivot = s.pivot !== undefined ? s.pivot : 0.15;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const val = imgA[i + c] / 255;
+            const out_val = val + ((val - pivot) * k) * (1.0 - val) * val * 4.0;
+            out[i + c] = Math.max(0, Math.min(255, out_val * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'contrast_tanh_s') {
+        const k = s.k !== undefined ? s.k : 3.5;
+        const denom = Math.tanh(k * 0.5);
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const val = imgA[i + c] / 255;
+            const out_val = 0.5 * (Math.tanh(k * (val - 0.5)) / denom + 1.0);
+            out[i + c] = Math.max(0, Math.min(255, out_val * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'contrast_overlay') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const val = imgA[i + c] / 255;
+            const blend = val < 0.5 ? 2 * val * val : 1 - 2 * (1 - val) * (1 - val);
+            const out_val = val * (1 - k) + blend * k;
+            out[i + c] = Math.max(0, Math.min(255, out_val * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'contrast_soft_light') {
+        const k = s.k !== undefined ? s.k : 0.7;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const val = imgA[i + c] / 255;
+            const blend = val < 0.5 ? val * (val + 0.5) : 1 - (1 - val) * (1 - (val - 0.5));
+            const out_val = val * (1 - k) + blend * k;
+            out[i + c] = Math.max(0, Math.min(255, out_val * 255));
+          }
           out[i + 3] = 255;
         }
       }
