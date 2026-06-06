@@ -320,6 +320,19 @@ def check_relevance_fallback(title):
                 
     return False
 
+def clean_json_text(text):
+    """Cleans markdown code block wraps (like ```json ... ```) from a text response."""
+    text = text.strip()
+    if text.startswith("```"):
+        first_line_end = text.find("\n")
+        if first_line_end != -1:
+            text = text[first_line_end:].strip()
+        else:
+            text = text[3:].strip()
+    if text.endswith("```"):
+        text = text[:-3].strip()
+    return text
+
 def process_with_deepseek(item, api_key):
     """Uses the DeepSeek API to translate, summarize, and filter for relevance as fallback."""
     url = "https://api.deepseek.com/chat/completions"
@@ -366,36 +379,58 @@ URL: {item['url']}"""
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
     
-    try:
-        # Use 15 seconds timeout
-        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
-            res_data = json.loads(response.read().decode('utf-8'))
+    max_retries = 3
+    retry_delay = 4.0
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                
+            text_response = res_data['choices'][0]['message']['content'].strip()
+            text_response = clean_json_text(text_response)
+            deepseek_result = json.loads(text_response)
             
-        text_response = res_data['choices'][0]['message']['content'].strip()
-        deepseek_result = json.loads(text_response)
-        
-        # Check relevance
-        if not deepseek_result.get('relevant', False):
-            print(f"Skipping off-topic resource (DeepSeek): '{item['title']}' is not related to PixInsight.")
-            return {"skipped": True}
+            # Extract keys defensively
+            relevant = deepseek_result.get('relevant', False)
+            title_es = deepseek_result.get('title_es') or deepseek_result.get('titulo_es') or item['title']
+            title_en = deepseek_result.get('title_en') or item['title']
+            summary_es = deepseek_result.get('summary_es') or deepseek_result.get('resumen_es') or ""
+            summary_en = deepseek_result.get('summary_en') or deepseek_result.get('resumen_en') or ""
+            category_es = deepseek_result.get('category_es') or deepseek_result.get('categoria_es') or "SOFTWARE"
+            category_en = deepseek_result.get('category_en') or deepseek_result.get('categoria_en') or "SOFTWARE"
+            tags = deepseek_result.get('tags') or []
             
-        processed_item = {
-            "id": item['url'],
-            "title_es": deepseek_result['title_es'],
-            "title_en": deepseek_result['title_en'],
-            "summary_es": deepseek_result['summary_es'],
-            "summary_en": deepseek_result['summary_en'],
-            "category_es": deepseek_result['category_es'],
-            "category_en": deepseek_result['category_en'],
-            "date": item['date'],
-            "url": item['url'],
-            "tags": deepseek_result['tags']
-        }
-        return processed_item
-        
-    except Exception as e:
-        print(f"Error calling DeepSeek API for '{item['title']}': {e}")
-        return None
+            # Check relevance
+            if not relevant:
+                print(f"Skipping off-topic resource (DeepSeek): '{item['title']}' is not related to PixInsight.")
+                return {"skipped": True}
+                
+            processed_item = {
+                "id": item['url'],
+                "title_es": title_es,
+                "title_en": title_en,
+                "summary_es": summary_es,
+                "summary_en": summary_en,
+                "category_es": category_es.upper(),
+                "category_en": category_en.upper(),
+                "date": item['date'],
+                "url": item['url'],
+                "tags": tags
+            }
+            return processed_item
+            
+        except urllib.error.HTTPError as he:
+            if he.code in [429, 503, 504] and attempt < max_retries - 1:
+                print(f"DeepSeek API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                print(f"Error calling DeepSeek API for '{item['title']}': {he}")
+                return None
+        except Exception as e:
+            print(f"Error calling DeepSeek API for '{item['title']}': {e}")
+            return None
 
 
 def process_with_groq(item, api_key):
@@ -444,36 +479,58 @@ URL: {item['url']}"""
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
     
-    try:
-        # Use 15 seconds timeout
-        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
-            res_data = json.loads(response.read().decode('utf-8'))
+    max_retries = 3
+    retry_delay = 4.0
+    
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                
+            text_response = res_data['choices'][0]['message']['content'].strip()
+            text_response = clean_json_text(text_response)
+            groq_result = json.loads(text_response)
             
-        text_response = res_data['choices'][0]['message']['content'].strip()
-        groq_result = json.loads(text_response)
-        
-        # Check relevance
-        if not groq_result.get('relevant', False):
-            print(f"Skipping off-topic resource (Groq): '{item['title']}' is not related to PixInsight.")
-            return {"skipped": True}
+            # Extract keys defensively
+            relevant = groq_result.get('relevant', False)
+            title_es = groq_result.get('title_es') or groq_result.get('titulo_es') or item['title']
+            title_en = groq_result.get('title_en') or item['title']
+            summary_es = groq_result.get('summary_es') or groq_result.get('resumen_es') or ""
+            summary_en = groq_result.get('summary_en') or groq_result.get('resumen_en') or ""
+            category_es = groq_result.get('category_es') or groq_result.get('categoria_es') or "SOFTWARE"
+            category_en = groq_result.get('category_en') or groq_result.get('categoria_en') or "SOFTWARE"
+            tags = groq_result.get('tags') or []
             
-        processed_item = {
-            "id": item['url'],
-            "title_es": groq_result['title_es'],
-            "title_en": groq_result['title_en'],
-            "summary_es": groq_result['summary_es'],
-            "summary_en": groq_result['summary_en'],
-            "category_es": groq_result['category_es'],
-            "category_en": groq_result['category_en'],
-            "date": item['date'],
-            "url": item['url'],
-            "tags": groq_result['tags']
-        }
-        return processed_item
-        
-    except Exception as e:
-        print(f"Error calling Groq API for '{item['title']}': {e}")
-        return None
+            # Check relevance
+            if not relevant:
+                print(f"Skipping off-topic resource (Groq): '{item['title']}' is not related to PixInsight.")
+                return {"skipped": True}
+                
+            processed_item = {
+                "id": item['url'],
+                "title_es": title_es,
+                "title_en": title_en,
+                "summary_es": summary_es,
+                "summary_en": summary_en,
+                "category_es": category_es.upper(),
+                "category_en": category_en.upper(),
+                "date": item['date'],
+                "url": item['url'],
+                "tags": tags
+            }
+            return processed_item
+            
+        except urllib.error.HTTPError as he:
+            if he.code in [429, 503, 504] and attempt < max_retries - 1:
+                print(f"Groq API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                print(f"Error calling Groq API for '{item['title']}': {he}")
+                return None
+        except Exception as e:
+            print(f"Error calling Groq API for '{item['title']}': {e}")
+            return None
 
 
 def process_fallback(item):
