@@ -1,93 +1,141 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%; overflow: hidden;">
+<html lang="en">
 <head>
   <link rel="icon" href="favicon_cabra.png" type="image/png">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Light Pollution Map - CabraSpace</title>
-  <meta name="description" content="View the official LightPollutionMap.info interactive map integrated into CabraSpace to plan your astrophotography and observation nights.">
+  <meta name="description" content="View the official LightPollutionMap.info interactive map to plan your astrophotography and observation nights with the darkest skies.">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="support.css">
   <style>
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      background: #020202;
-    }
-
-    /* Main full-screen container below the fixed header */
-    .map-container {
+    .tool-hero {
+      min-height: calc(100vh - 76px);
       display: flex;
-      flex-direction: column;
-      height: 100vh;
-      padding-top: 76px; /* Height of the fixed header */
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 60px;
       box-sizing: border-box;
       position: relative;
       z-index: 10;
     }
 
-    /* Styled and compact upper attribution bar */
-    .attribution-bar {
-      background: rgba(207, 171, 74, 0.04);
-      border-bottom: 1px solid var(--border-color);
-      padding: 8px 20px;
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      z-index: 20;
-    }
-
-    .attribution-bar strong {
-      color: var(--gold-primary);
-    }
-
-    .attribution-bar a {
-      color: var(--gold-primary);
-      text-decoration: underline;
-      transition: var(--transition-smooth);
-    }
-
-    .attribution-bar a:hover {
-      color: var(--gold-light);
-    }
-
-    /* Container for the iframe to occupy the rest of the screen */
-    .iframe-wrapper {
-      flex: 1;
+    .tool-card {
+      max-width: 720px;
       width: 100%;
-      height: 100%;
-      position: relative;
-      background: #020202;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 60px rgba(207,171,74,0.1);
     }
 
-    .map-iframe {
+    .tool-card-img {
       width: 100%;
-      height: 100%;
-      border: none;
+      height: 340px;
+      object-fit: cover;
       display: block;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tool-card-body {
+      padding: 36px 32px 40px;
+      text-align: center;
+    }
+
+    .tool-card-body h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+    .tool-card-body h1 span {
+      color: var(--gold-primary);
+    }
+
+    .tool-card-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold-primary);
+      background: rgba(207,171,74,0.08);
+      border: 1px solid rgba(207,171,74,0.18);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .tool-card-body p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 0 0 28px;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tool-card-body .tool-sources {
+      font-size: 0.82rem;
+      color: var(--text-muted, #666);
+      margin-bottom: 28px;
+    }
+    .tool-card-body .tool-sources strong {
+      color: var(--text-secondary);
+    }
+
+    .tool-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 36px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #000;
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-light, #e8c84a));
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 4px 20px rgba(207,171,74,0.3);
+    }
+    .tool-cta:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 32px rgba(207,171,74,0.45);
+    }
+    .tool-cta svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    @media (max-width: 600px) {
+      .tool-card-img { height: 200px; }
+      .tool-card-body { padding: 24px 20px 32px; }
+      .tool-card-body h1 { font-size: 1.35rem; }
+      .tool-cta { padding: 12px 28px; font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
-  <!-- FOUC Preventer for Night Mode -->
   <script>
     if (localStorage.getItem('night-vision') === 'enabled') {
       document.body.classList.add('night-vision');
     }
   </script>
 
-  <!-- Background Overlays for Resend Aesthetic -->
   <div class="grid-overlay"></div>
   <div class="radial-glow"></div>
 
-  <!-- Header / Navigation -->
   <header id="navbar">
     <div class="container nav-container">
       <a href="en.html" class="logo-link">
@@ -147,27 +195,24 @@
     </div>
   </header>
 
-  <!-- Main Full-Screen Container -->
-  <div class="map-container">
-    <!-- Slim Attribution Bar -->
-    <div class="attribution-bar">
-      <span>
-        Interactive light pollution map provided by <strong><a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer">LightPollutionMap.info</a></strong>
-      </span>
-      <span>
-        VIIRS / DMSP satellite data
-      </span>
+  <section class="tool-hero">
+    <div class="tool-card">
+      <img src="img/lightpollution-preview.png" alt="Light Pollution Map" class="tool-card-img">
+      <div class="tool-card-body">
+        <div class="tool-card-badge">External tool</div>
+        <h1>Light <span>Pollution Map</span></h1>
+        <p>Explore the interactive worldwide light pollution map from <strong>LightPollutionMap.info</strong>. Discover the darkest areas near your location to plan your astrophotography and observation sessions under the best possible skies.</p>
+        <div class="tool-sources">Satellite data from <strong>VIIRS / DMSP</strong> sensors</div>
+        <a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="tool-cta" id="cta-lightpollution">
+          Open Map
+          <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zm-2 16H5V7h7V5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7h-2v7a0 0 0 0 1 0 0H7z"/></svg>
+        </a>
+      </div>
     </div>
-
-    <!-- Embedded Light Pollution Map application -->
-    <div class="iframe-wrapper">
-      <iframe src="https://www.lightpollutionmap.info/" title="Light Pollution Map App" class="map-iframe"></iframe>
-    </div>
-  </div>
+  </section>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Toggle Modo Noche
       const nightToggle = document.getElementById('nightmode-toggle');
       if (nightToggle) {
         nightToggle.addEventListener('click', () => {
