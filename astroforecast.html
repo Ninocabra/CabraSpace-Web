@@ -23,26 +23,32 @@
     }
 
     .tool-card {
-      max-width: 720px;
+      max-width: 780px;
       width: 100%;
       background: rgba(255,255,255,0.025);
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(207,171,74,0.15);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(207,171,74,0.04);
       transition: transform 0.35s ease, box-shadow 0.35s ease;
     }
     .tool-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 60px rgba(207,171,74,0.1);
+      box-shadow: 0 16px 60px rgba(207,171,74,0.12), 0 0 80px rgba(207,171,74,0.06);
+      border-color: rgba(207,171,74,0.25);
+    }
+
+    .tool-card-img-wrapper {
+      padding: 20px 20px 0;
     }
 
     .tool-card-img {
       width: 100%;
-      height: 340px;
-      object-fit: cover;
+      height: auto;
       display: block;
-      border-bottom: 1px solid var(--border-color);
+      border-radius: 10px;
+      border: 1px solid rgba(207,171,74,0.12);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 20px rgba(207,171,74,0.05);
     }
 
     .tool-card-body {
@@ -109,7 +115,7 @@
     }
 
     @media (max-width: 600px) {
-      .tool-card-img { height: 200px; }
+      .tool-card-img-wrapper { padding: 12px 12px 0; }
       .tool-card-body { padding: 24px 20px 32px; }
       .tool-card-body h1 { font-size: 1.35rem; }
       .tool-cta { padding: 12px 28px; font-size: 0.95rem; }
@@ -191,7 +197,9 @@
   <!-- Tool Hero Section -->
   <section class="tool-hero">
     <div class="tool-card">
-      <img src="img/nightvis-preview.png" alt="NightVis - Previsión astronómica" class="tool-card-img">
+      <div class="tool-card-img-wrapper">
+        <img src="img/nightvis-preview.png" alt="NightVis - Previsión astronómica" class="tool-card-img">
+      </div>
       <div class="tool-card-body">
 
         <h1>Astro <span>Forecast</span></h1>
