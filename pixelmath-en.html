@@ -828,6 +828,9 @@
       { id: 'stars_recompose', name: 'Recompose Stars', category: 'Star Operations', description: 'Adds stars back to the starless background nebula, setting the resulting stars brightness. Helps to manage star dominance over the background.', r: 'Starless + k * Stars', g: 'Starless + k * Stars', b: 'Starless + k * Stars', renderType: 'stars_add', sources: ['starless', 'stars'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.5, step: 0.05, value: 1.0 }] },
       { id: 'stars_reduction', name: 'Star Reduction', category: 'Star Operations', description: 'Attenuates stars proportionally, keeping only a percentage of the original star signal and blending the rest with the starless background.', r: 'Original * k + Starless * (1 - k)', g: 'Original * k + Starless * (1 - k)', b: 'Original * k + Starless * (1 - k)', renderType: 'stars_reduce', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Stars Percentage (k)', min: 0, max: 1, step: 0.05, value: 0.5 }] },
       { id: 'stars_reduction_coldest', name: 'Targeted Star Reduction "Coldest Nights"', category: 'Star Operations', description: 'Attenuates stars using conditionals so that brightness reduction is only applied to pixels where the original image is brighter than the starless version. Fully protects background sky and faint nebulosity.', r: 'iif(Original > Starless, Starless + (Original - Starless) * k, Original)', g: 'iif(Original > Starless, Starless + (Original - Starless) * k, Original)', b: 'iif(Original > Starless, Starless + (Original - Starless) * k, Original)', renderType: 'stars_reduce', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Residual Star Intensity (k)', min: 0, max: 1, step: 0.05, value: 0.40 }] },
+      { id: 'stars_reduction_screen', name: 'Screen Blend Star Reduction', category: 'Star Operations', description: 'Isolates the star layer (Original - Starless), attenuates it by a factor k, and recombines it with the starless version (Starless) using the Screen function. Prevents star clipping and blooming in bright nebular areas.', r: '~(~Starless * ~((Original - Starless) * k))', g: '~(~Starless * ~((Original - Starless) * k))', b: '~(~Starless * ~((Original - Starless) * k))', renderType: 'stars_reduction_screen', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.20, step: 0.05, value: 0.60 }] },
+      { id: 'stars_reduction_relativistic', name: 'Relativistic Star Reduction', category: 'Star Operations', description: 'Uses Einstein\'s special relativity velocity-addition formula to blend the reduced stars back onto the starless background. Achieves an extremely progressive, natural transition with zero risk of clipping or highlight bloating.', r: '((Original - Starless) * k + Starless) / (1 + (Original - Starless) * k * Starless)', g: '((Original - Starless) * k + Starless) / (1 + (Original - Starless) * k * Starless)', b: '((Original - Starless) * k + Starless) / (1 + (Original - Starless) * k * Starless)', renderType: 'stars_reduction_relativistic', sources: ['original', 'starless'], sliders: [{ id: 'k', label: 'Stars Intensity (k)', min: 0, max: 1.20, step: 0.05, value: 0.50 }] },
+      { id: 'stars_reduction_mtf', name: 'Non-Linear MTF Star Reduction', category: 'Star Operations', description: 'Applies a non-linear Midtones Transfer Function (MTF) to the isolated star layer (Original - Starless) before adding it back. By non-linearly darkening star halos, it effectively shrinks their visual diameter.', r: 'Starless + ((Original - Starless) * m) / ((m - 1) * (Original - Starless) + 1)', g: 'Starless + ((Original - Starless) * m) / ((m - 1) * (Original - Starless) + 1)', b: 'Starless + ((Original - Starless) * m) / ((m - 1) * (Original - Starless) + 1)', renderType: 'stars_reduction_mtf', sources: ['original', 'starless'], sliders: [{ id: 'm', label: 'MTF Midpoint (m)', min: 0.50, max: 0.95, step: 0.01, value: 0.70 }] },
       { id: 'stars_mask_diff', name: 'Clean Star Mask via Difference', category: 'Star Operations', description: 'Generates a precise monochrome star mask by subtracting the starless image from the original, forcing any values below zero to clip to absolute black to avoid background artifacts.', r: 'max(0, Original - Starless)', g: 'max(0, Original - Starless)', b: 'max(0, Original - Starless)', renderType: 'stars_add', sources: ['original', 'starless'], sliders: [] },
       { id: 'stars_halo_circular', name: 'Circular Star Halo Mask', category: 'Star Operations', description: 'Generates a faded circular mask around specific coordinates. Ideal for isolating and mitigating reflection halos or filter reflections around bright stars.', r: 'iif(sqrt((x() - center_x)^2 + (y() - center_y)^2) < radius, 1.0 - (sqrt((x() - center_x)^2 + (y() - center_y)^2) / radius) * edge, 0.0)', g: 'iif(sqrt((x() - center_x)^2 + (y() - center_y)^2) < radius, 1.0 - (sqrt((x() - center_x)^2 + (y() - center_y)^2) / radius) * edge, 0.0)', b: 'iif(sqrt((x() - center_x)^2 + (y() - center_y)^2) < radius, 1.0 - (sqrt((x() - center_x)^2 + (y() - center_y)^2) / radius) * edge, 0.0)', renderType: 'stars_add', sources: ['original'], sliders: [{ id: 'center_x', label: 'Center X', min: 0, max: 400, step: 5, value: 200 }, { id: 'center_y', label: 'Center Y', min: 0, max: 400, step: 5, value: 200 }, { id: 'radius', label: 'Radius in Pixels', min: 10, max: 200, step: 5, value: 60 }, { id: 'edge', label: 'Edge Fade', min: 0, max: 1.0, step: 0.05, value: 0.5 }] },
       { id: 'sho_magenta_stars_corr', name: 'Narrowband Magenta Stars Correction (SHO)', category: 'Star Operations', description: 'Detects stars with excessive Red and Blue relative to Green (artificial magenta stars typical of SHO processing) and aligns their level to the green channel, cleanly neutralizing the cast.', r: 'iif(R > G && B > G, G, R)', g: 'G', b: 'iif(R > G && B > G, G, B)', renderType: 'stars_reduce', sources: ['original'], sliders: [] },
@@ -1680,6 +1683,43 @@
           out[i]     = imgA[i] * k + imgB[i] * inv_k;
           out[i + 1] = imgA[i + 1] * k + imgB[i + 1] * inv_k;
           out[i + 2] = imgA[i + 2] * k + imgB[i + 2] * inv_k;
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'stars_reduction_screen') {
+        const k = s.k !== undefined ? s.k : 0.6;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const starless = imgB[i + c] / 255;
+            const stars = Math.max(0, imgA[i + c] - imgB[i + c]) / 255;
+            const blend = 1.0 - (1.0 - starless) * (1.0 - stars * k);
+            out[i + c] = Math.max(0, Math.min(255, blend * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'stars_reduction_relativistic') {
+        const k = s.k !== undefined ? s.k : 0.5;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const starless = imgB[i + c] / 255;
+            const stars = Math.max(0, imgA[i + c] - imgB[i + c]) / 255;
+            const blend = (stars * k + starless) / (1.0 + stars * k * starless);
+            out[i + c] = Math.max(0, Math.min(255, blend * 255));
+          }
+          out[i + 3] = 255;
+        }
+      }
+      else if (type === 'stars_reduction_mtf') {
+        const m = s.m !== undefined ? s.m : 0.7;
+        for (let i = 0; i < totalPixels * 4; i += 4) {
+          for (let c = 0; c < 3; c++) {
+            const starless = imgB[i + c] / 255;
+            const stars = Math.max(0, imgA[i + c] - imgB[i + c]) / 255;
+            const mtf_stars = (stars * m) / ((m - 1.0) * stars + 1.0);
+            const blend = starless + mtf_stars;
+            out[i + c] = Math.max(0, Math.min(255, blend * 255));
+          }
           out[i + 3] = 255;
         }
       } 
