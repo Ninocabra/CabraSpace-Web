@@ -136,6 +136,61 @@
       background: #020203;
     }
 
+    .player-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 300;
+      min-height: 200px;
+    }
+
+    .player-loading-spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin-loader 1s infinite linear;
+      margin-bottom: 12px;
+    }
+
+    /* Attribution credit */
+    .engine-attribution {
+      margin-top: 12px;
+      padding: 14px 18px;
+      background: rgba(207, 171, 74, 0.03);
+      border: 1px solid rgba(207, 171, 74, 0.08);
+      border-radius: 4px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .engine-attribution a {
+      color: var(--gold-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition-smooth);
+    }
+
+    .engine-attribution a:hover {
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    .engine-attribution .attr-icon {
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+
     /* Sidebar info */
     .podcast-sidebar {
       background: #08080a;
@@ -696,9 +751,13 @@
       <!-- Embedded Podcast Player -->
       <article class="premium-glass-card">
         <h2 class="section-headline">Reproductor de Episodios</h2>
-        <div class="player-container">
-          <!-- Acast Embed Show Player -->
-          <iframe src="https://embed.acast.com/$/coffee-break-senal-y-ruido" width="100%" height="480" frameBorder="0" style="border:none; display:block;" title="Coffee Break Acast Player"></iframe>
+        <p style="color: var(--text-muted); font-size: 0.82rem; font-weight: 300; margin-bottom: 10px;">Último episodio disponible · actualizado automáticamente</p>
+        <div class="player-container" id="podcast-player-container">
+          <!-- Loading state while fetching latest episode -->
+          <div class="player-loading" id="player-loading">
+            <span class="player-loading-spinner"></span>
+            <p>Cargando último episodio...</p>
+          </div>
         </div>
       </article>
     </section>
@@ -785,6 +844,13 @@
         Explora fragmentos de audio específicos de las tertulias semanales de Coffee Break clasificados en 8 disciplinas científicas clave. Usa el buscador o filtra por categorías para acceder directamente al minuto de la explicación en el reproductor oficial.
       </p>
 
+      <div class="engine-attribution">
+        <span class="attr-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        Este buscador temático utiliza datos generados por <a href="https://cb.awebaos.org" target="_blank" rel="noopener noreferrer">Sttcast</a>, un motor de búsqueda semántica para podcasts desarrollado por <a href="https://github.com/pulijon/Sttcast" target="_blank" rel="noopener noreferrer">José Miguel Robles Román</a>. Gracias a su trabajo, es posible navegar entre más de 1700 fragmentos transcritos y clasificados mediante inteligencia artificial.
+      </div>
+
       <!-- Selector de Categorías -->
       <div class="categories-container" id="categories-tabs">
         <!-- Dinámico -->
@@ -857,6 +923,45 @@
             localStorage.setItem('night-vision', 'disabled');
           }
         });
+      }
+
+      // Cargar último episodio dinámicamente desde el RSS de Acast
+      const playerContainer = document.getElementById('podcast-player-container');
+      const playerLoading = document.getElementById('player-loading');
+      if (playerContainer) {
+        const RSS_URL = 'https://feeds.acast.com/public/shows/coffee-break-senal-y-ruido';
+        fetch(RSS_URL)
+          .then(response => response.text())
+          .then(xmlText => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+            const items = xmlDoc.querySelectorAll('item');
+            if (items.length > 0) {
+              // Extraer el slug del episodio más reciente del link
+              const firstLink = items[0].querySelector('link');
+              let episodeSlug = '';
+              if (firstLink && firstLink.textContent) {
+                // El link tiene formato: https://shows.acast.com/coffee-break-senal-y-ruido/episodes/SLUG
+                const parts = firstLink.textContent.trim().split('/episodes/');
+                if (parts.length > 1) {
+                  episodeSlug = parts[1].split('?')[0];
+                }
+              }
+              if (episodeSlug) {
+                const embedUrl = `https://embed.acast.com/$/coffee-break-senal-y-ruido/${episodeSlug}`;
+                playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="200" frameBorder="0" style="border:none; display:block;" title="Coffee Break - Último Episodio"></iframe>`;
+              } else {
+                // Fallback: mostrar el player general del show
+                playerContainer.innerHTML = `<iframe src="https://embed.acast.com/$/coffee-break-senal-y-ruido" width="100%" height="480" frameBorder="0" style="border:none; display:block;" title="Coffee Break Acast Player"></iframe>`;
+              }
+            } else {
+              playerContainer.innerHTML = `<iframe src="https://embed.acast.com/$/coffee-break-senal-y-ruido" width="100%" height="480" frameBorder="0" style="border:none; display:block;" title="Coffee Break Acast Player"></iframe>`;
+            }
+          })
+          .catch(err => {
+            console.warn('No se pudo cargar el RSS, usando player general:', err);
+            playerContainer.innerHTML = `<iframe src="https://embed.acast.com/$/coffee-break-senal-y-ruido" width="100%" height="480" frameBorder="0" style="border:none; display:block;" title="Coffee Break Acast Player"></iframe>`;
+          });
       }
 
       // Lógica del Buscador Temático de Coffee Break
