@@ -966,6 +966,123 @@ def is_duplicate_product_introduction(title, known_models):
             
     return False, None
 
+def regenerate_markdown_catalog(db):
+    """Regenerates the markdown product catalog from the database entries."""
+    catalog_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "catalogo_productos.md")
+    
+    # 1. Map brands dynamically
+    brands_lower = {b.lower(): b for b in FABRICANTES}
+    extra_brands = {
+        "touptek": "ToupTek",
+        "zwo": "ZWO",
+        "pegasus": "Pegasus Astro",
+        "celestron": "Celestron",
+        "sky-watcher": "Sky-Watcher",
+        "skywatcher": "Sky-Watcher",
+        "william optics": "William Optics",
+        "askar": "Askar",
+        "sharpstar": "Sharpstar",
+        "svbony": "Svbony",
+        "qhy": "QHYCCD",
+        "player one": "Player One Astronomy",
+        "primalucelab": "PrimaLuceLab",
+        "planewave": "Planewave",
+        "explore scientific": "Explore Scientific",
+        "lunt": "Lunt Solar Systems",
+        "dwarflab": "Dwarflab",
+        "vespera": "Vaonis",
+        "stellina": "Vaonis",
+        "seestar": "ZWO",
+        "dwarf ii": "Dwarflab",
+        "siril": "Siril",
+        "stellarium": "Stellarium",
+        "phd2": "PHD2 Guiding",
+        "nina": "N.I.N.A.",
+        "indi": "INDI Library",
+        "ekos": "Ekos",
+        "kstars": "KStars"
+    }
+    for k, v in extra_brands.items():
+        if k not in brands_lower:
+            brands_lower[k] = v
+
+    known_models = extract_known_models(db)
+    
+    # Group products by manufacturer and category
+    grouped = {}
+    for entry in db:
+        mfg = None
+        tags = [t.strip() for t in entry.get("tags", [])]
+        
+        for tag in tags:
+            tag_lower = tag.lower()
+            if tag_lower in brands_lower:
+                mfg = brands_lower[tag_lower]
+                break
+                
+        if not mfg:
+            title_lower = entry.get("title_en", "").lower()
+            for b_low, b_name in brands_lower.items():
+                if b_low in title_lower:
+                    mfg = b_name
+                    break
+                    
+        if not mfg:
+            mfg = "Otros / No especificado"
+            
+        category = entry.get("category_en", "ACCESSORIES")
+        
+        model = None
+        for tag in tags:
+            tag_lower = tag.lower()
+            if tag_lower in known_models:
+                model = tag
+                break
+                
+        if not model:
+            model = "General / No especificado"
+            
+        if mfg not in grouped:
+            grouped[mfg] = {}
+        if category not in grouped[mfg]:
+            grouped[mfg][category] = {}
+        if model not in grouped[mfg][category]:
+            grouped[mfg][category][model] = []
+            
+        grouped[mfg][category][model].append({
+            "title": entry.get("title_es", entry.get("title_en", "")),
+            "date": entry.get("date", ""),
+            "url": entry.get("url", "")
+        })
+        
+    md_content = """# Catálogo de Equipamiento por Fabricante
+
+Este documento contiene la lista de todos los productos de astrofotografía y hardware identificados en la base de datos de CabraSpace (`equipamiento.json`) agrupados por fabricante y categoría. Se regenera automáticamente cada vez que se ejecuta el scraper.
+
+---
+"""
+    
+    for mfg in sorted(grouped.keys()):
+        if mfg == "Otros / No especificado" and len(grouped[mfg]) == 0:
+            continue
+        md_content += f"\n## {mfg}\n"
+        for category in sorted(grouped[mfg].keys()):
+            md_content += f"\n### {category}\n"
+            for model in sorted(grouped[mfg][category].keys()):
+                if model == "General / No especificado":
+                    md_content += f"- **Actualizaciones Generales / Revisiones:**\n"
+                else:
+                    md_content += f"- **Modelo: {model}**\n"
+                for item in grouped[mfg][category][model]:
+                    md_content += f"  - [{item['title']}]({item['url']}) ({item['date']})\n"
+                    
+    try:
+        with open(catalog_path, "w", encoding="utf-8") as f:
+            f.write(md_content)
+        print(f"Successfully updated markdown catalog at {catalog_path}")
+    except Exception as e:
+        print(f"Error writing markdown catalog: {e}")
+
 def main():
     print("Starting Astrophotography Equipment News Scraper...")
     gemini_key = os.environ.get("GEMINI_API_KEY")
@@ -1150,6 +1267,9 @@ def main():
         print(f"Successfully added {processed_count} new entries to equipamiento.json")
     else:
         print("No new relevant updates added in this run.")
+        
+    # Unconditionally regenerate the markdown product catalog at the end of the run
+    regenerate_markdown_catalog(db)
 
 if __name__ == "__main__":
     main()
