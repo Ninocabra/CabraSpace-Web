@@ -830,6 +830,142 @@ def process_fallback(item):
         "tags": list(dict.fromkeys(tags))[:6] # Unique elements, limit to 6
     }
 
+def extract_known_models(db):
+    """Extracts unique model names from the database tags, excluding brands and generic words."""
+    brands = {b.lower() for b in FABRICANTES} | {
+        "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron", 
+        "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one", 
+        "primalucelab", "planewave", "explore scientific", "dwarflab", "askar", 
+        "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos", 
+        "kstars", "seestar", "dwarf ii"
+    }
+    
+    # Generic keywords and phrases to exclude from being treated as models
+    generic = {
+        # Categories and product types (ES/EN)
+        "telescopio", "telescope", "cámara", "camera", "montura", "mount", 
+        "accesorio", "accessory", "accessories", "software", "firmware", 
+        "guiding", "filtro", "filter", "focuser", "rotator", "flattener", 
+        "reducer", "eyepiece", "ocular", "oculares", "binocular", "binoculares",
+        "binoculars", "prismáticos", "smart telescope", "guide scope",
+        "telescopios", "telescopes", "cámaras", "cameras", "monturas", "mounts",
+        "accesorios", "smart telescopes", "driver", "drivers", "app", "apps",
+        "web app", "web apps", "controller", "controllers", "sensor", "sensors",
+        "optics", "óptica", "ópticas", "optical", "mirror", "mirrors",
+        "adapter", "adapters", "adaptador", "adaptadores", "kit lens", "lens", "lente",
+        
+        # General astronomy and astrophotography terms
+        "astrophotography", "astrofotografía", "astronomy", "astronomía",
+        "deep sky", "deep-sky", "cielo profundo", "planetary", "planetaria",
+        "solar", "lunar", "wide-field", "campo amplio", "astroimaging",
+        "astrograph", "astrografo", "refractor", "newtonian", "newtoniano",
+        "dobsonian", "dobson", "schmidt-cassegrain", "sct", "apo", "apochromatic",
+        "apocromático", "triplet", "triplete", "mono", "color", "cooled",
+        "enfriada", "infrarrojo", "infrared", "ir", "light pollution",
+        "contaminación lumínica", "dark sky", "bortle", "seeing", "guia",
+        "guide", "guiado", "autoguiding", "dithering", "polar alignment",
+        "alineación", "alignment", "collimation", "colimación", "focusing",
+        "focus", "focal", "aperture", "apertura", "focal ratio",
+        "vía láctea", "milky way", "moon", "sun", "stars", "star",
+        
+        # Action, type of resource and content terms
+        "review", "unboxing", "setup", "tutorial", "guía", "guide", "tips",
+        "tricks", "first look", "first impressions", "primeras impresiones",
+        "test", "testing", "comparativa", "comparison", "overview", "leak",
+        "rumor", "leak/rumor", "news", "noticias", "anuncio", "announcement",
+        "lanzamiento", "launch", "release", "update", "actualización", "diy",
+        "modificación", "modification", "cleaning", "limpieza", "build",
+        "building", "remote control", "control remoto", "automation",
+        "automatización", "observatory", "observatorio", "planning",
+        "scheduler", "secuenciador", "sequencer", "software update",
+        "firmware update", "processing", "procesamiento", "compatibility",
+        "compatibilidad", "troubleshooting", "error", "problem",
+        
+        # Target audience and general adjectives
+        "beginner", "beginners", "principiante", "principiantes", "first",
+        "primero", "primer", "best", "mejor", "mejores", "top", "budget",
+        "cheap", "barato", "expensive", "premium", "pro", "professional",
+        "profesional", "affordable", "new", "nuevo", "nueva", "latest",
+        "último", "actual", "modern", "moderno", "portable", "compact",
+        "compacto", "innovación", "innovation", "tech", "technology",
+        
+        # Miscellaneous words found in tags
+        "actualización", "astrofotografía ir", "astrografía", "astroimaging software",
+        "astronomy apps", "astronomy camera", "astronomy forecast", "astronómica",
+        "astrophotografía", "astrophotography camera", "astrophotography mount",
+        "astrophotography software", "astrophotography tips", "guiding kit",
+        "mirror cleaning", "monocromática", "montura altazimutal",
+        "observation", "observación", "observación astronómica", "observación solar",
+        "observatory setup", "observatory system", "observing planner",
+        "optical accessories", "outdoor setup", "photometry", "primer telescopio",
+        "radio telescope software", "recommendations", "remote system",
+        "revisión", "revisión equipamiento", "software update", "solar camera",
+        "solar telescope", "telescope accessory", "telescope automation",
+        "telescope control", "telescope enclosure", "telescope mirror",
+        "telescope mount", "telescope review", "telescope selection",
+        "telescope tube", "telescope upgrades", "telescopio apocromático",
+        "telescopio solar", "visual telescope", "weatherproof", "web app",
+        "wide-field astrophotography", "equipment comparison", "equipo",
+        "new product", "novedad", "novedades", "nuevo producto", "reddit",
+        "stargazers lounge", "pixinsight"
+    }
+    
+    known_models = set()
+    for entry in db:
+        for tag in entry.get("tags", []):
+            tag_clean = tag.strip().lower()
+            # Exclude brand names, generic words, or tags that are empty/too short
+            if tag_clean and len(tag_clean) > 2 and tag_clean not in brands and tag_clean not in generic:
+                known_models.add(tag_clean)
+                
+    return known_models
+
+
+def is_duplicate_product_introduction(title, known_models):
+    """
+    Checks if a candidate title contains a known model name AND introductory keywords
+    indicating it is a duplicate introduction/unboxing/presentation.
+    """
+    title_lower = title.lower()
+    
+    # Normalize a string by removing spaces and non-alphanumeric characters
+    def normalize_str(s):
+        return re.sub(r'[^a-z0-9]', '', s)
+        
+    title_normalized = normalize_str(title_lower)
+    
+    matched_model = None
+    for model in known_models:
+        model_normalized = normalize_str(model)
+        if not model_normalized:
+            continue
+        # If the model is a short code (e.g. 3 chars like 'am5'), matching it as a substring of normalized title might be risky
+        # but since 'am5' would be in 'zwoam5mount', it works. Let's make sure it is not too short.
+        if len(model_normalized) <= 3:
+            if re.search(r'\b' + re.escape(model) + r'\b', title_lower):
+                matched_model = model
+                break
+        else:
+            if model_normalized in title_normalized:
+                matched_model = model
+                break
+                
+    if not matched_model:
+        return False, None
+        
+    introductory_keywords = [
+        "presentando", "presentacion", "presentación", "presenta", "presentamos", 
+        "introducing", "introduction", "introduces", "unveiling", "first look", 
+        "first impression", "primeras impresiones", "unboxing", "lanzamiento", "launch", 
+        "anuncio de", "announcing", "anunciando", "new product", "nuevo producto"
+    ]
+    
+    for keyword in introductory_keywords:
+        if keyword in title_lower:
+            return True, matched_model
+            
+    return False, None
+
 def main():
     print("Starting Astrophotography Equipment News Scraper...")
     gemini_key = os.environ.get("GEMINI_API_KEY")
@@ -841,6 +977,8 @@ def main():
         
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
+    known_models = extract_known_models(db)
+    print(f"Extracted {len(known_models)} known product models from database tags.")
     
     # Gather candidates from all feeds
     candidates = []
@@ -924,6 +1062,12 @@ def main():
                 print(f"Skipping off-topic candidate (pre-filtered): '{item['title']}' from {item['source']}")
                 continue
             
+        # Check if candidate is a duplicate product introduction
+        is_dup, matched_m = is_duplicate_product_introduction(item['title'], known_models)
+        if is_dup:
+            print(f"Skipping duplicate product introduction (pre-filtered): '{item['title']}' matches known model '{matched_m}'")
+            continue
+            
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
@@ -975,6 +1119,24 @@ def main():
             processed_item = process_fallback(item)
             
         if processed_item:
+            # Post-filter check using AI-extracted tags or translated titles
+            is_dup_post = False
+            matched_tag = None
+            for tag in processed_item.get('tags', []):
+                tag_clean = tag.strip().lower()
+                if tag_clean in known_models:
+                    for title_field in ['title_es', 'title_en']:
+                        val, matched_m = is_duplicate_product_introduction(processed_item[title_field], {tag_clean})
+                        if val:
+                            is_dup_post = True
+                            matched_tag = tag_clean
+                            break
+                if is_dup_post:
+                    break
+            if is_dup_post:
+                print(f"Skipping duplicate product introduction (post-filtered): '{processed_item['title_en']}' matches known model '{matched_tag}'")
+                continue
+                
             updates_to_add.append(processed_item)
             processed_count += 1
             
