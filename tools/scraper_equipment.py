@@ -1089,8 +1089,10 @@ def main():
     groq_key = os.environ.get("GROQ_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     
+    is_dry_run = False
     if not gemini_key and not groq_key and not deepseek_key:
-        print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode.")
+        print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode (database will not be modified).")
+        is_dry_run = True
         
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
@@ -1263,13 +1265,17 @@ def main():
         # Trim database if it exceeds max size
         if len(db) > MAX_DB_SIZE:
             db = db[:MAX_DB_SIZE]
-        save_database(db)
-        print(f"Successfully added {processed_count} new entries to equipamiento.json")
+        
+        if not is_dry_run:
+            save_database(db)
+            print(f"Successfully added {processed_count} new entries to equipamiento.json")
+            regenerate_markdown_catalog(db)
+        else:
+            print(f"[DRY-RUN] Found {processed_count} new entries, but database was not modified.")
     else:
         print("No new relevant updates added in this run.")
-        
-    # Unconditionally regenerate the markdown product catalog at the end of the run
-    regenerate_markdown_catalog(db)
+        if not is_dry_run:
+            regenerate_markdown_catalog(db)
 
 if __name__ == "__main__":
     main()

@@ -47,8 +47,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Explore Scientific
 
 ### ACCESSORIES
-- **Modelo: Equipamiento**
-  - [178th Global Star Party — Signals From the Stars (Explore Scientific (YouTube))](https://www.youtube.com/watch?v=wpTZSSp86vo) (2026-06-10)
 - **Modelo: eyepieces**
   - [Cómo limpiar y almacenar tus oculares: consejos de Explore Scientific](https://www.youtube.com/shorts/3d9hTWm_gl0) (2025-12-22)
 
@@ -102,8 +100,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### MOUNTS
 - **Modelo: Cuiv The Lazy Geek**
   - [Montura de seguimiento de cohetes: de demo a montaje exterior resistente a la intemperie](https://www.youtube.com/shorts/IYkqkAOXWSM) (2026-05-25)
-- **Modelo: Equipamiento**
-  - [New Mount Arrived - Scorpio Astro SA-17M (Stargazers Lounge)](https://stargazerslounge.com/topic/445101-new-mount-arrived-scorpio-astro-sa-17m/) (2026-06-10)
 - **Modelo: Saturn**
   - [Nueva montura Saturn: la próxima gran innovación](https://www.youtube.com/shorts/VxK2DBVOdCM) (2026-05-25)
 - **Modelo: harmonic drive mount**
@@ -311,18 +307,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tutorial de StellaVita App 2.0: Configuración de Plan de Captura](https://www.youtube.com/watch?v=2b8Obk4QVUw) (2026-05-12)
 
 ### TELESCOPES
-- **Modelo: Equipamiento**
-  - [Journey Beyond Light-Years with HOPE D60. ✨ #touptek #space #astronomy #telescope (ToupTek Astro)](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
 - **Modelo: HOPE D60**
   - [Unboxing del telescopio HOPE D60 de ToupTek](https://www.youtube.com/shorts/OlJ7FbLOPVo) (2026-04-27)
 
 ## ZWO
 
 ### ACCESSORIES
-- **Modelo: Equipamiento**
-  - [✨ "If there is something you want to do, you should go do it." #zwo #space #astrophotography (ZWO (YouTube))](https://www.youtube.com/shorts/xalQ4gjH72I) (2026-06-09)
-  - [The Eclipse That Started a Journey to the Stars ——Willie’s ZWO journey (ZWO)](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
-  - [Solo and Symphony Under the Stars: Guillermo Cervantes Mosqueda’s 12-Year Cosmic Journey (ZWO)](https://www.zwoastro.com/2026/06/08/guillermo-cervantes-astrophotography-journey/) (2026-06-08)
 - **Modelo: star tracker**
   - [Ya no necesitas una Star Tracker para Astrofotografía](https://www.youtube.com/watch?v=tvPlLafd7sk) (2026-06-07)
 
@@ -341,7 +331,5 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Configuración completa de ASIAir en observatorio](https://www.youtube.com/watch?v=4HbqlIXPiaE) (2026-05-30)
 
 ### TELESCOPES
-- **Modelo: Equipamiento**
-  - [NASA’s Space and Terrestrial telescopes vs my telescope  #nasa #space #astronomy #zwo #telescope (ZWO (YouTube))](https://www.youtube.com/shorts/1FCsp-pGnwE) (2026-06-10)
 - **Modelo: distributed aperture**
   - [Telescopios de apertura distribuida de ZWO](https://www.zwoastro.com/2026/04/24/distributed-aperture-telescopes/) (2026-04-24)
