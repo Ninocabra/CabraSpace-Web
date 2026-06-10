@@ -359,7 +359,7 @@
             <button id="zoomOut" class="btn-action" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(7, 7, 8, 0.85); border-color: var(--border-color); font-weight: bold; border-radius: 4px; color: var(--text-primary);" title="Alejar (Rueda de ratón)">-</button>
             <button id="zoomReset" class="btn-action" style="padding: 4px 8px; font-size: 0.72rem; background: rgba(7, 7, 8, 0.85); border-color: var(--border-color); border-radius: 4px; color: var(--text-primary);" title="Restablecer (Doble clic en imagen)">1:1</button>
           </div>
-          <div id="hint" style="color: var(--text-secondary); text-align: center; padding: 24px; font-size: 0.9rem; font-weight: 300;">
+          <div id="hint" style="position: absolute; color: var(--text-secondary); text-align: center; padding: 24px; font-size: 0.9rem; font-weight: 300; z-index: 5; max-width: 80%; pointer-events: none;">
             Carga una imagen lineal (FITS, XISF, TIFF de 16 bits, PNG o JPG) para comenzar
           </div>
           <canvas id="cv" width="640" height="360"></canvas>
