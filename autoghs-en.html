@@ -354,6 +354,12 @@
             <div class="spinner"></div>
             <span>Processing AutoGHS...</span>
           </div>
+          <!-- Floating Zoom Controls -->
+          <div id="zoomControls" style="display: none; position: absolute; top: 12px; right: 12px; gap: 6px; z-index: 15; opacity: 0.8; transition: opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.8'">
+            <button id="zoomIn" class="btn-action" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(7, 7, 8, 0.85); border-color: var(--border-color); font-weight: bold; border-radius: 4px; color: var(--text-primary);" title="Zoom In (Mouse Wheel)">+</button>
+            <button id="zoomOut" class="btn-action" style="padding: 4px 8px; font-size: 0.85rem; background: rgba(7, 7, 8, 0.85); border-color: var(--border-color); font-weight: bold; border-radius: 4px; color: var(--text-primary);" title="Zoom Out (Mouse Wheel)">-</button>
+            <button id="zoomReset" class="btn-action" style="padding: 4px 8px; font-size: 0.72rem; background: rgba(7, 7, 8, 0.85); border-color: var(--border-color); border-radius: 4px; color: var(--text-primary);" title="Reset (Double click on image)">1:1</button>
+          </div>
           <div id="hint" style="color: var(--text-secondary); text-align: center; padding: 24px; font-size: 0.9rem; font-weight: 300;">
             Upload a linear image (FITS, XISF, 16-bit TIFF, PNG or JPG) to start
           </div>
@@ -488,6 +494,23 @@
 
     let ORIG = null;        // { ch, w, h, nc, isColor }
 
+    // Zoom and Pan control variables
+    let zoom = 1;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+
+    function updateTransform() {
+      cv.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    }
+
+    function resetZoom() {
+      zoom = 1;
+      panX = 0;
+      panY = 0;
+      updateTransform();
+    }
+
     function setStatus(msg, cls) { 
       statusEl.textContent = msg || ""; 
       statusEl.className = "status" + (cls ? " " + cls : ""); 
@@ -506,6 +529,9 @@
           (capped.w !== loaded.w ? " (downsampled to " + capped.w + "×" + capped.h + " for preview)" : "");
         
         hint.style.display = "none";
+        el("zoomControls").style.display = "flex";
+        cv.style.cursor = "grab";
+        resetZoom();
         el("runBtn").disabled = false;
         setStatus("Image loaded. Applying AutoGHS stretch...");
         apply();
@@ -605,6 +631,70 @@
     // Prevent default browser behavior (opening file) on window drag & drop
     window.addEventListener("dragover", (e) => { e.preventDefault(); }, false);
     window.addEventListener("drop", (e) => { e.preventDefault(); }, false);
+
+    // Zoom and Pan event listeners
+    const wrapper = document.querySelector(".canvas-wrapper");
+    wrapper.addEventListener("wheel", (e) => {
+      if (!ORIG) return;
+      e.preventDefault();
+      const zoomFactor = 1.15;
+      if (e.deltaY < 0) {
+        zoom = Math.min(15, zoom * zoomFactor);
+      } else {
+        zoom = Math.max(0.8, zoom / zoomFactor);
+      }
+      if (zoom === 1) {
+        panX = 0;
+        panY = 0;
+      }
+      updateTransform();
+    }, { passive: false });
+
+    cv.addEventListener("mousedown", (e) => {
+      if (!ORIG) return;
+      isDragging = true;
+      dragStartX = e.clientX - panX;
+      dragStartY = e.clientY - panY;
+      cv.style.cursor = "grabbing";
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - dragStartX;
+      panY = e.clientY - dragStartY;
+      updateTransform();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        cv.style.cursor = "grab";
+      }
+    });
+
+    cv.addEventListener("dblclick", () => {
+      resetZoom();
+    });
+
+    el("zoomIn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!ORIG) return;
+      zoom = Math.min(15, zoom * 1.25);
+      updateTransform();
+    });
+
+    el("zoomOut").addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!ORIG) return;
+      zoom = Math.max(0.8, zoom / 1.25);
+      if (zoom === 1) { panX = 0; panY = 0; }
+      updateTransform();
+    });
+
+    el("zoomReset").addEventListener("click", (e) => {
+      e.stopPropagation();
+      resetZoom();
+    });
 
     el("runBtn").addEventListener("click", apply);
     
