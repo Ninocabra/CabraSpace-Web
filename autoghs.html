@@ -341,12 +341,12 @@
     <div class="pm-grid">
       <!-- Columna simulador (Sticky) -->
       <section class="simulator-card">
-        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
+        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
+          <div style="min-width: 0; flex: 1 1 200px;">
             <label style="display:block; margin-bottom:4px; font-size:0.62rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Imagen Activa</label>
-            <h3 id="imageFileName" style="font-family:var(--font-display); font-size:1.1rem; color:var(--gold-primary); margin:0; font-weight:500;">Ninguna imagen cargada</h3>
+            <h3 id="imageFileName" style="font-family:var(--font-display); font-size:1.1rem; color:var(--gold-primary); margin:0; font-weight:500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="Ninguna imagen cargada">Ninguna imagen cargada</h3>
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);" id="meta"></div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right; min-width: 0; flex: 0 1 auto;" id="meta"></div>
         </div>
 
         <div class="canvas-wrapper">
@@ -501,6 +501,7 @@
         ORIG = { ch: capped.ch, w: capped.w, h: capped.h, nc: loaded.nc, isColor: loaded.isColor };
         
         el("imageFileName").textContent = file.name;
+        el("imageFileName").title = file.name;
         metaEl.textContent = loaded.w + "×" + loaded.h + " px · " + (loaded.isColor ? "Color" : "Monocromo") +
           (capped.w !== loaded.w ? " (downsampleado a " + capped.w + "×" + capped.h + " para previsualización)" : "");
         
@@ -569,6 +570,42 @@
     el("selColor").addEventListener("change", () => { if (el("autoApply").checked) apply(); });
     el("file").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
     el("fileLabel").addEventListener("click", () => el("file").click());
+
+    // Soporte para arrastrar y soltar (drag & drop) en fileLabel
+    const fileLabel = el("fileLabel");
+    ["dragenter", "dragover"].forEach((eventName) => {
+      fileLabel.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileLabel.style.borderColor = "var(--gold-primary)";
+        fileLabel.style.background = "rgba(212, 175, 55, 0.08)";
+        fileLabel.style.boxShadow = "0 0 15px rgba(212, 175, 55, 0.15)";
+      }, false);
+    });
+    ["dragleave", "dragend"].forEach((eventName) => {
+      fileLabel.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileLabel.style.borderColor = "";
+        fileLabel.style.background = "";
+        fileLabel.style.boxShadow = "";
+      }, false);
+    });
+    fileLabel.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileLabel.style.borderColor = "";
+      fileLabel.style.background = "";
+      fileLabel.style.boxShadow = "";
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    }, false);
+
+    // Evitar comportamiento predeterminado (abrir archivo) en el resto de la ventana
+    window.addEventListener("dragover", (e) => { e.preventDefault(); }, false);
+    window.addEventListener("drop", (e) => { e.preventDefault(); }, false);
+
     el("runBtn").addEventListener("click", apply);
     
     el("resetBtn").addEventListener("click", () => {
