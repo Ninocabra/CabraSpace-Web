@@ -1167,6 +1167,7 @@
         
         <div class="detail-actions">
           <button class="btn-action" id="btnCopyDetails">Copiar Fórmula</button>
+          <button class="btn-action" id="btnExportXpsm">Exportar Icono (.xpsm)</button>
           <button class="btn-action btn-primary-action" id="btnLoadDetails">
             Cargar en Simulador
           </button>
@@ -1188,6 +1189,79 @@
             btn.style.color = "";
           }, 1500);
         });
+      });
+
+      // Export process icon event
+      document.getElementById('btnExportXpsm').addEventListener('click', () => {
+        function escapeXml(unsafe) {
+          return unsafe.replace(/[<>&'"]/g, function (c) {
+            switch (c) {
+              case '<': return '&lt;';
+              case '>': return '&gt;';
+              case '&': return '&amp;';
+              case '\'': return '&apos;';
+              case '"': return '&quot;';
+            }
+          });
+        }
+
+        const isSingle = !!formula.rgb;
+        const expr = isSingle ? replaceVariables(formula.rgb, formula) : "";
+        const exprR = !isSingle ? replaceVariables(formula.r, formula) : "";
+        const exprG = !isSingle ? replaceVariables(formula.g, formula) : "";
+        const exprB = !isSingle ? replaceVariables(formula.b, formula) : "";
+        const exprA = !isSingle ? replaceVariables(formula.a || "", formula) : "";
+        const symbolsStr = formula.symbols ? replaceVariables(formula.symbols, formula) : "";
+
+        const safeExpr = escapeXml(expr);
+        const safeExprR = escapeXml(exprR);
+        const safeExprG = escapeXml(exprG);
+        const safeExprB = escapeXml(exprB);
+        const safeExprA = escapeXml(exprA);
+        const safeSymbols = escapeXml(symbolsStr);
+
+        const cleanName = formula.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        const newImageId = cleanName + "_Result";
+
+        const xmlText = `<?xml version="1.0" encoding="UTF-8"?>
+<xpsm version="1.0" xmlns="http://www.pixinsight.com/xpsm">
+   <instance class="PixelMath" version="1.0">
+      <parameter id="expression">${safeExpr}</parameter>
+      <parameter id="expression0">${safeExprR || safeExpr}</parameter>
+      <parameter id="expression1">${safeExprG}</parameter>
+      <parameter id="expression2">${safeExprB}</parameter>
+      <parameter id="expression3">${safeExprA}</parameter>
+      <parameter id="expressionR">${safeExprR}</parameter>
+      <parameter id="expressionG">${safeExprG}</parameter>
+      <parameter id="expressionB">${safeExprB}</parameter>
+      <parameter id="expressionA">${safeExprA}</parameter>
+      <parameter id="useSingleExpression">${isSingle}</parameter>
+      <parameter id="symbols">${safeSymbols}</parameter>
+      <parameter id="generateManagedImage">false</parameter>
+      <parameter id="newImageId">${newImageId}</parameter>
+      <parameter id="newImageColorSpace">Same</parameter>
+      <parameter id="newImageSampleFormat">Same</parameter>
+      <parameter id="newImageWidth">0</parameter>
+      <parameter id="newImageHeight">0</parameter>
+      <parameter id="newImagePixelAspect">1</parameter>
+      <parameter id="newImageColorSpace_v">0</parameter>
+      <parameter id="newImageSampleFormat_v">0</parameter>
+      <parameter id="newImageMode">0</parameter>
+      <parameter id="newImageActive">false</parameter>
+      <parameter id="showImage">true</parameter>
+      <parameter id="clearImage">true</parameter>
+   </instance>
+</xpsm>`;
+
+        const blob = new Blob([xmlText], { type: 'application/xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${formula.id}.xpsm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       });
 
       // Load preset in simulator event
@@ -1321,7 +1395,7 @@
         // Hidden file input selector
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = 'image/*';
+        fileInput.accept = 'image/*,.fits,.fit';
         fileInput.style.display = 'none';
         box.appendChild(fileInput);
 
@@ -1547,8 +1621,17 @@
 
     function handleCustomImageUpload(key, file, canvasEl) {
       if (!file) return;
+      
+      const fileName = file.name.toLowerCase();
+      const isFits = fileName.endsWith('.fits') || fileName.endsWith('.fit');
+      
+      if (isFits) {
+        processFitsFile(key, file, canvasEl);
+        return;
+      }
+      
       if (!file.type.startsWith('image/')) {
-        alert("Error: El formato del archivo no es una imagen. Por favor, carga archivos PNG, JPG o WebP.");
+        alert("Error: El formato del archivo no es una imagen. Por favor, carga archivos PNG, JPG, WebP, FITS o FIT.");
         return;
       }
       
@@ -1594,6 +1677,223 @@
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    }
+
+    function processFitsFile(key, file, canvasEl) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const arrayBuffer = e.target.result;
+          const dataView = new DataView(arrayBuffer);
+          let offset = 0;
+          let header = "";
+          let simple = false;
+          let bitpix = 0;
+          let naxis = 0;
+          let naxis1 = 0;
+          let naxis2 = 0;
+          let bscale = 1.0;
+          let bzero = 0.0;
+
+          // Read header blocks (2880 bytes each)
+          let headerEnded = false;
+          while (offset < arrayBuffer.byteLength && !headerEnded) {
+            if (offset + 2880 > arrayBuffer.byteLength) {
+              throw new Error("Archivo FITS truncado en la cabecera.");
+            }
+            const blockBytes = new Uint8Array(arrayBuffer, offset, 2880);
+            
+            // Build string manually to avoid maximum stack size exceed with String.fromCharCode
+            let blockText = "";
+            for (let i = 0; i < 2880; i++) {
+              blockText += String.fromCharCode(blockBytes[i]);
+            }
+            
+            header += blockText;
+            offset += 2880;
+
+            for (let i = 0; i < 36; i++) {
+              const line = blockText.substring(i * 80, (i + 1) * 80).trim();
+              if (line.startsWith("END")) {
+                headerEnded = true;
+                break;
+              }
+            }
+          }
+
+          if (!headerEnded) {
+            throw new Error("No se encontró la palabra clave END en la cabecera FITS.");
+          }
+
+          // Parse header fields
+          const records = header.match(/.{80}/g) || [];
+          records.forEach(record => {
+            const cardKey = record.substring(0, 8).trim();
+            const valPart = record.substring(8).trim();
+            
+            let val = "";
+            if (valPart.startsWith("=")) {
+              let rest = valPart.substring(1).trim();
+              const slashIdx = rest.indexOf("/");
+              if (slashIdx !== -1) {
+                rest = rest.substring(0, slashIdx).trim();
+              }
+              if (rest.startsWith("'")) {
+                const lastQuote = rest.lastIndexOf("'");
+                val = rest.substring(1, lastQuote).trim();
+              } else {
+                val = rest.trim();
+              }
+            }
+
+            if (cardKey === "SIMPLE") {
+              simple = (val === "T");
+            } else if (cardKey === "BITPIX") {
+              bitpix = parseInt(val, 10);
+            } else if (cardKey === "NAXIS") {
+              naxis = parseInt(val, 10);
+            } else if (cardKey === "NAXIS1") {
+              naxis1 = parseInt(val, 10);
+            } else if (cardKey === "NAXIS2") {
+              naxis2 = parseInt(val, 10);
+            } else if (cardKey === "BSCALE") {
+              bscale = parseFloat(val);
+            } else if (cardKey === "BZERO") {
+              bzero = parseFloat(val);
+            }
+          });
+
+          if (!simple) {
+            throw new Error("El archivo no es un FITS estándar válido (SIMPLE != T).");
+          }
+          if (naxis < 2) {
+            throw new Error("El archivo FITS debe tener al menos 2 dimensiones (NAXIS >= 2).");
+          }
+
+          // Byte size per pixel based on BITPIX
+          let byteSize = 1;
+          if (bitpix === 16) byteSize = 2;
+          else if (bitpix === 32 || bitpix === -32) byteSize = 4;
+          else if (bitpix === -64) byteSize = 8;
+
+          // Downsample to 400x400 float array in one go
+          const targetW = 400;
+          const targetH = 400;
+          const rawData = new Float32Array(targetW * targetH);
+
+          for (let ty = 0; ty < targetH; ty++) {
+            const sy = Math.min(naxis2 - 1, Math.max(0, Math.floor(ty * (naxis2 / targetH))));
+            for (let tx = 0; tx < targetW; tx++) {
+              const sx = Math.min(naxis1 - 1, Math.max(0, Math.floor(tx * (naxis1 / targetW))));
+              const srcIndex = sy * naxis1 + sx;
+              const pixelOffset = offset + srcIndex * byteSize;
+
+              if (pixelOffset + byteSize > arrayBuffer.byteLength) {
+                throw new Error("El bloque de datos del FITS está incompleto.");
+              }
+
+              let val = 0.0;
+              if (bitpix === 8) {
+                val = dataView.getUint8(pixelOffset);
+              } else if (bitpix === 16) {
+                val = dataView.getInt16(pixelOffset, false);
+              } else if (bitpix === 32) {
+                val = dataView.getInt32(pixelOffset, false);
+              } else if (bitpix === -32) {
+                val = dataView.getFloat32(pixelOffset, false);
+              } else if (bitpix === -64) {
+                val = dataView.getFloat64(pixelOffset, false);
+              }
+              rawData[ty * targetW + tx] = val * bscale + bzero;
+            }
+          }
+
+          // --- AUTO-STF Stretch ---
+          // 1. Find Min/Max to normalize to [0, 1]
+          let minVal = rawData[0];
+          let maxVal = rawData[0];
+          for (let i = 1; i < rawData.length; i++) {
+            const v = rawData[i];
+            if (v < minVal) minVal = v;
+            if (v > maxVal) maxVal = v;
+          }
+
+          const range = maxVal - minVal;
+          const normData = new Float32Array(rawData.length);
+          if (range > 0) {
+            for (let i = 0; i < rawData.length; i++) {
+              normData[i] = (rawData[i] - minVal) / range;
+            }
+          }
+
+          // 2. Compute Median of normData
+          const sorted = new Float32Array(normData);
+          sorted.sort();
+          const median = sorted[Math.floor(sorted.length / 2)];
+
+          // 3. Compute MAD (Median Absolute Deviation) of normData
+          const absoluteDeviations = new Float32Array(normData.length);
+          for (let i = 0; i < normData.length; i++) {
+            absoluteDeviations[i] = Math.abs(normData[i] - median);
+          }
+          absoluteDeviations.sort();
+          const mad = absoluteDeviations[Math.floor(absoluteDeviations.length / 2)];
+
+          // 4. Calculate Shadow Clipping and Midtones parameter
+          const c_shadow = Math.max(0.0, Math.min(1.0, median - 2.8 * mad));
+          const target_bg = 0.25;
+
+          let m = 0.5;
+          if (median > c_shadow) {
+            const m_clip = Math.max(0.0, Math.min(1.0, (median - c_shadow) / (1.0 - c_shadow)));
+            if (m_clip > 0 && m_clip < 1) {
+              m = (m_clip * (target_bg - 1.0)) / (m_clip * (2.0 * target_bg - 1.0) - target_bg);
+            }
+          }
+          m = Math.max(0.0001, Math.min(0.9999, m));
+
+          // 5. Apply STF stretching to the target image buffer
+          const totalPixels = targetW * targetH;
+          const imgData = new Uint8ClampedArray(totalPixels * 4);
+
+          for (let i = 0; i < totalPixels; i++) {
+            const p = normData[i];
+            let stretched = 0.0;
+            if (p > c_shadow) {
+              const x = Math.min(1.0, (p - c_shadow) / (1.0 - c_shadow));
+              stretched = (m - 1.0) * x / ((2.0 * m - 1.0) * x - m);
+            }
+            const gray = Math.max(0, Math.min(255, Math.round(stretched * 255)));
+            const idx = i * 4;
+            imgData[idx]     = gray;
+            imgData[idx + 1] = gray;
+            imgData[idx + 2] = gray;
+            imgData[idx + 3] = 255;
+          }
+
+          // Override local channel buffer
+          channels[key] = imgData;
+
+          // Redraw this input canvas
+          drawChannelToCanvas(key, canvasEl);
+
+          // Rerun active simulation
+          runSimulation();
+
+          // Gold glow success feedback
+          canvasEl.classList.remove('upload-success');
+          void canvasEl.offsetWidth; // reflow trigger
+          canvasEl.classList.add('upload-success');
+
+        } catch (err) {
+          console.error(err);
+          alert("Error al cargar el archivo FITS: " + err.message);
+        }
+      };
+      reader.onerror = () => {
+        alert("Error al leer el archivo FITS.");
+      };
+      reader.readAsArrayBuffer(file);
     }
 
 
