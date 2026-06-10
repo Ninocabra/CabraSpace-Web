@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="icon" href="favicon_cabra.png" type="image/png">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoGHS - CabraSpace</title>
+  <meta name="description" content="Estirado de imágenes astronómicas mediante el algoritmo AutoGHS (Generalised Hyperbolic Stretch) adaptado a la web.">
+  <link rel="stylesheet" href="index.css?v=1.2">
+  <link rel="stylesheet" href="support.css">
+  <style>
+    /* Estilos específicos para AutoGHS */
+    .pixelmath-header {
+      padding-top: 150px;
+      padding-bottom: 36px;
+      text-align: center;
+    }
+    
+    .pm-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .pm-subtitle {
+      color: var(--text-secondary);
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .pm-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-bottom: 60px;
+      align-items: start;
+    }
+
+    @media (min-width: 1200px) {
+      .pm-grid {
+        grid-template-columns: 1fr 440px;
+      }
+    }
+
+    /* Card de simulación (Sticky) */
+    .simulator-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #cv {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .canvas-loader {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 2, 2, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-primary);
+      font-size: 0.9rem;
+      gap: 12px;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(207, 171, 74, 0.2);
+      border-top-color: var(--gold-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Controles y Sliders */
+    .controls-group {
+      margin-bottom: 14px;
+    }
+
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .control-title {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .control-val {
+      font-family: monospace;
+      color: var(--gold-primary);
+    }
+
+    .pm-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-color);
+      outline: none;
+      margin-bottom: 10px;
+      transition: background 0.3s;
+    }
+
+    .pm-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--gold-glow);
+      transition: transform 0.1s;
+    }
+
+    .pm-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Consola */
+    .pm-console {
+      background: #020202;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #e0e0e0;
+      position: relative;
+    }
+
+    .console-header {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-upload-zone {
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      background: #020202;
+      display: block;
+      color: var(--gold-primary);
+      font-weight: 500;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+    
+    .file-upload-zone:hover {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.02);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.05);
+    }
+
+    /* Estructura Master-Detail */
+    .library-card {
+      background: #070708;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-action {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-action:hover:not(:disabled) {
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .btn-action.btn-primary-action {
+      border-color: var(--gold-primary);
+      background: rgba(207, 171, 74, 0.05);
+      color: var(--gold-primary);
+    }
+
+    .btn-action.btn-primary-action:hover:not(:disabled) {
+      background: var(--gold-primary);
+      color: var(--bg-color);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+  </style>
+</head>
+<body>
+  <!-- FOUC Preventer for Night Mode -->
+  <script>
+    if (localStorage.getItem('night-vision') === 'enabled') {
+      document.body.classList.add('night-vision');
+    }
+  </script>
+
+  <!-- Background Overlays for Resend Aesthetic -->
+  <div class="grid-overlay"></div>
+  <div class="radial-glow"></div>
+
+  <!-- Header / Navigation -->
+  <header id="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="CabraSpace Logo">
+        <span>CabraSpace</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Inicio</a></li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Novedades <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
+            <li><a href="novedades.html" class="dropdown-item">PixInsight</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle active">Astrofotografía <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="astroforecast.html" class="dropdown-item">Astro Forecast</a></li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle active">Recursos PixInsight <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="cabrascripts.html" class="dropdown-item">CabraScripts</a></li>
+                <li><a href="pixelmath.html" class="dropdown-item">PixelMath-teca</a></li>
+                <li><a href="cursos-youtube.html" class="dropdown-item">Cursos Youtube</a></li>
+                <li><a href="autoghs.html" class="dropdown-item active">AutoGHS</a></li>
+              </ul>
+            </li>
+            <li class="dropdown-submenu">
+              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="contaminacion-mapa.html" class="dropdown-item">Mapa de Contaminación</a></li>
+                <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="nav-link dropdown-toggle">Divulgación <span class="arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="divulgacion-coffeebreak.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
+          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="lang-switcher">
+          <a href="autoghs.html" class="lang-link active">ES</a>
+          <span class="lang-separator">|</span>
+          <a href="autoghs-en.html" class="lang-link">EN</a>
+        </div>
+        <a href="index.html#newsletter" class="nav-cta hidden">Suscribirse</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <section class="pixelmath-header">
+      <h1 class="pm-title">AutoGHS</h1>
+      <p class="pm-subtitle">
+        <strong>Generalised Hyperbolic Stretch Automático</strong>. Realiza el estiramiento hiperbólico no lineal óptimo de tus tomas en banda estrecha o banda ancha directamente en el navegador, preservando el color y controlando el rango dinámico.
+      </p>
+    </section>
+
+    <div class="pm-grid">
+      <!-- Columna simulador (Sticky) -->
+      <section class="simulator-card">
+        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <label style="display:block; margin-bottom:4px; font-size:0.62rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Imagen Activa</label>
+            <h3 id="imageFileName" style="font-family:var(--font-display); font-size:1.1rem; color:var(--gold-primary); margin:0; font-weight:500;">Ninguna imagen cargada</h3>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);" id="meta"></div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <div class="canvas-loader" id="ov" style="display: none;">
+            <div class="spinner"></div>
+            <span>Procesando AutoGHS...</span>
+          </div>
+          <div id="hint" style="color: var(--text-secondary); text-align: center; padding: 24px; font-size: 0.9rem; font-weight: 300;">
+            Carga una imagen lineal (FITS, TIFF de 16 bits, PNG o JPG) para comenzar
+          </div>
+          <canvas id="cv" width="640" height="360"></canvas>
+        </div>
+
+        <!-- Consola con logs de GHS -->
+        <div class="pm-console">
+          <div class="console-header">
+            <span>Iteraciones AutoGHS</span>
+          </div>
+          <div id="status" style="white-space: pre-wrap; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">Esperando imagen lineal...</div>
+        </div>
+      </section>
+
+      <!-- Columna Biblioteca de Parámetros -->
+      <aside class="library-card">
+        <h2 style="font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-primary); margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Configuración</h2>
+
+        <label class="file-upload-zone" for="file" id="fileLabel">
+          Elegir archivo astronómico...
+        </label>
+        <input id="file" type="file" accept="image/*,.tif,.tiff,.fit,.fits,.fts" style="display:none" />
+
+        <div class="row controls-group">
+          <div class="control-label-row">
+            <span class="control-title">Sigmas from center</span>
+            <span class="control-val" id="vSig">1.00</span>
+          </div>
+          <input type="range" class="pm-slider" id="sSig" min="-3" max="6" step="0.05" value="1.0">
+        </div>
+
+        <div class="row controls-group">
+          <div class="control-label-row">
+            <span class="control-title">Stretch intensity (S)</span>
+            <span class="control-val" id="vInt">0.70</span>
+          </div>
+          <input type="range" class="pm-slider" id="sInt" min="0" max="3" step="0.05" value="0.7">
+        </div>
+
+        <div class="row controls-group">
+          <div class="control-label-row">
+            <span class="control-title">Iterations</span>
+            <span class="control-val" id="vIter">10</span>
+          </div>
+          <input type="range" class="pm-slider" id="sIter" min="1" max="30" step="1" value="10">
+        </div>
+
+        <div class="row controls-group">
+          <div class="control-label-row">
+            <span class="control-title">Black point sigmas</span>
+            <span class="control-val" id="vBP">2.80</span>
+          </div>
+          <input type="range" class="pm-slider" id="sBP" min="0" max="6" step="0.05" value="2.8">
+        </div>
+
+        <details class="adv" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+          <summary style="cursor: pointer; color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;">Opciones Avanzadas</summary>
+          
+          <div class="row controls-group">
+            <div class="control-label-row">
+              <span class="control-title">Target median (stop)</span>
+              <span class="control-val" id="vTgt">0.220</span>
+            </div>
+            <input type="range" class="pm-slider" id="sTgt" min="0.02" max="0.6" step="0.005" value="0.22">
+          </div>
+
+          <div class="row controls-group">
+            <div class="control-label-row">
+              <span class="control-title">Highlight protect (HP)</span>
+              <span class="control-val" id="vHP">0.920</span>
+            </div>
+            <input type="range" class="pm-slider" id="sHP" min="0.5" max="1.0" step="0.005" value="0.92">
+          </div>
+
+          <div class="row controls-group">
+            <div class="control-label-row">
+              <span class="control-title">Local intensity (b)</span>
+              <span class="control-val" id="vB">1.0</span>
+            </div>
+            <input type="range" class="pm-slider" id="sB" min="-2" max="10" step="0.1" value="1.0">
+          </div>
+
+          <div class="row controls-group">
+            <div class="control-label-row">
+              <span class="control-title">Color mode</span>
+            </div>
+            <select id="selColor" style="width: 100%; background: #020203; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; color: var(--text-primary); font-family: inherit; font-size: 0.82rem; outline: none; margin-bottom: 10px;">
+              <option value="luminance">Luminance (preserva color)</option>
+              <option value="rgb">RGB (vinculado)</option>
+            </select>
+          </div>
+        </details>
+
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-secondary); margin: 20px 0; cursor: pointer;">
+          <input type="checkbox" id="autoApply" checked style="accent-color: var(--gold-primary);">
+          Aplicar en vivo al mover sliders
+        </label>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+          <div style="display: flex; gap: 10px; width: 100%;">
+            <button class="btn-action btn-primary-action" id="runBtn" disabled style="flex: 2;">Aplicar AutoGHS</button>
+            <button class="btn-action" id="resetBtn" style="flex: 1;">Defaults</button>
+          </div>
+          <button class="btn-action btn-primary-action" id="dlBtn" disabled style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke-width: 2.2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar PNG
+          </button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="background:#020202; border-top:1px solid var(--border-color); padding: 40px 0; font-size:0.85rem; color:var(--text-muted); text-align:center;">
+    <div class="container">
+      <p>&copy; 2026 CabraSpace. Diseñado para la comunidad de astrofotografía.</p>
+    </div>
+  </footer>
+
+  <!-- UTIF.js (TIFF 16-bit support) -->
+  <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+  <!-- AutoGHS Core Library -->
+  <script src="autoghs.js"></script>
+  
+  <script>
+    // App Logic: Conecta la UI con la librería AutoGHS
+    const MAX_DIM = 2400;   // working resolution cap
+    const el = (id) => document.getElementById(id);
+    const cv = el("cv"), ctx = cv.getContext("2d");
+    const ov = el("ov"), statusEl = el("status"), metaEl = el("meta"), hint = el("hint");
+
+    let ORIG = null;        // { ch, w, h, nc, isColor }
+
+    function setStatus(msg, cls) { 
+      statusEl.textContent = msg || ""; 
+      statusEl.className = "status" + (cls ? " " + cls : ""); 
+    }
+
+    async function handleFile(file) {
+      setStatus("Cargando archivo astronómico...");
+      try {
+        const loaded = await AutoGHS.loadFromFile(file);
+        const capped = AutoGHS.capChannels(loaded.ch, loaded.w, loaded.h, loaded.nc, MAX_DIM);
+        ORIG = { ch: capped.ch, w: capped.w, h: capped.h, nc: loaded.nc, isColor: loaded.isColor };
+        
+        el("imageFileName").textContent = file.name;
+        metaEl.textContent = loaded.w + "×" + loaded.h + " px · " + (loaded.isColor ? "Color" : "Monocromo") +
+          (capped.w !== loaded.w ? " (downsampleado a " + capped.w + "×" + capped.h + " para previsualización)" : "");
+        
+        hint.style.display = "none";
+        el("runBtn").disabled = false;
+        setStatus("Imagen cargada. Aplicando estirado AutoGHS...");
+        apply();
+      } catch (e) {
+        setStatus("Error al cargar la imagen: " + e.message, "err");
+      }
+    }
+
+    function currentConfig() {
+      const cfg = AutoGHS.defaultConfig();
+      cfg.sigmasFromCenter = parseFloat(el("sSig").value);
+      cfg.stretchIntensity = parseFloat(el("sInt").value);
+      cfg.maxIterations    = parseInt(el("sIter").value, 10);
+      cfg.blackPointSigmas = parseFloat(el("sBP").value);
+      cfg.targetMedian     = parseFloat(el("sTgt").value);
+      cfg.highlightProtect = parseFloat(el("sHP").value);
+      cfg.localIntensity_b = parseFloat(el("sB").value);
+      cfg.colorMode        = el("selColor").value;
+      return cfg;
+    }
+
+    let busy = false, pending = false;
+    function apply() {
+      if (!ORIG) return;
+      if (busy) { pending = true; return; }
+      busy = true;
+      ov.style.display = "flex";
+      setTimeout(() => {
+        try {
+          const cfg = currentConfig();
+          const n = ORIG.w * ORIG.h;
+          const t0 = performance.now();
+          const res = AutoGHS.process(ORIG.ch, n, ORIG.nc, ORIG.isColor, cfg);
+          cv.width = ORIG.w; cv.height = ORIG.h;
+          ctx.putImageData(AutoGHS.channelsToImageData(res.channels, ORIG.w, ORIG.h, ORIG.nc), 0, 0);
+          el("dlBtn").disabled = false;
+          setStatus(res.log.join("\n") + "\n\nTiempo de procesado: " + ((performance.now() - t0) | 0) + " ms", "ok");
+        } catch (e) {
+          setStatus("Error en el procesado AutoGHS: " + e.message, "err");
+        } finally {
+          ov.style.display = "none";
+          busy = false;
+          if (pending) { pending = false; apply(); }
+        }
+      }, 50);
+    }
+
+    const sliders = [
+      ["sSig","vSig",2],["sInt","vInt",2],["sIter","vIter",0],["sBP","vBP",2],
+      ["sTgt","vTgt",3],["sHP","vHP",3],["sB","vB",1]
+    ];
+    let debounce = null;
+    function onParamChange() {
+      for (const [s, v, p] of sliders) el(v).textContent = parseFloat(el(s).value).toFixed(p);
+      if (el("autoApply").checked && ORIG) { 
+        clearTimeout(debounce); 
+        debounce = setTimeout(apply, 200); 
+      }
+    }
+
+    for (const [s] of sliders) el(s).addEventListener("input", onParamChange);
+    el("selColor").addEventListener("change", () => { if (el("autoApply").checked) apply(); });
+    el("file").addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+    el("fileLabel").addEventListener("click", () => el("file").click());
+    el("runBtn").addEventListener("click", apply);
+    
+    el("resetBtn").addEventListener("click", () => {
+      const d = AutoGHS.defaultConfig();
+      el("sSig").value = d.sigmasFromCenter; 
+      el("sInt").value = d.stretchIntensity;
+      el("sIter").value = d.maxIterations;  
+      el("sBP").value = d.blackPointSigmas;
+      el("sTgt").value = d.targetMedian;    
+      el("sHP").value = d.highlightProtect;
+      el("sB").value = d.localIntensity_b;  
+      el("selColor").value = d.colorMode;
+      onParamChange(); 
+      if (ORIG) apply();
+    });
+
+    el("dlBtn").addEventListener("click", () => {
+      cv.toBlob((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); 
+        a.download = "AutoGHS_resultado.png"; 
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }, "image/png");
+    });
+
+    // Toggle Modo Noche
+    const nightToggle = document.getElementById('nightmode-toggle');
+    if (nightToggle) {
+      nightToggle.addEventListener('click', () => {
+        document.body.classList.toggle('night-vision');
+        if (document.body.classList.contains('night-vision')) {
+          localStorage.setItem('night-vision', 'enabled');
+        } else {
+          localStorage.setItem('night-vision', 'disabled');
+        }
+      });
+    }
+
+    onParamChange();
+  </script>
+</body>
+</html>
