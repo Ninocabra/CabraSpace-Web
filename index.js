@@ -37,18 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (swData.length > 0) {
         swContainer.innerHTML = swData.slice(0, 3).map(item => {
           const title = isEn ? item.title_en : item.title_es;
-          const summary = isEn ? item.summary_en : item.summary_es;
           const category = isEn ? item.category_en : item.category_es;
+          const page = isEn ? 'novedades-en.html' : 'novedades.html';
           return `
             <div class="dashboard-item">
-              <a href="${item.url}" target="_blank" rel="noopener noreferrer">
+              <a href="${page}?search=${encodeURIComponent(title)}">
                 <div class="dashboard-meta">
                   <span>${item.date}</span>
                   <span>|</span>
                   <span>${category}</span>
                 </div>
                 <h4>${title}</h4>
-                <p>${summary}</p>
               </a>
             </div>
           `;
@@ -61,18 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (hwData.length > 0) {
         hwContainer.innerHTML = hwData.slice(0, 3).map(item => {
           const title = isEn ? item.title_en : item.title_es;
-          const summary = isEn ? item.summary_en : item.summary_es;
           const category = isEn ? item.category_en : item.category_es;
+          const page = isEn ? 'equipamiento-en.html' : 'equipamiento.html';
           return `
             <div class="dashboard-item">
-              <a href="${item.url}" target="_blank" rel="noopener noreferrer">
+              <a href="${page}?search=${encodeURIComponent(title)}">
                 <div class="dashboard-meta">
                   <span>${item.date}</span>
                   <span>|</span>
                   <span>${category}</span>
                 </div>
                 <h4>${title}</h4>
-                <p>${summary}</p>
               </a>
             </div>
           `;

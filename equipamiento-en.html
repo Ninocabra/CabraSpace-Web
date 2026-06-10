@@ -585,6 +585,14 @@
         renderNews();
       }, 200));
 
+      // Check URL query parameter for search
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      if (searchParam) {
+        searchInput.value = searchParam;
+        searchQuery = searchParam.trim().toLowerCase();
+      }
+
       // 6. Toggle Night Mode
       const nightToggle = document.getElementById('nightmode-toggle');
       if (nightToggle) {
