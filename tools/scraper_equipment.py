@@ -1238,23 +1238,91 @@ def main():
             processed_item = process_fallback(item)
             
         if processed_item:
-            # Post-filter check using AI-extracted tags or translated titles
-            is_dup_post = False
-            matched_tag = None
+            # Post-filter check: identify candidate model tags and verify if they are a subset of known models
+            candidate_models = set()
+            brands = {b.lower() for b in FABRICANTES} | {
+                "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron", 
+                "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one", 
+                "primalucelab", "planewave", "explore scientific", "dwarflab", "askar", 
+                "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos", 
+                "kstars", "seestar", "dwarf ii"
+            }
+            generic = {
+                "telescopio", "telescope", "cámara", "camera", "montura", "mount", 
+                "accesorio", "accessory", "accessories", "software", "firmware", 
+                "guiding", "filtro", "filter", "focuser", "rotator", "flattener", 
+                "reducer", "eyepiece", "ocular", "oculares", "binocular", "binoculares",
+                "binoculars", "prismáticos", "smart telescope", "guide scope",
+                "telescopios", "telescopes", "cámaras", "cameras", "monturas", "mounts",
+                "accesorios", "smart telescopes", "driver", "drivers", "app", "apps",
+                "web app", "web apps", "controller", "controllers", "sensor", "sensors",
+                "optics", "óptica", "ópticas", "optical", "mirror", "mirrors",
+                "adapter", "adapters", "adaptador", "adaptadores", "kit lens", "lens", "lente",
+                "astrophotography", "astrofotografía", "astronomy", "astronomía",
+                "deep sky", "deep-sky", "cielo profundo", "planetary", "planetaria",
+                "solar", "lunar", "wide-field", "campo amplio", "astroimaging",
+                "astrograph", "astrografo", "refractor", "newtonian", "newtoniano",
+                "dobsonian", "dobson", "schmidt-cassegrain", "sct", "apo", "apochromatic",
+                "apocromático", "triplet", "triplete", "mono", "color", "cooled",
+                "enfriada", "infrarrojo", "infrared", "ir", "light pollution",
+                "contaminación lumínica", "dark sky", "bortle", "seeing", "guia",
+                "guide", "guiado", "autoguiding", "dithering", "polar alignment",
+                "alineación", "alignment", "collimation", "colimación", "focusing",
+                "focus", "focal", "aperture", "apertura", "focal ratio",
+                "vía láctea", "milky way", "moon", "sun", "stars", "star",
+                "review", "unboxing", "setup", "tutorial", "guía", "guide", "tips",
+                "tricks", "first look", "first impressions", "primeras impresiones",
+                "test", "testing", "comparativa", "comparison", "overview", "leak",
+                "rumor", "leak/rumor", "news", "noticias", "anuncio", "announcement",
+                "lanzamiento", "launch", "release", "update", "actualización", "diy",
+                "modificación", "modification", "cleaning", "limpieza", "build",
+                "building", "remote control", "control remoto", "automation",
+                "automatización", "observatory", "observatorio", "planning",
+                "scheduler", "secuenciador", "sequencer", "software update",
+                "firmware update", "processing", "procesamiento", "compatibility",
+                "compatibilidad", "troubleshooting", "error", "problem",
+                "beginner", "beginners", "principiante", "principiantes", "first",
+                "primero", "primer", "best", "mejor", "mejores", "top", "budget",
+                "cheap", "barato", "expensive", "premium", "pro", "professional",
+                "profesional", "affordable", "new", "nuevo", "nueva", "latest",
+                "último", "actual", "modern", "moderno", "portable", "compact",
+                "compacto", "innovación", "innovation", "tech", "technology",
+                "actualización", "astrofotografía ir", "astrografía", "astroimaging software",
+                "astronomy apps", "astronomy camera", "astronomy forecast", "astronómica",
+                "astrophotografía", "astrophotography camera", "astrophotography mount",
+                "astrophotography software", "astrophotography tips", "guiding kit",
+                "mirror cleaning", "monocromática", "montura altazimutal",
+                "observation", "observación", "observación astronómica", "observación solar",
+                "observatory setup", "observatory system", "observing planner",
+                "optical accessories", "outdoor setup", "photometry", "primer telescopio",
+                "radio telescope software", "recommendations", "remote system",
+                "revisión", "revisión equipamiento", "software update", "solar camera",
+                "solar telescope", "telescope accessory", "telescope automation",
+                "telescope control", "telescope enclosure", "telescope mirror",
+                "telescope mount", "telescope review", "telescope selection",
+                "telescope tube", "telescope upgrades", "telescopio apocromático",
+                "telescopio solar", "visual telescope", "weatherproof", "web app",
+                "wide-field astrophotography", "equipment comparison", "equipo",
+                "new product", "novedad", "novedades", "nuevo producto", "reddit",
+                "stargazers lounge", "pixinsight"
+            }
+            
             for tag in processed_item.get('tags', []):
                 tag_clean = tag.strip().lower()
-                if tag_clean in known_models:
-                    for title_field in ['title_es', 'title_en']:
-                        val, matched_m = is_duplicate_product_introduction(processed_item[title_field], {tag_clean})
-                        if val:
-                            is_dup_post = True
-                            matched_tag = tag_clean
-                            break
-                if is_dup_post:
-                    break
-            if is_dup_post:
-                print(f"Skipping duplicate product introduction (post-filtered): '{processed_item['title_en']}' matches known model '{matched_tag}'")
-                continue
+                if tag_clean and len(tag_clean) > 2 and tag_clean not in brands and tag_clean not in generic:
+                    candidate_models.add(tag_clean)
+                    
+            # If the candidate has product model tags, check if they are all already known
+            if candidate_models:
+                if candidate_models.issubset(known_models):
+                    # Check if it's a software/firmware update
+                    software_keywords = ["firmware", "software", "driver", "controlador", "update", "actualización", "version", "versión", "release"]
+                    title_lower = processed_item['title_en'].lower()
+                    is_software = processed_item['category_en'] == "SOFTWARE" or any(k in title_lower for k in software_keywords)
+                    
+                    if not is_software:
+                        print(f"Skipping duplicate product entry (post-filtered): '{processed_item['title_en']}' only references known models {candidate_models}")
+                        continue
                 
             updates_to_add.append(processed_item)
             processed_count += 1
