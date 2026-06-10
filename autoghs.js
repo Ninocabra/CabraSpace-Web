@@ -288,14 +288,185 @@
     return { ch: ch, w: w, h: h, nc: nc, isColor: isColor };
   }
 
+  // XISF (Extensible Image Serialization Format) parser para archivos monolíticos
+  // sin comprimir (Float32/Float64/UInt16/UInt32/UInt8, planar o normal).
+  function parseXISF(buffer) {
+    var bytes = new Uint8Array(buffer);
+    if (bytes.length < 16) throw new Error("Archivo XISF demasiado pequeño o corrupto.");
+
+    // 1. Verificar firma de 8 bytes
+    var signature = "";
+    for (var i = 0; i < 8; ++i) signature += String.fromCharCode(bytes[i]);
+    if (signature !== "XISF0100") {
+      throw new Error("No es un archivo XISF válido (firma incorrecta).");
+    }
+
+    // 2. Leer longitud de cabecera XML (uint32, little-endian en offset 8)
+    var dv = new DataView(buffer);
+    var xmlLength = dv.getUint32(8, true);
+
+    if (16 + xmlLength > bytes.length) {
+      throw new Error("Archivo XISF corrupto: la cabecera XML excede el tamaño del archivo.");
+    }
+
+    // 3. Decodificar la cabecera XML como UTF-8
+    var xmlBytes = new Uint8Array(buffer, 16, xmlLength);
+    var xmlText = new TextDecoder("utf-8").decode(xmlBytes);
+    var parser = new DOMParser();
+    var xmlDoc = parser.parseFromString(xmlText, "text/xml");
+    
+    var parseError = xmlDoc.getElementsByTagName("parsererror")[0];
+    if (parseError) {
+      throw new Error("Error al analizar la cabecera XML del archivo XISF: " + parseError.textContent);
+    }
+
+    // 4. Buscar el primer elemento <Image>
+    var imageEl = null;
+    var images = xmlDoc.getElementsByTagName("Image");
+    if (images.length > 0) {
+      imageEl = images[0];
+    } else {
+      images = xmlDoc.getElementsByTagNameNS("http://www.pixinsight.com/xisf", "Image");
+      if (images.length > 0) {
+        imageEl = images[0];
+      } else {
+        var allElems = xmlDoc.getElementsByTagName("*");
+        for (var idx = 0; idx < allElems.length; ++idx) {
+          var nodeName = allElems[idx].nodeName;
+          if (nodeName === "Image" || nodeName.indexOf(":Image") !== -1 || (allElems[idx].localName && allElems[idx].localName === "Image")) {
+            imageEl = allElems[idx];
+            break;
+          }
+        }
+      }
+    }
+    
+    if (!imageEl) {
+      throw new Error("No se encontró ningún elemento de imagen en la cabecera XISF.");
+    }
+
+    // 5. Validar compresión (no la soportamos en cliente por rendimiento y tamaño de librerías)
+    var compression = imageEl.getAttribute("compression");
+    if (compression && compression.trim().length > 0) {
+      throw new Error("El archivo XISF está comprimido (" + compression + "). Por favor, guarda el archivo en PixInsight desmarcando la opción 'Compression' al guardar para poder cargarlo aquí.");
+    }
+
+    // 6. Leer geometría (width:height:channels)
+    var geometryStr = imageEl.getAttribute("geometry");
+    if (!geometryStr) throw new Error("Geometría de la imagen no especificada en XISF.");
+    var geom = geometryStr.split(":");
+    var w = parseInt(geom[0], 10);
+    var h = parseInt(geom[1], 10);
+    var nc = parseInt(geom[2], 10) || 1;
+    if (!(w > 0) || !(h > 0)) throw new Error("Dimensiones de imagen inválidas en XISF.");
+
+    // 7. Leer formato de muestras y ubicación
+    var sampleFormat = imageEl.getAttribute("sampleFormat");
+    if (!sampleFormat) throw new Error("Formato de muestra (sampleFormat) no especificado en XISF.");
+
+    var locationStr = imageEl.getAttribute("location");
+    if (!locationStr) throw new Error("Ubicación de los datos (location) no especificada en XISF.");
+    var loc = locationStr.split(":");
+    if (loc[0] !== "attachment") {
+      throw new Error("Ubicación de datos '" + loc[0] + "' no soportada. Solo se admiten archivos monolíticos adjuntos.");
+    }
+    var dataOffset = parseInt(loc[1], 10);
+    var dataSize = parseInt(loc[2], 10);
+
+    if (dataOffset + dataSize > buffer.byteLength) {
+      throw new Error("El bloque de datos de la imagen está fuera de los límites del archivo.");
+    }
+
+    // 8. Leer atributos de formato
+    var byteOrder = imageEl.getAttribute("byteOrder") || "little-endian";
+    byteOrder = byteOrder.toLowerCase();
+    var isLittleEndian = (byteOrder === "little-endian");
+    if (byteOrder !== "little-endian" && byteOrder !== "big-endian") {
+      throw new Error("Orden de bytes '" + byteOrder + "' no soportado.");
+    }
+
+    var pixelStorage = imageEl.getAttribute("pixelStorage") || "planar";
+    pixelStorage = pixelStorage.toLowerCase();
+    if (pixelStorage !== "planar" && pixelStorage !== "normal") {
+      throw new Error("Formato de almacenamiento de píxeles '" + pixelStorage + "' no soportado.");
+    }
+
+    // 9. Determinar bytes por muestra
+    var bytesPer = 4;
+    switch (sampleFormat) {
+      case "UInt8":   bytesPer = 1; break;
+      case "Int8":    bytesPer = 1; break;
+      case "UInt16":  bytesPer = 2; break;
+      case "Int16":   bytesPer = 2; break;
+      case "UInt32":  bytesPer = 4; break;
+      case "Int32":   bytesPer = 4; break;
+      case "Float32": bytesPer = 4; break;
+      case "Float64": bytesPer = 8; break;
+      default:
+        throw new Error("Formato de muestra '" + sampleFormat + "' no soportado.");
+    }
+
+    var n = w * h;
+    var expectedSize = n * nc * bytesPer;
+    if (dataSize < expectedSize) {
+      throw new Error("El tamaño del bloque de datos (" + dataSize + " bytes) es menor al esperado (" + expectedSize + " bytes).");
+    }
+
+    var dvData = new DataView(buffer, dataOffset, dataSize);
+
+    function readSample(idx) {
+      var bytePos = idx * bytesPer;
+      switch (sampleFormat) {
+        case "UInt8":   return dvData.getUint8(bytePos);
+        case "Int8":    return dvData.getInt8(bytePos);
+        case "UInt16":  return dvData.getUint16(bytePos, isLittleEndian);
+        case "Int16":   return dvData.getInt16(bytePos, isLittleEndian);
+        case "UInt32":  return dvData.getUint32(bytePos, isLittleEndian);
+        case "Int32":   return dvData.getInt32(bytePos, isLittleEndian);
+        case "Float32": return dvData.getFloat32(bytePos, isLittleEndian);
+        case "Float64": return dvData.getFloat64(bytePos, isLittleEndian);
+      }
+    }
+
+    var isColor = nc >= 3;
+    var readNc = isColor ? 3 : 1;
+    var ch = [];
+    for (var c = 0; c < readNc; ++c) {
+      ch[c] = new Float32Array(n);
+    }
+
+    for (var c2 = 0; c2 < readNc; ++c2) {
+      var dst = ch[c2];
+      for (var y = 0; y < h; ++y) {
+        var rowStart = y * w;
+        for (var x = 0; x < w; ++x) {
+          var pixelIndex = rowStart + x;
+          var sampleIndex;
+          if (pixelStorage === "planar") {
+            sampleIndex = c2 * n + pixelIndex;
+          } else {
+            sampleIndex = pixelIndex * nc + c2;
+          }
+          dst[pixelIndex] = readSample(sampleIndex);
+        }
+      }
+    }
+
+    normalizeByMax(ch, n, readNc);
+    return { ch: ch, w: w, h: h, nc: readNc, isColor: isColor };
+  }
+
   function isFitsName(name) { return /\.(fits?|fts)$/i.test(name || ""); }
+  function isXisfName(name) { return /\.xisf$/i.test(name || ""); }
   function isTiffName(name) { return /\.tiff?$/i.test(name || ""); }
 
-  // Detección por extensión: FITS / TIFF / (resto vía canvas).
+  // Detección por extensión: FITS / XISF / TIFF / (resto vía canvas).
   function loadFromFile(file) {
     var name = file.name || "";
     if (isFitsName(name))
       return file.arrayBuffer().then(function (buf) { return parseFITS(buf); });
+    if (isXisfName(name))
+      return file.arrayBuffer().then(function (buf) { return parseXISF(buf); });
     if (isTiffName(name))
       return file.arrayBuffer().then(function (buf) { return loadViaTIFF(buf); });
     return createImageBitmap(file).then(function (bmp) { return loadViaCanvas(bmp); });
@@ -308,6 +479,7 @@
     medianMAD: medianMAD,
     loadFromFile: loadFromFile,
     parseFITS: parseFITS,
+    parseXISF: parseXISF,
     normalizeByMax: normalizeByMax,
     capChannels: capChannels,
     channelsToImageData: channelsToImageData
