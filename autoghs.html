@@ -275,6 +275,10 @@
         <span>CabraSpace</span>
       </a>
       
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
       <ul class="nav-menu">
         <li><a href="index.html" class="nav-link">Inicio</a></li>
         <li class="dropdown">
@@ -295,6 +299,7 @@
                 <li><a href="pixelmath.html" class="dropdown-item">PixelMath-teca</a></li>
                 <li><a href="cursos-youtube.html" class="dropdown-item">Cursos Youtube</a></li>
                 <li><a href="autoghs.html" class="dropdown-item active">AutoGHS</a></li>
+                <li><a href="pi-workflow.html" class="dropdown-item">PI Workflow</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
@@ -327,6 +332,8 @@
       </div>
     </div>
   </header>
+
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
   <!-- Main Content -->
   <main class="container">
@@ -736,5 +743,6 @@
 
     onParamChange();
   </script>
+  <script src="mobile-menu.js"></script>
 </body>
 </html>

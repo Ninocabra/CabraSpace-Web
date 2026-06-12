@@ -98,5 +98,123 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // =======================================================================
+  // 7. Mobile Menu System (Hamburger + Accordion Dropdowns)
+  // =======================================================================
+  const MOBILE_BREAKPOINT = 1024;
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const navMenu = document.querySelector('.nav-menu');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+
+  function isMobileView() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  function closeMenu() {
+    if (!hamburgerBtn || !navMenu) return;
+    hamburgerBtn.classList.remove('active');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    navMenu.classList.remove('active');
+    if (menuOverlay) menuOverlay.classList.remove('active');
+    document.body.classList.remove('menu-open');
+    // Close all open dropdowns
+    document.querySelectorAll('.dropdown.open, .dropdown-submenu.open').forEach(el => {
+      el.classList.remove('open');
+    });
+  }
+
+  function openMenu() {
+    if (!hamburgerBtn || !navMenu) return;
+    hamburgerBtn.classList.add('active');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+    navMenu.classList.add('active');
+    if (menuOverlay) menuOverlay.classList.add('active');
+    document.body.classList.add('menu-open');
+  }
+
+  function toggleMenu() {
+    if (navMenu && navMenu.classList.contains('active')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  }
+
+  // Hamburger button click
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+  }
+
+  // Overlay click closes menu
+  if (menuOverlay) {
+    menuOverlay.addEventListener('click', closeMenu);
+  }
+
+  // Escape key closes menu
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
+      closeMenu();
+    }
+  });
+
+  // Tap/click on dropdown toggles (accordion behavior on mobile)
+  document.querySelectorAll('.dropdown > .dropdown-toggle, .dropdown-submenu > .dropdown-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      if (!isMobileView()) return; // Let desktop hover behavior work
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const parentDropdown = toggle.parentElement;
+      const isOpen = parentDropdown.classList.contains('open');
+      
+      // Close sibling dropdowns at the same level
+      const siblings = parentDropdown.parentElement.querySelectorAll(':scope > .dropdown.open, :scope > .dropdown-submenu.open');
+      siblings.forEach(sib => {
+        if (sib !== parentDropdown) {
+          sib.classList.remove('open');
+          // Also close nested children
+          sib.querySelectorAll('.dropdown.open, .dropdown-submenu.open').forEach(child => {
+            child.classList.remove('open');
+          });
+        }
+      });
+      
+      // Toggle current dropdown
+      if (isOpen) {
+        parentDropdown.classList.remove('open');
+        parentDropdown.querySelectorAll('.dropdown.open, .dropdown-submenu.open').forEach(child => {
+          child.classList.remove('open');
+        });
+      } else {
+        parentDropdown.classList.add('open');
+      }
+    });
+  });
+
+  // Close menu when clicking a real navigation link (not a toggle)
+  document.querySelectorAll('.nav-menu a:not(.dropdown-toggle)').forEach(link => {
+    link.addEventListener('click', () => {
+      if (isMobileView() && navMenu && navMenu.classList.contains('active')) {
+        // Small delay to allow navigation to start
+        setTimeout(closeMenu, 150);
+      }
+    });
+  });
+
+  // Resize handler: clean up mobile states if window grows past breakpoint
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (!isMobileView()) {
+        closeMenu();
+      }
+    }, 150);
+  });
 });
 

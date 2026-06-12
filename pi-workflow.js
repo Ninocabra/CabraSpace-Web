@@ -1,0 +1,4913 @@
+/* =========================================================================
+ * pi-workflow.js — Motor de Procesado y UI de PI Workflow
+ *
+ * Coordina las operaciones cliente de pre-procesado, estirado, máscaras
+ * y mezcla de canales directamente en el navegador.
+ * ========================================================================= */
+
+(function () {
+  "use strict";
+
+  // --- CONFIGURACIÓN Y ESTADO GLOBAL ---
+  const MAX_PREVIEW_DIM = 2000; // Resolución máx. de trabajo para mantener 60 FPS
+  const wl = [0.2126, 0.7152, 0.0722]; // Pesos de luminancia Rec.709
+
+  const state = {
+    // Canales de carga inicial (Tab 0): 0=R, 1=G, 2=B, 3=L, 4=SII, 5=Ha, 6=OIII, 7=Color RGB Directa
+    loadedChannels: [null, null, null, null, null, null, null, null],
+    channelNames: ["", "", "", "", "", "", "", ""],
+    
+    // Capas cargadas externamente (Tab 1): Starless y Stars
+    starlessImage: null,
+    starsImage: null,
+
+    // Imagen activa actual en el espacio de trabajo
+    activeImage: null, // { ch: [Float32Array], w, h, nc, isColor }
+    originalImage: null, // Para deshacer o comparar
+    stepInputImage: null, // Entrada inicial para la sección actual (previene cambios acumulados)
+    subtractedGradient: null, // Modelo del gradiente extraído para visualización
+    previewGradientMode: false, // Si true, renderiza el gradiente en lugar de la imagen
+    wcs: null, // Metadatos WCS del Plate Solving (se preserva globalmente)
+    
+    // Máscaras
+    activeMask: null, // Float32Array (tamaño w * h, valores [0, 1])
+    previewMaskMode: false, // Si true, renderiza la máscara en lugar de la imagen
+    screenStretchMode: false, // Estirado temporal AutoSTF (MAD) de pantalla para imágenes lineales
+    workflowImages: {}, // Guarda las imágenes del flujo, ej. {"R": img, "MonoRGB": img}
+    activeWorkflowKey: "", // Clave del flujo activa actual, ej. "R" o "MonoRGB"
+
+    // Slots de memoria (1 a 8)
+    imageSlots: new Array(8).fill(null),
+    maskSlots: new Array(8).fill(null),
+    activeSlotIdx: -1,
+
+    // Visualización
+    zoom: 1,
+    panX: 0,
+    panY: 0,
+    isDragging: false,
+    dragStartX: 0,
+    dragStartY: 0,
+
+    // Comparación Split (Cortinilla)
+    splitViewMode: false,
+    splitPercent: 0.5, // 0.0 a 1.0 (posición del control deslizante)
+    isDraggingSplit: false,
+    splitCompareImage: null, // Imagen contra la que se compara (ej. Slot o Original)
+
+    // Hue Rueda de color
+    selectedHue: 180,
+  };
+
+  let narrowbandFormulas = [];
+
+  // --- ELEMENTOS DEL DOM ---
+  const el = (id) => document.getElementById(id);
+  const cv = el("piwCanvas");
+  const ctx = cv.getContext("2d");
+  const container = el("canvasContainer");
+  const loader = el("piwLoader");
+  const loaderText = el("piwLoaderText");
+  const consoleOutput = el("piwConsoleOutput");
+
+  // --- UTILIDADES ---
+  function logConsole(msg, type = "info") {
+    const time = new Date().toTimeString().split(" ")[0];
+    const line = document.createElement("div");
+    line.className = "piw-console-line";
+    line.innerHTML = `<span class="time">[${time}]</span><span class="${type}">${msg}</span>`;
+    consoleOutput.appendChild(line);
+    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+  }
+
+  function showLoader(text) {
+    loaderText.textContent = text;
+    loader.style.display = "flex";
+  }
+
+  // Cierra el loader de UI
+  function hideLoader() {
+    loader.style.display = "none";
+  }
+
+  function cloneImage(img) {
+    if (!img) return null;
+    const copy = {
+      w: img.w,
+      h: img.h,
+      nc: img.nc,
+      isColor: img.isColor,
+      ch: []
+    };
+    for (let c = 0; c < img.nc; ++c) {
+      copy.ch[c] = Float32Array.from(img.ch[c]);
+    }
+    if (img.wcs) {
+      copy.wcs = { ...img.wcs };
+    }
+    if (img.hasTransforms) {
+      copy.hasTransforms = img.hasTransforms;
+    }
+    return copy;
+  }
+
+  // -------------------------------------------------------------------------
+  // Auto STF MAD — Port exacto de PI Workflow (optMadMidtone + optApplyMadAutoStretch)
+  //
+  // Ref: PI Workflow.js líneas 1449-1523
+  //   shadow  = max(0,  median - 1.25 * MAD)          // ← MAD sin escalar 1.4826
+  //   midtone = MTF(0.25, median - shadow)             // ← target background = 0.25
+  //   MTF(m, x) = (m-1)·x / ((2m-1)·x - m)
+  //
+  // Modos:
+  //   linked=false  → Unlinked: parámetros independientes por canal (unlinked MAD AutoSTF)
+  //   linked=true   → Linked:   media de medianas y MADs de los 3 canales RGB
+  //
+  // Devuelve nuevos Float32Array estirados para previsualización.
+  // El original NO se modifica (trabaja sobre copias).
+  // -------------------------------------------------------------------------
+
+  // Función MTF (Midtone Transfer Function) de PixInsight
+  // MTF(m, x) = (m-1)·x / ((2m-1)·x - m)
+  // Port directo de optMadMidtone() en PI Workflow.js:1449
+  function optMadMidtone(median, shadow, targetBackground) {
+    var value = median - shadow;
+    var target = isFinite(targetBackground) ? targetBackground : 0.25;
+    // Si la diferencia es casi nula o negativa (por ejemplo, fondos restados agresivamente),
+    // usamos un valor de estirado por defecto (0.002) en lugar de 0.5 para que no se vea negra.
+    if (!isFinite(value) || value <= 0.0001) return 0.002;
+    var denom = (2 * target - 1) * value - target;
+    if (Math.abs(denom) < 1.0e-12) return 0.002;
+    var midtone = (target - 1) * value / denom;
+    if (!isFinite(midtone)) return 0.002;
+    return Math.max(0.0001, Math.min(0.9999, midtone));
+  }
+
+  // Mediana rápida por muestreo (≤ MAX_SAMPLES puntos para rendimiento)
+  function fastSampledMedian(ch) {
+    const n = ch.length;
+    const MAX_SAMPLES = 500000;
+    let arr;
+    if (n > MAX_SAMPLES) {
+      arr = new Float32Array(MAX_SAMPLES);
+      const step = Math.floor(n / MAX_SAMPLES);
+      for (let i = 0; i < MAX_SAMPLES; i++) arr[i] = ch[i * step];
+    } else {
+      arr = Float32Array.from(ch);
+    }
+    arr.sort();
+    const mid = arr.length >> 1;
+    return arr.length % 2 === 0 ? (arr[mid - 1] + arr[mid]) * 0.5 : arr[mid];
+  }
+
+  // MAD rápido por muestreo dado la mediana ya calculada
+  function fastSampledMAD(ch, median) {
+    const n = ch.length;
+    const MAX_SAMPLES = 500000;
+    const sampleCount = Math.min(n, MAX_SAMPLES);
+    const step = n > MAX_SAMPLES ? Math.floor(n / MAX_SAMPLES) : 1;
+    const absDevs = new Float32Array(sampleCount);
+    for (let i = 0; i < sampleCount; i++) absDevs[i] = Math.abs(ch[i * step] - median);
+    absDevs.sort();
+    const mid = absDevs.length >> 1;
+    return absDevs.length % 2 === 0 ? (absDevs[mid - 1] + absDevs[mid]) * 0.5 : absDevs[mid];
+  }
+
+  // Port directo de optApplyMadAutoStretch() en PI Workflow.js:1463
+  // linked=false → unlinked (parámetros por canal, como "mad-unlinked")
+  // linked=true  → linked   (parámetros compartidos, como "mad-linked")
+  function applyAutoSTF(channels, nc, isColor, linked) {
+    const TB = 0.25; // targetBackground
+    const n = channels[0].length;
+    const shadows  = [0.0, 0.0, 0.0];
+    const midtones = [0.5, 0.5, 0.5];
+
+    if (linked === true && isColor && nc >= 3) {
+      // Modo LINKED: media de medianas y MADs de los 3 canales
+      var sumMedian = 0.0, sumMad = 0.0;
+      for (var c0 = 0; c0 < 3; c0++) {
+        const med = fastSampledMedian(channels[c0]);
+        sumMedian += med;
+        sumMad    += fastSampledMAD(channels[c0], med);
+      }
+      const linkedMedian = sumMedian / 3.0;
+      // Clampeamos el MAD mínimo a 0.0005 para evitar colapsos visuales y estirados verticales infinitos
+      const linkedMad    = Math.max(0.0005, sumMad / 3.0);
+      const linkedShadow = Math.max(0.0, linkedMedian - 1.25 * linkedMad);
+      const linkedMidtone = optMadMidtone(linkedMedian, linkedShadow, TB);
+      shadows[0]  = shadows[1]  = shadows[2]  = linkedShadow;
+      midtones[0] = midtones[1] = midtones[2] = linkedMidtone;
+    } else {
+      // Modo UNLINKED: parámetros independientes por canal
+      const count = Math.min(nc, 3);
+      for (var c1 = 0; c1 < count; c1++) {
+        const median = fastSampledMedian(channels[c1]);
+        // Clampeamos el MAD mínimo a 0.0005 para evitar colapsos visuales y estirados verticales infinitos
+        const mad    = Math.max(0.0005, fastSampledMAD(channels[c1], median));
+        const shadow = Math.max(0.0, median - 1.25 * mad);
+        shadows[c1]  = isFinite(shadow) ? shadow : 0.0;
+        midtones[c1] = optMadMidtone(median, shadows[c1], TB);
+      }
+    }
+
+    // Equivalente a HistogramTransformation de PixInsight:
+    // H(x) = MTF(midtone, clamp01((x - shadow) / (1 - shadow)))
+    // MTF(m, x) = (m-1)·x / ((2m-1)·x - m)
+    function mtfPure(m, x) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      var denom = (2 * m - 1) * x - m;
+      if (Math.abs(denom) < 1e-12) return x;
+      return (m - 1) * x / denom;
+    }
+
+    const result = [];
+    for (let c = 0; c < nc; c++) {
+      const src = channels[c];
+      const dst = new Float32Array(n);
+      const sh = shadows[c]  || 0.0;
+      const mt = midtones[c] || 0.5;
+      const scale = sh >= 1.0 ? 1.0 : (1.0 - sh);
+      for (let i = 0; i < n; i++) {
+        const x = Math.max(0.0, Math.min(1.0, (src[i] - sh) / scale));
+        dst[i] = mtfPure(mt, x);
+      }
+      result.push(dst);
+    }
+    return result;
+  }
+
+
+  // Convierte coordenadas de píxel de imagen a coordenadas de Canvas
+  function getCanvasCoords(imgX, imgY) {
+    const rect = cv.getBoundingClientRect();
+    const scaleX = cv.width / rect.width;
+    const scaleY = cv.height / rect.height;
+    
+    // Centrar
+    const cx = cv.width / 2 + state.panX;
+    const cy = cv.height / 2 + state.panY;
+    
+    const x = cx + (imgX - state.activeImage.w / 2) * state.zoom;
+    const y = cy + (imgY - state.activeImage.h / 2) * state.zoom;
+    return { x, y };
+  }
+
+  // --- CROP STATE & LOGIC ---
+  const CROP_MIN_SIZE = 64;
+  const CROP_HIT_TOLERANCE_PX = 10;
+  const CROP_HANDLE_NONE = -1;
+  const CROP_HANDLE_TL = 0, CROP_HANDLE_TM = 1, CROP_HANDLE_TR = 2;
+  const CROP_HANDLE_ML = 3,                       CROP_HANDLE_MR = 4;
+  const CROP_HANDLE_BL = 5, CROP_HANDLE_BM = 6, CROP_HANDLE_BR = 7;
+  const CROP_HANDLE_INSIDE = 8;
+
+  let cropState = {
+    rect: null, // { x, y, width, height } in image coordinates
+    drawing: false,
+    dragMode: "", // "move", "resize", "draw"
+    dragHandle: CROP_HANDLE_NONE,
+    dragStartImgX: 0,
+    dragStartImgY: 0,
+    dragStartRect: null
+  };
+
+  // Convert canvas event coordinates to image coordinates
+  function getImageCoordsFromEvent(e) {
+    if (!state.activeImage) return { x: 0, y: 0 };
+    const rect = cv.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Reverse the scale & translation of the canvas style transform
+    // The CSS transform: translate(panX, panY) scale(zoom)
+    // The canvas's intrinsic size is cv.width x cv.height, but it's rendered at clientWidth x clientHeight.
+    // However, coordinate-wise inside the canvas, the mouse position on the canvas coordinate space (0 to cv.width/height):
+    const imgX = (mouseX / rect.width) * cv.width;
+    const imgY = (mouseY / rect.height) * cv.height;
+    
+    return {
+      x: Math.max(0, Math.min(state.activeImage.w - 1, Math.floor(imgX))),
+      y: Math.max(0, Math.min(state.activeImage.h - 1, Math.floor(imgY)))
+    };
+  }
+
+  function cropClampRect(rect, imgW, imgH) {
+    let x1 = Math.max(0, Math.min(imgW - 1, rect.x));
+    let y1 = Math.max(0, Math.min(imgH - 1, rect.y));
+    let w = Math.max(CROP_MIN_SIZE, Math.min(imgW - x1, rect.width));
+    let h = Math.max(CROP_MIN_SIZE, Math.min(imgH - y1, rect.height));
+    return { x: x1, y: y1, width: w, height: h };
+  }
+
+  function cropHandlePositions(r) {
+    if (!r) return [];
+    const { x, y, width: w, height: h } = r;
+    const halfW = w / 2;
+    const halfH = h / 2;
+    return [
+      { x: x, y: y },         // TL
+      { x: x + halfW, y: y }, // TM
+      { x: x + w, y: y },     // TR
+      { x: x, y: y + halfH }, // ML
+      { x: x + w, y: y + halfH }, // MR
+      { x: x, y: y + h },     // BL
+      { x: x + halfW, y: y + h }, // BM
+      { x: x + w, y: y + h }  // BR
+    ];
+  }
+
+  function cropHitTest(rect, ix, iy) {
+    if (!rect) return CROP_HANDLE_NONE;
+    const handles = cropHandlePositions(rect);
+    const toleranceImg = CROP_HIT_TOLERANCE_PX / state.zoom;
+    
+    for (let i = 0; i < handles.length; i++) {
+      const dx = ix - handles[i].x;
+      const dy = iy - handles[i].y;
+      if (Math.sqrt(dx*dx + dy*dy) <= toleranceImg) {
+        return i;
+      }
+    }
+    
+    if (ix >= rect.x && ix <= rect.x + rect.width && iy >= rect.y && iy <= rect.y + rect.height) {
+      return CROP_HANDLE_INSIDE;
+    }
+    
+    return CROP_HANDLE_NONE;
+  }
+
+  function cropResizeFromHandle(startRect, handle, ix, iy, imgW, imgH) {
+    let x1 = startRect.x;
+    let y1 = startRect.y;
+    let x2 = startRect.x + startRect.width;
+    let y2 = startRect.y + startRect.height;
+    
+    switch (handle) {
+      case CROP_HANDLE_TL:
+        x1 = Math.min(x2 - CROP_MIN_SIZE, Math.max(0, ix));
+        y1 = Math.min(y2 - CROP_MIN_SIZE, Math.max(0, iy));
+        break;
+      case CROP_HANDLE_TM:
+        y1 = Math.min(y2 - CROP_MIN_SIZE, Math.max(0, iy));
+        break;
+      case CROP_HANDLE_TR:
+        x2 = Math.max(x1 + CROP_MIN_SIZE, Math.min(imgW - 1, ix));
+        y1 = Math.min(y2 - CROP_MIN_SIZE, Math.max(0, iy));
+        break;
+      case CROP_HANDLE_ML:
+        x1 = Math.min(x2 - CROP_MIN_SIZE, Math.max(0, ix));
+        break;
+      case CROP_HANDLE_MR:
+        x2 = Math.max(x1 + CROP_MIN_SIZE, Math.min(imgW - 1, ix));
+        break;
+      case CROP_HANDLE_BL:
+        x1 = Math.min(x2 - CROP_MIN_SIZE, Math.max(0, ix));
+        y2 = Math.max(y1 + CROP_MIN_SIZE, Math.min(imgH - 1, iy));
+        break;
+      case CROP_HANDLE_BM:
+        y2 = Math.max(y1 + CROP_MIN_SIZE, Math.min(imgH - 1, iy));
+        break;
+      case CROP_HANDLE_BR:
+        x2 = Math.max(x1 + CROP_MIN_SIZE, Math.min(imgW - 1, ix));
+        y2 = Math.max(y1 + CROP_MIN_SIZE, Math.min(imgH - 1, iy));
+        break;
+    }
+    
+    return {
+      x: x1,
+      y: y1,
+      width: x2 - x1,
+      height: y2 - y1
+    };
+  }
+
+  function cropUpdateStatus() {
+    const lbl = el("lblCropStatus");
+    const btnCur = el("btnCropApplyCurrent");
+    const btnAll = el("btnCropApplyAll");
+    if (!lbl) return;
+    
+    const lang = document.documentElement.lang || "es";
+    if (cropState.rect) {
+      const r = cropState.rect;
+      lbl.textContent = `● ${r.width} × ${r.height} px @ (${r.x}, ${r.y})`;
+      if (btnCur) btnCur.removeAttribute("disabled");
+      if (btnAll) btnAll.removeAttribute("disabled");
+    } else {
+      lbl.textContent = lang === "es" ? "● Sin selección" : "● No selection";
+      if (btnCur) btnCur.setAttribute("disabled", "true");
+      if (btnAll) btnAll.setAttribute("disabled", "true");
+    }
+    updateBigApply();
+  }
+
+  function cropApplyToImage(imgObj, rect) {
+    const { x, y, width: w, height: h } = rect;
+    const srcW = imgObj.w;
+    const result = { w, h, nc: imgObj.nc, isColor: imgObj.isColor, ch: [] };
+    for (let c = 0; c < imgObj.nc; c++) {
+      const dst = new Float32Array(w * h);
+      for (let row = 0; row < h; row++) {
+        const srcOffset = (y + row) * srcW + x;
+        dst.set(imgObj.ch[c].subarray(srcOffset, srcOffset + w), row * w);
+      }
+      result.ch.push(dst);
+    }
+    return result;
+  }
+
+  function drawCropOverlay(ctx, rect) {
+    if (!rect || !state.activeImage) return;
+    const w = state.activeImage.w;
+    const h = state.activeImage.h;
+    
+    // Draw shaded exterior areas
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    // Top box
+    ctx.fillRect(0, 0, w, rect.y);
+    // Bottom box
+    ctx.fillRect(0, rect.y + rect.height, w, h - (rect.y + rect.height));
+    // Left box
+    ctx.fillRect(0, rect.y, rect.x, rect.height);
+    // Right box
+    ctx.fillRect(rect.x + rect.width, rect.y, w - (rect.x + rect.width), rect.height);
+    
+    // Draw amber border
+    ctx.strokeStyle = "#FFD000";
+    ctx.lineWidth = Math.max(1, 2 / state.zoom);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    
+    // Draw handles
+    const handles = cropHandlePositions(rect);
+    const size = Math.max(4, 8 / state.zoom);
+    ctx.fillStyle = "#FFD000";
+    for (const hd of handles) {
+      ctx.fillRect(hd.x - size/2, hd.y - size/2, size, size);
+    }
+  }
+
+  // Bind Apply Crop Buttons
+  if (el("btnCropApplyCurrent")) {
+    el("btnCropApplyCurrent").addEventListener("click", () => {
+      if (!cropState.rect || !state.activeImage) return;
+      const cropped = cropApplyToImage(state.activeImage, cropState.rect);
+      state.activeImage = cropped;
+      if (state.activeWorkflowKey) {
+        state.workflowImages[state.activeWorkflowKey] = cropped;
+      }
+      cropState.rect = null;
+      cropUpdateStatus();
+      refreshPathBar();
+      render();
+      const lang = document.documentElement.lang || "es";
+      logConsole(lang === "es" ? `Crop aplicado a imagen actual (${cropped.w}×${cropped.h} px)` : `Crop applied to current image (${cropped.w}×${cropped.h} px)`, "info");
+    });
+  }
+
+  if (el("btnCropApplyAll")) {
+    el("btnCropApplyAll").addEventListener("click", () => {
+      if (!cropState.rect || !state.activeImage) return;
+      const rect = cropState.rect;
+      for (const key of Object.keys(state.workflowImages)) {
+        state.workflowImages[key] = cropApplyToImage(state.workflowImages[key], rect);
+      }
+      if (state.activeWorkflowKey && state.workflowImages[state.activeWorkflowKey]) {
+        state.activeImage = state.workflowImages[state.activeWorkflowKey];
+      } else {
+        state.activeImage = cropApplyToImage(state.activeImage, rect);
+      }
+      cropState.rect = null;
+      cropUpdateStatus();
+      refreshPathBar();
+      render();
+      const lang = document.documentElement.lang || "es";
+      logConsole(lang === "es" ? `Crop aplicado a todo el flujo (${state.activeImage.w}×${state.activeImage.h} px)` : `Crop applied to all workflow images (${state.activeImage.w}×${state.activeImage.h} px)`, "info");
+    });
+  }
+
+  // --- PLATE SOLVING CON ASTROMETRY.NET ---
+  const ASTROMETRY_API_KEY = "coqpscljnloiluyi";
+
+  // Redirige a través del proxy CORS local (puerto 8010) para gestionar OPTIONS y subidas de archivos
+  function corsFetch(url, options = {}) {
+    const proxyUrl = url.replace("https://nova.astrometry.net", "http://localhost:8010");
+    return fetch(proxyUrl, options);
+  }
+
+  async function getSessionKey() {
+    const res = await corsFetch("https://nova.astrometry.net/api/login", {
+      method: "POST",
+      body: new URLSearchParams({
+        "request-json": JSON.stringify({ apikey: ASTROMETRY_API_KEY })
+      })
+    });
+    const data = await res.json();
+    if (data.status !== "success") {
+      throw new Error(data.errmessage || "Login fallido");
+    }
+    return data.session;
+  }
+
+  // Comprimir imagen activa a Blob JPEG usando un canvas temporal de tamaño optimizado
+  function getActiveImageAsJpegBlob() {
+    return new Promise((resolve, reject) => {
+      if (!state.activeImage) return reject(new Error("No active image"));
+      
+      const img = state.activeImage;
+      const tempCv = document.createElement("canvas");
+      // Escalar la imagen a un tamaño máximo de 800px para subirla super rápido
+      const maxDim = 800;
+      let w = img.w;
+      let h = img.h;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+      
+      tempCv.width = w;
+      tempCv.height = h;
+      const tempCtx = tempCv.getContext("2d");
+      
+      // Dibujar imagen a color u monocromo en el canvas temporal
+      let channelsToDraw = img.ch;
+      if (state.screenStretchMode) {
+        try {
+          channelsToDraw = applyAutoSTF(img.ch, img.nc, img.isColor);
+        } catch (e) {}
+      }
+      const id = AutoGHS.channelsToImageData(channelsToDraw, img.w, img.h, img.nc);
+      
+      // Para redimensionar con suavizado, dibujamos primero a tamaño completo y luego escalamos
+      const fullCv = document.createElement("canvas");
+      fullCv.width = img.w;
+      fullCv.height = img.h;
+      fullCv.getContext("2d").putImageData(id, 0, 0);
+      
+      tempCtx.drawImage(fullCv, 0, 0, w, h);
+      
+      tempCv.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Blob conversion failed"));
+      }, "image/jpeg", 0.85);
+    });
+  }
+
+  async function uploadImageToAstrometry(session, jpegBlob) {
+    const form = new FormData();
+    form.append("request-json", JSON.stringify({
+      session: session,
+      allow_commercial_use: "n",
+      allow_modifications: "n",
+      publicly_visible: "y"
+    }));
+    form.append("file", jpegBlob, "solve_img.jpg");
+
+    const res = await corsFetch("https://nova.astrometry.net/api/upload", {
+      method: "POST",
+      body: form
+    });
+    const data = await res.json();
+    if (data.status !== "success") {
+      throw new Error(data.errmessage || "Upload fallido");
+    }
+    return data.subid;
+  }
+
+  async function pollSubmissionStatus(subid) {
+    const url = `https://nova.astrometry.net/api/submissions/${subid}`;
+    // Intentos de polling con reintento cada 5 segundos
+    for (let i = 0; i < 40; i++) {
+      const res = await corsFetch(url);
+      const data = await res.json();
+      
+      if (data.processing_finished === "true" || data.jobs && data.jobs.length > 0) {
+        const job = data.jobs[0];
+        if (job) return job;
+      }
+      
+      await new Promise(r => setTimeout(r, 5000));
+    }
+    throw new Error("Timeout esperando resolución en Astrometry.net");
+  }
+
+  async function checkJobSolved(jobId) {
+    const url = `https://nova.astrometry.net/api/jobs/${jobId}/info`;
+    const res = await corsFetch(url);
+    const data = await res.json();
+    if (data.status === "success") {
+      return data;
+    }
+    return null;
+  }
+
+  async function getCalibrationData(jobId) {
+    const url = `https://nova.astrometry.net/api/jobs/${jobId}/calibration`;
+    const res = await corsFetch(url);
+    const data = await res.json();
+    return data;
+  }
+
+  // Ejecución principal del solved
+  async function performPlateSolving() {
+    const lang = document.documentElement.lang || "es";
+    if (!state.activeImage) {
+      logConsole(lang === "es" ? "No hay ninguna imagen activa para resolver" : "No active image to solve", "err");
+      return;
+    }
+
+    showLoader(lang === "es" ? "Iniciando Plate Solving..." : "Starting Plate Solving...");
+    logConsole(lang === "es" ? "Conectando con Astrometry.net..." : "Connecting to Astrometry.net...", "info");
+    
+    try {
+      const session = await getSessionKey();
+      
+      showLoader(lang === "es" ? "Comprimiendo y preparando imagen..." : "Compressing image...");
+      const jpegBlob = await getActiveImageAsJpegBlob();
+      
+      showLoader(lang === "es" ? "Subiendo imagen a Astrometry.net..." : "Uploading image to Astrometry.net...");
+      const subid = await uploadImageToAstrometry(session, jpegBlob);
+      logConsole(lang === "es" ? `Envío de imagen exitoso (Submission ID: ${subid})` : `Upload successful (Submission ID: ${subid})`, "info");
+      
+      // Polling para esperar a que termine el procesamiento y nos devuelva el id del Job
+      showLoader(lang === "es" ? "Resolviendo campo (espera de 10-30s)..." : "Solving field (waiting 10-30s)...");
+      const jobId = await pollSubmissionStatus(subid);
+      logConsole(lang === "es" ? `Job ID asignado: ${jobId}. Recuperando resultados...` : `Job ID assigned: ${jobId}. Fetching results...`, "info");
+      
+      const jobInfo = await checkJobSolved(jobId);
+      const calibration = await getCalibrationData(jobId);
+      
+      hideLoader();
+
+      if (calibration && calibration.ra) {
+        // Guardar metadatos WCS globalmente en state
+        state.wcs = {
+          ra: calibration.ra,
+          dec: calibration.dec,
+          radius: calibration.radius,
+          pixscale: calibration.pixscale,
+          orientation: calibration.orientation,
+          parity: calibration.parity
+        };
+        // También en la imagen activa por compatibilidad
+        state.activeImage.wcs = state.wcs;
+        
+        // Actualizar UI
+        const statusLbl = el("lblSolveStatus");
+        if (statusLbl) {
+          const ar = calibration.ra.toFixed(4);
+          const dec = calibration.dec.toFixed(4);
+          statusLbl.textContent = `● AR:${ar}°, DEC:${dec}° (${calibration.pixscale.toFixed(2)}"/px)`;
+          statusLbl.style.color = "#7ed89b";
+        }
+        
+        logConsole(lang === "es" 
+          ? `Plate Solving Exitoso! Centro AR: ${calibration.ra.toFixed(4)}°, DEC: ${calibration.dec.toFixed(4)}°, Escala: ${calibration.pixscale.toFixed(2)}"/px, Rotación: ${calibration.orientation.toFixed(1)}°`
+          : `Plate Solving Successful! Center RA: ${calibration.ra.toFixed(4)}°, DEC: ${calibration.dec.toFixed(4)}°, Scale: ${calibration.pixscale.toFixed(2)}"/px, Rotation: ${calibration.orientation.toFixed(1)}°`, 
+          "info"
+        );
+      } else {
+        throw new Error("Astrometry.net no pudo resolver la imagen.");
+      }
+    } catch (err) {
+      hideLoader();
+      logConsole(lang === "es" ? `Error en Plate Solving: ${err.message}` : `Plate Solving Error: ${err.message}`, "err");
+      const statusLbl = el("lblSolveStatus");
+      if (statusLbl) {
+        statusLbl.textContent = lang === "es" ? "● Error al resolver" : "● Solve failed";
+        statusLbl.style.color = "#ff4a4a";
+      }
+    }
+  }
+
+  // Bind del botón
+  if (el("btnSolveImage")) {
+    el("btnSolveImage").addEventListener("click", (e) => {
+      e.preventDefault();
+      performPlateSolving();
+    });
+  }
+
+  // --- CORRECCIÓN DE GRADIENTES (MGC, ABE, AutoDBE, GraXpert) ---
+
+  // Ajusta un polinomio 2D de bajo grado sobre una imagen reducida (para rendimiento)
+  // Grado 1 (plano inclinado): ax + by + c
+  // Grado 2 (superficie cuadrática / viñeteo): ax^2 + by^2 + cxy + dx + ey + f
+  function fitPolynomial2D(img, degree = 2, outlierRejection = true) {
+    const w = img.w;
+    const h = img.h;
+    
+    // Submuestrear la imagen a un tamaño manejable (~100 píxeles de ancho) para ajustar rápido
+    const step = Math.max(1, Math.floor(w / 100));
+    const samples = [];
+    
+    for (let c = 0; c < img.nc; c++) {
+      const ch = img.ch[c];
+      const chSamples = [];
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const val = ch[y * w + x];
+          chSamples.push({ x: x / w, y: y / h, val: val }); // Coordenadas normalizadas [0, 1]
+        }
+      }
+      
+      // Ajuste iterativo por mínimos cuadrados con rechazo de valores atípicos (outliers de estrellas/nebulosas)
+      let coeffs = solveLeastSquaresPolynomial(chSamples, degree);
+      if (outlierRejection) {
+        for (let iter = 0; iter < 3; iter++) {
+          // Calcular desviación estándar de los residuos
+          let sumSq = 0;
+          const count = chSamples.length;
+          const residuals = new Float32Array(count);
+          for (let i = 0; i < count; i++) {
+            const s = chSamples[i];
+            const pVal = evaluatePolynomial(s.x, s.y, coeffs, degree);
+            residuals[i] = s.val - pVal;
+            sumSq += residuals[i] * residuals[i];
+          }
+          const stdDev = Math.sqrt(sumSq / count);
+          
+          // Filtrar muestras que se alejen demasiado (estrellas o nebulosas brillantes)
+          // Evitamos que el umbral colapse a cero en tomas ya corregidas usando un mínimo de 0.002
+          const filtered = chSamples.filter((s, idx) => Math.abs(residuals[idx]) < Math.max(2.0 * stdDev, 0.002));
+          if (filtered.length > 10) {
+            coeffs = solveLeastSquaresPolynomial(filtered, degree);
+          }
+        }
+      }
+      samples.push(coeffs);
+    }
+    return samples;
+  }
+
+  function evaluatePolynomial(x, y, c, d) {
+    if (d === 1) {
+      // ax + by + c
+      return c[0] * x + c[1] * y + c[2];
+    } else {
+      // ax^2 + by^2 + cxy + dx + ey + f
+      return c[0] * x * x + c[1] * y * y + c[2] * x * y + c[3] * x + c[4] * y + c[5];
+    }
+  }
+
+  // Resuelve A * coeffs = B mediante eliminación de Gauss-Jordan con pivoteo parcial
+  function solveLinearSystem(A, B) {
+    const n = B.length;
+    const mat = Array.from({ length: n }, (_, i) => Float64Array.from(A[i]));
+    const rhs = Float64Array.from(B);
+    
+    for (let i = 0; i < n; i++) {
+      // Búsqueda de pivote (pivoteo parcial)
+      let maxRow = i;
+      let maxVal = Math.abs(mat[i][i]);
+      for (let r = i + 1; r < n; r++) {
+        const val = Math.abs(mat[r][i]);
+        if (val > maxVal) {
+          maxVal = val;
+          maxRow = r;
+        }
+      }
+      
+      // Intercambio de filas
+      if (maxRow !== i) {
+        const tempRow = mat[i];
+        mat[i] = mat[maxRow];
+        mat[maxRow] = tempRow;
+        
+        const tempRhs = rhs[i];
+        rhs[i] = rhs[maxRow];
+        rhs[maxRow] = tempRhs;
+      }
+      
+      let pivot = mat[i][i];
+      if (Math.abs(pivot) < 1e-15) {
+        pivot = pivot >= 0 ? 1e-12 : -1e-12;
+      }
+      
+      // Normalizar fila pivote
+      for (let j = i; j < n; j++) {
+        mat[i][j] /= pivot;
+      }
+      rhs[i] /= pivot;
+      
+      // Eliminar el resto de filas
+      for (let k = 0; k < n; k++) {
+        if (k !== i) {
+          const factor = mat[k][i];
+          for (let j = i; j < n; j++) {
+            mat[k][j] -= factor * mat[i][j];
+          }
+          rhs[k] -= factor * rhs[i];
+        }
+      }
+    }
+    return rhs;
+  }
+
+  // Resuelve A * coeffs = B
+  function solveLeastSquaresPolynomial(samples, degree) {
+    const numCoeffs = degree === 1 ? 3 : 6;
+    const A = Array.from({ length: numCoeffs }, () => new Float64Array(numCoeffs));
+    const B = new Float64Array(numCoeffs);
+    
+    for (const s of samples) {
+      let terms;
+      if (degree === 1) {
+        terms = [s.x, s.y, 1];
+      } else {
+        terms = [s.x * s.x, s.y * s.y, s.x * s.y, s.x, s.y, 1];
+      }
+      for (let i = 0; i < numCoeffs; i++) {
+        for (let j = 0; j < numCoeffs; j++) {
+          A[i][j] += terms[i] * terms[j];
+        }
+        B[i] += terms[i] * s.val;
+      }
+    }
+    
+    return solveLinearSystem(A, B);
+  }
+
+  // --- Lógica del modelo MGC ---
+  function applyMGC(img, smooth, multipliers) {
+    // Generar gradiente sintético bilineal/bicúbico suave
+    const w = img.w;
+    const h = img.h;
+    const result = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    
+    // Ajustar un polinomio de grado 2 (con rechazo moderado)
+    const coeffs = fitPolynomial2D(img, 2, true);
+    
+    for (let c = 0; c < img.nc; c++) {
+      const src = img.ch[c];
+      const dst = new Float32Array(w * h);
+      const coeff = coeffs[c];
+      const mult = multipliers[c] || 1.0;
+      
+      for (let y = 0; y < h; y++) {
+        const ny = y / h;
+        for (let x = 0; x < w; x++) {
+          const nx = x / w;
+          const idx = y * w + x;
+          
+          // Evaluar polinomio de fondo modelado
+          const gradVal = evaluatePolynomial(nx, ny, coeff, 2) * smooth * mult;
+          
+          // Resta del gradiente
+          dst[idx] = Math.max(0, src[idx] - gradVal);
+        }
+      }
+      result.ch.push(dst);
+    }
+    return result;
+  }
+
+  // --- Lógica del modelo ABE ---
+  // --- Lógica del modelo ABE ---
+  function applyABE(img, degree, method, normalize) {
+    const w = img.w;
+    const h = img.h;
+    const result = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    const grad = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    
+    // Ajustar polinomio del grado configurado con fuerte rechazo de outliers
+    const coeffs = fitPolynomial2D(img, degree, true);
+    
+    for (let c = 0; c < img.nc; c++) {
+      const src = img.ch[c];
+      const dst = new Float32Array(w * h);
+      const bgCh = new Float32Array(w * h);
+      const coeff = coeffs[c];
+      
+      // Calcular la media del canal original para normalización si es requerida
+      let mean = 0;
+      if (normalize) {
+        let sum = 0;
+        for (let i = 0; i < src.length; i++) sum += src[i];
+        mean = sum / src.length;
+      }
+      
+      for (let y = 0; y < h; y++) {
+        const ny = y / h;
+        for (let x = 0; x < w; x++) {
+          const nx = x / w;
+          const idx = y * w + x;
+          
+          const background = evaluatePolynomial(nx, ny, coeff, degree === 1 ? 1 : 2);
+          bgCh[idx] = background;
+          
+          if (method === "subtraction") {
+            dst[idx] = Math.max(0, src[idx] - background);
+            if (normalize) dst[idx] = Math.min(1.0, dst[idx] + mean);
+          } else {
+            // División (Division)
+            const denom = Math.max(0.001, background);
+            dst[idx] = Math.max(0, Math.min(1.0, src[idx] / denom));
+            if (normalize) dst[idx] = Math.min(1.0, dst[idx] * mean);
+          }
+        }
+      }
+      result.ch.push(dst);
+      grad.ch.push(bgCh);
+    }
+    state.subtractedGradient = grad;
+    return result;
+  }
+
+  // --- Lógica del modelo AutoDBE por RBF (Radial Basis Functions) ---
+  function applyAutoDBE(img, pathCount, tolerance, smoothness) {
+    const w = img.w;
+    const h = img.h;
+    const result = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    const grad = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    
+    // Generar muestras dinámicas automáticas en áreas oscuras de la toma
+    // Para simplificar y optimizar, seleccionamos puntos aleatorios y nos quedamos con los de menor luminancia
+    const points = [];
+    const step = Math.max(1, Math.floor(w / 100));
+    
+    // Evaluar luminancia para evitar nebulosas/estrellas
+    const lum = new Float32Array(w * h);
+    if (img.isColor) {
+      for (let i = 0; i < w*h; i++) {
+        lum[i] = wl[0] * img.ch[0][i] + wl[1] * img.ch[1][i] + wl[2] * img.ch[2][i];
+      }
+    } else {
+      lum.set(img.ch[0]);
+    }
+    
+    // Dividir la imagen en una cuadrícula de bloques (ej. 8x6) para asegurar distribución uniforme
+    const cols = 8;
+    const rows = 6;
+    const cellW = Math.floor(w / cols);
+    const cellH = Math.floor(h / rows);
+    
+    const selectedPoints = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const startX = c * cellW + 10;
+        const endX = Math.min(w - 10, (c + 1) * cellW);
+        const startY = r * cellH + 10;
+        const endY = Math.min(h - 10, (r + 1) * cellH);
+        
+        let minVal = Infinity;
+        let minX = startX;
+        let minY = startY;
+        
+        for (let y = startY; y < endY; y += 4) {
+          for (let x = startX; x < endX; x += 4) {
+            const val = lum[y * w + x];
+            if (val < minVal) {
+              minVal = val;
+              minX = x;
+              minY = y;
+            }
+          }
+        }
+        selectedPoints.push({ x: minX, y: minY, val: minVal });
+      }
+    }
+    
+    for (let c = 0; c < img.nc; c++) {
+      const src = img.ch[c];
+      const dst = new Float32Array(w * h);
+      const bgCh = new Float32Array(w * h);
+      
+      // RBF interpolator (Multiquadric radial basis)
+      // f(x,y) = sum( w_i * phi(r_i) ) donde phi(r) = sqrt(r^2 + s^2)
+      const nPoints = selectedPoints.length;
+      const rbfWeights = new Float64Array(nPoints);
+      const s2 = smoothness * smoothness * 0.1; // Parámetro de suavizado
+      
+      // Ajustar pesos RBF resolviendo sistema lineal
+      const mat = Array.from({ length: nPoints }, () => new Float64Array(nPoints));
+      const rhs = new Float64Array(nPoints);
+      
+      for (let i = 0; i < nPoints; i++) {
+        const p1 = selectedPoints[i];
+        rhs[i] = src[p1.y * w + p1.x];
+        for (let j = 0; j < nPoints; j++) {
+          const p2 = selectedPoints[j];
+          const dx = (p1.x - p2.x) / w;
+          const dy = (p1.y - p2.y) / h;
+          const r2 = dx*dx + dy*dy;
+          mat[i][j] = Math.sqrt(r2 + s2);
+        }
+      }
+      
+      // Solve system using robust solver with partial pivoting
+      const weights = solveLinearSystem(mat, rhs);
+      rbfWeights.set(weights);
+      
+      // Evaluar RBF en toda la cuadrícula
+      for (let y = 0; y < h; y++) {
+        const ny = y / h;
+        for (let x = 0; x < w; x++) {
+          const nx = x / w;
+          const idx = y * w + x;
+          
+          let background = 0;
+          for (let i = 0; i < nPoints; i++) {
+            const p = selectedPoints[i];
+            const dx = nx - (p.x / w);
+            const dy = ny - (p.y / h);
+            const r2 = dx*dx + dy*dy;
+            background += rbfWeights[i] * Math.sqrt(r2 + s2);
+          }
+          bgCh[idx] = Math.max(0, background);
+          
+          // Resta del gradiente elástico
+          dst[idx] = Math.max(0, src[idx] - Math.max(0, background));
+        }
+      }
+      
+      result.ch.push(dst);
+      grad.ch.push(bgCh);
+    }
+    
+    state.subtractedGradient = grad;
+    return result;
+  }
+
+  // --- Lógica del modelo GraXpert ---
+  function applyGraXpert(img, correction, smoothness) {
+    // GraXpert web simula una interpolación bicúbica multiescala de muy baja frecuencia
+    const w = img.w;
+    const h = img.h;
+    const result = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    const grad = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
+    
+    // Estimación bicúbica del fondo
+    const coeffs = fitPolynomial2D(img, 2, true);
+    
+    for (let c = 0; c < img.nc; c++) {
+      const src = img.ch[c];
+      const dst = new Float32Array(w * h);
+      const bgCh = new Float32Array(w * h);
+      const coeff = coeffs[c];
+      
+      // Calcular la media para normalización
+      let sum = 0;
+      for (let i = 0; i < src.length; i++) sum += src[i];
+      const mean = sum / src.length;
+      
+      for (let y = 0; y < h; y++) {
+        const ny = y / h;
+        for (let x = 0; x < w; x++) {
+          const nx = x / w;
+          const idx = y * w + x;
+          
+          const background = evaluatePolynomial(nx, ny, coeff, 2) * (1 - smoothness * 0.15);
+          bgCh[idx] = background;
+          
+          if (correction === "subtraction") {
+            dst[idx] = Math.max(0, src[idx] - background);
+          } else {
+            const denom = Math.max(0.001, background);
+            dst[idx] = Math.max(0, Math.min(1.0, src[idx] / denom)) * mean;
+          }
+        }
+      }
+      result.ch.push(dst);
+      grad.ch.push(bgCh);
+    }
+    state.subtractedGradient = grad;
+    return result;
+  }
+
+  // --- PROCESAMIENTO GENERAL DE GRADIENTE ---
+  function applyGradientCorrection(img) {
+    if (!img) return null;
+    const algo = el("selGradientAlgo").value;
+    
+    if (algo === "dbe") {
+      const paths = parseInt(el("sldAdbePaths").value, 10);
+      const tol = parseFloat(el("sldAdbeTol").value);
+      const smooth = parseFloat(el("sldAdbeSmooth").value);
+      return applyAutoDBE(img, paths, tol, smooth);
+    } else if (algo === "abe") {
+      const degree = parseInt(el("sldAbeDegree").value, 10);
+      const corr = el("selAbeCorrection").value;
+      const norm = el("chkAbeNormalize").checked;
+      // Mapear grados impares a 1 y pares a 2 en la aproximación analítica
+      const fitDegree = degree <= 2 ? 1 : 2;
+      return applyABE(img, fitDegree, corr, norm);
+    } else if (algo === "graxpert") {
+      const corr = el("selGraXpertCorrection").value;
+      const smooth = parseFloat(el("sldGraXpertSmooth").value);
+      return applyGraXpert(img, corr, smooth);
+    }
+    return img;
+  }
+
+  // Bind de sliders dinámicos del gradiente
+  const gradSliders = [
+    { s: "sldAdbePaths", v: "valAdbePaths", p: 0 },
+    { s: "sldAdbeTol", v: "valAdbeTol", p: 2 },
+    { s: "sldAdbeSmooth", v: "valAdbeSmooth", p: 2 },
+    { s: "sldAbeDegree", v: "valAbeDegree", p: 0 },
+    { s: "sldGraXpertSmooth", v: "valGraXpertSmooth", p: 3 }
+  ];
+
+  gradSliders.forEach(({ s, v, p }) => {
+    const sld = el(s);
+    const val = el(v);
+    if (sld && val) {
+      sld.addEventListener("input", () => {
+        val.textContent = parseFloat(sld.value).toFixed(p);
+      });
+    }
+  });
+
+  // Event Listeners de Botones de Gradiente
+  if (el("btnApplyGradient")) {
+    el("btnApplyGradient").addEventListener("click", () => {
+      if (!state.activeImage) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Aplicando Corrección de Gradiente..." : "Applying Gradient Correction...");
+      
+      setTimeout(async () => {
+        try {
+          const algo = el("selGradientAlgo").value;
+          let corrected;
+          const srcImg = state.stepInputImage || state.activeImage;
+          if (algo === "graxpert_ia" || algo === "dbe") {
+            let params = {};
+            if (algo === "graxpert_ia") {
+              params = {
+                correction: el("selGraXpertCorrection").value,
+                smoothness: parseFloat(el("sldGraXpertSmooth").value)
+              };
+            } else {
+              params = {
+                paths: parseInt(el("sldAdbePaths").value, 10),
+                tolerance: parseFloat(el("sldAdbeTol").value),
+                smoothness: parseFloat(el("sldAdbeSmooth").value)
+              };
+            }
+            const res = await SASProPyodide.processImageRaw(srcImg, algo, params);
+            corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+            if (res.bgCh) {
+              state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+            }
+          } else {
+            corrected = applyGradientCorrection(srcImg);
+          }
+          
+          state.activeImage = corrected;
+          // Activar estirado automático de pantalla (AutoSTF) para que el resultado lineal no se vea negro
+          state.screenStretchMode = true;
+          const stfBtn = el("btnToolAutoSTF");
+          if (stfBtn) stfBtn.classList.add("active");
+          
+          hideLoader();
+          render();
+          drawHistogram();
+          logConsole(lang === "es" ? "Vista previa de gradiente calculada (AutoSTF habilitado)" : "Gradient preview calculated (AutoSTF enabled)", "info");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+
+  if (el("btnCompareGradient")) {
+    el("btnCompareGradient").addEventListener("click", () => {
+      if (!state.activeImage) return;
+      const lang = document.documentElement.lang || "es";
+      
+      if (state.splitViewMode) {
+        // Desactivar cortinilla
+        state.splitViewMode = false;
+        el("btnCompareGradient").classList.remove("active");
+        render();
+        return;
+      }
+
+      showLoader(lang === "es" ? "Generando modelo de gradiente..." : "Generating gradient model...");
+      
+      setTimeout(async () => {
+        try {
+          const algo = el("selGradientAlgo").value;
+          let corrected;
+          const srcImg = state.stepInputImage || state.activeImage;
+          if (algo === "graxpert_ia" || algo === "dbe") {
+            let params = {};
+            if (algo === "graxpert_ia") {
+              params = {
+                correction: el("selGraXpertCorrection").value,
+                smoothness: parseFloat(el("sldGraXpertSmooth").value)
+              };
+            } else {
+              params = {
+                paths: parseInt(el("sldAdbePaths").value, 10),
+                tolerance: parseFloat(el("sldAdbeTol").value),
+                smoothness: parseFloat(el("sldAdbeSmooth").value)
+              };
+            }
+            const res = await SASProPyodide.processImageRaw(srcImg, algo, params);
+            corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+            if (res.bgCh) {
+              state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+            }
+          } else {
+            corrected = applyGradientCorrection(srcImg);
+          }
+          
+          // Entrar en modo cortinilla comparando imagen activa original contra la corregida
+          state.splitCompareImage = corrected;
+          state.splitViewMode = true;
+          state.splitPercent = 0.5;
+          el("btnCompareGradient").classList.add("active");
+          
+          // Activar estirado automático de pantalla (AutoSTF)
+          state.screenStretchMode = true;
+          const stfBtn = el("btnToolAutoSTF");
+          if (stfBtn) stfBtn.classList.add("active");
+
+          hideLoader();
+          render();
+          logConsole(lang === "es" ? "Comparación del modelo de gradiente activada (AutoSTF habilitado)" : "Gradient model comparison activated (AutoSTF enabled)", "info");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+
+  if (el("btnGradientApplyAll")) {
+    el("btnGradientApplyAll").addEventListener("click", () => {
+      if (!state.activeImage) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Aplicando Gradiente a todo el flujo..." : "Applying Gradient to all workflow images...");
+      
+      setTimeout(async () => {
+        try {
+          const algo = el("selGradientAlgo").value;
+          for (const key of Object.keys(state.workflowImages)) {
+            if (algo === "graxpert_ia" || algo === "dbe") {
+              let params = {};
+              if (algo === "graxpert_ia") {
+                params = {
+                  correction: el("selGraXpertCorrection").value,
+                  smoothness: parseFloat(el("sldGraXpertSmooth").value)
+                };
+              } else {
+                params = {
+                  paths: parseInt(el("sldAdbePaths").value, 10),
+                  tolerance: parseFloat(el("sldAdbeTol").value),
+                  smoothness: parseFloat(el("sldAdbeSmooth").value)
+                };
+              }
+              const res = await SASProPyodide.processImageRaw(state.workflowImages[key], algo, params);
+              state.workflowImages[key] = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: state.workflowImages[key].wcs };
+              if (key === state.activeWorkflowKey && res.bgCh) {
+                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              }
+            } else {
+              state.workflowImages[key] = applyGradientCorrection(state.workflowImages[key]);
+            }
+          }
+          if (state.activeWorkflowKey && state.workflowImages[state.activeWorkflowKey]) {
+            state.activeImage = state.workflowImages[state.activeWorkflowKey];
+          }
+          
+          // Activar estirado automático de pantalla (AutoSTF)
+          state.screenStretchMode = true;
+          const stfBtn = el("btnToolAutoSTF");
+          if (stfBtn) stfBtn.classList.add("active");
+
+          hideLoader();
+          render();
+          drawHistogram();
+          logConsole(lang === "es" ? "Corrección de gradiente aplicada a todo el flujo (AutoSTF habilitado)" : "Gradient correction applied to all workflow images (AutoSTF enabled)", "info");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+
+  // --- CARGA DE ARCHIVOS ---
+  let targetLoadingChannel = -1;
+
+  // Cargar canales individuales
+  document.querySelectorAll(".piw-channel-row").forEach(row => {
+    row.addEventListener("click", () => {
+      targetLoadingChannel = parseInt(row.getAttribute("data-channel"), 10);
+      el("fileInputChannel").value = "";
+      el("fileInputChannel").click();
+    });
+  });
+
+  el("fileInputChannel").addEventListener("change", async (e) => {
+    if (e.target.files && e.target.files[0] && targetLoadingChannel !== -1) {
+      const file = e.target.files[0];
+      const chanIdx = targetLoadingChannel;
+      showLoader(`Cargando canal ${file.name}...`);
+      
+      setTimeout(async () => {
+        try {
+          const loaded = await AutoGHS.loadFromFile(file);
+          // Reducir la resolución de trabajo para rendimiento óptimo
+          const capped = AutoGHS.capChannels(loaded.ch, loaded.w, loaded.h, loaded.nc, MAX_PREVIEW_DIM);
+          
+          let loadedItem;
+          if (chanIdx === 7) {
+            // Guardar imagen color/mono original
+            loadedItem = {
+              ch: capped.ch,
+              w: capped.w,
+              h: capped.h,
+              nc: loaded.nc,
+              isColor: loaded.isColor
+            };
+          } else {
+            // Guardar canal (monocromo, cogemos la luminancia si el canal cargado es color)
+            let monoCh;
+            if (loaded.isColor) {
+              monoCh = new Float32Array(capped.w * capped.h);
+              for (let i = 0; i < monoCh.length; ++i) {
+                monoCh[i] = wl[0] * capped.ch[0][i] + wl[1] * capped.ch[1][i] + wl[2] * capped.ch[2][i];
+              }
+            } else {
+              monoCh = capped.ch[0];
+            }
+            loadedItem = {
+              ch: [monoCh],
+              w: capped.w,
+              h: capped.h,
+              nc: 1,
+              isColor: false
+            };
+          }
+
+          state.loadedChannels[chanIdx] = loadedItem;
+          state.channelNames[chanIdx] = file.name;
+
+          // Actualizar UI
+          const rowEl = document.querySelector(`.piw-channel-row[data-channel="${chanIdx}"]`);
+          if (rowEl) rowEl.classList.add("loaded");
+          
+          const filenameEl = el(`file-name-${chanIdx}`);
+          if (filenameEl) {
+            filenameEl.textContent = file.name;
+            filenameEl.title = file.name;
+          }
+
+          logConsole(`Canal ${chanIdx} cargado: ${file.name} (${capped.w}x${capped.h})`, "info");
+          
+          // Habilitar combinación
+          checkCombineState();
+        } catch (err) {
+          logConsole(`Error al cargar canal: ${err.message}`, "err");
+        } finally {
+          hideLoader();
+        }
+      }, 50);
+    }
+  });
+
+  // Habilita el botón de combinación si hay suficientes canales cargados
+  function checkCombineState() {
+    // 1. R+G+B
+    const hasR = state.loadedChannels[0] !== null;
+    const hasG = state.loadedChannels[1] !== null;
+    const hasB = state.loadedChannels[2] !== null;
+    const hasL = state.loadedChannels[3] !== null;
+    const rgbValid = (hasR && hasG) || (hasR && hasG && hasB) || hasL;
+    el("btnCombineRGB").disabled = !rgbValid;
+    if (el("btnSeparateRGB")) el("btnSeparateRGB").disabled = !rgbValid;
+    
+    // 2. NB (Narrowband)
+    const hasSII = state.loadedChannels[4] !== null;
+    const hasHa = state.loadedChannels[5] !== null;
+    const hasOIII = state.loadedChannels[6] !== null;
+    
+    let nbValid = false;
+    const selectEl = el("selNbRecipe");
+    if (selectEl) {
+      const recipeId = selectEl.value;
+      const formula = narrowbandFormulas && narrowbandFormulas.find(f => f.id === recipeId);
+      if (formula) {
+        nbValid = true;
+        const reqSources = formula.sources || ['sii', 'ha', 'oiii'];
+        if (reqSources.includes("sii") && !hasSII) nbValid = false;
+        if (reqSources.includes("ha") && !hasHa) nbValid = false;
+        if (reqSources.includes("oiii") && !hasOIII) nbValid = false;
+      } else {
+        // Fallback si no han cargado aún las fórmulas de la PixelMath-teca
+        if (recipeId === "sho" && hasSII && hasHa && hasOIII) nbValid = true;
+        else if (recipeId === "hoo" && hasHa && hasOIII) nbValid = true;
+        else if (recipeId === "hso" && hasSII && hasHa && hasOIII) nbValid = true;
+      }
+    }
+    el("btnCombineNB").disabled = !nbValid;
+    if (el("btnSeparateNB")) el("btnSeparateNB").disabled = !nbValid;
+
+    // 3. RGB Color (Direct)
+    const hasColorImg = state.loadedChannels[7] !== null;
+    el("btnLoadRGBColor").disabled = !hasColorImg;
+  }
+
+  // Combinación de canales RGB (Tab 0)
+  el("btnCombineRGB").addEventListener("click", () => {
+    showLoader("Combinando canales RGB...");
+    setTimeout(() => {
+      try {
+        const hasR = state.loadedChannels[0] !== null;
+        const hasG = state.loadedChannels[1] !== null;
+        const hasB = state.loadedChannels[2] !== null;
+        const hasL = state.loadedChannels[3] !== null;
+
+        let w = 0, h = 0;
+        // Obtener dimensiones de referencia
+        for (let i = 0; i < 4; ++i) {
+          if (state.loadedChannels[i]) {
+            w = state.loadedChannels[i].w;
+            h = state.loadedChannels[i].h;
+            break;
+          }
+        }
+
+        if (w === 0 || h === 0) throw new Error("No hay canales válidos cargados.");
+
+        const n = w * h;
+        let finalImage;
+
+        if (hasR && hasG) {
+          // Es una imagen color (clonamos para no mutar los cargados originales)
+          const rChan = Float32Array.from(state.loadedChannels[0].ch[0]);
+          const gChan = Float32Array.from(state.loadedChannels[1].ch[0]);
+          let bChan;
+
+          if (hasB) {
+            bChan = Float32Array.from(state.loadedChannels[2].ch[0]);
+          } else {
+            // Sintetizar bicolor (HOO): B = OIII (G)
+            bChan = Float32Array.from(gChan);
+            logConsole("Mezcla bicolor HOO autodetectada (duplicando canal Verde en Azul)", "info");
+          }
+
+          // Inyectar luminancia si está cargada
+          if (hasL) {
+            const lChan = state.loadedChannels[3].ch[0];
+            const rgbL = new Float32Array(n);
+            for (let i = 0; i < n; ++i) {
+              rgbL[i] = wl[0] * rChan[i] + wl[1] * gChan[i] + wl[2] * bChan[i];
+            }
+            // Escalar canales cromáticos por el ratio L / Luminancia_RGB
+            for (let i = 0; i < n; ++i) {
+              const ratio = rgbL[i] > 1e-5 ? lChan[i] / rgbL[i] : 1;
+              rChan[i] = Math.min(1, rChan[i] * ratio);
+              gChan[i] = Math.min(1, gChan[i] * ratio);
+              bChan[i] = Math.min(1, bChan[i] * ratio);
+            }
+            logConsole("Luminancia inyectada en canales de crominancia", "info");
+          }
+
+          finalImage = {
+            ch: [rChan, gChan, bChan],
+            w: w,
+            h: h,
+            nc: 3,
+            isColor: true
+          };
+        } else if (hasL) {
+          // Solo luminancia (monocromo, clonamos para no mutar)
+          finalImage = {
+            ch: [Float32Array.from(state.loadedChannels[3].ch[0])],
+            w: w,
+            h: h,
+            nc: 1,
+            isColor: false
+          };
+          logConsole("Imagen monocroma (Luminancia) generada", "info");
+        }
+
+        // Limpiar claves de Banda Estrecha
+        const nbKeys = ["S", "H", "O", "HSO"];
+        nbKeys.forEach(k => delete state.workflowImages[k]);
+
+        state.workflowImages["MonoRGB"] = finalImage;
+        state.activeWorkflowKey = "MonoRGB";
+        setActiveImage(finalImage);
+        refreshPathBar();
+        logConsole(`Combinación completada con éxito (${w}x${h} px)`, "info");
+      } catch (err) {
+        logConsole(`Error al combinar canales: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Combinación de canales NB (Tab 0)
+  el("btnCombineNB").addEventListener("click", () => {
+    showLoader("Combinando canales Banda Estrecha...");
+    setTimeout(() => {
+      try {
+        const hasSII = state.loadedChannels[4] !== null;
+        const hasHa = state.loadedChannels[5] !== null;
+        const hasOIII = state.loadedChannels[6] !== null;
+        const recipeId = el("selNbRecipe").value;
+        const formula = narrowbandFormulas.find(f => f.id === recipeId);
+        if (!formula) throw new Error("Fórmula no encontrada.");
+
+        let w = 0, h = 0;
+        // Obtener dimensiones de referencia
+        for (let i = 4; i <= 6; ++i) {
+          if (state.loadedChannels[i]) {
+            w = state.loadedChannels[i].w;
+            h = state.loadedChannels[i].h;
+            break;
+          }
+        }
+
+        if (w === 0 || h === 0) throw new Error("No hay canales válidos cargados para Banda Estrecha.");
+
+        const n = w * h;
+        let finalImage;
+
+        // Reservar canales R, G, B
+        const rChan = new Float32Array(n);
+        const gChan = new Float32Array(n);
+        const bChan = new Float32Array(n);
+
+        const sii = hasSII ? state.loadedChannels[4].ch[0] : new Float32Array(n);
+        const ha = hasHa ? state.loadedChannels[5].ch[0] : new Float32Array(n);
+        const oiii = hasOIII ? state.loadedChannels[6].ch[0] : new Float32Array(n);
+
+        // Compile expressions for R, G, B
+        // Collect slider keys and values
+        const sliderKeys = formula.sliders ? formula.sliders.map(s => s.id) : [];
+        const sliderVals = sliderKeys.map(key => {
+          const inputEl = el(`sldNb_${key}`);
+          return inputEl ? parseFloat(inputEl.value) : (formula.sliders.find(s => s.id === key).value);
+        });
+
+        const fnR = compilePixelMathExpression(formula.r || 'Ha', sliderKeys);
+        const fnG = compilePixelMathExpression(formula.g || 'OIII', sliderKeys);
+        const fnB = compilePixelMathExpression(formula.b || 'OIII', sliderKeys);
+
+        if (!fnR || !fnG || !fnB) {
+          throw new Error("No se pudo compilar la expresión matemática de la fórmula.");
+        }
+
+        // Ejecutar píxel a píxel
+        for (let i = 0; i < n; ++i) {
+          rChan[i] = Math.min(1.0, Math.max(0.0, fnR(sii[i], ha[i], oiii[i], sii[i], ha[i], oiii[i], ...sliderVals)));
+          gChan[i] = Math.min(1.0, Math.max(0.0, fnG(sii[i], ha[i], oiii[i], sii[i], ha[i], oiii[i], ...sliderVals)));
+          bChan[i] = Math.min(1.0, Math.max(0.0, fnB(sii[i], ha[i], oiii[i], sii[i], ha[i], oiii[i], ...sliderVals)));
+        }
+
+        logConsole(`Mezcla PixelMath aplicada: ${formula.name}`, "info");
+
+        finalImage = {
+          ch: [rChan, gChan, bChan],
+          w: w,
+          h: h,
+          nc: 3,
+          isColor: true
+        };
+
+        // Limpiar claves de Banda Ancha RGB
+        const rgbKeys = ["MonoRGB", "RGB", "R", "G", "B", "L"];
+        rgbKeys.forEach(k => delete state.workflowImages[k]);
+
+        state.workflowImages["HSO"] = finalImage;
+        state.activeWorkflowKey = "HSO";
+        setActiveImage(finalImage);
+        refreshPathBar();
+        logConsole(`Combinación NB completada con éxito (${w}x${h} px)`, "info");
+      } catch (err) {
+        logConsole(`Error al combinar canales NB: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Carga de imagen a color directa (Tab 0)
+  el("btnLoadRGBColor").addEventListener("click", () => {
+    showLoader("Cargando imagen a color...");
+    setTimeout(() => {
+      try {
+        const loadedColor = state.loadedChannels[7];
+        if (!loadedColor) throw new Error("No hay imagen color cargada.");
+
+        // Clonamos la imagen para no machacar la guardada
+        const finalImage = cloneImage(loadedColor);
+
+        // Limpiar claves de Banda Estrecha
+        const nbKeys = ["S", "H", "O", "HSO"];
+        nbKeys.forEach(k => delete state.workflowImages[k]);
+
+        state.workflowImages["RGB"] = finalImage;
+        state.activeWorkflowKey = "RGB";
+        setActiveImage(finalImage);
+        refreshPathBar();
+        logConsole(`Carga de imagen color completada con éxito (${finalImage.w}x${finalImage.h} px)`, "info");
+      } catch (err) {
+        logConsole(`Error al cargar imagen color: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Procesar por separado RGB (Tab 0)
+  el("btnSeparateRGB").addEventListener("click", () => {
+    showLoader("Separando canales RGB...");
+    setTimeout(() => {
+      try {
+        const hasR = state.loadedChannels[0] !== null;
+        const hasG = state.loadedChannels[1] !== null;
+        const hasB = state.loadedChannels[2] !== null;
+        const hasL = state.loadedChannels[3] !== null;
+
+        let w = 0, h = 0;
+        for (let i = 0; i < 4; ++i) {
+          if (state.loadedChannels[i]) {
+            w = state.loadedChannels[i].w;
+            h = state.loadedChannels[i].h;
+            break;
+          }
+        }
+
+        if (w === 0 || h === 0) throw new Error("No hay canales válidos cargados.");
+
+        // Limpiar claves de Banda Estrecha
+        const nbKeys = ["S", "H", "O", "HSO"];
+        nbKeys.forEach(k => delete state.workflowImages[k]);
+        
+        if (hasR) state.workflowImages["R"] = cloneImage(state.loadedChannels[0]);
+        if (hasG) state.workflowImages["G"] = cloneImage(state.loadedChannels[1]);
+        if (hasB) state.workflowImages["B"] = cloneImage(state.loadedChannels[2]);
+        if (hasL) state.workflowImages["L"] = cloneImage(state.loadedChannels[3]);
+
+        const keys = Object.keys(state.workflowImages);
+        if (keys.length === 0) throw new Error("No hay ningún canal cargado.");
+
+        state.activeWorkflowKey = keys[0];
+        setActiveImage(state.workflowImages[state.activeWorkflowKey]);
+        refreshPathBar();
+        logConsole(`Canales separados cargados con éxito (${w}x${h} px)`, "info");
+      } catch (err) {
+        logConsole(`Error al cargar canales por separado: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Procesar por separado NB (Tab 0)
+  el("btnSeparateNB").addEventListener("click", () => {
+    showLoader("Separando canales Banda Estrecha...");
+    setTimeout(() => {
+      try {
+        const hasSII = state.loadedChannels[4] !== null;
+        const hasHa = state.loadedChannels[5] !== null;
+        const hasOIII = state.loadedChannels[6] !== null;
+
+        let w = 0, h = 0;
+        for (let i = 4; i <= 6; ++i) {
+          if (state.loadedChannels[i]) {
+            w = state.loadedChannels[i].w;
+            h = state.loadedChannels[i].h;
+            break;
+          }
+        }
+
+        if (w === 0 || h === 0) throw new Error("No hay canales válidos cargados.");
+
+        // Limpiar claves de Banda Ancha RGB
+        const rgbKeys = ["MonoRGB", "RGB", "R", "G", "B", "L"];
+        rgbKeys.forEach(k => delete state.workflowImages[k]);
+        
+        if (hasSII) state.workflowImages["S"] = cloneImage(state.loadedChannels[4]);
+        if (hasHa) state.workflowImages["H"] = cloneImage(state.loadedChannels[5]);
+        if (hasOIII) state.workflowImages["O"] = cloneImage(state.loadedChannels[6]);
+
+        const keys = Object.keys(state.workflowImages);
+        if (keys.length === 0) throw new Error("No hay ningún canal cargado.");
+
+        state.activeWorkflowKey = keys[0];
+        setActiveImage(state.workflowImages[state.activeWorkflowKey]);
+        refreshPathBar();
+        logConsole(`Canales de banda estrecha cargados por separado (${w}x${h} px)`, "info");
+      } catch (err) {
+        logConsole(`Error al cargar canales NB por separado: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Refresca la barra de botones del flujo de canales (path buttons)
+  function refreshPathBar() {
+    const bar = el("piwPathBar");
+    if (!bar) return;
+    bar.innerHTML = "";
+    
+    const keys = Object.keys(state.workflowImages);
+    if (keys.length === 0) {
+      bar.style.display = "none";
+      return;
+    }
+    
+    bar.style.display = "flex";
+    keys.forEach(key => {
+      const btn = document.createElement("button");
+      btn.className = "piw-path-btn";
+      btn.setAttribute("data-key", key);
+      
+      const imgObj = state.workflowImages[key];
+      const hasTransforms = imgObj && imgObj.hasTransforms;
+      
+      if (key === state.activeWorkflowKey) {
+        btn.classList.add("active");
+        btn.textContent = `[${key}]`;
+      } else {
+        btn.textContent = key;
+        if (hasTransforms) {
+          btn.classList.add("done");
+        }
+      }
+      
+      btn.addEventListener("click", () => {
+        selectWorkflowKey(key);
+      });
+      
+      bar.appendChild(btn);
+    });
+  }
+
+  // Cambia el canal/imagen del flujo activo actual
+  function selectWorkflowKey(key) {
+    if (!state.workflowImages[key]) return;
+    state.activeWorkflowKey = key;
+    state.activeImage = state.workflowImages[key];
+    state.originalImage = cloneImage(state.activeImage);
+    
+    // Si la imagen es a color, habilitar SCNR/Saturación, etc.
+    el("btnApplyScnr").disabled = !state.activeImage.isColor;
+    el("btnApplySat").disabled = !state.activeImage.isColor;
+    
+    // Forzar redibujado de la pantalla
+    render();
+    drawHistogram();
+    refreshPathBar();
+    logConsole(`Visualizando canal/imagen del flujo: ${key}`, "info");
+  }
+
+  // Establece la imagen activa y refresca el canvas
+  function setActiveImage(img) {
+    state.activeImage = img;
+    state.originalImage = cloneImage(img);
+    state.stepInputImage = cloneImage(img);
+    
+    // AutoSTF habilitado por defecto para ver imágenes lineales combinadas/cargadas
+    state.screenStretchMode = true;
+    const btnAutoStf = el("btnToolAutoSTF");
+    if (btnAutoStf) btnAutoStf.classList.add("active");
+    logConsole("Estirado de pantalla AutoSTF activado automáticamente", "info");
+    
+    // Reset de visualización
+    zoomFit();
+    setTimeout(zoomFit, 100);
+    setTimeout(zoomFit, 300); // Doble cobertura por si la interfaz tarda en renderizar el acordeón o scrollbar
+    
+    // Habilitar botones de acción en las pestañas
+    const cardLF = el("cardLinearFit");
+    if (cardLF) {
+      if (img.isColor) {
+        cardLF.classList.remove("disabled");
+      } else {
+        cardLF.classList.add("disabled");
+      }
+    }
+    const cardBN = el("cardBN");
+    if (cardBN) {
+      cardBN.classList.remove("disabled");
+    }
+    const cardSPCC = el("cardSPCC");
+    if (cardSPCC) {
+      if (img.isColor) {
+        cardSPCC.classList.remove("disabled");
+      } else {
+        cardSPCC.classList.add("disabled");
+      }
+    }
+    const cardOT = el("cardOT");
+    if (cardOT) {
+      if (img.isColor) {
+        cardOT.classList.remove("disabled");
+      } else {
+        cardOT.classList.add("disabled");
+      }
+    }
+    el("btnApplyDecon").disabled = false;
+    el("btnApplyStretch").disabled = false;
+    el("btnApplyScnr").disabled = !img.isColor;
+    el("btnPreviewMask").disabled = false;
+    el("btnApplyMask").disabled = false;
+    el("btnApplySat").disabled = !img.isColor;
+    el("btnDownloadPNG").disabled = false;
+    el("btnGenerateBlend").disabled = false;
+
+    el("piwHint").style.display = "none";
+    el("piwToolbar").style.display = "flex";
+
+    // Rellenar selectores de la pestaña Mezcla
+    updateMixSourceOptions();
+
+    // Dibujar
+    render();
+    drawHistogram();
+    drawCurvesWidget();
+    drawColorBalanceWidget();
+  }
+
+  // --- OPERACIONES DE PRE-PROCESADO (TAB 0) ---
+
+  // Auto Linear Fit helper function
+  function runLinearFit() {
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg || !srcImg.isColor) return;
+    showLoader("Alineando canales (Linear Fit)...");
+    setTimeout(() => {
+      try {
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        const refCh = img.ch[1];
+        const refStats = AutoGHS.medianMAD(refCh, n, 200000);
+        for (let c of [0, 2]) {
+          const tgtCh = img.ch[c];
+          const tgtStats = AutoGHS.medianMAD(tgtCh, n, 200000);
+          if (tgtStats.sigma > 1e-6) {
+            const scale = refStats.sigma / tgtStats.sigma;
+            for (let i = 0; i < n; ++i) {
+              const val = (tgtCh[i] - tgtStats.median) * scale + refStats.median;
+              tgtCh[i] = val < 0 ? 0 : (val > 1 ? 1 : val);
+            }
+            logConsole(`Canal ${c === 0 ? "Rojo" : "Azul"} alineado: factor ${scale.toFixed(4)}, shift ${(refStats.median - tgtStats.median * scale).toFixed(4)}`, "info");
+          }
+        }
+        img.hasTransforms = true;
+        state.activeImage = img;
+        render();
+        drawHistogram();
+        refreshPathBar();
+        logConsole("Alineación de canales completada", "info");
+      } catch (err) {
+        logConsole(`Error en Linear Fit: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  }
+
+  // Optimal Transport (1D Wasserstein) helper function
+  function runOptimalTransport() {
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg || !srcImg.isColor || srcImg.nc < 3) return;
+    const lang = document.documentElement.lang || "es";
+    showLoader(lang === "es" ? "Aplicando Optimal Transport (Wasserstein 1D)..." : "Applying Optimal Transport (1D Wasserstein)...");
+    setTimeout(() => {
+      try {
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        
+        // Referencia: canal verde (índice 1)
+        const refCh = img.ch[1];
+        
+        // Construir CDF del canal de referencia
+        const numBins = 65536;
+        const refHist = new Float64Array(numBins);
+        for (let i = 0; i < n; i++) {
+          const bin = Math.min(numBins - 1, Math.max(0, Math.floor(refCh[i] * (numBins - 1))));
+          refHist[bin]++;
+        }
+        // Normalizar a CDF
+        const refCDF = new Float64Array(numBins);
+        refCDF[0] = refHist[0] / n;
+        for (let b = 1; b < numBins; b++) {
+          refCDF[b] = refCDF[b - 1] + refHist[b] / n;
+        }
+        
+        // Para cada canal objetivo (R=0, B=2), hacer histogram matching vía transporte 1D
+        for (const c of [0, 2]) {
+          const tgtCh = img.ch[c];
+          
+          // Construir CDF del canal objetivo
+          const tgtHist = new Float64Array(numBins);
+          for (let i = 0; i < n; i++) {
+            const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
+            tgtHist[bin]++;
+          }
+          const tgtCDF = new Float64Array(numBins);
+          tgtCDF[0] = tgtHist[0] / n;
+          for (let b = 1; b < numBins; b++) {
+            tgtCDF[b] = tgtCDF[b - 1] + tgtHist[b] / n;
+          }
+          
+          // Construir LUT de transporte: para cada bin del target, encontrar el bin del ref con CDF más cercana
+          const lut = new Float32Array(numBins);
+          let refIdx = 0;
+          for (let b = 0; b < numBins; b++) {
+            while (refIdx < numBins - 1 && refCDF[refIdx] < tgtCDF[b]) {
+              refIdx++;
+            }
+            // Interpolar para mayor precisión
+            if (refIdx > 0 && refCDF[refIdx] > tgtCDF[b]) {
+              const d0 = tgtCDF[b] - refCDF[refIdx - 1];
+              const d1 = refCDF[refIdx] - tgtCDF[b];
+              const frac = d0 / (d0 + d1 + 1e-12);
+              lut[b] = ((refIdx - 1) + frac) / (numBins - 1);
+            } else {
+              lut[b] = refIdx / (numBins - 1);
+            }
+          }
+          
+          // Aplicar LUT
+          for (let i = 0; i < n; i++) {
+            const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
+            tgtCh[i] = lut[bin];
+          }
+          
+          logConsole(lang === "es" 
+            ? `Canal ${c === 0 ? "Rojo" : "Azul"} alineado por transporte óptimo` 
+            : `Channel ${c === 0 ? "Red" : "Blue"} aligned via optimal transport`, "info");
+        }
+        
+        img.hasTransforms = true;
+        state.activeImage = img;
+        render();
+        drawHistogram();
+        refreshPathBar();
+        logConsole(lang === "es" ? "Optimal Transport (Wasserstein 1D) completado" : "Optimal Transport (1D Wasserstein) completed", "info");
+      } catch (err) {
+        logConsole(`Error en Optimal Transport: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  }
+
+  // Background Neutralization helper function
+  async function runBackgroundNeutralization() {
+    if (!state.activeImage) return;
+    const lang = document.documentElement.lang || "es";
+    showLoader(lang === "es" ? "Neutralizando fondo (SetiAstro)..." : "Neutralizing background (SetiAstro)...");
+    try {
+      const srcImg = state.stepInputImage || state.activeImage;
+      const res = await window.SASProPyodide.processImageRaw(srcImg, "background_neutralization", {});
+      
+      const wcsCopy = srcImg.wcs;
+      state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
+      state.activeImage.hasTransforms = true;
+      
+      render();
+      drawHistogram();
+      refreshPathBar();
+      
+      if (res.extra && res.extra.bg_vals) {
+        const bg = res.extra.bg_vals;
+        const bgStr = bg.map(v => v.toFixed(4)).join(", ");
+        logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
+      }
+      logConsole(lang === "es" ? "Neutralización de fondo (SetiAstro) completada" : "Background Neutralization (SetiAstro) completed", "info");
+    } catch (err) {
+      logConsole(`Error en Neutralización: ${err.message}`, "err");
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // Web-SPCC helper function
+  async function runSPCC() {
+    if (!state.activeImage) return;
+    const lang = document.documentElement.lang || "es";
+    const wcsData = state.wcs || state.activeImage.wcs;
+    if (!wcsData) {
+      logConsole(lang === "es" 
+        ? "Error: Web-SPCC requiere que la imagen esté resuelta (Plate Solving) previamente." 
+        : "Error: Web-SPCC requires the image to be solved (Plate Solving) first.", "err");
+      alert(lang === "es" 
+        ? "Por favor, ejecute Plate Solving en la pestaña correspondiente antes de usar SPCC." 
+        : "Please run Plate Solving in the corresponding tab before using SPCC.");
+      return;
+    }
+    
+    showLoader(lang === "es" ? "Consultando catálogo Gaia DR3 en VizieR..." : "Querying Gaia DR3 catalog on VizieR...");
+    
+    try {
+      const ra = wcsData.ra;
+      const dec = wcsData.dec;
+      const radiusArcmin = wcsData.radius * 60; // radius in arcminutes
+      
+      // Consultar VizieR
+      const url = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/355/gaiadr3&-c=${ra}+${dec}&-c.r=${radiusArcmin}&-out=RA_ICRS&-out=DE_ICRS&-out=Gmag&-out=BPmag&-out=RPmag&-out.max=250`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      const tsvText = await response.text();
+      
+      // Parsear
+      const stars = [];
+      const lines = tsvText.split('\n');
+      let dataStarted = false;
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        if (line.startsWith('----') || line.startsWith('====')) {
+          dataStarted = true;
+          continue;
+        }
+        if (!dataStarted) continue;
+        if (line.startsWith('#')) continue;
+        
+        const parts = line.split('\t');
+        if (parts.length >= 5) {
+          const s_ra = parseFloat(parts[0]);
+          const s_dec = parseFloat(parts[1]);
+          const g = parseFloat(parts[2]);
+          const bp = parseFloat(parts[3]);
+          const rp = parseFloat(parts[4]);
+          
+          if (!isNaN(s_ra) && !isNaN(s_dec) && !isNaN(g) && !isNaN(bp) && !isNaN(rp)) {
+            stars.push({ ra: s_ra, dec: s_dec, g, bp, rp });
+          }
+        }
+      }
+      
+      if (stars.length === 0) {
+        throw new Error(lang === "es" ? "No se encontraron estrellas del catálogo Gaia DR3 en esta zona." : "No Gaia DR3 catalog stars found in this region.");
+      }
+      
+      logConsole(lang === "es" ? `Descargadas ${stars.length} estrellas de Gaia DR3. Ejecutando fotometría y calibración en Pyodide...` : `Downloaded ${stars.length} Gaia DR3 stars. Running photometry and calibration in Pyodide...`, "info");
+      
+      showLoader(lang === "es" ? "Calculando calibración espectrofotométrica..." : "Calculating spectrophotometric calibration...");
+      
+      const srcImg = state.stepInputImage || state.activeImage;
+      const res = await window.SASProPyodide.processImageRaw(srcImg, "spcc", {
+        catalogStars: stars,
+        wcsMeta: {
+          ra: wcsData.ra,
+          dec: wcsData.dec,
+          pixscale: wcsData.pixscale,
+          orientation: wcsData.orientation,
+          parity: wcsData.parity
+        }
+      });
+      
+      const wcsCopy = srcImg.wcs;
+      state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
+      state.activeImage.hasTransforms = true;
+      
+      render();
+      drawHistogram();
+      refreshPathBar();
+      
+      if (res.extra && res.extra.factors) {
+        const k = res.extra.factors;
+        logConsole(lang === "es" 
+          ? `Web-SPCC Completado. Factores calculados (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]` 
+          : `Web-SPCC Completed. Calculated factors (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`, 
+          "ok"
+        );
+      } else {
+        logConsole(lang === "es" ? "Web-SPCC completado sin cambios de factores." : "Web-SPCC completed without factor changes.", "info");
+      }
+    } catch (err) {
+      logConsole(`Error en Web-SPCC: ${err.message}`, "err");
+    } finally {
+      hideLoader();
+    }
+  }
+
+  // Auto Linear Fit
+  const cardLF = el("cardLinearFit");
+  if (cardLF) {
+    cardLF.addEventListener("click", () => {
+      if (cardLF.classList.contains("disabled") || !state.activeImage || !state.activeImage.isColor) return;
+      cardLF.classList.add("active-cc");
+      const cBN = el("cardBN");
+      if (cBN) cBN.classList.remove("active-cc");
+      const cSPCC = el("cardSPCC");
+      if (cSPCC) cSPCC.classList.remove("active-cc");
+      const cOT = el("cardOT");
+      if (cOT) cOT.classList.remove("active-cc");
+      updateBigApply();
+      
+      runLinearFit();
+    });
+  }
+
+  // Background Neutralization
+  const cardBN = el("cardBN");
+  if (cardBN) {
+    cardBN.addEventListener("click", () => {
+      if (cardBN.classList.contains("disabled") || !state.activeImage) return;
+      cardBN.classList.add("active-cc");
+      const cLF = el("cardLinearFit");
+      if (cLF) cLF.classList.remove("active-cc");
+      const cSPCC = el("cardSPCC");
+      if (cSPCC) cSPCC.classList.remove("active-cc");
+      const cOT = el("cardOT");
+      if (cOT) cOT.classList.remove("active-cc");
+      updateBigApply();
+      
+      runBackgroundNeutralization();
+    });
+  }
+
+  // SPCC
+  const cardSPCC = el("cardSPCC");
+  if (cardSPCC) {
+    cardSPCC.addEventListener("click", () => {
+      if (cardSPCC.classList.contains("disabled") || !state.activeImage || !state.activeImage.isColor) return;
+      cardSPCC.classList.add("active-cc");
+      const cLF = el("cardLinearFit");
+      if (cLF) cLF.classList.remove("active-cc");
+      const cBN = el("cardBN");
+      if (cBN) cBN.classList.remove("active-cc");
+      const cOT = el("cardOT");
+      if (cOT) cOT.classList.remove("active-cc");
+      updateBigApply();
+      
+      runSPCC();
+    });
+  }
+
+  // Optimal Transport
+  const cardOTEl = el("cardOT");
+  if (cardOTEl) {
+    cardOTEl.addEventListener("click", () => {
+      if (cardOTEl.classList.contains("disabled") || !state.activeImage || !state.activeImage.isColor) return;
+      cardOTEl.classList.add("active-cc");
+      const cLF = el("cardLinearFit");
+      if (cLF) cLF.classList.remove("active-cc");
+      const cBN = el("cardBN");
+      if (cBN) cBN.classList.remove("active-cc");
+      const cSPCC = el("cardSPCC");
+      if (cSPCC) cSPCC.classList.remove("active-cc");
+      updateBigApply();
+      
+      runOptimalTransport();
+    });
+  }
+
+  // --- COSMIC CLARITY IA / STANDARD DECONVOLUTION ENGINE ---
+  const STELLAR_MODEL_URL = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_sharp_stellar_cnn_AI3_5s.onnx";
+  const NONSTELLAR_MODEL_URLS = {
+    radius_1: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_1AI3_5s.onnx",
+    radius_2: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
+    radius_4: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_4AI3_5s.onnx",
+    radius_8: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_8AI3_5s.onnx"
+  };
+
+  function openModelDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("cosmic-clarity-models-db", 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains("models")) {
+          db.createObjectStore("models", { keyPath: "url" });
+        }
+      };
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function getCachedModel(url) {
+    try {
+      const db = await openModelDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("models", "readonly");
+        const store = tx.objectStore("models");
+        const req = store.get(url);
+        req.onsuccess = () => resolve(req.result ? req.result.data : null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.warn("IndexedDB error:", err);
+      return null;
+    }
+  }
+
+  async function cacheModel(url, arrayBuffer) {
+    try {
+      const db = await openModelDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("models", "readwrite");
+        const store = tx.objectStore("models");
+        const req = store.put({ url: url, data: arrayBuffer });
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.warn("Caching error:", err);
+    }
+  }
+
+  async function fetchModelWithCache(url, onProgress) {
+    const cached = await getCachedModel(url);
+    if (cached) return cached;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error ${response.status} fetching model`);
+
+    const contentLength = response.headers.get("content-length");
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+    const reader = response.body.getReader();
+    let received = 0;
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      if (total && onProgress) {
+        onProgress(received / total);
+      }
+    }
+
+    const blob = new Blob(chunks);
+    const arrayBuffer = await blob.arrayBuffer();
+    cacheModel(url, arrayBuffer).catch((e) => console.warn("Cache write failed:", e));
+    return arrayBuffer;
+  }
+
+  async function runOnnxModelTiled(session, imgData, tileSize = 512, overlap = 32) {
+    const W = imgData.w;
+    const H = imgData.h;
+    const nc = imgData.nc;
+    const outCh = [];
+    for (let c = 0; c < nc; ++c) {
+      outCh.push(new Float32Array(W * H));
+    }
+
+    const step = tileSize - 2 * overlap;
+    const inputName = session.inputNames[0];
+    const outputName = session.outputNames[0];
+
+    for (let y = 0; y < H; y += step) {
+      for (let x = 0; x < W; x += step) {
+        const x_start = Math.max(0, x - overlap);
+        const y_start = Math.max(0, y - overlap);
+        const x_end = Math.min(W, x + tileSize - overlap);
+        const y_end = Math.min(H, y + tileSize - overlap);
+
+        const tw = x_end - x_start;
+        const th = y_end - y_start;
+
+        const pw = Math.ceil(tw / 32) * 32;
+        const ph = Math.ceil(th / 32) * 32;
+
+        const tileData = new Float32Array(3 * ph * pw);
+
+        for (let row = 0; row < ph; ++row) {
+          let imgY = y_start + row;
+          if (imgY >= H) imgY = H - 1;
+
+          for (let col = 0; col < pw; ++col) {
+            let imgX = x_start + col;
+            if (imgX >= W) imgX = W - 1;
+
+            const pixelIdx = imgY * W + imgX;
+            if (nc === 3) {
+              tileData[0 * ph * pw + row * pw + col] = imgData.ch[0][pixelIdx];
+              tileData[1 * ph * pw + row * pw + col] = imgData.ch[1][pixelIdx];
+              tileData[2 * ph * pw + row * pw + col] = imgData.ch[2][pixelIdx];
+            } else {
+              const val = imgData.ch[0][pixelIdx];
+              tileData[0 * ph * pw + row * pw + col] = val;
+              tileData[1 * ph * pw + row * pw + col] = val;
+              tileData[2 * ph * pw + row * pw + col] = val;
+            }
+          }
+        }
+
+        const inputTensor = new ort.Tensor("float32", tileData, [1, 3, ph, pw]);
+        const results = await session.run({ [inputName]: inputTensor });
+        const outData = results[outputName].data;
+
+        const col_start = (x_start === 0) ? 0 : overlap;
+        const col_end = (x_end === W) ? tw : (tw - overlap);
+        const row_start = (y_start === 0) ? 0 : overlap;
+        const row_end = (y_end === H) ? th : (th - overlap);
+
+        for (let r = row_start; r < row_end; ++r) {
+          const globalY = y_start + r;
+          if (globalY >= H) continue;
+
+          for (let c = col_start; c < col_end; ++c) {
+            const globalX = x_start + c;
+            if (globalX >= W) continue;
+
+            const globalIdx = globalY * W + globalX;
+            const tileIdxR = 0 * ph * pw + r * pw + c;
+            const tileIdxG = 1 * ph * pw + r * pw + c;
+            const tileIdxB = 2 * ph * pw + r * pw + c;
+
+            if (nc === 3) {
+              outCh[0][globalIdx] = outData[tileIdxR];
+              outCh[1][globalIdx] = outData[tileIdxG];
+              outCh[2][globalIdx] = outData[tileIdxB];
+            } else {
+              outCh[0][globalIdx] = (outData[tileIdxR] + outData[tileIdxG] + outData[tileIdxB]) / 3.0;
+            }
+          }
+        }
+      }
+    }
+    return outCh;
+  }
+
+  // Event Listener para Deconvolución
+  el("btnApplyDecon").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    const lang = document.documentElement.lang || "es";
+    const algo = el("selDeconAlgo").value;
+    const mode = el("selCcSharpenMode").value;
+    const stellarAmt = parseFloat(el("sldCcStellarAmt").value);
+    const nsStrength = parseFloat(el("sldCcNsStrength").value);
+    const nsAmount = parseFloat(el("sldCcNsAmount").value);
+    const removeAb = el("chkCcRemoveAb").checked;
+
+    showLoader(lang === "es" ? "Iniciando deconvolución..." : "Starting deconvolution...");
+
+    setTimeout(async () => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        let stellarAiCh = null;
+        let nonstellarAiCh = null;
+
+        if (algo === "cosmic_ia") {
+          // 1. CARGAR E INFERIR ESTRELLAS
+          if (mode === "both" || mode === "stellar") {
+            if (stellarAmt > 0.01) {
+              showLoader(lang === "es" ? "Cargando modelo de estrellas IA..." : "Loading AI stellar model...");
+              const stellarModelData = await fetchModelWithCache(STELLAR_MODEL_URL, (p) => {
+                showLoader(lang === "es" 
+                  ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` 
+                  : `Downloading stellar model: ${(p * 100).toFixed(0)}%`
+                );
+              });
+
+              showLoader(lang === "es" ? "Inicializando sesión ONNX (estrellas)..." : "Initializing ONNX session (stars)...");
+              let session;
+              try {
+                session = await ort.InferenceSession.create(stellarModelData, { executionProviders: ["webgpu", "wasm"] });
+              } catch (e) {
+                console.warn("Failed with WebGPU provider, trying WASM only:", e);
+                session = await ort.InferenceSession.create(stellarModelData, { executionProviders: ["wasm"] });
+              }
+
+              showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
+              stellarAiCh = await runOnnxModelTiled(session, srcImg);
+            }
+          }
+
+          // 2. CARGAR E INFERIR NEBULOSA
+          if (mode === "both" || mode === "nonstellar") {
+            if (nsAmount > 0.01) {
+              let modelKey = "radius_2";
+              if (nsStrength <= 1.5) modelKey = "radius_1";
+              else if (nsStrength <= 3.0) modelKey = "radius_2";
+              else if (nsStrength <= 6.0) modelKey = "radius_4";
+              else modelKey = "radius_8";
+
+              const nonstellarUrl = NONSTELLAR_MODEL_URLS[modelKey];
+              showLoader(lang === "es" ? `Cargando modelo de nebulosa IA (${modelKey})...` : `Loading AI nebula model (${modelKey})...`);
+              const nonstellarModelData = await fetchModelWithCache(nonstellarUrl, (p) => {
+                showLoader(lang === "es"
+                  ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%`
+                  : `Downloading nebula model: ${(p * 100).toFixed(0)}%`
+                );
+              });
+
+              showLoader(lang === "es" ? "Inicializando sesión ONNX (nebulosa)..." : "Initializing ONNX session (nebula)...");
+              let session;
+              try {
+                session = await ort.InferenceSession.create(nonstellarModelData, { executionProviders: ["webgpu", "wasm"] });
+              } catch (e) {
+                console.warn("Failed with WebGPU provider, trying WASM only:", e);
+                session = await ort.InferenceSession.create(nonstellarModelData, { executionProviders: ["wasm"] });
+              }
+
+              showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
+              nonstellarAiCh = await runOnnxModelTiled(session, srcImg);
+            }
+          }
+        }
+
+        // 3. EJECUTAR MEZCLA EN PYODIDE
+        showLoader(lang === "es" ? "Realizando mezcla final en Pyodide..." : "Performing final blending in Pyodide...");
+        const params = {
+          mode: mode,
+          stellar_amt: stellarAmt,
+          ns_strength: nsStrength,
+          ns_amount: nsAmount,
+          remove_aberration: removeAb,
+          stellar_ai: stellarAiCh,
+          nonstellar_ai: nonstellarAiCh
+        };
+
+        const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
+
+        const wcsCopy = srcImg.wcs;
+        state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
+        state.activeImage.hasTransforms = true;
+
+        render();
+        refreshPathBar();
+
+        const methodStr = algo === "cosmic_ia" ? "Cosmic Clarity IA (opción B)" : "Standard Deconvolution (opción A)";
+        const msg = lang === "es"
+          ? `${methodStr} aplicada (Modo: ${mode}, Stellar: ${stellarAmt.toFixed(2)}, Ns. Size: ${nsStrength.toFixed(2)}, Ns. Amt: ${nsAmount.toFixed(2)})`
+          : `${methodStr} applied (Mode: ${mode}, Stellar: ${stellarAmt.toFixed(2)}, Ns. Size: ${nsStrength.toFixed(2)}, Ns. Amt: ${nsAmount.toFixed(2)})`;
+        logConsole(msg, "info");
+
+      } catch (err) {
+        logConsole(`Error en Deconvolución: ${err.message}`, "err");
+        
+        if (algo === "cosmic_ia") {
+          logConsole(lang === "es" 
+            ? "Fallo en Cosmic Clarity IA. Reintentando con Deconvolución Estándar automáticamente..." 
+            : "Cosmic Clarity AI failed. Retrying with Standard Deconvolution automatically...", 
+            "warn"
+          );
+          
+          try {
+            showLoader(lang === "es" ? "Ejecutando Deconvolución Estándar (Fallback)..." : "Running Standard Deconvolution (Fallback)...");
+            const srcImg = state.stepInputImage || state.activeImage;
+            const params = {
+              mode: mode,
+              stellar_amt: stellarAmt,
+              ns_strength: nsStrength,
+              ns_amount: nsAmount,
+              remove_aberration: removeAb,
+              stellar_ai: null,
+              nonstellar_ai: null
+            };
+            const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
+            
+            const wcsCopy = srcImg.wcs;
+            state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
+            state.activeImage.hasTransforms = true;
+            
+            render();
+            refreshPathBar();
+            
+            logConsole(lang === "es" 
+              ? "Deconvolución Estándar (Fallback) aplicada correctamente." 
+              : "Standard Deconvolution (Fallback) applied successfully.", 
+              "info"
+            );
+          } catch (fallbackErr) {
+            logConsole(`Error en Deconvolución Estándar: ${fallbackErr.message}`, "err");
+          }
+        }
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // --- OPERACIONES DE ESTIRADO / STRETCHING (TAB 1) ---
+
+  // Auto STF
+  function runAutoSTF(img, targetBg, clipSigmas) {
+    const n = img.w * img.h;
+    
+    for (let c = 0; c < img.nc; ++c) {
+      const ch = img.ch[c];
+      const stats = AutoGHS.medianMAD(ch, n, 200000);
+      
+      // Calcular punto negro (c0)
+      let c0 = stats.median + clipSigmas * stats.sigma;
+      if (c0 < 0) c0 = 0;
+      if (c0 > stats.median) c0 = stats.median;
+
+      // Rescalar
+      const c0Den = (1 - c0) || 1e-6;
+      const rescaledCh = new Float32Array(n);
+      for (let i = 0; i < n; ++i) {
+        const val = (ch[i] - c0) / c0Den;
+        rescaledCh[i] = val < 0 ? 0 : (val > 1 ? 1 : val);
+      }
+
+      // Calcular nueva mediana tras el punto negro
+      const stats2 = AutoGHS.medianMAD(rescaledCh, n, 100000);
+      const mPrime = Math.max(0.0001, Math.min(0.9999, stats2.median));
+
+      // Resolver Midtones Balance (m)
+      const m = ((targetBg - 1) * mPrime) / (2 * targetBg * mPrime - targetBg - mPrime);
+      
+      // Aplicar MTF
+      if (m > 0 && m < 1) {
+        const m1 = m - 1;
+        const m2 = 2 * m - 1;
+        for (let i = 0; i < n; ++i) {
+          const x = rescaledCh[i];
+          const den = m2 * x - m;
+          ch[i] = Math.abs(den) > 1e-12 ? Math.min(1, Math.max(0, (m1 * x) / den)) : x;
+        }
+        logConsole(`Canal ${c} estirado con STF: bp = ${c0.toFixed(4)}, m = ${m.toFixed(4)}`, "info");
+      }
+    }
+  }
+
+  // Cargar Starless
+  el("btnLoadStarless").addEventListener("click", () => {
+    el("fileInputStarless").value = "";
+    el("fileInputStarless").click();
+  });
+  el("fileInputStarless").addEventListener("change", async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      showLoader("Cargando Starless...");
+      setTimeout(async () => {
+        try {
+          const loaded = await AutoGHS.loadFromFile(file);
+          const capped = AutoGHS.capChannels(loaded.ch, loaded.w, loaded.h, loaded.nc, MAX_PREVIEW_DIM);
+          state.starlessImage = {
+            ch: capped.ch,
+            w: capped.w,
+            h: capped.h,
+            nc: loaded.nc,
+            isColor: loaded.isColor
+          };
+          el("btnLoadStarless").classList.add("primary");
+          logConsole(`Imagen sin estrellas (Starless) cargada: ${file.name}`, "info");
+          updateMixSourceOptions();
+        } catch (err) {
+          logConsole(`Error al cargar Starless: ${err.message}`, "err");
+        } finally {
+          hideLoader();
+        }
+      }, 50);
+    }
+  });
+
+  // Cargar Estrellas
+  el("btnLoadStars").addEventListener("click", () => {
+    el("fileInputStars").value = "";
+    el("fileInputStars").click();
+  });
+  el("fileInputStars").addEventListener("change", async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      showLoader("Cargando capa de estrellas...");
+      setTimeout(async () => {
+        try {
+          const loaded = await AutoGHS.loadFromFile(file);
+          const capped = AutoGHS.capChannels(loaded.ch, loaded.w, loaded.h, loaded.nc, MAX_PREVIEW_DIM);
+          state.starsImage = {
+            ch: capped.ch,
+            w: capped.w,
+            h: capped.h,
+            nc: loaded.nc,
+            isColor: loaded.isColor
+          };
+          el("btnLoadStars").classList.add("primary");
+          logConsole(`Imagen de estrellas cargada: ${file.name}`, "info");
+          updateMixSourceOptions();
+        } catch (err) {
+          logConsole(`Error al cargar Estrellas: ${err.message}`, "err");
+        } finally {
+          hideLoader();
+        }
+      }, 50);
+    }
+  });
+
+  // Mostrar u ocultar controles dinámicos de estirado según algoritmo seleccionado
+  el("selStretchAlgo").addEventListener("change", (e) => {
+    const val = e.target.value;
+    el("stretch-stf-controls").style.display = val === "stf" ? "block" : "none";
+    el("stretch-ghs-controls").style.display = val === "ghs" ? "block" : "none";
+    el("stretch-stars-controls").style.display = val === "stars" ? "block" : "none";
+  });
+
+  // Aplicar estirado
+  el("btnApplyStretch").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    const algo = el("selStretchAlgo").value;
+    showLoader("Estirando imagen...");
+
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        let img = cloneImage(srcImg);
+        
+        // Si el usuario marcó trabajar sobre capa Starless, trabajamos sobre ella
+        if (el("chkStarlessView").checked && state.starlessImage) {
+          img = cloneImage(state.starlessImage);
+        }
+
+        if (algo === "stf") {
+          const bg = parseFloat(el("sldStfBg").value);
+          const clip = parseFloat(el("sldStfClip").value);
+          runAutoSTF(img, bg, clip);
+        } else if (algo === "ghs") {
+          const cfg = AutoGHS.defaultConfig();
+          cfg.sigmasFromCenter = parseFloat(el("sldGhsSig").value);
+          cfg.stretchIntensity = parseFloat(el("sldGhsInt").value);
+          cfg.colorMode = img.isColor ? "luminance" : "rgb";
+          
+          const res = AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, cfg);
+          img.ch = res.channels;
+          logConsole("Estirado AutoGHS completado:\n" + res.log.join("\n"), "info");
+        } else if (algo === "stars") {
+          const amt = parseFloat(el("sldStarsStretch").value);
+          const n = img.w * img.h;
+          const normFactor = 1 / Math.asinh(amt);
+          for (let c = 0; c < img.nc; ++c) {
+            const ch = img.ch[c];
+            for (let i = 0; i < n; ++i) {
+              ch[i] = Math.asinh(amt * ch[i]) * normFactor;
+            }
+          }
+          logConsole(`Estirado de estrellas asinh aplicado (Intensidad ${amt.toFixed(2)})`, "info");
+        }
+
+        // Si se actualizó starless, forzar la imagen activa
+        if (el("chkStarlessView").checked && state.starlessImage) {
+          state.starlessImage = img;
+          state.activeImage = img;
+        } else {
+          state.activeImage = img;
+        }
+
+        // Una vez aplicado el estirado permanente, desactivar el estirado de pantalla AutoGHS
+        state.screenStretchMode = false;
+        const btnAutoStf = el("btnToolAutoSTF");
+        if (btnAutoStf) btnAutoStf.classList.remove("active");
+        logConsole("Estirado permanente aplicado. Se desactiva el estirado de pantalla AutoSTF.", "info");
+
+        state.activeImage.hasTransforms = true;
+        render();
+        drawHistogram();
+        refreshPathBar();
+      } catch (err) {
+        logConsole(`Error en estirado: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // --- OPERACIONES DE POST-PROCESADO (TAB 2) ---
+
+  // SCNR Green
+  el("btnApplyScnr").addEventListener("click", () => {
+    if (!state.activeImage || !state.activeImage.isColor) return;
+    const k = parseFloat(el("sldScnrInt").value);
+    showLoader("Eliminando cast verde (SCNR)...");
+
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        const rCh = img.ch[0];
+        const gCh = img.ch[1];
+        const bCh = img.ch[2];
+
+        // SCNR Average Neutral
+        for (let i = 0; i < n; ++i) {
+          const limit = (rCh[i] + bCh[i]) / 2;
+          if (gCh[i] > limit) {
+            gCh[i] = (1 - k) * gCh[i] + k * limit;
+          }
+        }
+
+        state.activeImage = img;
+        state.activeImage.hasTransforms = true;
+        render();
+        refreshPathBar();
+        logConsole(`SCNR Green aplicado al ${(k*100).toFixed(0)}%`, "info");
+      } catch (err) {
+        logConsole(`Error en SCNR: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Rueda de color en Color Mask
+  const wheel = el("maskColorWheel");
+  const wheelIndicator = el("maskWheelIndicator");
+
+  wheel.addEventListener("click", (e) => {
+    const rect = wheel.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    
+    // Obtener ángulo en grados [0, 360]
+    let angle = Math.atan2(y, x) * (180 / Math.PI);
+    if (angle < 0) angle += 360;
+    
+    state.selectedHue = Math.round(angle);
+    el("sldMaskHue").value = state.selectedHue;
+    el("valMaskHue").textContent = state.selectedHue + "°";
+
+    // Mover indicador
+    const rad = Math.min(rect.width / 2 - 10, Math.sqrt(x*x + y*y));
+    const radAngle = angle * (Math.PI / 180);
+    const indX = rect.width / 2 + rad * Math.cos(radAngle);
+    const indY = rect.height / 2 + rad * Math.sin(radAngle);
+    
+    wheelIndicator.style.left = indX + "px";
+    wheelIndicator.style.top = indY + "px";
+  });
+
+  el("sldMaskHue").addEventListener("input", (e) => {
+    state.selectedHue = parseInt(e.target.value, 10);
+    el("valMaskHue").textContent = state.selectedHue + "°";
+    
+    // Mover indicador
+    const rect = wheel.getBoundingClientRect();
+    const angle = state.selectedHue;
+    const rad = rect.width / 2 - 12;
+    const radAngle = angle * (Math.PI / 180);
+    const indX = rect.width / 2 + rad * Math.cos(radAngle);
+    const indY = rect.height / 2 + rad * Math.sin(radAngle);
+    
+    wheelIndicator.style.left = indX + "px";
+    wheelIndicator.style.top = indY + "px";
+  });
+
+  // Mostrar u ocultar controles de máscara según tipo seleccionado
+  el("selMaskType").addEventListener("change", (e) => {
+    const val = e.target.value;
+    el("mask-range-controls").style.display = val === "range" ? "block" : "none";
+    el("mask-color-controls").style.display = val === "color" ? "block" : "none";
+  });
+
+  // Previsualizar Máscara
+  el("btnPreviewMask").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    showLoader("Generando vista previa de máscara...");
+
+    setTimeout(() => {
+      try {
+        generateMaskData();
+        state.previewMaskMode = true;
+        el("btnToolViewMask").classList.add("active");
+        el("btnToolViewCurrent").classList.remove("active");
+        render();
+        logConsole("Previsualización de máscara activada en la ventana principal", "info");
+      } catch (err) {
+        logConsole(`Error al generar máscara: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // Función matemática de generación de máscaras
+  function generateMaskData() {
+    const img = state.activeImage;
+    const n = img.w * img.h;
+    const type = el("selMaskType").value;
+    const mask = new Float32Array(n);
+
+    if (type === "range") {
+      const low = parseFloat(el("sldMaskLow").value);
+      const high = parseFloat(el("sldMaskHigh").value);
+      const fuzz = parseFloat(el("sldMaskFuzz").value);
+
+      // Calcular luminancia
+      const lum = new Float32Array(n);
+      if (img.isColor) {
+        for (let i = 0; i < n; ++i) lum[i] = wl[0]*img.ch[0][i] + wl[1]*img.ch[1][i] + wl[2]*img.ch[2][i];
+      } else {
+        lum.set(img.ch[0]);
+      }
+
+      // Aplicar umbralización con fuzziness (rampa lineal)
+      for (let i = 0; i < n; ++i) {
+        const val = lum[i];
+        if (val < low - fuzz) {
+          mask[i] = 0;
+        } else if (val > high + fuzz) {
+          mask[i] = 0;
+        } else if (val >= low && val <= high) {
+          mask[i] = 1;
+        } else if (val < low) {
+          // Rampa ascendente
+          mask[i] = (val - (low - fuzz)) / fuzz;
+        } else {
+          // Rampa descendente
+          mask[i] = ((high + fuzz) - val) / fuzz;
+        }
+      }
+    } else if (type === "color" && img.isColor) {
+      const targetHue = state.selectedHue;
+      const hueRange = parseFloat(el("sldMaskHueRange").value);
+      
+      const r = img.ch[0];
+      const g = img.ch[1];
+      const b = img.ch[2];
+
+      for (let i = 0; i < n; ++i) {
+        // Conversión RGB a HSL rápida
+        const rv = r[i], gv = g[i], bv = b[i];
+        const max = Math.max(rv, gv, bv);
+        const min = Math.min(rv, gv, bv);
+        const d = max - min;
+        
+        let hVal = 0;
+        if (d > 1e-4) {
+          if (max === rv) hVal = ((gv - bv) / d) % 6;
+          else if (max === gv) hVal = (bv - rv) / d + 2;
+          else hVal = (rv - gv) / d + 4;
+          hVal = Math.round(hVal * 60);
+          if (hVal < 0) hVal += 360;
+        }
+        
+        const sat = max > 1e-4 ? d / max : 0; // Saturación HSV para rechazar fondos negros
+
+        // Calcular distancia cíclica de Hue
+        let dist = Math.abs(hVal - targetHue);
+        if (dist > 180) dist = 360 - dist;
+
+        if (dist <= hueRange && sat > 0.08) {
+          // Intensidad basada en la cercanía al ángulo objetivo y en la saturación
+          const factor = 1 - (dist / hueRange);
+          mask[i] = factor * sat;
+        } else {
+          mask[i] = 0;
+        }
+      }
+    } else {
+      // Monocroma para color mask
+      mask.fill(1);
+    }
+
+    state.activeMask = mask;
+  }
+
+  // Guardar máscara en el almacén de máscaras activa
+  el("btnApplyMask").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    try {
+      generateMaskData();
+      logConsole("Máscara generada y establecida como Máscara Activa de Post-Procesado", "info");
+      
+      // Auto-guardar en la primera ranura libre o Slot M1
+      state.maskSlots[0] = Float32Array.from(state.activeMask);
+      const btn = document.querySelector(`.piw-slot-btn[data-mask-slot="1"]`);
+      btn.classList.add("filled");
+
+      state.previewMaskMode = false;
+      el("btnToolViewMask").classList.remove("active");
+      el("btnToolViewCurrent").classList.add("active");
+      render();
+    } catch (err) {
+      logConsole(`Error al guardar máscara: ${err.message}`, "err");
+    }
+  });
+
+  // Aplicar saturación cromática
+  el("btnApplySat").addEventListener("click", () => {
+    if (!state.activeImage || !state.activeImage.isColor) return;
+    const boost = parseFloat(el("sldSatBoost").value);
+    showLoader("Ajustando saturación cromática...");
+
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        const r = img.ch[0];
+        const g = img.ch[1];
+        const b = img.ch[2];
+
+        for (let i = 0; i < n; ++i) {
+          // Usar el multiplicador con opacidad/máscara si está activa
+          const maskVal = state.activeMask ? state.activeMask[i] : 1;
+          const localBoost = 1 + (boost - 1) * maskVal;
+
+          const rv = r[i], gv = g[i], bv = b[i];
+          const luma = wl[0]*rv + wl[1]*gv + wl[2]*bv;
+
+          r[i] = Math.max(0, Math.min(1, luma + (rv - luma) * localBoost));
+          g[i] = Math.max(0, Math.min(1, luma + (gv - luma) * localBoost));
+          b[i] = Math.max(0, Math.min(1, luma + (bv - luma) * localBoost));
+        }
+
+        state.activeImage = img;
+        state.activeImage.hasTransforms = true;
+        render();
+        refreshPathBar();
+        logConsole(`Saturación ajustada (factor ${boost.toFixed(2)})`, "info");
+      } catch (err) {
+        logConsole(`Error en saturación: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+  // --- OPERACIONES DE MEZCLA DE CANALES (TAB 3) ---
+
+  // Actualiza los selectores de las capas de mezcla según las imágenes disponibles
+  function updateMixSourceOptions() {
+    const options = [];
+    options.push('<option value="none">-- Sin imagen --</option>');
+    if (state.activeImage) options.push('<option value="active">Imagen de Trabajo Activa</option>');
+    if (state.starlessImage) options.push('<option value="starless">Capa Sin Estrellas (Starless)</option>');
+    if (state.starsImage) options.push('<option value="stars">Capa de Estrellas (Stars)</option>');
+
+    // Añadir ranuras rellenas
+    for (let i = 0; i < 8; ++i) {
+      if (state.imageSlots[i]) {
+        options.push(`<option value="slot-${i}">Slot de Memoria ${i + 1}</option>`);
+      }
+    }
+
+    const html = options.join("");
+    el("selMixSource1").innerHTML = html;
+    el("selMixSource2").innerHTML = html;
+    el("selMixSource3").innerHTML = html;
+
+    // Valores por defecto inteligentes
+    if (state.starlessImage) el("selMixSource1").value = "starless";
+    else if (state.activeImage) el("selMixSource1").value = "active";
+
+    if (state.activeImage && !state.starlessImage) el("selMixSource2").value = "active";
+    
+    if (state.starsImage) el("selMixSource3").value = "stars";
+  }
+
+  // Componer y Renderizar Mezcla (Tab 3)
+  el("btnGenerateBlend").addEventListener("click", () => {
+    showLoader("Componiendo mezcla de canales...");
+    setTimeout(() => {
+      try {
+        const useLayer1 = el("chkMixLayer1").checked;
+        const useLayer2 = el("chkMixLayer2").checked;
+        const useLayer3 = el("chkMixLayer3").checked;
+
+        const src1Key = el("selMixSource1").value;
+        const src2Key = el("selMixSource2").value;
+        const src3Key = el("selMixSource3").value;
+
+        const getSourceImage = (key) => {
+          if (key === "active") return state.activeImage;
+          if (key === "starless") return state.starlessImage;
+          if (key === "stars") return state.starsImage;
+          if (key.startsWith("slot-")) {
+            const idx = parseInt(key.split("-")[1], 10);
+            return state.imageSlots[idx];
+          }
+          return null;
+        };
+
+        const img1 = useLayer1 ? getSourceImage(src1Key) : null;
+        const img2 = useLayer2 ? getSourceImage(src2Key) : null;
+        const img3 = useLayer3 ? getSourceImage(src3Key) : null;
+
+        if (!img1) throw new Error("La Capa 1 es obligatoria y debe tener una imagen seleccionada.");
+
+        const w = img1.w;
+        const h = img1.h;
+        const n = w * h;
+
+        // Reservar memoria para salida RGB
+        const outR = new Float32Array(n);
+        const outG = new Float32Array(n);
+        const outB = new Float32Array(n);
+
+        // Inicializar con la Capa 1
+        const op1 = parseFloat(el("sldMixOpacity1").value);
+        for (let i = 0; i < n; ++i) {
+          outR[i] = (img1.ch[0][i] || 0) * op1;
+          outG[i] = (img1.nc > 1 ? img1.ch[1][i] : img1.ch[0][i]) * op1;
+          outB[i] = (img1.nc > 2 ? img1.ch[2][i] : (img1.nc > 1 ? img1.ch[1][i] : img1.ch[0][i])) * op1;
+        }
+
+        // Fusión de la Capa 2
+        if (img2) {
+          const op2 = parseFloat(el("sldMixOpacity2").value);
+          const blend2 = el("selMixBlend2").value;
+          const r2 = img2.ch[0];
+          const g2 = img2.nc > 1 ? img2.ch[1] : img2.ch[0];
+          const b2 = img2.nc > 2 ? img2.ch[2] : (img2.nc > 1 ? img2.ch[1] : img2.ch[0]);
+
+          for (let i = 0; i < n; ++i) {
+            const vR = (r2[i] || 0) * op2;
+            const vG = (g2[i] || 0) * op2;
+            const vB = (b2[i] || 0) * op2;
+
+            if (blend2 === "add") {
+              outR[i] = Math.min(1, outR[i] + vR);
+              outG[i] = Math.min(1, outG[i] + vG);
+              outB[i] = Math.min(1, outB[i] + vB);
+            } else if (blend2 === "screen") {
+              outR[i] = 1 - (1 - outR[i]) * (1 - vR);
+              outG[i] = 1 - (1 - outG[i]) * (1 - vG);
+              outB[i] = 1 - (1 - outB[i]) * (1 - vB);
+            } else if (blend2 === "lighten") {
+              outR[i] = Math.max(outR[i], vR);
+              outG[i] = Math.max(outG[i], vG);
+              outB[i] = Math.max(outB[i], vB);
+            } else {
+              // Normal (interpolación)
+              outR[i] = outR[i] * (1 - op2) + vR;
+              outG[i] = outG[i] * (1 - op2) + vG;
+              outB[i] = outB[i] * (1 - op2) + vB;
+            }
+          }
+        }
+
+        // Fusión de la Capa 3 (Estrellas)
+        if (img3) {
+          const op3 = parseFloat(el("sldMixOpacity3").value);
+          const blend3 = el("selMixBlend3").value;
+          const r3 = img3.ch[0];
+          const g3 = img3.nc > 1 ? img3.ch[1] : img3.ch[0];
+          const b3 = img3.nc > 2 ? img3.ch[2] : (img3.nc > 1 ? img3.ch[1] : img3.ch[0]);
+
+          for (let i = 0; i < n; ++i) {
+            const vR = (r3[i] || 0) * op3;
+            const vG = (g3[i] || 0) * op3;
+            const vB = (b3[i] || 0) * op3;
+
+            if (blend3 === "add") {
+              outR[i] = Math.min(1, outR[i] + vR);
+              outG[i] = Math.min(1, outG[i] + vG);
+              outB[i] = Math.min(1, outB[i] + vB);
+            } else if (blend3 === "screen") {
+              outR[i] = 1 - (1 - outR[i]) * (1 - vR);
+              outG[i] = 1 - (1 - outG[i]) * (1 - vG);
+              outB[i] = 1 - (1 - outB[i]) * (1 - vB);
+            } else if (blend3 === "lighten") {
+              outR[i] = Math.max(outR[i], vR);
+              outG[i] = Math.max(outG[i], vG);
+              outB[i] = Math.max(outB[i], vB);
+            } else {
+              outR[i] = outR[i] * (1 - op3) + vR;
+              outG[i] = outG[i] * (1 - op3) + vG;
+              outB[i] = outB[i] * (1 - op3) + vB;
+            }
+          }
+        }
+
+        // Reemplazar la imagen activa con la composición
+        state.activeImage = {
+          ch: [outR, outG, outB],
+          w: w,
+          h: h,
+          nc: 3,
+          isColor: true,
+          hasTransforms: true
+        };
+
+        render();
+        drawHistogram();
+        refreshPathBar();
+        logConsole(`Composición multi-capa generada con éxito`, "info");
+      } catch (err) {
+        logConsole(`Error al generar mezcla: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+
+
+  // --- SLOTS DE MEMORIA DE IMAGEN Y MÁSCARA ---
+
+  // Inicializar grid de slots
+  document.querySelectorAll(".piw-slot-btn").forEach(btn => {
+    // Ranuras de imagen
+    const slotIdx = parseInt(btn.getAttribute("data-slot"), 10) - 1;
+    if (slotIdx >= 0 && slotIdx < 8) {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        
+        if (state.imageSlots[slotIdx] === null) {
+          // Guardar si está vacío
+          saveSlot(slotIdx);
+        } else {
+          // Cargar si tiene contenido
+          loadSlot(slotIdx);
+        }
+      });
+
+      btn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        // Clic derecho: sobreescribir / forzar guardado
+        saveSlot(slotIdx);
+      });
+    }
+
+    // Ranuras de máscara
+    const maskIdx = parseInt(btn.getAttribute("data-mask-slot"), 10) - 1;
+    if (maskIdx >= 0 && maskIdx < 8) {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (state.maskSlots[maskIdx] === null) {
+          saveMaskSlot(maskIdx);
+        } else {
+          loadMaskSlot(maskIdx);
+        }
+      });
+      btn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        saveMaskSlot(maskIdx);
+      });
+    }
+  });
+
+  function saveSlot(idx) {
+    if (!state.activeImage) return;
+    state.imageSlots[idx] = cloneImage(state.activeImage);
+    
+    const btn = document.querySelector(`.piw-slot-btn[data-slot="${idx + 1}"]`);
+    btn.classList.add("filled");
+    logConsole(`Imagen activa guardada en Slot de Imagen ${idx + 1}`, "info");
+    updateMixSourceOptions();
+  }
+
+  function loadSlot(idx) {
+    if (!state.imageSlots[idx]) return;
+    
+    // Desmarcar anterior activo
+    document.querySelectorAll(".piw-slot-btn").forEach(btn => btn.classList.remove("active-slot"));
+    
+    state.activeImage = cloneImage(state.imageSlots[idx]);
+    state.subtractedGradient = null;
+    state.previewGradientMode = false;
+    if (state.activeWorkflowKey) {
+      state.workflowImages[state.activeWorkflowKey] = state.activeImage;
+    }
+    const btn = document.querySelector(`.piw-slot-btn[data-slot="${idx + 1}"]`);
+    btn.classList.add("active-slot");
+
+    logConsole(`Slot de Imagen ${idx + 1} recuperado al espacio de trabajo`, "info");
+    render();
+    drawHistogram();
+    refreshPathBar();
+  }
+
+  function saveMaskSlot(idx) {
+    if (!state.activeMask) {
+      logConsole("No hay ninguna máscara activa para guardar", "err");
+      return;
+    }
+    state.maskSlots[idx] = Float32Array.from(state.activeMask);
+    const btn = document.querySelector(`.piw-slot-btn[data-mask-slot="${idx + 1}"]`);
+    btn.classList.add("filled");
+    logConsole(`Máscara activa guardada en Slot de Máscara M${idx + 1}`, "info");
+  }
+
+  function loadMaskSlot(idx) {
+    if (!state.maskSlots[idx]) return;
+    
+    state.activeMask = Float32Array.from(state.maskSlots[idx]);
+    logConsole(`Máscara M${idx + 1} cargada y establecida como Máscara Activa`, "info");
+
+    state.previewMaskMode = true;
+    el("btnToolViewMask").classList.add("active");
+    el("btnToolViewCurrent").classList.remove("active");
+    render();
+  }
+
+  el("btnClearSlots").addEventListener("click", () => {
+    state.imageSlots.fill(null);
+    state.maskSlots.fill(null);
+    document.querySelectorAll(".piw-slot-btn").forEach(btn => {
+      btn.classList.remove("filled", "active-slot");
+    });
+    logConsole("Slots de memoria de imagen y máscaras vaciados", "info");
+    updateMixSourceOptions();
+  });
+
+
+  // --- VISUALIZADOR Y DIBUJO ---
+
+  function render() {
+    if (!state.activeImage) {
+      const btn = el("btnBigApply");
+      if (btn) btn.style.display = "none";
+      return;
+    }
+    updateBigApply();
+    if (state.activeWorkflowKey) {
+      state.workflowImages[state.activeWorkflowKey] = state.activeImage;
+    }
+
+    // Mostrar/ocultar el botón de ver gradiente
+    if (el("btnToolViewGradient")) {
+      if (state.subtractedGradient) {
+        el("btnToolViewGradient").style.display = "inline-block";
+      } else {
+        el("btnToolViewGradient").style.display = "none";
+        el("btnToolViewGradient").classList.remove("active");
+        if (state.previewGradientMode) {
+          state.previewGradientMode = false;
+          el("btnToolViewCurrent").classList.add("active");
+        }
+      }
+    }
+
+    const img = state.activeImage;
+    cv.width = img.w;
+    cv.height = img.h;
+
+    // Limpiar canvas
+    ctx.fillStyle = "#020202";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+
+    const n = img.w * img.h;
+
+    // Generar imagen final a dibujar
+    let id;
+    if (state.previewMaskMode && state.activeMask) {
+      // Dibujar máscara en escala de grises
+      id = new ImageData(img.w, img.h);
+      const d = id.data;
+      for (let i = 0, p = 0; i < n; ++i, p += 4) {
+        const val = Math.round(state.activeMask[i] * 255);
+        d[p] = val; d[p+1] = val; d[p+2] = val; d[p+3] = 255;
+      }
+    } else if (state.previewGradientMode && state.subtractedGradient) {
+      // Dibujar modelo de gradiente sustraído
+      let channelsToDraw = state.subtractedGradient.ch;
+      if (state.screenStretchMode) {
+        try {
+          channelsToDraw = applyAutoSTF(state.subtractedGradient.ch, state.subtractedGradient.nc, state.subtractedGradient.isColor, false);
+        } catch (e) {
+          console.warn("Failed to apply AutoSTF screen stretch to gradient:", e);
+        }
+      }
+      id = AutoGHS.channelsToImageData(channelsToDraw, state.subtractedGradient.w, state.subtractedGradient.h, state.subtractedGradient.nc);
+    } else {
+      // Dibujar imagen (color o monocromo)
+      let channelsToDraw = img.ch;
+      if (state.screenStretchMode) {
+        try {
+          // Estirado de pantalla AutoSTF en modo UNLINKED
+          channelsToDraw = applyAutoSTF(img.ch, img.nc, img.isColor, false);
+        } catch (e) {
+          console.warn("Failed to apply AutoSTF screen stretch:", e);
+        }
+      }
+      id = AutoGHS.channelsToImageData(channelsToDraw, img.w, img.h, img.nc);
+    }
+
+    if (state.splitViewMode && state.splitCompareImage) {
+      // Renderizar vista dividida A/B
+      let compChannelsToDraw = state.splitCompareImage.ch;
+      if (state.screenStretchMode) {
+        try {
+          compChannelsToDraw = applyAutoSTF(state.splitCompareImage.ch, state.splitCompareImage.nc, state.splitCompareImage.isColor, false);
+        } catch (e) {
+          console.warn("Failed to apply AutoSTF screen stretch to split image:", e);
+        }
+      }
+      const compId = AutoGHS.channelsToImageData(compChannelsToDraw, img.w, img.h, img.nc);
+      const splitX = Math.round(img.w * state.splitPercent);
+      
+      const tempCanvasA = document.createElement("canvas");
+      tempCanvasA.width = img.w; tempCanvasA.height = img.h;
+      tempCanvasA.getContext("2d").putImageData(id, 0, 0);
+
+      const tempCanvasB = document.createElement("canvas");
+      tempCanvasB.width = img.w; tempCanvasB.height = img.h;
+      tempCanvasB.getContext("2d").putImageData(compId, 0, 0);
+
+      // Dibujar porciones
+      ctx.drawImage(tempCanvasA, 0, 0, splitX, img.h, 0, 0, splitX, img.h);
+      ctx.drawImage(tempCanvasB, splitX, 0, img.w - splitX, img.h, splitX, 0, img.w - splitX, img.h);
+      
+      // Mostrar y posicionar el slider de cortinilla
+      const containerRect = container.getBoundingClientRect();
+      const splitSlider = el("piwSplitSlider");
+      splitSlider.style.display = "block";
+      splitSlider.style.left = (state.splitPercent * containerRect.width) + "px";
+    } else {
+      ctx.putImageData(id, 0, 0);
+      el("piwSplitSlider").style.display = "none";
+    }
+
+    // Draw crop overlay if a selection exists
+    if (cropState.rect) {
+      drawCropOverlay(ctx, cropState.rect);
+    }
+  }
+
+  // Dibujar Histograma SVG
+  function drawHistogram() {
+    if (!state.activeImage) return;
+
+    const img = state.activeImage;
+    const n = img.w * img.h;
+    const bins = new Uint32Array(256).fill(0);
+
+    // Calcular distribución de luminancia
+    const lum = new Float32Array(n);
+    if (img.isColor) {
+      for (let i = 0; i < n; ++i) lum[i] = wl[0]*img.ch[0][i] + wl[1]*img.ch[1][i] + wl[2]*img.ch[2][i];
+    } else {
+      lum.set(img.ch[0]);
+    }
+
+    for (let i = 0; i < n; ++i) {
+      const idx = Math.min(255, Math.max(0, Math.floor(lum[i] * 255)));
+      bins[idx]++;
+    }
+
+    // Encontrar máximo para escalar (ignorando picos extremos del fondo)
+    let max = 0;
+    for (let i = 3; i < 256; ++i) { // Ignorar los primeros bins de negros puros
+      if (bins[i] > max) max = bins[i];
+    }
+    if (max === 0) max = 1;
+
+    const width = 330;
+    const height = 60;
+    const points = [];
+    points.push(`0,${height}`);
+
+    for (let i = 0; i < 256; ++i) {
+      const x = (i / 255) * width;
+      const val = bins[i] > max ? max : bins[i];
+      const y = height - (val / max) * height;
+      points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+    points.push(`${width},${height}`);
+
+    el("histogramPath").setAttribute("d", `M ${points.join(" L ")} Z`);
+  }
+
+  // --- CONTROLES DE ZOOM, PAN Y SPLIT SLIDER ---
+
+  function zoomFit() {
+    if (!state.activeImage) return;
+    const parentWidth = container.clientWidth;
+    const parentHeight = container.clientHeight;
+    
+    const scaleX = parentWidth / state.activeImage.w;
+    const scaleY = parentHeight / state.activeImage.h;
+    
+    state.zoom = Math.min(scaleX, scaleY) * 0.95;
+    state.panX = 0;
+    state.panY = 0;
+    updateTransform();
+  }
+
+  function updateTransform() {
+    cv.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  }
+
+  // Zoom de la rueda del ratón
+  container.addEventListener("wheel", (e) => {
+    if (!state.activeImage) return;
+    e.preventDefault();
+    const zoomFactor = 1.15;
+    if (e.deltaY < 0) {
+      state.zoom = Math.min(15, state.zoom * zoomFactor);
+    } else {
+      state.zoom = Math.max(0.2, state.zoom / zoomFactor);
+    }
+    updateTransform();
+  }, { passive: false });
+
+  // Paneo y Crop con arrastre del ratón
+  cv.addEventListener("mousedown", (e) => {
+    if (!state.activeImage) return;
+    
+    // Check if Crop section is expanded/visible to allow crop mode
+    const sectionCrop = el("sectionCrop");
+    const cropActive = sectionCrop && !sectionCrop.classList.contains("collapsed");
+    
+    if (cropActive) {
+      const { x: ix, y: iy } = getImageCoordsFromEvent(e);
+      const hit = cropHitTest(cropState.rect, ix, iy);
+      
+      if (e.shiftKey) {
+        // Start drawing a new crop box
+        cropState.drawing = true;
+        cropState.dragMode = "draw";
+        cropState.dragStartImgX = ix;
+        cropState.dragStartImgY = iy;
+        cropState.rect = { x: ix, y: iy, width: CROP_MIN_SIZE, height: CROP_MIN_SIZE };
+        cropClampRect(cropState.rect, state.activeImage.w, state.activeImage.h);
+        cropUpdateStatus();
+        render();
+        return;
+      } else if (hit !== CROP_HANDLE_NONE) {
+        // Move or resize existing crop box
+        cropState.drawing = true;
+        cropState.dragStartImgX = ix;
+        cropState.dragStartImgY = iy;
+        cropState.dragStartRect = { ...cropState.rect };
+        if (hit === CROP_HANDLE_INSIDE) {
+          cropState.dragMode = "move";
+          cv.style.cursor = "move";
+        } else {
+          cropState.dragMode = "resize";
+          cropState.dragHandle = hit;
+          cv.style.cursor = "crosshair";
+        }
+        return;
+      }
+    }
+    
+    // Default: Pan dragging
+    state.isDragging = true;
+    state.dragStartX = e.clientX - state.panX;
+    state.dragStartY = e.clientY - state.panY;
+    cv.style.cursor = "grabbing";
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (cropState.drawing && state.activeImage) {
+      const { x: ix, y: iy } = getImageCoordsFromEvent(e);
+      const imgW = state.activeImage.w;
+      const imgH = state.activeImage.h;
+      
+      if (cropState.dragMode === "draw") {
+        const x1 = Math.min(cropState.dragStartImgX, ix);
+        const y1 = Math.min(cropState.dragStartImgY, iy);
+        const x2 = Math.max(cropState.dragStartImgX, ix);
+        const y2 = Math.max(cropState.dragStartImgY, iy);
+        cropState.rect = cropClampRect({
+          x: x1,
+          y: y1,
+          width: x2 - x1,
+          height: y2 - y1
+        }, imgW, imgH);
+      } else if (cropState.dragMode === "move" && cropState.dragStartRect) {
+        const dx = ix - cropState.dragStartImgX;
+        const dy = iy - cropState.dragStartImgY;
+        let newX = cropState.dragStartRect.x + dx;
+        let newY = cropState.dragStartRect.y + dy;
+        
+        // Clamp bounds to prevent moving box outside image
+        newX = Math.max(0, Math.min(imgW - cropState.dragStartRect.width, newX));
+        newY = Math.max(0, Math.min(imgH - cropState.dragStartRect.height, newY));
+        
+        cropState.rect = {
+          ...cropState.rect,
+          x: newX,
+          y: newY
+        };
+      } else if (cropState.dragMode === "resize" && cropState.dragStartRect) {
+        cropState.rect = cropResizeFromHandle(cropState.dragStartRect, cropState.dragHandle, ix, iy, imgW, imgH);
+      }
+      cropUpdateStatus();
+      render();
+      return;
+    }
+    
+    if (state.isDragging) {
+      state.panX = e.clientX - state.dragStartX;
+      state.panY = e.clientY - state.dragStartY;
+      updateTransform();
+    }
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (cropState.drawing) {
+      cropState.drawing = false;
+      cropState.dragMode = "";
+      cropState.dragHandle = CROP_HANDLE_NONE;
+      cropState.dragStartRect = null;
+      cv.style.cursor = "default";
+      return;
+    }
+    
+    if (state.isDragging) {
+      state.isDragging = false;
+      cv.style.cursor = "grab";
+    }
+  });
+
+  // Toolbar events
+  el("btnToolZoomFit").addEventListener("click", zoomFit);
+  el("btnToolZoomReset").addEventListener("click", () => {
+    state.zoom = 1;
+    state.panX = 0;
+    state.panY = 0;
+    updateTransform();
+  });
+
+  // Toggles de previsualización y estirado
+  el("btnToolAutoSTF").addEventListener("click", () => {
+    state.screenStretchMode = !state.screenStretchMode;
+    if (state.screenStretchMode) {
+      el("btnToolAutoSTF").classList.add("active");
+      logConsole("Estirado de pantalla AutoSTF (MAD) activado", "info");
+    } else {
+      el("btnToolAutoSTF").classList.remove("active");
+      logConsole("Estirado de pantalla AutoSTF desactivado", "info");
+    }
+    render();
+  });
+
+  el("btnToolViewCurrent").addEventListener("click", () => {
+    state.previewMaskMode = false;
+    state.previewGradientMode = false;
+    el("btnToolViewCurrent").classList.add("active");
+    el("btnToolViewMask").classList.remove("active");
+    if (el("btnToolViewGradient")) el("btnToolViewGradient").classList.remove("active");
+    render();
+  });
+
+  el("btnToolViewMask").addEventListener("click", () => {
+    if (!state.activeMask) {
+      logConsole("No hay ninguna máscara activa para ver", "err");
+      return;
+    }
+    state.previewMaskMode = true;
+    state.previewGradientMode = false;
+    el("btnToolViewMask").classList.add("active");
+    el("btnToolViewCurrent").classList.remove("active");
+    if (el("btnToolViewGradient")) el("btnToolViewGradient").classList.remove("active");
+    render();
+  });
+
+  if (el("btnToolViewGradient")) {
+    el("btnToolViewGradient").addEventListener("click", () => {
+      if (!state.subtractedGradient) {
+        logConsole("No hay ningún gradiente sustraído para ver", "err");
+        return;
+      }
+      state.previewMaskMode = false;
+      state.previewGradientMode = true;
+      el("btnToolViewGradient").classList.add("active");
+      el("btnToolViewCurrent").classList.remove("active");
+      el("btnToolViewMask").classList.remove("active");
+      render();
+    });
+  }
+
+  // Toggle Cortinilla A/B
+  el("btnToolSplitView").addEventListener("click", () => {
+    state.splitViewMode = !state.splitViewMode;
+    
+    if (state.splitViewMode) {
+      el("btnToolSplitView").classList.add("active");
+      
+      // Comparar contra el original por defecto, o el primer slot disponible
+      state.splitCompareImage = state.originalImage;
+      for (let i = 0; i < 8; ++i) {
+        if (state.imageSlots[i]) {
+          state.splitCompareImage = state.imageSlots[i];
+          break;
+        }
+      }
+      logConsole("Cortinilla de comparación A/B activada", "info");
+    } else {
+      el("btnToolSplitView").classList.remove("active");
+      el("piwSplitSlider").style.display = "none";
+    }
+    render();
+  });
+
+  // Arrastrar Cortinilla Split View
+  const splitSlider = el("piwSplitSlider");
+  splitSlider.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+    state.isDraggingSplit = true;
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (state.isDraggingSplit) {
+      const rect = container.getBoundingClientRect();
+      const posX = e.clientX - rect.left;
+      state.splitPercent = Math.max(0.01, Math.min(0.99, posX / rect.width));
+      render();
+    }
+  });
+
+  window.addEventListener("mouseup", () => {
+    state.isDraggingSplit = false;
+  });
+
+
+  // --- CAMBIO DE PESTAÑAS (TABS) ---
+  document.querySelectorAll(".piw-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".piw-tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".piw-tab-content").forEach(c => c.classList.remove("active"));
+
+      btn.classList.add("active");
+      el(btn.getAttribute("data-tab")).classList.add("active");
+      updateBigApply();
+    });
+  });
+
+  // --- EXPORTAR PNG ---
+  el("btnDownloadPNG").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    cv.toBlob((blob) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); 
+      a.download = "PI_Workflow_Final.png"; 
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      logConsole("Imagen final exportada y descargada como PNG", "info");
+    }, "image/png");
+  });
+
+  // --- LIMPIAR CONSOLA ---
+  el("btnConsoleClear").addEventListener("click", () => {
+    consoleOutput.innerHTML = "";
+  });
+
+  // --- SLIDERS EVENT LISTENERS ---
+  const dynamicSliders = [
+    { s: "sldCcStellarAmt", v: "valCcStellarAmt", p: 2 },
+    { s: "sldCcNsStrength", v: "valCcNsStrength", p: 2 },
+    { s: "sldCcNsAmount", v: "valCcNsAmount", p: 2 },
+    { s: "sldStfBg", v: "valStfBg", p: 2 },
+    { s: "sldStfClip", v: "valStfClip", p: 2 },
+    { s: "sldGhsSig", v: "valGhsSig", p: 2 },
+    { s: "sldGhsInt", v: "valGhsInt", p: 2 },
+    { s: "sldStarsStretch", v: "valStarsStretch", p: 2 },
+    { s: "sldScnrInt", v: "valScnrInt", p: 2 },
+    { s: "sldMaskLow", v: "valMaskLow", p: 2 },
+    { s: "sldMaskHigh", v: "valMaskHigh", p: 2 },
+    { s: "sldMaskFuzz", v: "valMaskFuzz", p: 2 },
+    { s: "sldMaskHueRange", v: "valMaskHueRange", p: 0 },
+    { s: "sldSatBoost", v: "valSatBoost", p: 2 },
+    { s: "sldMixOpacity1", v: "valMixOpacity1", p: 2 },
+    { s: "sldMixOpacity2", v: "valMixOpacity2", p: 2 },
+    { s: "sldMixOpacity3", v: "valMixOpacity3", p: 2 }
+  ];
+
+  dynamicSliders.forEach(({ s, v, p }) => {
+    const sld = el(s);
+    const val = el(v);
+    if (sld && val) {
+      sld.addEventListener("input", () => {
+        val.textContent = parseFloat(sld.value).toFixed(p);
+      });
+    }
+  });
+
+  // --- REGISTRO DRAG & DROP GLOBAL DE ARCHIVOS ---
+  window.addEventListener("dragover", (e) => e.preventDefault());
+  window.addEventListener("drop", (e) => e.preventDefault());
+
+  container.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    container.style.borderColor = "var(--gold-primary)";
+    container.style.background = "rgba(207, 171, 74, 0.02)";
+  });
+
+  container.addEventListener("dragleave", () => {
+    container.style.borderColor = "";
+    container.style.background = "";
+  });
+
+  container.addEventListener("drop", (e) => {
+    e.preventDefault();
+    container.style.borderColor = "";
+    container.style.background = "";
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      
+      // Determinar modo de carga activo (R+G+B, NB, RGB)
+      const activeSegBtn = document.querySelector(".piw-segmented-control .piw-segment-btn.active");
+      const activeMode = activeSegBtn ? activeSegBtn.getAttribute("data-mode") : "rgb-split";
+      
+      let channelRange = [0, 1, 2, 3];
+      if (activeMode === "nb-split") {
+        channelRange = [4, 5, 6];
+      } else if (activeMode === "rgb-color") {
+        channelRange = [7];
+      }
+
+      let freeChanIdx = channelRange[0];
+      for (const idx of channelRange) {
+        if (!state.loadedChannels[idx]) {
+          freeChanIdx = idx;
+          break;
+        }
+      }
+      
+      targetLoadingChannel = freeChanIdx;
+      // Disparar la misma lógica que el file input
+      const fileInput = el("fileInputChannel");
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+      fileInput.dispatchEvent(new Event("change"));
+    }
+  });
+
+  // --- DRAG & DROP DIRECTO EN CANALES DE CARGA ---
+  // Permite arrastrar archivos desde el explorador de ficheros directamente
+  // a una fila de canal específica (R, G, B, L, SII, Ha, OIII, RGB Directa)
+  document.querySelectorAll(".piw-channel-row.piw-drop-target").forEach(row => {
+    const chanIdx = parseInt(row.getAttribute("data-channel"), 10);
+
+    row.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // Evitar que el canvas también reaccione
+      row.classList.add("drag-over");
+    });
+
+    row.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      row.classList.add("drag-over");
+    });
+
+    row.addEventListener("dragleave", (e) => {
+      // Solo quitar la clase si el ratón sale del elemento (no de un hijo)
+      if (!row.contains(e.relatedTarget)) {
+        row.classList.remove("drag-over");
+      }
+    });
+
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      row.classList.remove("drag-over");
+
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const file = e.dataTransfer.files[0];
+        targetLoadingChannel = chanIdx;
+        const fileInput = el("fileInputChannel");
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        fileInput.dispatchEvent(new Event("change"));
+      }
+    });
+  });
+
+  // --- MOCK Y WIDGETS INTERACTIVOS DE ALTA FIDELIDAD ---
+
+  const messages = {
+    es: {
+      btnSolveImage: "El Plate Solving requiere procesado astronómico local. Ejecútelo en PixInsight.",
+      btnSolveAll: "El Plate Solving por lotes requiere procesado astronómico local. Ejecútelo en PixInsight.",
+      btnApplyGradient: "La Corrección de Gradiente avanzada requiere el motor local de PixInsight.",
+      btnCompareGradient: "Comparación de modelos de gradiente solo disponible en PixInsight local.",
+      btnGradientApplyAll: "La corrección de gradiente por lotes solo está disponible en PixInsight.",
+      btnCompareColor: "La comparación de calibración de color requiere los catálogos estelares locales.",
+      btnApplyPostNR: "La Reducción de Ruido mediante IA requiere aceleración por hardware local en PixInsight.",
+      btnComparePostNR: "La comparación de algoritmos de reducción de ruido está desactivada en la versión web.",
+      btnApplyPostSharp: "El enfoque por deconvolución requiere el motor local BlurXTerminator en PixInsight.",
+      btnComparePostSharp: "La comparación de algoritmos de enfoque está desactivada en la versión web.",
+      btnApplyPostColor: "El balance de color por rueda cromática es un mockup interactivo. Aplique procesos activos en la pestaña Stretch.",
+      btnApplyPostCurves: "Las curvas interactivas son un mockup de diseño. Use procesos activos como STF o GHS para estirar.",
+      btnPostFameNext: "El enmascaramiento FAME requiere el script de PixInsight local.",
+      btnPostFameUndo: "El enmascaramiento FAME requiere el script de PixInsight local.",
+      btnPostFameReset: "El enmascaramiento FAME requiere el script de PixInsight local.",
+      cardSPCC: "SPCC requiere catálogos Gaia DR3 locales. Use Auto Linear Fit en la versión web.",
+      cardOT: "Optimal Transport requiere integración local. Use Auto Linear Fit en la versión web."
+    },
+    en: {
+      btnSolveImage: "Plate Solving requires local astronomical processing. Please run it in PixInsight.",
+      btnSolveAll: "Batch Plate Solving requires local astronomical processing. Please run it in PixInsight.",
+      btnApplyGradient: "Advanced Gradient Correction requires the local PixInsight engine.",
+      btnCompareGradient: "Gradient model comparison is only available in local PixInsight.",
+      btnGradientApplyAll: "Batch gradient correction is only available in local PixInsight.",
+      btnCompareColor: "Color calibration comparison requires local stellar catalogs.",
+      btnApplyPostNR: "AI-based Noise Reduction requires local hardware acceleration in PixInsight.",
+      btnComparePostNR: "Noise reduction algorithm comparison is disabled in the web version.",
+      btnApplyPostSharp: "Deconvolution sharpening requires the local BlurXTerminator engine in PixInsight.",
+      btnComparePostSharp: "Sharpening algorithm comparison is disabled in the web version.",
+      btnApplyPostColor: "Color balance wheel is an interactive mockup. Use active processes in the Stretch tab.",
+      btnApplyPostCurves: "Interactive curves are a design mockup. Use active processes like STF or GHS to stretch.",
+      btnPostFameNext: "FAME masking requires the local PixInsight script.",
+      btnPostFameUndo: "FAME masking requires the local PixInsight script.",
+      btnPostFameReset: "FAME masking requires the local PixInsight script.",
+      cardSPCC: "SPCC requires local Gaia DR3 catalogs. Please use Auto Linear Fit in the web version.",
+      cardOT: "Optimal Transport requires local integration. Please use Auto Linear Fit in the web version."
+    }
+  };
+
+  // 1. Lógica de visibilidad de dropdowns
+  function setupDropdownToggle(selectId, mappings) {
+    const selector = el(selectId);
+    if (!selector) return;
+    
+    function update() {
+      const val = selector.value;
+      // Primero ocultar todos los paneles mapeados
+      for (const panelId of Object.values(mappings)) {
+        const panel = el(panelId);
+        if (panel) panel.style.display = "none";
+      }
+      // Mostrar el panel mapeado para el valor seleccionado activo
+      const activePanelId = mappings[val];
+      const activePanel = el(activePanelId);
+      if (activePanel) activePanel.style.display = "block";
+    }
+
+    update();
+    selector.addEventListener("change", update);
+  }
+
+  // Inicializar toggles de dropdown
+  setupDropdownToggle("selGradientAlgo", {
+    dbe: "gradient-dbe-controls",
+    abe: "gradient-abe-controls",
+    graxpert: "gradient-graxpert-controls",
+    graxpert_ia: "gradient-graxpert-controls"
+  });
+
+  setupDropdownToggle("selDeconAlgo", {
+    cosmic_std: "decon-cosmic-controls",
+    cosmic_ia: "decon-cosmic-controls"
+  });
+
+  setupDropdownToggle("selPostNoiseAlgo", {
+    nxt: "post-noise-nxt-controls",
+    tgv: "post-noise-tgv-controls",
+    cosmic: "post-noise-cosmic-controls",
+    graxpert: "post-noise-graxpert-controls",
+    prism: "post-noise-prism-controls",
+    deepsnr: "post-noise-deepsnr-controls"
+  });
+
+  setupDropdownToggle("selPostSharpAlgo", {
+    bxt: "post-sharp-bxt-controls",
+    usm: "post-sharp-usm-controls",
+    hdr: "post-sharp-hdr-controls",
+    lhe: "post-sharp-lhe-controls",
+    dse: "post-sharp-dse-controls",
+    cosmic: "post-sharp-cosmic-controls"
+  });
+
+  setupDropdownToggle("selMaskType", {
+    range: "mask-range-controls",
+    color: "mask-color-controls",
+    fame: "mask-fame-controls"
+  });
+
+  // Control segmentado para Selección y Carga
+  document.querySelectorAll(".piw-segment-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Quitar clase active a los botones del mismo grupo
+      btn.parentElement.querySelectorAll(".piw-segment-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Ocultar todas las subzonas
+      document.querySelectorAll(".piw-loading-subzone").forEach(sz => {
+        sz.style.display = "none";
+      });
+
+      // Mostrar la subzona seleccionada
+      const mode = btn.getAttribute("data-mode");
+      if (mode === "rgb-split") {
+        el("loading-rgb-split").style.display = "block";
+      } else if (mode === "nb-split") {
+        el("loading-nb-split").style.display = "block";
+      } else if (mode === "rgb-color") {
+        el("loading-rgb-color").style.display = "block";
+      }
+
+      checkCombineState();
+    });
+  });
+
+  // Escuchar cambio de receta NB
+  const selNbRecipe = el("selNbRecipe");
+  if (selNbRecipe) {
+    selNbRecipe.addEventListener("change", checkCombineState);
+  }
+
+  // Título de sección colapsable (Toggle .collapsed en .piw-section con auto-acordeón)
+  document.querySelectorAll(".piw-section-title").forEach(title => {
+    title.addEventListener("click", () => {
+      const section = title.closest(".piw-section");
+      if (section) {
+        const isCollapsed = section.classList.contains("collapsed");
+        if (isCollapsed) {
+          // Descolapsar esta sección y colapsar todas las demás
+          document.querySelectorAll(".piw-section").forEach(s => s.classList.add("collapsed"));
+          section.classList.remove("collapsed");
+          if (state.activeImage) {
+            state.stepInputImage = cloneImage(state.activeImage);
+          }
+        } else {
+          // Si ya está abierta y se pulsa, simplemente colapsarla
+          section.classList.add("collapsed");
+        }
+        updateBigApply();
+      }
+    });
+  });
+
+  // --- INTEGRACIÓN PYODIDE / SAS PRO (WASM) ---
+  const btnInitSaspro = el("btnInitSaspro");
+  const lblSasproStatus = el("lblSasproStatus");
+  const sasproControls = el("saspro-controls");
+  const selSasproAlgo = el("selSasproAlgo");
+  const sldSasproTgt = el("sldSasproTgt");
+  const valSasproTgt = el("valSasproTgt");
+  const sldSasproSigma = el("sldSasproSigma");
+  const valSasproSigma = el("valSasproSigma");
+  const sldSasproCp = el("sldSasproCp");
+  const valSasproCp = el("valSasproCp");
+  const sldSasproAmt = el("sldSasproAmt");
+  const valSasproAmt = el("valSasproAmt");
+  const btnSasproUploadTrigger = el("btnSasproUploadTrigger");
+  const fileInputSaspro = el("fileInputSaspro");
+
+  if (btnInitSaspro) {
+    btnInitSaspro.addEventListener("click", async () => {
+      const lang = document.documentElement.lang || "es";
+      btnInitSaspro.disabled = true;
+      lblSasproStatus.textContent = lang === "es" ? "● Cargando..." : "● Loading...";
+      try {
+        await SASProPyodide.init();
+        lblSasproStatus.textContent = lang === "es" ? "● Listo" : "● Ready";
+        lblSasproStatus.style.color = "var(--gold-primary)";
+        btnInitSaspro.style.display = "none";
+        if (sasproControls) sasproControls.style.display = "block";
+      } catch (err) {
+        btnInitSaspro.disabled = false;
+        lblSasproStatus.textContent = lang === "es" ? "● Error al inicializar" : "● Init Error";
+        lblSasproStatus.style.color = "#ff4444";
+      }
+    });
+  }
+
+  // Sliders dinámicos
+  if (sldSasproTgt && valSasproTgt) {
+    sldSasproTgt.addEventListener("input", () => valSasproTgt.textContent = parseFloat(sldSasproTgt.value).toFixed(2));
+  }
+  if (sldSasproSigma && valSasproSigma) {
+    sldSasproSigma.addEventListener("input", () => valSasproSigma.textContent = parseFloat(sldSasproSigma.value).toFixed(1));
+  }
+  if (sldSasproCp && valSasproCp) {
+    sldSasproCp.addEventListener("input", () => valSasproCp.textContent = parseFloat(sldSasproCp.value).toFixed(2));
+  }
+  if (sldSasproAmt && valSasproAmt) {
+    sldSasproAmt.addEventListener("input", () => valSasproAmt.textContent = parseFloat(sldSasproAmt.value).toFixed(2));
+  }
+
+  // Cambio de algoritmo
+  if (selSasproAlgo) {
+    selSasproAlgo.addEventListener("change", () => {
+      const algo = selSasproAlgo.value;
+      const stretchParams = el("saspro-stretch-params");
+      const starSpec = el("saspro-star-spec");
+      const scnrParams = el("saspro-scnr-params");
+
+      if (algo === "statistical_stretch") {
+        if (stretchParams) stretchParams.style.display = "block";
+        if (starSpec) starSpec.style.display = "none";
+        if (scnrParams) scnrParams.style.display = "none";
+      } else if (algo === "star_stretch") {
+        if (stretchParams) stretchParams.style.display = "block";
+        if (starSpec) starSpec.style.display = "block";
+        if (scnrParams) scnrParams.style.display = "none";
+      } else if (algo === "scnr") {
+        if (stretchParams) stretchParams.style.display = "none";
+        if (starSpec) starSpec.style.display = "none";
+        if (scnrParams) scnrParams.style.display = "block";
+      }
+    });
+  }
+
+  // Disparar selector de archivos
+  if (btnSasproUploadTrigger && fileInputSaspro) {
+    btnSasproUploadTrigger.addEventListener("click", () => {
+      fileInputSaspro.value = "";
+      fileInputSaspro.click();
+    });
+  }
+
+  // Procesar archivo seleccionado
+  if (fileInputSaspro) {
+    fileInputSaspro.addEventListener("change", async (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const algo = selSasproAlgo.value;
+        const params = {};
+        const lang = document.documentElement.lang || "es";
+
+        if (algo === "statistical_stretch") {
+          params.target_median = parseFloat(sldSasproTgt.value);
+          params.sigma_clip = parseFloat(sldSasproSigma.value);
+        } else if (algo === "star_stretch") {
+          params.target_median = parseFloat(sldSasproTgt.value);
+          params.sigma_clip = parseFloat(sldSasproSigma.value);
+          params.color_preservation = parseFloat(sldSasproCp.value);
+        } else if (algo === "scnr") {
+          params.amount = parseFloat(sldSasproAmt.value);
+        }
+
+        try {
+          const result = await SASProPyodide.processImageFile(file, algo, params);
+          
+          // Establecer como imagen activa y actualizar la previsualización
+          state.activeImage = result;
+          state.originalImage = cloneImage(result);
+          
+          // Guardar en slots de flujo
+          state.workflowImages["RGB"] = result;
+          state.activeWorkflowKey = "RGB";
+          
+          // Desactivar estirado de pantalla temporal si SASPro ya aplicó estirado
+          if (algo === "statistical_stretch" || algo === "star_stretch") {
+            state.screenStretchMode = false;
+            const btnAutoStf = el("btnToolAutoSTF");
+            if (btnAutoStf) btnAutoStf.classList.remove("active");
+          } else {
+            // Si es SCNR, mantenemos el estirado de pantalla
+            state.screenStretchMode = true;
+            const btnAutoStf = el("btnToolAutoSTF");
+            if (btnAutoStf) btnAutoStf.classList.add("active");
+          }
+
+          setActiveImage(result);
+          logConsole(lang === "es" ? `Proceso SASPro ${algo} aplicado con éxito` : `SASPro ${algo} process applied successfully`, "ok");
+        } catch (err) {
+          logConsole(`Error: ${err.message}`, "err");
+        }
+      }
+    });
+  }
+
+  // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
+  const mockButtons = [
+    "btnCompareColor", "btnApplyPostNR", "btnComparePostNR", 
+    "btnApplyPostSharp", "btnComparePostSharp", "btnApplyPostColor", "btnApplyPostCurves",
+    "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
+  ];
+  mockButtons.forEach(id => {
+    const btn = el(id);
+    if (btn) {
+      btn.removeAttribute("disabled");
+      btn.classList.add("mock-disabled");
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const lang = document.documentElement.lang || "es";
+        const msg = messages[lang][id] || "Función no disponible en la versión web.";
+        logConsole(msg, "warn");
+      });
+    }
+  });
+
+  // (mockCards vacío — todos los métodos de calibración están activos)
+
+  // --- COMPILADOR Y CARGADOR DINÁMICO DE PIXELMATH ---
+
+  function compilePixelMathExpression(expr, sliderKeys) {
+    let js = expr;
+
+    // 1. Reemplazar iif(cond, a, b) por ((cond)?(a):(b))
+    let prev;
+    do {
+      prev = js;
+      js = js.replace(/iif\s*\(\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^)]+)\)/g, '(($1)?($2):($3))');
+    } while (js !== prev);
+
+    // 2. Reemplazar funciones max, min y sqrt
+    js = js.replace(/max\s*\(/g, 'Math.max(');
+    js = js.replace(/min\s*\(/g, 'Math.min(');
+    js = js.replace(/sqrt\s*\(/g, 'Math.sqrt(');
+
+    // 3. Reemplazar operador ~: ~x -> (1.0 - x)
+    js = js.replace(/~\s*([A-Za-z0-9_]+)/g, '(1.0 - $1)');
+    js = js.replace(/~\s*(\([^)]+\))/g, '(1.0 - $1)');
+
+    // 4. Reemplazar operador ^: a ^ b -> Math.pow(a, b)
+    let pos;
+    while ((pos = js.indexOf('^')) !== -1) {
+      let leftStart = pos - 1;
+      while (leftStart >= 0 && /\s/.test(js[leftStart])) leftStart--;
+      if (js[leftStart] === ')') {
+        let depth = 1;
+        leftStart--;
+        while (leftStart >= 0 && depth > 0) {
+          if (js[leftStart] === ')') depth++;
+          else if (js[leftStart] === '(') depth--;
+          leftStart--;
+        }
+        leftStart++;
+      } else {
+        while (leftStart >= 0 && /[A-Za-z0-9_.]/.test(js[leftStart])) leftStart--;
+        leftStart++;
+      }
+      const left = js.substring(leftStart, pos).trim();
+
+      let rightEnd = pos + 1;
+      while (rightEnd < js.length && /\s/.test(js[rightEnd])) rightEnd++;
+      if (js[rightEnd] === '(') {
+        let depth = 1;
+        rightEnd++;
+        while (rightEnd < js.length && depth > 0) {
+          if (js[rightEnd] === '(') depth++;
+          else if (js[rightEnd] === ')') depth--;
+          rightEnd++;
+        }
+      } else {
+        while (rightEnd < js.length && /[A-Za-z0-9_.]/.test(js[rightEnd])) rightEnd++;
+      }
+      const right = js.substring(pos + 1, rightEnd).trim();
+
+      js = js.substring(0, leftStart) + `Math.pow(${left}, ${right})` + js.substring(rightEnd);
+    }
+
+    // 5. Reemplazar operadores lógicos & -> &&, | -> ||
+    js = js.replace(/([^&])&([^&])/g, '$1&&$2');
+    js = js.replace(/([^|])\|([^|])/g, '$1||$2');
+
+    const argNames = ['SII', 'Ha', 'OIII', 'sii', 'ha', 'oiii', ...sliderKeys];
+    try {
+      return new Function(...argNames, `return ${js};`);
+    } catch (e) {
+      console.error("Failed to compile expression:", expr, js, e);
+      return null;
+    }
+  }
+
+  function handleFormulaChange() {
+    const selectEl = el("selNbRecipe");
+    if (!selectEl) return;
+    const formulaId = selectEl.value;
+    const formula = narrowbandFormulas.find(f => f.id === formulaId);
+    
+    // Limpiar y recrear controles de sliders
+    const container = el("nb-formula-sliders-container");
+    if (container) {
+      container.innerHTML = "";
+      if (formula && formula.sliders && formula.sliders.length > 0) {
+        formula.sliders.forEach(slider => {
+          const row = document.createElement("div");
+          row.className = "piw-control-group";
+          row.style.marginTop = "6px";
+          
+          const labelRow = document.createElement("div");
+          labelRow.className = "piw-label-row";
+          
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "piw-label";
+          labelSpan.textContent = slider.label;
+          
+          const valueSpan = document.createElement("span");
+          valueSpan.className = "piw-value";
+          valueSpan.id = `valNb_${slider.id}`;
+          valueSpan.textContent = parseFloat(slider.value).toFixed(2);
+          
+          labelRow.appendChild(labelSpan);
+          labelRow.appendChild(valueSpan);
+          
+          const input = document.createElement("input");
+          input.type = "range";
+          input.className = "piw-slider";
+          input.id = `sldNb_${slider.id}`;
+          input.min = slider.min;
+          input.max = slider.max;
+          input.step = slider.step || 0.05;
+          input.value = slider.value;
+          
+          input.addEventListener("input", () => {
+            valueSpan.textContent = parseFloat(input.value).toFixed(2);
+          });
+          
+          row.appendChild(labelRow);
+          row.appendChild(input);
+          container.appendChild(row);
+        });
+      }
+    }
+
+    checkCombineState();
+  }
+
+  async function initNarrowbandFormulas() {
+    const lang = document.documentElement.lang || "es";
+    const isEn = lang.startsWith("en");
+    const sourceFile = isEn ? "pixelmath-en.html" : "pixelmath.html";
+    const categoryName = isEn ? "Narrowband Palette" : "Paleta Banda Estrecha";
+
+    // Fallbacks
+    const fallbackFormulas = isEn ? [
+      { id: 'sho_hub', name: 'Hubble Palette (SHO) - Classic', category: 'Narrowband Palette', r: 'SII', g: 'Ha', b: 'OIII', sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hoo_std', name: 'Bicolor Palette (HOO) - Standard', category: 'Narrowband Palette', r: 'Ha', g: 'OIII', b: 'OIII' },
+      { id: 'hso_std', name: 'HSO Palette', category: 'Narrowband Palette', r: 'Ha', g: 'SII', b: 'OIII' }
+    ] : [
+      { id: 'sho_hub', name: 'Paleta Hubble (SHO) - Clásica', category: 'Paleta Banda Estrecha', r: 'SII', g: 'Ha', b: 'OIII', sliders: [{ id: 'k_r', label: 'Mezcla SII / Ha en canal Rojo', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Mezcla Ha / OIII en canal Verde', min: 0, max: 1, step: 0.05, value: 1.0 }] },
+      { id: 'hoo_std', name: 'Paleta Bicolor (HOO) - Estándar', category: 'Paleta Banda Estrecha', r: 'Ha', g: 'OIII', b: 'OIII' },
+      { id: 'hso_std', name: 'Paleta HSO', category: 'Paleta Banda Estrecha', r: 'Ha', g: 'SII', b: 'OIII' }
+    ];
+
+    try {
+      const response = await fetch(sourceFile);
+      if (!response.ok) throw new Error("Network response not OK");
+      const text = await response.text();
+      const loaded = [];
+      
+      // 1. Intentar buscar el bloque de código 'const baseFormulas =' completo (soporta múltiples líneas)
+      const startIdx = text.indexOf('const baseFormulas =');
+      if (startIdx !== -1) {
+        let bracketCount = 0;
+        let endIdx = -1;
+        let started = false;
+        for (let i = startIdx; i < text.length; i++) {
+          if (text[i] === '[') {
+            bracketCount++;
+            started = true;
+          } else if (text[i] === ']') {
+            bracketCount--;
+            if (started && bracketCount === 0) {
+              endIdx = i + 1;
+              break;
+            }
+          }
+        }
+        if (endIdx !== -1) {
+          try {
+            const block = text.substring(startIdx, endIdx);
+            const fn = new Function(block + "; return baseFormulas;");
+            const allFormulas = fn();
+            if (Array.isArray(allFormulas)) {
+              allFormulas.forEach(obj => {
+                if (obj && obj.category === categoryName && obj.id && obj.name) {
+                  loaded.push(obj);
+                }
+              });
+            }
+          } catch (e) {
+            console.warn("Failed to parse baseFormulas block, falling back to line-by-line:", e);
+          }
+        }
+      }
+
+      // 2. Fallback: Análisis línea a línea si el analizador de bloque no cargó nada
+      if (loaded.length === 0) {
+        const lines = text.split("\n");
+        for (let line of lines) {
+          line = line.trim();
+          if (line.includes(`category: '${categoryName}'`) && line.startsWith("{") && (line.endsWith("},") || line.endsWith("}"))) {
+            if (line.endsWith(",")) {
+              line = line.slice(0, -1);
+            }
+            try {
+              const fn = new Function("return " + line);
+              const obj = fn();
+              if (obj && obj.id && obj.name) {
+                loaded.push(obj);
+              }
+            } catch (e) {
+              console.warn("Error parsing formula line:", line, e);
+            }
+          }
+        }
+      }
+      
+      if (loaded.length > 0) {
+        narrowbandFormulas = loaded;
+        logConsole(`Fórmulas de banda estrecha cargadas de la PixelMath-teca: ${loaded.length}`, "info");
+      } else {
+        narrowbandFormulas = fallbackFormulas;
+      }
+    } catch (err) {
+      console.warn("Failed to fetch narrowband formulas, using fallbacks:", err);
+      narrowbandFormulas = fallbackFormulas;
+    }
+
+    // Poblar el selector selNbRecipe
+    const selectEl = el("selNbRecipe");
+    if (selectEl) {
+      selectEl.innerHTML = "";
+      narrowbandFormulas.forEach(formula => {
+        const opt = document.createElement("option");
+        opt.value = formula.id;
+        opt.textContent = formula.name;
+        selectEl.appendChild(opt);
+      });
+      
+      selectEl.addEventListener("change", handleFormulaChange);
+      handleFormulaChange();
+    }
+  }
+
+  // Inicializar fórmulas al cargar
+  initNarrowbandFormulas();
+
+  // Forzar tarjetas de calibración activas en gris al inicio
+  const cardLFOnStart = el("cardLinearFit");
+  if (cardLFOnStart) cardLFOnStart.classList.add("disabled");
+  const cardBNOnStart = el("cardBN");
+  if (cardBNOnStart) cardBNOnStart.classList.add("disabled");
+  const cardSPCCOnStart = el("cardSPCC");
+  if (cardSPCCOnStart) cardSPCCOnStart.classList.add("disabled");
+  const cardOTOnStart = el("cardOT");
+  if (cardOTOnStart) cardOTOnStart.classList.add("disabled");
+
+
+  // 2. Editor de Curvas Interactivas (Mockup)
+  state.curves = {
+    K: [{x: 0, y: 0}, {x: 1, y: 1}],
+    R: [{x: 0, y: 0}, {x: 1, y: 1}],
+    G: [{x: 0, y: 0}, {x: 1, y: 1}],
+    B: [{x: 0, y: 0}, {x: 1, y: 1}],
+    S: [{x: 0, y: 0}, {x: 1, y: 1}]
+  };
+  let activeCurveChan = "K";
+
+  // Monotone Cubic Hermite Interpolation (Fritsch-Carlson)
+  function getCubicSpline(points) {
+    const n = points.length;
+    if (n < 2) return (x) => 0;
+    if (n === 2) {
+      const p0 = points[0], p1 = points[1];
+      return (x) => p0.y + (x - p0.x) * (p1.y - p0.y) / ((p1.x - p0.x) || 1e-6);
+    }
+    
+    const dx = [];
+    const dy = [];
+    const ms = [];
+    for (let i = 0; i < n - 1; i++) {
+      dx[i] = points[i+1].x - points[i].x;
+      dy[i] = points[i+1].y - points[i].y;
+      ms[i] = dy[i] / (dx[i] || 1e-6);
+    }
+    
+    const ds = [];
+    ds[0] = ms[0];
+    ds[n-1] = ms[n-2];
+    for (let i = 1; i < n - 1; i++) {
+      const m0 = ms[i-1];
+      const m1 = ms[i];
+      if (m0 * m1 <= 0) {
+        ds[i] = 0;
+      } else {
+        ds[i] = 2 * m0 * m1 / (m0 + m1);
+      }
+    }
+    
+    return function(x) {
+      if (x <= points[0].x) return points[0].y;
+      if (x >= points[n-1].x) return points[n-1].y;
+      
+      let idx = 0;
+      for (let i = 0; i < n - 1; i++) {
+        if (x >= points[i].x && x <= points[i+1].x) {
+          idx = i;
+          break;
+        }
+      }
+      
+      const x0 = points[idx].x;
+      const x1 = points[idx+1].x;
+      const h = x1 - x0;
+      const t = (x - x0) / (h || 1e-6);
+      
+      const a = points[idx].y;
+      const b = h * ds[idx];
+      const c = 3 * (points[idx+1].y - points[idx].y) - h * (2 * ds[idx] + ds[idx+1]);
+      const d = 2 * (points[idx].y - points[idx+1].y) + h * (ds[idx] + ds[idx+1]);
+      
+      return a + b * t + c * t * t + d * t * t * t;
+    };
+  }
+
+  function drawCurvesWidget() {
+    const canvas = el("curvesCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    ctx.fillStyle = "#020202";
+    ctx.fillRect(0, 0, w, h);
+    
+    // Cuadrícula / Grid
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    for (let i = 1; i < 4; i++) {
+      // Líneas verticales
+      const lx = (i / 4) * w;
+      ctx.moveTo(lx, 0);
+      ctx.lineTo(lx, h);
+      // Líneas horizontales
+      const ly = (i / 4) * h;
+      ctx.moveTo(0, ly);
+      ctx.lineTo(w, ly);
+    }
+    ctx.stroke();
+    
+    // Diagonal de referencia lineal
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(w, 0);
+    ctx.stroke();
+    ctx.setLineDash([]); // Reset
+    
+    // Spline curve
+    const pts = state.curves[activeCurveChan];
+    const spline = getCubicSpline(pts);
+    
+    let color = "#e8e8ea"; // Default K
+    if (activeCurveChan === "R") color = "#e36a6a";
+    else if (activeCurveChan === "G") color = "#72c98a";
+    else if (activeCurveChan === "B") color = "#6aa3e3";
+    else if (activeCurveChan === "S") color = "#e3a56a";
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, (1 - spline(0)) * h);
+    for (let x = 1; x < w; x++) {
+      const xNorm = x / w;
+      ctx.lineTo(x, (1 - spline(xNorm)) * h);
+    }
+    ctx.stroke();
+    
+    // Dibujar puntos de control
+    pts.forEach((p, idx) => {
+      const cx = p.x * w;
+      const cy = (1 - p.y) * h;
+      const radius = (idx === hoveredCurvePtIdx || idx === draggedCurvePtIdx) ? 6 : 4;
+      
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    });
+  }
+
+  const curvesCv = el("curvesCanvas");
+  let draggedCurvePtIdx = -1;
+  let hoveredCurvePtIdx = -1;
+
+  if (curvesCv) {
+    function getMouseNormCoords(e) {
+      const rect = curvesCv.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = 1 - (e.clientY - rect.top) / rect.height;
+      return { x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
+    }
+    
+    function findPointIndex(normCoords) {
+      const pts = state.curves[activeCurveChan];
+      const threshX = 10 / curvesCv.width;
+      const threshY = 10 / curvesCv.height;
+      
+      for (let i = 0; i < pts.length; i++) {
+        if (Math.abs(pts[i].x - normCoords.x) < threshX && Math.abs(pts[i].y - normCoords.y) < threshY) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    curvesCv.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const coords = getMouseNormCoords(e);
+      const pts = state.curves[activeCurveChan];
+      const ptIdx = findPointIndex(coords);
+      
+      if (e.button === 2) {
+        // Clic derecho: borrar punto
+        if (ptIdx > 0 && ptIdx < pts.length - 1) {
+          pts.splice(ptIdx, 1);
+          hoveredCurvePtIdx = -1;
+          draggedCurvePtIdx = -1;
+          drawCurvesWidget();
+        }
+      } else {
+        // Clic izquierdo
+        if (ptIdx !== -1) {
+          draggedCurvePtIdx = ptIdx;
+        } else {
+          // Crear punto nuevo
+          if (coords.x > 0.02 && coords.x < 0.98) {
+            pts.push(coords);
+            pts.sort((a, b) => a.x - b.x);
+            draggedCurvePtIdx = pts.findIndex(p => p.x === coords.x && p.y === coords.y);
+            drawCurvesWidget();
+          }
+        }
+      }
+    });
+
+    curvesCv.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    curvesCv.addEventListener("mousemove", (e) => {
+      const coords = getMouseNormCoords(e);
+      const pts = state.curves[activeCurveChan];
+      
+      if (draggedCurvePtIdx !== -1) {
+        const pt = pts[draggedCurvePtIdx];
+        if (draggedCurvePtIdx === 0) {
+          pt.y = coords.y;
+        } else if (draggedCurvePtIdx === pts.length - 1) {
+          pt.y = coords.y;
+        } else {
+          const minX = pts[draggedCurvePtIdx - 1].x + 0.01;
+          const maxX = pts[draggedCurvePtIdx + 1].x - 0.01;
+          pt.x = Math.max(minX, Math.min(maxX, coords.x));
+          pt.y = coords.y;
+        }
+        
+        const hintLbl = el("lblPostCurvesHint");
+        if (hintLbl) {
+          const lang = document.documentElement.lang || "es";
+          if (lang === "es") {
+            hintLbl.innerHTML = `Punto seleccionado: <b>X: ${pt.x.toFixed(2)}, Y: ${pt.y.toFixed(2)}</b> (Canal: ${activeCurveChan})`;
+          } else {
+            hintLbl.innerHTML = `Selected point: <b>X: ${pt.x.toFixed(2)}, Y: ${pt.y.toFixed(2)}</b> (Channel: ${activeCurveChan})`;
+          }
+        }
+        drawCurvesWidget();
+      } else {
+        const ptIdx = findPointIndex(coords);
+        if (ptIdx !== hoveredCurvePtIdx) {
+          hoveredCurvePtIdx = ptIdx;
+          drawCurvesWidget();
+        }
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (draggedCurvePtIdx !== -1) {
+        draggedCurvePtIdx = -1;
+        drawCurvesWidget();
+        const hintLbl = el("lblPostCurvesHint");
+        if (hintLbl) {
+          const lang = document.documentElement.lang || "es";
+          hintLbl.textContent = lang === "es" 
+            ? "Curvas: click izquierdo añade/arrastra, click derecho elimina."
+            : "Curves: left click adds/drags, right click deletes.";
+        }
+      }
+    });
+  }
+
+  const curvesChanSel = el("selPostCurvesChan");
+  if (curvesChanSel) {
+    curvesChanSel.addEventListener("change", (e) => {
+      activeCurveChan = e.target.value;
+      drawCurvesWidget();
+    });
+  }
+
+
+  // 3. Rueda de Balance de Color Cromático (Mockup)
+  const wheelRadius = 65;
+  const wheelCenterX = 75;
+  const wheelCenterY = 75;
+  let cachedWheelImgData = null;
+  state.colorBalanceAnchor = { x: 0, y: 0 };
+
+  function hslToRgb(h, s, l) {
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function initColorWheel(canvas) {
+    const ctx = canvas.getContext("2d");
+    const imgData = ctx.createImageData(150, 150);
+    const data = imgData.data;
+    
+    for (let y = 0; y < 150; y++) {
+      for (let x = 0; x < 150; x++) {
+        const dx = x - wheelCenterX;
+        const dy = y - wheelCenterY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const idx = (y * 150 + x) * 4;
+        
+        if (dist <= wheelRadius) {
+          let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+          if (angle < 0) angle += 360;
+          
+          const rgb = hslToRgb(angle / 360, dist / wheelRadius, 0.5);
+          data[idx] = rgb[0];
+          data[idx+1] = rgb[1];
+          data[idx+2] = rgb[2];
+          data[idx+3] = 255;
+        } else {
+          data[idx] = 0;
+          data[idx+1] = 0;
+          data[idx+2] = 0;
+          data[idx+3] = 0;
+        }
+      }
+    }
+    cachedWheelImgData = imgData;
+  }
+
+  function drawColorBalanceWidget() {
+    const canvas = el("colorBalanceCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    if (!cachedWheelImgData) {
+      initColorWheel(canvas);
+    }
+    ctx.putImageData(cachedWheelImgData, 0, 0);
+    
+    // Borde
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(wheelCenterX, wheelCenterY, wheelRadius, 0, 2*Math.PI);
+    ctx.stroke();
+    
+    // Ejes
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(wheelCenterX - wheelRadius, wheelCenterY);
+    ctx.lineTo(wheelCenterX + wheelRadius, wheelCenterY);
+    ctx.moveTo(wheelCenterX, wheelCenterY - wheelRadius);
+    ctx.lineTo(wheelCenterX, wheelCenterY + wheelRadius);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Ancla
+    const ax = wheelCenterX + state.colorBalanceAnchor.x;
+    const ay = wheelCenterY + state.colorBalanceAnchor.y;
+    
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(ax, ay, 4, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.fillStyle = "#000000";
+    ctx.beginPath();
+    ctx.arc(ax, ay, 2, 0, 2*Math.PI);
+    ctx.fill();
+  }
+
+  function updateColorBalanceReadout() {
+    const dx = state.colorBalanceAnchor.x;
+    const dy = state.colorBalanceAnchor.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const sat = dist / wheelRadius;
+    
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    if (angle < 0) angle += 360;
+    
+    const rad = angle * (Math.PI / 180);
+    const rShift = 1.0 + Math.cos(rad) * sat * 0.3;
+    const gShift = 1.0 + Math.cos(rad - 2*Math.PI/3) * sat * 0.3;
+    const bShift = 1.0 + Math.cos(rad - 4*Math.PI/3) * sat * 0.3;
+    
+    const sldR = el("sldPostBalanceR");
+    const sldG = el("sldPostBalanceG");
+    const sldB = el("sldPostBalanceB");
+    const sldSat = el("sldPostBalanceSat");
+    
+    if (sldR) { sldR.value = rShift; el("valPostBalanceR").textContent = rShift.toFixed(3); }
+    if (sldG) { sldG.value = gShift; el("valPostBalanceG").textContent = gShift.toFixed(3); }
+    if (sldB) { sldB.value = bShift; el("valPostBalanceB").textContent = bShift.toFixed(3); }
+    if (sldSat) { sldSat.value = 1.0 + sat; el("valPostBalanceSat").textContent = (1.0 + sat).toFixed(2); }
+    
+    const readout = el("lblPostColorBalanceReadout");
+    if (readout) {
+      const lang = document.documentElement.lang || "es";
+      if (lang === "es") {
+        readout.innerHTML = `<b>Media:</b> 0.142 | <b>Objetivo:</b> H:${Math.round(angle)}°, S:${(sat*100).toFixed(1)}% | <b>Desv:</b> R:${rShift.toFixed(3)}, G:${gShift.toFixed(3)}, B:${bShift.toFixed(3)}`;
+      } else {
+        readout.innerHTML = `<b>Mean:</b> 0.142 | <b>Target:</b> H:${Math.round(angle)}°, S:${(sat*100).toFixed(1)}% | <b>Shift:</b> R:${rShift.toFixed(3)}, G:${gShift.toFixed(3)}, B:${bShift.toFixed(3)}`;
+      }
+    }
+  }
+
+  const cbCv = el("colorBalanceCanvas");
+  let isDraggingCb = false;
+
+  if (cbCv) {
+    function updateCbAnchor(clientX, clientY) {
+      const rect = cbCv.getBoundingClientRect();
+      const mouseX = clientX - rect.left;
+      const mouseY = clientY - rect.top;
+      
+      const dx = mouseX - wheelCenterX;
+      const dy = mouseY - wheelCenterY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      
+      if (dist <= wheelRadius) {
+        state.colorBalanceAnchor.x = dx;
+        state.colorBalanceAnchor.y = dy;
+      } else {
+        const angle = Math.atan2(dy, dx);
+        state.colorBalanceAnchor.x = wheelRadius * Math.cos(angle);
+        state.colorBalanceAnchor.y = wheelRadius * Math.sin(angle);
+      }
+      
+      updateColorBalanceReadout();
+      drawColorBalanceWidget();
+    }
+    
+    cbCv.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      isDraggingCb = true;
+      updateCbAnchor(e.clientX, e.clientY);
+    });
+    
+    window.addEventListener("mousemove", (e) => {
+      if (isDraggingCb) {
+        updateCbAnchor(e.clientX, e.clientY);
+      }
+    });
+    
+    window.addEventListener("mouseup", () => {
+      isDraggingCb = false;
+    });
+  }
+
+  const cbResetBtn = el("btnPostColorBalanceReset");
+  if (cbResetBtn) {
+    cbResetBtn.addEventListener("click", () => {
+      state.colorBalanceAnchor.x = 0;
+      state.colorBalanceAnchor.y = 0;
+      updateColorBalanceReadout();
+      drawColorBalanceWidget();
+      logConsole("Ancla de balance de color restablecida al centro", "info");
+    });
+  }
+
+  // Activar los widgets iniciales (estado vacío/por defecto)
+  const cbCanvasOnStart = el("colorBalanceCanvas");
+  if (cbCanvasOnStart) {
+    initColorWheel(cbCanvasOnStart);
+    drawColorBalanceWidget();
+  }
+  drawCurvesWidget();
+
+  // --- BOTÓN APLICAR GRANDE (UNIFICADO) ---
+  function updateBigApply() {
+    const btn = el("btnBigApply");
+    if (!btn) return;
+    
+    if (!state.activeImage) {
+      btn.style.display = "none";
+      return;
+    }
+    
+    const activeSection = document.querySelector(".piw-section:not(.collapsed)");
+    if (!activeSection) {
+      btn.style.display = "none";
+      return;
+    }
+    
+    const titleEl = activeSection.querySelector(".piw-section-title");
+    const titleText = titleEl ? titleEl.textContent.trim().toLowerCase() : "";
+    const id = activeSection.id;
+    
+    let action = null;
+    let btnText = "Aplicar";
+    const lang = document.documentElement.lang || "es";
+
+    const commitPreview = () => {
+      if (state.activeImage) {
+        state.stepInputImage = cloneImage(state.activeImage);
+        if (state.activeWorkflowKey) {
+          state.workflowImages[state.activeWorkflowKey] = state.activeImage;
+        }
+        logConsole(lang === "es" ? "Cambios aplicados y guardados en el flujo" : "Changes saved and committed to workflow", "ok");
+        updateBigApply();
+      }
+    };
+    
+    if (id === "sectionCrop" || titleText.includes("crop") || titleText.includes("recorte")) {
+      const applyCropBtn = el("btnCropApplyCurrent");
+      if (applyCropBtn && !applyCropBtn.disabled) {
+        action = () => {
+          applyCropBtn.click();
+          setTimeout(commitPreview, 100);
+        };
+        btnText = lang === "es" ? "Recortar" : "Crop";
+      }
+    } else if (id === "sectionSolve" || titleText.includes("solve")) {
+      action = () => el("btnSolveImage")?.click();
+      btnText = lang === "es" ? "Resolver" : "Solve";
+    } else if (id === "sectionGradient" || titleText.includes("gradient") || titleText.includes("gradiente")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Gradiente" : "Apply Gradient";
+    } else if (titleText.includes("calibration") || titleText.includes("calibración")) {
+      const activeCard = activeSection.querySelector(".piw-action-card.active-cc");
+      if (activeCard) {
+        action = () => {
+          commitPreview();
+        };
+        btnText = lang === "es" ? "Aplicar Calibración" : "Apply Calibration";
+      }
+    } else if (titleText.includes("deconvolución") || titleText.includes("deconvolution")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Deconvolución" : "Apply Deconvolve";
+    } else if (titleText.includes("estirado") || titleText.includes("stretching")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Estirado" : "Apply Stretch";
+    } else if (titleText.includes("ruido") || titleText.includes("noise")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Reducción" : "Apply Denoise";
+    } else if (titleText.includes("enfoque") || titleText.includes("sharp")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Enfoque" : "Apply Sharpen";
+    } else if (titleText.includes("balance") || titleText.includes("color balance")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Balance" : "Apply Balance";
+    } else if (titleText.includes("curves") || titleText.includes("curvas")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Curvas" : "Apply Curves";
+    } else if (titleText.includes("scnr") || titleText.includes("verde")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar SCNR" : "Apply SCNR";
+    } else if (titleText.includes("máscaras") || titleText.includes("mask")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Guardar Máscara" : "Save Mask";
+    } else if (titleText.includes("saturación") || titleText.includes("saturation")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar Saturación" : "Apply Saturation";
+    } else if (id === "sectionSaspro" || titleText.includes("sas pro")) {
+      action = () => {
+        commitPreview();
+      };
+      btnText = lang === "es" ? "Aplicar SASPro" : "Apply SASPro";
+    }
+
+    if (action) {
+      btn.style.display = "block";
+      btn.textContent = btnText;
+      
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener("click", action);
+    } else {
+      btn.style.display = "none";
+    }
+  }
+  
+  // Exponer a ámbito global/del módulo para que las tarjetas de calibración puedan actualizar el botón
+  window.updateBigApply = updateBigApply;
+
+  updateBigApply();
+
+})();

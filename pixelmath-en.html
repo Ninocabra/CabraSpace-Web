@@ -608,6 +608,27 @@
       color: var(--bg-color);
       box-shadow: 0 0 10px var(--gold-glow);
     }
+
+    /* Media queries for tablet and mobile compatibility */
+    @media (max-width: 1199px) {
+      .simulator-card {
+        position: static !important;
+        margin-bottom: 24px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .simulator-card {
+        padding: 16px;
+      }
+      .pixelmath-header {
+        padding-top: 110px;
+        padding-bottom: 24px;
+      }
+      .formula-master-panel {
+        max-height: 350px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -630,6 +651,10 @@
         <span>CabraSpace</span>
       </a>
       
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
       <ul class="nav-menu">
         <li><a href="en.html" class="nav-link">Home</a></li>
         <li class="dropdown">
@@ -651,6 +676,7 @@
                 <li><a href="cursos-youtube-en.html" class="dropdown-item">YouTube Courses</a></li>
 
                 <li><a href="autoghs-en.html" class="dropdown-item">AutoGHS</a></li>
+                <li><a href="pi-workflow-en.html" class="dropdown-item">PI Workflow</a></li>
               </ul>
             </li>
             <li class="dropdown-submenu">
@@ -683,6 +709,8 @@
       </div>
     </div>
   </header>
+
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
   <!-- Main Content -->
   <main class="container">
@@ -799,6 +827,7 @@
       { id: 'sho_green_mix', name: 'SHO Green Channel Mix', category: 'Narrowband Palette', description: 'Blends Hydrogen and Oxygen in the green channel to mitigate the pure green dominant tone of hydrogen.', r: 'SII', g: 'k_g * Ha + (1 - k_g) * OIII', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_r', label: 'SII / Ha Mix in Red Channel', min: 0, max: 1, step: 0.05, value: 1.0 }, { id: 'k_g', label: 'Ha / OIII Mix in Green Channel', min: 0, max: 1, step: 0.05, value: 0.8 }] },
       { id: 'sho_ha_red_boost', name: 'Hubble SHO with Ha-Red Boost', category: 'Narrowband Palette', description: 'Classic Hubble mapping that injects a controlled portion of Hydrogen into the Red channel to enrich and fill golden details in regions where the Sulfur signal is extremely weak.', r: 'k * SII + (1 - k) * Ha', g: 'Ha', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k', label: 'SII Percentage in Red Channel (k)', min: 0.3, max: 1.0, step: 0.05, value: 0.70 }] },
       { id: 'sho_dyn_cold', name: 'Dynamic SHO Palette (The Coldest Nights)', category: 'Narrowband Palette', description: 'Dynamic non-linear mapping where Oxygen intensity dynamically regulates the transition between Sulfur and Hydrogen in the red channel, and balances the green channel. Provides exceptional color separation.', r: '(OIII ^ ~OIII) * SII + ~(OIII ^ ~OIII) * Ha', g: '((OIII * Ha) ^ ~(OIII * Ha)) * Ha + ~((OIII * Ha) ^ ~(OIII * Ha)) * OIII', b: 'OIII', renderType: 'sho_dyn_cold', sources: ['sii', 'ha', 'oiii'], sliders: [] },
+      { id: 'nb_test_formula', name: 'Auto-Sync Test Palette', category: 'Narrowband Palette', description: 'A test formula to verify that the dynamic import and auto-synchronization from the PixelMath-teca to PI Workflow work correctly.', r: 'SII * k_test', g: 'Ha * (1 - k_test)', b: 'OIII', renderType: 'narrowband_blend', r_chan: 'sii', g_chan: 'ha', b_chan: 'oiii', sources: ['sii', 'ha', 'oiii'], sliders: [{ id: 'k_test', label: 'Test Slider (k_test)', min: 0.1, max: 0.9, step: 0.05, value: 0.5 }] },
 
       // 2. Color Masks
       { id: 'mask_red', name: 'Color Mask: Standard Red', category: 'Color Masks', description: 'Generates a monochrome mask isolating red tones. Useful for applying specific saturation or curves to emission nebulae.', r: 'R - max(G, B)', rgb: 'R - max(G, B)', renderType: 'mask_color', sources: ['original'], sliders: [] },
@@ -2448,5 +2477,6 @@
       });
     });
   </script>
+  <script src="mobile-menu.js"></script>
 </body>
 </html>

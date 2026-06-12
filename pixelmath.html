@@ -609,6 +609,27 @@
       color: var(--bg-color);
       box-shadow: 0 0 10px var(--gold-glow);
     }
+
+    /* Media queries for tablet and mobile compatibility */
+    @media (max-width: 1199px) {
+      .simulator-card {
+        position: static !important;
+        margin-bottom: 24px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .simulator-card {
+        padding: 16px;
+      }
+      .pixelmath-header {
+        padding-top: 110px;
+        padding-bottom: 24px;
+      }
+      .formula-master-panel {
+        max-height: 350px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -631,6 +652,10 @@
         <span>CabraSpace</span>
       </a>
       
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
       <ul class="nav-menu">
         <li><a href="index.html" class="nav-link">Inicio</a></li>
         <li class="dropdown">
@@ -684,6 +709,8 @@
       </div>
     </div>
   </header>
+
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
   <!-- Main Content -->
   <main class="container">
@@ -2451,5 +2478,6 @@
       });
     });
   </script>
+  <script src="mobile-menu.js"></script>
 </body>
 </html>
