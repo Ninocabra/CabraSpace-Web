@@ -29,8 +29,12 @@ MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
 MAX_DB_SIZE = 150         # Keep DB file size balanced
 # Prioridad de canales oficiales sobre terceros (reviewers/foros):
 MAX_OTHER_ITEMS = 5       # Tope de items de fuentes NO oficiales por run (reserva capacidad para oficiales)
-MFG_MAX_AGE_DAYS = 14     # Ventana de antigüedad para fuentes oficiales (más amplia: publican con menos frecuencia)
-OTHER_MAX_AGE_DAYS = 3    # Ventana de antigüedad para terceros (corta: evita captar reviews tardías como novedad)
+# Ventana de antigüedad. Los BLOGS/releases oficiales publican poco (Celestron ~mensual,
+# William Optics esporádico), así que un anuncio de marca no caduca en 2 semanas: ventana amplia.
+# Todo lo demás (YouTube oficial incluido, reviewers, foros) publica a diario: ventana corta para
+# no captar contenido viejo como novedad. La dedup por URL evita re-añadir el backfill inicial.
+MFG_BLOG_MAX_AGE_DAYS = 45  # Solo blogs/releases oficiales (is_mfg y NO YouTube)
+OTHER_MAX_AGE_DAYS = 3      # YouTube oficial, reviewers y foros
 # Cascada de IA: distinguir error de credencial (deshabilitar ya) de error transitorio (reintentar).
 AUTH_ERROR = "AUTH_ERROR"     # Sentinela: HTTP 401/403/404 (key inválida o modelo inexistente)
 AI_FAIL_LIMIT = 2             # Nº de fallos transitorios consecutivos antes de deshabilitar un proveedor
@@ -129,7 +133,7 @@ if not MFG_SOURCES:
         {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
         {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
         {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-        {"name": "Sharpstar Optics (Askar) (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},
+        {"name": "Askar / Sharpstar (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHfWUShNQ", "is_youtube": True, "is_mfg": True},
         {"name": "ToupTek Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True, "is_mfg": True},
         {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True, "is_mfg": True},
         {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True, "is_mfg": True},
@@ -153,12 +157,32 @@ GITLAB_REPOS = [
     {"name": "Siril", "project": "free-astro/siril", "category_es": "SOFTWARE", "category_en": "SOFTWARE"}
 ]
 
+# content:encoded de RSS 2.0 (WordPress/QHY) — cuerpo completo del post.
+CONTENT_ENCODED_TAG = '{http://purl.org/rss/1.0/modules/content/}encoded'
+
+def _strip_html(text):
+    """Quita etiquetas HTML y colapsa espacios. Sirve para pasar el cuerpo del feed a la IA
+    sin gastar presupuesto de tokens en markup."""
+    if not text:
+        return ""
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
 def fetch_feed_items(source_info):
     """Fetches and parses items from a single RSS or Atom feed with SSL bypass."""
     url = source_info["url"]
     is_youtube = source_info["is_youtube"]
-    
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+
+    # CRÍTICO: sin la cabecera 'Accept', los blogs OFICIALES sobre Shopify/Cloudflare
+    # (Celestron, William Optics, Sky-Watcher, Explore Scientific, Lunt...) responden 403 y
+    # devuelven 0 items. Eso hacía que el equipamiento real cayera silenciosamente a reviewers
+    # de YouTube y foros. Verificado: con Accept + Accept-Language pasan a 200 OK.
+    headers = {
+        'User-Agent': BROWSER_UA,
+        'Accept': 'application/atom+xml,application/rss+xml,application/xml;q=0.9,text/xml;q=0.8,*/*;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9'
+    }
     req = urllib.request.Request(url, headers=headers)
     
     try:
@@ -196,7 +220,14 @@ def fetch_feed_items(source_info):
                 
                 # Format: "2026-06-02T15:00:00+00:00" -> "2026-06-02"
                 date_formatted = pub_date_str.split('T')[0] if 'T' in pub_date_str else datetime.now().strftime("%Y-%m-%d")
-                
+
+                # Cuerpo del post (atom <content>/<summary>) -> contexto para que la IA distinga
+                # un anuncio de producto de ruido de blog (eventos, star parties, ofertas).
+                body_el = entry.find('atom:content', ns)
+                if body_el is None:
+                    body_el = entry.find('atom:summary', ns)
+                body_content = _strip_html(body_el.text) if body_el is not None else ""
+
                 if title and link:
                     results.append({
                         "id": link,
@@ -205,7 +236,8 @@ def fetch_feed_items(source_info):
                         "date": date_formatted,
                         "source": author,
                         "is_youtube": is_youtube,
-                        "is_mfg": source_info.get("is_mfg", False)
+                        "is_mfg": source_info.get("is_mfg", False),
+                        "body_content": body_content
                     })
                     
         # RSS 2.0 Feed
@@ -226,7 +258,13 @@ def fetch_feed_items(source_info):
                         date_formatted = dt.strftime("%Y-%m-%d")
                     except Exception:
                         date_formatted = datetime.now().strftime("%Y-%m-%d")
-                        
+
+                    # Cuerpo del post (RSS content:encoded / description) -> contexto para la IA.
+                    body_el = item.find(CONTENT_ENCODED_TAG)
+                    if body_el is None:
+                        body_el = item.find('description')
+                    body_content = _strip_html(body_el.text) if body_el is not None else ""
+
                     if title and link:
                         results.append({
                             "id": link,
@@ -235,7 +273,8 @@ def fetch_feed_items(source_info):
                             "date": date_formatted,
                             "source": source_info["name"],
                             "is_youtube": is_youtube,
-                            "is_mfg": source_info.get("is_mfg", False)
+                            "is_mfg": source_info.get("is_mfg", False),
+                            "body_content": body_content
                         })
         return results
     except Exception as e:
@@ -769,10 +808,34 @@ if not PALABRAS_CLAVE:
         "firecapture", "sharpcap", "autostakkert", "pixinsight"
     ]
 
+# NOISE-FILTER-BEGIN
+# Patrones de contenido de 'engagement' que NO son novedades de equipo: eventos, webcasts,
+# historias personales, fotos de comunidad, fechas señaladas. Son frecuentísimos en los canales
+# OFICIALES de YouTube (ZWO, Svbony, Sky-Watcher) que, al ser is_mfg, se saltaban el pre-filtro.
+ENGAGEMENT_NOISE_PATTERNS = [
+    "star party", "global star", "webcast", "what's up", "whats up",
+    "night sky", "night skies", "blue moon", "full moon", "new moon",
+    "did you capture", "have you captured", "journey", "story of",
+    "under the stars", "dreams to reality", "#shorts", "giveaway",
+    "sorteo", "happy holiday", "merry christmas", "black friday",
+    "cyber monday", "year in review", "behind the scenes"
+]
+
+def is_engagement_noise(title):
+    """True si el título es claramente contenido de engagement/comunidad, no una novedad de
+    producto. Denylist de alta precisión: estos términos no aparecen en anuncios de equipo
+    (verificado: 0 falsos positivos sobre títulos reales de producto)."""
+    title_lower = title.lower()
+    return any(p in title_lower for p in ENGAGEMENT_NOISE_PATTERNS)
+# NOISE-FILTER-END
+
 def check_relevance_fallback(title):
     """Rule-based relevance filter for equipment updates using manufacturers and keywords."""
     title_lower = title.lower()
-    
+    # Quita hashtags antes de casar marca/keyword: las marcas espolvorean #zwo #celestron en
+    # shorts de relleno, lo que colaba ese contenido no-producto por el pre-filtro.
+    title_lower = re.sub(r'#\w+', ' ', title_lower)
+
     # 1. Match brand names
     for brand in FABRICANTES:
         brand_lower = brand.lower()
@@ -1153,11 +1216,13 @@ def main():
     print(f"Extracted {len(known_models)} known product models from database tags ({len(known_models_official)} already covered by official sources).")
     
     # Gather candidates from all feeds
+    source_health = []  # (name, count, is_mfg) -> para el resumen de salud al final
     candidates = []
     for source in SOURCES:
         print(f"Fetching from: {source['name']}...")
         items = fetch_feed_items(source)
         print(f"Fetched {len(items)} items from {source['name']}.")
+        source_health.append((source['name'], len(items), source.get('is_mfg', False)))
         candidates.extend(items)
         
     # Gather software releases from GitHub
@@ -1178,6 +1243,19 @@ def main():
             print(f"Found release for {repo_info['name']}: {release_item['title']}")
             candidates.append(release_item)
         
+    # Resumen de salud de fuentes: feeds que devolvieron 0 items (probable 403/404/feed roto).
+    # Imprescindible para no volver a quedarnos sin fuentes OFICIALES sin enterarnos (el motivo
+    # por el que el equipamiento oficial llevaba tiempo sin entrar pese a 'optimizar' el filtro).
+    dead = [(n, m) for (n, c, m) in source_health if c == 0]
+    if dead:
+        print("\n=== AVISO: fuentes sin items en esta ejecucion ===")
+        for n, m in dead:
+            print(f"  [{'OFICIAL' if m else 'tercero'}] {n} -> 0 items (revisa el feed)")
+        dead_mfg = [n for n, m in dead if m]
+        if dead_mfg:
+            print(f"  >>> {len(dead_mfg)} fuente(s) OFICIAL(es) caida(s): {', '.join(dead_mfg)}")
+        print("==================================================\n")
+
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
     
@@ -1191,9 +1269,10 @@ def main():
         try:
             item_date = datetime.strptime(c['date'], "%Y-%m-%d")
             days_diff = (current_date - item_date).days
-            # Ventana más amplia para canales oficiales: publican con menos frecuencia y no
-            # queremos que un anuncio del fabricante caduque mientras sí entran reviews posteriores.
-            max_age = MFG_MAX_AGE_DAYS if c.get('is_mfg', False) else OTHER_MAX_AGE_DAYS
+            # Ventana amplia SOLO para blogs/releases oficiales (publican poco); el YouTube oficial
+            # y todo lo demás usan ventana corta porque publican relleno a diario.
+            is_official_blog = c.get('is_mfg', False) and not c.get('is_youtube', False)
+            max_age = MFG_BLOG_MAX_AGE_DAYS if is_official_blog else OTHER_MAX_AGE_DAYS
             if days_diff <= max_age:
                 new_candidates.append(c)
                 seen_urls_this_run.add(c['url'])
@@ -1204,6 +1283,12 @@ def main():
     # Partition into manufacturers/official releases vs others to avoid starvation of vendor updates
     new_mfg_candidates = [c for c in new_candidates if c.get('is_mfg', False)]
     new_other_candidates = [c for c in new_candidates if not c.get('is_mfg', False)]
+    # Dentro de oficiales: blogs/releases (centrados en producto) ANTES que el YouTube oficial
+    # (centrado en engagement), para que las novedades de producto consuman primero el cupo de
+    # MAX_ITEMS_TO_PROCESS y no se lo coman los shorts diarios de marca.
+    mfg_blogs = [c for c in new_mfg_candidates if not c.get('is_youtube', False)]
+    mfg_youtube = [c for c in new_mfg_candidates if c.get('is_youtube', False)]
+    new_mfg_candidates = mfg_blogs + mfg_youtube
     new_candidates = new_mfg_candidates + new_other_candidates
     
     print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)} (Manufacturers/Official: {len(new_mfg_candidates)}, Others: {len(new_other_candidates)})")
@@ -1229,6 +1314,13 @@ def main():
         # Check if candidate is from a manufacturer feed
         is_mfg = item.get('is_mfg', False)
         is_forum = item['source'] in ["Stargazers Lounge", "Reddit r/astrophotography", "Reddit r/telescopes"]
+
+        # Descarta contenido de engagement (eventos, webcasts, historias, fechas señaladas) de
+        # CUALQUIER fuente, incluidas las OFICIALES: su YouTube publica mucho relleno que no es
+        # novedad de equipo y antes se colaba directo a la IA por ser is_mfg.
+        if is_engagement_noise(item['title']):
+            print(f"Skipping engagement/non-product content (pre-filtered): '{item['title']}' from {item['source']}")
+            continue
 
         # Reserva de capacidad: limita cuántos items de terceros se procesan por run para que
         # los canales oficiales (procesados primero por el orden mfg-first) no se queden sin slots.

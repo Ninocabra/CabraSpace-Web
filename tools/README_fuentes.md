@@ -42,7 +42,8 @@ Fabricantes relevantes que aún **no** tienen canal oficial vigilado (complétal
 
 ## Cómo se prioriza (lógica del motor)
 
-- Los oficiales se procesan **antes** que los terceros en cada ejecución (orden `is_mfg` primero).
-- Ventana de antigüedad: **14 días** para oficiales, **3 días** para terceros (un anuncio del fabricante no caduca mientras entran reviews tardías).
+- Los oficiales se procesan **antes** que los terceros; dentro de oficiales, los **blogs/releases** van antes que el **YouTube oficial** (centrado en engagement).
+- Ventana de antigüedad: **45 días** solo para **blogs/releases oficiales** (`MFG_BLOG_MAX_AGE_DAYS`; publican poco y un anuncio no caduca en 2 semanas), **3 días** para todo lo demás incluido el YouTube oficial, reviewers y foros. La deduplicación por URL evita re-añadir el backfill inicial.
+- Filtro de ruido (`is_engagement_noise`): descarta de **cualquier** fuente el contenido de engagement (eventos, webcasts, "what's up", historias personales, "blue moon", giveaways…) antes de gastar IA. Los canales oficiales de YouTube publican mucho de esto.
 - Cuota: máximo **5** items de terceros por ejecución (`MAX_OTHER_ITEMS`), reservando el resto a oficiales.
 - Deduplicación por origen: un anuncio **oficial** puede entrar aunque un reviewer ya hubiera cubierto ese modelo; un reviewer se descarta si el modelo ya está cubierto. Cada entrada guarda `source_type` (`official`/`reviewer`).

@@ -43,6 +43,6 @@ jobs:
         run: |
           git config user.name "CabraSpace Bot"
           git config user.email "ninocabra@gmail.com"
-          git add novedades.json equipamiento.json
+          git add novedades.json equipamiento.json catalogo_productos.md
           git diff --staged --quiet || git commit -m "🤖 Actualización automática de noticias [$(date +'%Y-%m-%d %H:%M')]"
           git push
