@@ -205,7 +205,7 @@ def process_with_gemini(video, api_key):
     
     for attempt in range(max_retries):
         try:
-            with urllib.request.urlopen(req, timeout=15) as response:
+            with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
                 res_data = json.loads(response.read().decode('utf-8'))
             text_response = res_data['candidates'][0]['content']['parts'][0]['text']
             return json.loads(text_response)
@@ -282,7 +282,7 @@ Author/Channel: "{video['author']}" """
     
     for attempt in range(max_retries):
         try:
-            with urllib.request.urlopen(req, timeout=15) as response:
+            with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
                 res_data = json.loads(response.read().decode('utf-8'))
             text_response = res_data['choices'][0]['message']['content'].strip()
             text_response = clean_json_text(text_response)
@@ -406,13 +406,16 @@ def scrape_youtube_videos(query):
     url = f"https://www.youtube.com/results?search_query={encoded_query}"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+        # Las IPs de datacenter (GitHub Actions) reciben la pagina de consentimiento de YouTube en
+        # vez de resultados -> ytInitialData ausente -> [] silencioso. Esta cookie la salta.
+        'Cookie': 'CONSENT=YES+cb; SOCS=CAI'
     }
-    
+
     req = urllib.request.Request(url, headers=headers)
     videos = []
     try:
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
             html_content = response.read().decode('utf-8', errors='ignore')
             
             m = re.search(r'ytInitialData\s*=\s*(\{.*?\});', html_content)
@@ -477,6 +480,13 @@ def main():
         time.sleep(2) # Sleep to avoid rate limits
         
     print(f"Total raw videos harvested: {len(all_raw_videos)}")
+
+    # Aviso de cosecha vacia: si YouTube sirve la pagina de consentimiento/captcha (tipico en
+    # IPs de datacenter), ytInitialData no aparece y todas las queries devuelven []. Sin esto,
+    # el run "tendria exito" guardando 0 nuevos en silencio.
+    if not all_raw_videos:
+        print("=== AVISO: 0 videos cosechados de YouTube. Probable muro de consentimiento/bloqueo "
+              "de IP. Revisa la cookie CONSENT o el parseo de ytInitialData. ===")
     
     # Deduplicate raw videos by video_id
     unique_videos = {}
