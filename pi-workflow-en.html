@@ -1063,6 +1063,23 @@
       box-shadow: inset 0 0 0 1px var(--gold-border);
     }
   </style>
+  <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
+  <link rel="canonical" href="https://cabraspace.com/pi-workflow-en.html">
+  <link rel="alternate" hreflang="es" href="https://cabraspace.com/pi-workflow.html">
+  <link rel="alternate" hreflang="en" href="https://cabraspace.com/pi-workflow-en.html">
+  <link rel="alternate" hreflang="x-default" href="https://cabraspace.com/pi-workflow.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="CabraSpace">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://cabraspace.com/pi-workflow-en.html">
+  <meta property="og:title" content="PI Workflow (BETA) - CabraSpace">
+  <meta property="og:description" content="Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.">
+  <meta property="og:image" content="https://cabraspace.com/logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PI Workflow (BETA) - CabraSpace">
+  <meta name="twitter:description" content="Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.">
+  <meta name="twitter:image" content="https://cabraspace.com/logo.png">
+  <!-- SEO-AUTO-END -->
 </head>
 <body>
   <!-- FOUC Preventer for Night Mode -->
@@ -1080,7 +1097,7 @@
   <header id="navbar">
     <div class="container nav-container">
       <a href="en.html" class="logo-link">
-        <img src="logo.png" alt="CabraSpace Logo">
+        <img src="logo.webp" alt="CabraSpace Logo">
         <span>CabraSpace</span>
       </a>
       
@@ -1169,6 +1186,22 @@
               <button class="piw-segment-btn" data-mode="nb-split">NB</button>
               <button class="piw-segment-btn" data-mode="rgb-color">RGB</button>
             </div>
+
+            <!-- WORK-RES-SELECTOR-BEGIN -->
+            <div class="piw-control-group" style="margin-top:10px;">
+              <div class="piw-label-row">
+                <span class="piw-label">Working resolution</span>
+                <span class="piw-value" id="valWorkRes">2000 px</span>
+              </div>
+              <select class="piw-select" id="selWorkRes" title="Maximum long-edge size of the working image. Higher = more detail but slower and more memory. Applied when loading the image.">
+                <option value="1000">1000 px (fast)</option>
+                <option value="1500">1500 px</option>
+                <option value="2000" selected>2000 px (balanced)</option>
+                <option value="3000">3000 px</option>
+                <option value="4000">4000 px (max quality)</option>
+              </select>
+            </div>
+            <!-- WORK-RES-SELECTOR-END -->
 
             <!-- R+G+B Subzone -->
             <div id="loading-rgb-split" class="piw-loading-subzone">
@@ -1475,9 +1508,9 @@
               </div>
             </div>
 
-            <div style="display: flex; gap: 8px;">
-              <button class="piw-btn primary" id="btnApplyDecon" disabled style="flex:2;">Apply Deconvolution</button>
-              <button class="piw-btn" id="btnCompareDecon" disabled style="flex:1;">Compare</button>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="piw-btn primary" id="btnApplyDecon" disabled>Test Deconvolution</button>
+              <button class="piw-btn" id="btnCompareDecon" disabled>Compare</button>
             </div>
           </div>
         </div>

@@ -1237,11 +1237,12 @@ elif algo == "cosmic":
     
     stellar_ai = params.get("stellar_ai")
     if stellar_ai is not None:
-        stellar_ai = np.array([np.array(x) for x in stellar_ai])
-        
+        # Cada canal IA llega plano (H*W) desde runOnnxModelTiled -> reshape a (H, W)
+        stellar_ai = np.array([np.array(x).reshape((js_h, js_w)) for x in stellar_ai])
+
     nonstellar_ai = params.get("nonstellar_ai")
     if nonstellar_ai is not None:
-        nonstellar_ai = np.array([np.array(x) for x in nonstellar_ai])
+        nonstellar_ai = np.array([np.array(x).reshape((js_h, js_w)) for x in nonstellar_ai])
         
     processed = apply_cosmic_clarity_decon(
         img_np, mode=mode, stellar_amt=stellar_amt, 

@@ -9,7 +9,7 @@
   "use strict";
 
   // --- CONFIGURACIÓN Y ESTADO GLOBAL ---
-  const MAX_PREVIEW_DIM = 2000; // Resolución máx. de trabajo para mantener 60 FPS
+  let MAX_PREVIEW_DIM = 2000; // Resolución máx. de trabajo (default 2000; ajustable por el selector "Resolución de trabajo", máx 4000). Se aplica al cargar.
   const wl = [0.2126, 0.7152, 0.0722]; // Pesos de luminancia Rec.709
 
   const state = {
@@ -2001,6 +2001,7 @@
     const btnCmpColor = el("btnCompareColor");
     if (btnCmpColor) btnCmpColor.disabled = !img.isColor;
     el("btnApplyDecon").disabled = false;
+    { const b = el("btnCompareDecon"); if (b) b.disabled = false; }
     el("btnApplyStretch").disabled = false;
     el("btnApplyScnr").disabled = !img.isColor;
     // SCNR-PRE-BEGIN
@@ -2420,147 +2421,182 @@
     radius_8: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_8AI3_5s.onnx"
   };
 
+  // COSMIC-MODEL-ROUTING-BEGIN
+  // En localhost usa las copias locales de scratch/ (la Release de setiastro no permite fetch
+  // cross-origin por CORS → "Failed to fetch"). En producción seguiría apuntando a la Release;
+  // para que funcione en producción habría que re-hospedar los modelos en una Release propia con
+  // CORS (GATE humano), igual que se hizo con nox/GraXpert.
+  function resolveCosmicModelUrl(url) {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "scratch/" + url.split("/").pop();
+    }
+    return url;
+  }
+  // COSMIC-MODEL-ROUTING-END
+
   // ONNX-ENGINE-REF-BEGIN
   // Las funciones openModelDB, getCachedModel, cacheModel, fetchModelWithCache y runOnnxModelTiled
   // han sido movidas al módulo independiente 'onnx-engine.js' para modularidad y reutilización en nox/GraXpert.
   // ONNX-ENGINE-REF-END
 
   // Event Listener para Deconvolución
-  el("btnApplyDecon").addEventListener("click", () => {
-    if (!state.activeImage) return;
+  // DECON-COMPUTE-BEGIN
+  // Calcula la deconvolución para un algoritmo EXPLÍCITO (cosmic_std | cosmic_ia) sobre srcImg,
+  // leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
+  async function computeDeconv(algo, srcImg) {
     const lang = document.documentElement.lang || "es";
-    const algo = el("selDeconAlgo").value;
     const mode = el("selCcSharpenMode").value;
     const stellarAmt = parseFloat(el("sldCcStellarAmt").value);
     const nsStrength = parseFloat(el("sldCcNsStrength").value);
     const nsAmount = parseFloat(el("sldCcNsAmount").value);
     const removeAb = el("chkCcRemoveAb").checked;
+    let stellarAiCh = null;
+    let nonstellarAiCh = null;
 
+    if (algo === "cosmic_ia") {
+      // DECON-STRETCH-BEGIN: el modelo Cosmic Clarity está entrenado con datos ESTIRADOS.
+      // Estiramos srcImg (MTF a mediana objetivo ~0.25), inferimos, y deshacemos el estirado
+      // (MTF inverso con midtone 1-m, propiedad auto-inversa de la MTF) para devolver la salida
+      // al dominio lineal del blend.
+      const _lumCh = (srcImg.isColor && srcImg.nc >= 2) ? srcImg.ch[1] : srcImg.ch[0];
+      const _med = fastSampledMedian(_lumCh);
+      const _mMid = optMadMidtone(_med, 0, 0.25);
+      const _mtf = (m, x) => { const d = (2 * m - 1) * x - m; if (Math.abs(d) < 1e-12) return x; const v = (m - 1) * x / d; return v < 0 ? 0 : (v > 1 ? 1 : v); };
+      const _stretchChans = (chans, m) => chans.map((src) => { const dst = new Float32Array(src.length); for (let i = 0; i < src.length; i++) dst[i] = _mtf(m, src[i]); return dst; });
+      const stretchedSrc = { w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, ch: _stretchChans(srcImg.ch, _mMid) };
+      const _unstretch = (chans) => _stretchChans(chans, 1 - _mMid);
+      // DECON-STRETCH-END
+      // ONNX-ENGINE-REF-BEGIN
+      if ((mode === "both" || mode === "stellar") && stellarAmt > 0.01) {
+        showLoader(lang === "es" ? "Cargando modelo de estrellas IA..." : "Loading AI stellar model...");
+        const stellarModelData = await window.OnnxEngine.fetchModelWithCache(resolveCosmicModelUrl(STELLAR_MODEL_URL), (p) => {
+          showLoader(lang === "es" ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` : `Downloading stellar model: ${(p * 100).toFixed(0)}%`);
+        });
+        showLoader(lang === "es" ? "Inicializando sesión ONNX (estrellas)..." : "Initializing ONNX session (stars)...");
+        const session = await window.OnnxEngine.createSession(stellarModelData);
+        showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
+        stellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
+      }
+      if ((mode === "both" || mode === "nonstellar") && nsAmount > 0.01) {
+        let modelKey = "radius_2";
+        if (nsStrength <= 1.5) modelKey = "radius_1";
+        else if (nsStrength <= 3.0) modelKey = "radius_2";
+        else if (nsStrength <= 6.0) modelKey = "radius_4";
+        else modelKey = "radius_8";
+        const nonstellarUrl = NONSTELLAR_MODEL_URLS[modelKey];
+        showLoader(lang === "es" ? `Cargando modelo de nebulosa IA (${modelKey})...` : `Loading AI nebula model (${modelKey})...`);
+        const nonstellarModelData = await window.OnnxEngine.fetchModelWithCache(resolveCosmicModelUrl(nonstellarUrl), (p) => {
+          showLoader(lang === "es" ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%` : `Downloading nebula model: ${(p * 100).toFixed(0)}%`);
+        });
+        showLoader(lang === "es" ? "Inicializando sesión ONNX (nebulosa)..." : "Initializing ONNX session (nebula)...");
+        const session = await window.OnnxEngine.createSession(nonstellarModelData);
+        showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
+        nonstellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
+      }
+      // ONNX-ENGINE-REF-END
+    }
+
+    showLoader(lang === "es" ? "Realizando mezcla final en Pyodide..." : "Performing final blending in Pyodide...");
+    const params = { mode, stellar_amt: stellarAmt, ns_strength: nsStrength, ns_amount: nsAmount, remove_aberration: removeAb, stellar_ai: stellarAiCh, nonstellar_ai: nonstellarAiCh };
+    return await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
+  }
+  // DECON-COMPUTE-END
+
+  // Event Listener para Deconvolución — "Probar" (preview no destructivo; commit en botón grande)
+  el("btnApplyDecon").addEventListener("click", () => {
+    if (!state.activeImage) return;
+    const lang = document.documentElement.lang || "es";
+    const algo = el("selDeconAlgo").value;
     showLoader(lang === "es" ? "Iniciando deconvolución..." : "Starting deconvolution...");
-
     setTimeout(async () => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        let stellarAiCh = null;
-        let nonstellarAiCh = null;
-
-        if (algo === "cosmic_ia") {
-          // ONNX-ENGINE-REF-BEGIN
-          // 1. CARGAR E INFERIR ESTRELLAS
-          if (mode === "both" || mode === "stellar") {
-            if (stellarAmt > 0.01) {
-              showLoader(lang === "es" ? "Cargando modelo de estrellas IA..." : "Loading AI stellar model...");
-              const stellarModelData = await window.OnnxEngine.fetchModelWithCache(STELLAR_MODEL_URL, (p) => {
-                showLoader(lang === "es" 
-                  ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` 
-                  : `Downloading stellar model: ${(p * 100).toFixed(0)}%`
-                );
-              });
-
-              showLoader(lang === "es" ? "Inicializando sesión ONNX (estrellas)..." : "Initializing ONNX session (stars)...");
-              const session = await window.OnnxEngine.createSession(stellarModelData);
-
-              showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
-              stellarAiCh = await window.OnnxEngine.runOnnxModelTiled(session, srcImg);
-            }
+        let res;
+        try {
+          res = await computeDeconv(algo, srcImg);
+        } catch (err) {
+          if (algo === "cosmic_ia") {
+            logConsole(lang === "es" ? "Fallo en Cosmic Clarity IA. Reintentando con Deconvolución Estándar automáticamente..." : "Cosmic Clarity AI failed. Retrying with Standard Deconvolution automatically...", "warn");
+            res = await computeDeconv("cosmic_std", srcImg);
+          } else {
+            throw err;
           }
-
-          // 2. CARGAR E INFERIR NEBULOSA
-          if (mode === "both" || mode === "nonstellar") {
-            if (nsAmount > 0.01) {
-              let modelKey = "radius_2";
-              if (nsStrength <= 1.5) modelKey = "radius_1";
-              else if (nsStrength <= 3.0) modelKey = "radius_2";
-              else if (nsStrength <= 6.0) modelKey = "radius_4";
-              else modelKey = "radius_8";
-
-              const nonstellarUrl = NONSTELLAR_MODEL_URLS[modelKey];
-              showLoader(lang === "es" ? `Cargando modelo de nebulosa IA (${modelKey})...` : `Loading AI nebula model (${modelKey})...`);
-              const nonstellarModelData = await window.OnnxEngine.fetchModelWithCache(nonstellarUrl, (p) => {
-                showLoader(lang === "es"
-                  ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%`
-                  : `Downloading nebula model: ${(p * 100).toFixed(0)}%`
-                );
-              });
-
-              showLoader(lang === "es" ? "Inicializando sesión ONNX (nebulosa)..." : "Initializing ONNX session (nebula)...");
-              const session = await window.OnnxEngine.createSession(nonstellarModelData);
-
-              showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
-              nonstellarAiCh = await window.OnnxEngine.runOnnxModelTiled(session, srcImg);
-            }
-          }
-          // ONNX-ENGINE-REF-END
         }
-
-        // 3. EJECUTAR MEZCLA EN PYODIDE
-        showLoader(lang === "es" ? "Realizando mezcla final en Pyodide..." : "Performing final blending in Pyodide...");
-        const params = {
-          mode: mode,
-          stellar_amt: stellarAmt,
-          ns_strength: nsStrength,
-          ns_amount: nsAmount,
-          remove_aberration: removeAb,
-          stellar_ai: stellarAiCh,
-          nonstellar_ai: nonstellarAiCh
-        };
-
-        const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
-
-        commitActiveImage(res, "Deconvolution", srcImg);
-
+        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Deconvolución")
+        previewActiveImage(res, srcImg, "Deconvolution");
         render();
-        refreshPathBar();
-
-        const methodStr = algo === "cosmic_ia" ? "Cosmic Clarity IA (opción B)" : "Standard Deconvolution (opción A)";
-        const msg = lang === "es"
-          ? `${methodStr} aplicada (Modo: ${mode}, Stellar: ${stellarAmt.toFixed(2)}, Ns. Size: ${nsStrength.toFixed(2)}, Ns. Amt: ${nsAmount.toFixed(2)})`
-          : `${methodStr} applied (Mode: ${mode}, Stellar: ${stellarAmt.toFixed(2)}, Ns. Size: ${nsStrength.toFixed(2)}, Ns. Amt: ${nsAmount.toFixed(2)})`;
-        logConsole(msg, "info");
-
-      } catch (err) {
-        logConsole(`Error en Deconvolución: ${err.message}`, "err");
-        
-        if (algo === "cosmic_ia") {
-          logConsole(lang === "es" 
-            ? "Fallo en Cosmic Clarity IA. Reintentando con Deconvolución Estándar automáticamente..." 
-            : "Cosmic Clarity AI failed. Retrying with Standard Deconvolution automatically...", 
-            "warn"
-          );
-          
-          try {
-            showLoader(lang === "es" ? "Ejecutando Deconvolución Estándar (Fallback)..." : "Running Standard Deconvolution (Fallback)...");
-            const srcImg = state.stepInputImage || state.activeImage;
-            const params = {
-              mode: mode,
-              stellar_amt: stellarAmt,
-              ns_strength: nsStrength,
-              ns_amount: nsAmount,
-              remove_aberration: removeAb,
-              stellar_ai: null,
-              nonstellar_ai: null
-            };
-            const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
-            
-            commitActiveImage(res, "Deconvolution", srcImg);
-
-            render();
-            refreshPathBar();
-
-            logConsole(lang === "es"
-              ? "Deconvolución Estándar (Fallback) aplicada correctamente."
-              : "Standard Deconvolution (Fallback) applied successfully.", 
-              "info"
-            );
-          } catch (fallbackErr) {
-            logConsole(`Error en Deconvolución Estándar: ${fallbackErr.message}`, "err");
-          }
-        }
+        drawHistogram();
+        logConsole(lang === "es" ? "Vista previa de deconvolución (Probar). Pulsa 'Aplicar Deconvolución' para confirmar." : "Deconvolution preview (Test). Press 'Apply Deconvolve' to commit.", "info");
+      } catch (e) {
+        logConsole(`Error en Deconvolución: ${e.message}`, "err");
       } finally {
         hideLoader();
       }
     }, 50);
   });
+
+  // DECON-COMPARE-BEGIN
+  // "Comparar": corre Standard y Cosmic Clarity IA con los parámetros actuales sobre la Imagen
+  // Inicial y guarda cada resultado en un Slot de Memoria (1-2). No commitea.
+  if (el("btnCompareDecon")) {
+    el("btnCompareDecon").addEventListener("click", () => {
+      if (!state.activeImage) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Comparando deconvoluciones..." : "Comparing deconvolutions...");
+      setTimeout(async () => {
+        try {
+          const srcImg = state.stepInputImage || state.activeImage;
+          const variants = [
+            { name: "Standard", algo: "cosmic_std" },
+            { name: "Cosmic Clarity IA", algo: "cosmic_ia" }
+          ];
+          const results = [];
+          for (const v of variants) {
+            try {
+              results.push({ name: v.name, img: await computeDeconv(v.algo, srcImg) });
+            } catch (e) {
+              logConsole((lang === "es" ? `${v.name} omitido: ` : `${v.name} skipped: `) + e.message, "warn");
+            }
+          }
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            state.imageSlots[i] = cloneImage({ ch: r.img.ch, w: r.img.w, h: r.img.h, nc: r.img.nc, isColor: r.img.isColor, wcs: r.img.wcs || (srcImg && srcImg.wcs) });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) {
+              slotBtn.classList.add("filled");
+              slotBtn.title = "Deconv: " + r.name;
+            }
+            logConsole(`Slot ${i + 1} ← ${r.name}`, "info");
+          }
+          updateMixSourceOptions();
+          hideLoader();
+          logConsole(lang === "es" ? `Comparación lista: ${results.length} en Slots 1-${results.length}. Carga un slot y pulsa 'Aplicar Deconvolución'.` : `Comparison ready: ${results.length} in Slots 1-${results.length}. Load a slot and press 'Apply Deconvolve'.`, "ok");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+  // DECON-COMPARE-END
+
+  // WORK-RES-SELECTOR-BEGIN
+  // Selector de resolución de trabajo: ajusta el cap del lado largo (máx 4000). Se aplica a
+  // las imágenes que se carguen DESPUÉS de cambiarlo (no re-escala la imagen ya cargada).
+  if (el("selWorkRes")) {
+    el("selWorkRes").addEventListener("change", (e) => {
+      const v = parseInt(e.target.value, 10);
+      MAX_PREVIEW_DIM = Math.min(4000, Math.max(500, isNaN(v) ? 2000 : v));
+      const lbl = el("valWorkRes");
+      if (lbl) lbl.textContent = MAX_PREVIEW_DIM + " px";
+      const lang = document.documentElement.lang || "es";
+      logConsole(lang === "es"
+        ? `Resolución de trabajo: ${MAX_PREVIEW_DIM} px (se aplica al cargar la imagen)`
+        : `Working resolution: ${MAX_PREVIEW_DIM} px (applies when loading the image)`, "info");
+    });
+  }
+  // WORK-RES-SELECTOR-END
 
   // --- OPERACIONES DE ESTIRADO / STRETCHING (TAB 1) ---
 
