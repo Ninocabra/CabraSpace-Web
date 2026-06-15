@@ -31,6 +31,9 @@ MAX_DB_SIZE = 150         # Keep DB file size balanced
 MAX_OTHER_ITEMS = 5       # Tope de items de fuentes NO oficiales por run (reserva capacidad para oficiales)
 MFG_MAX_AGE_DAYS = 14     # Ventana de antigüedad para fuentes oficiales (más amplia: publican con menos frecuencia)
 OTHER_MAX_AGE_DAYS = 3    # Ventana de antigüedad para terceros (corta: evita captar reviews tardías como novedad)
+# Cascada de IA: distinguir error de credencial (deshabilitar ya) de error transitorio (reintentar).
+AUTH_ERROR = "AUTH_ERROR"     # Sentinela: HTTP 401/403/404 (key inválida o modelo inexistente)
+AI_FAIL_LIMIT = 2             # Nº de fallos transitorios consecutivos antes de deshabilitar un proveedor
 
 # Load Centralized YouTubers/Creators
 TOOLS_DIR = os.path.dirname(__file__)
@@ -337,7 +340,7 @@ def save_database(data):
 
 def process_with_gemini(item, api_key):
     """Uses the Gemini 2.5 API with responseSchema to translate, summarize, and filter equipment relevance."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
     
     body_content = item.get("body_content", "")
     body_prompt = ""
@@ -460,6 +463,9 @@ def process_with_gemini(item, api_key):
                 print(f"Gemini API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
                 time.sleep(retry_delay)
                 retry_delay *= 2  # Exponential backoff
+            elif he.code in (401, 403, 404):
+                print(f"Gemini API credencial/modelo inválido (HTTP {he.code}). Revisa GEMINI_API_KEY o el nombre del modelo.")
+                return AUTH_ERROR
             else:
                 print(f"Error calling Gemini API for '{item['title']}': {he}")
                 return None
@@ -588,6 +594,9 @@ URL: {item['url']}
                 print(f"DeepSeek API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
                 time.sleep(retry_delay)
                 retry_delay *= 2
+            elif he.code in (401, 403, 404):
+                print(f"DeepSeek API credencial/modelo inválido (HTTP {he.code}). Revisa DEEPSEEK_API_KEY.")
+                return AUTH_ERROR
             else:
                 print(f"Error calling DeepSeek API for '{item['title']}': {he}")
                 return None
@@ -704,6 +713,9 @@ URL: {item['url']}
                 print(f"Groq API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
                 time.sleep(retry_delay)
                 retry_delay *= 2
+            elif he.code in (401, 403, 404):
+                print(f"Groq API credencial/modelo inválido (HTTP {he.code}). Revisa GROQ_API_KEY (regenérala en console.groq.com).")
+                return AUTH_ERROR
             else:
                 print(f"Error calling Groq API for '{item['title']}': {he}")
                 return None
@@ -1202,6 +1214,8 @@ def main():
 
     gemini_disabled = False
     groq_disabled = False
+    gemini_fails = 0
+    groq_fails = 0
 
     for item in new_candidates:
         if processed_count >= MAX_ITEMS_TO_PROCESS:
@@ -1242,47 +1256,63 @@ def main():
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
         
-        # 1. Try Gemini first if not disabled
+        # 1. Gemini. Auth-error (key/modelo) -> deshabilitar ya. Error transitorio (429/red) -> NO
+        #    matar Gemini al primer fallo: reintentar en los siguientes items y deshabilitar solo
+        #    tras AI_FAIL_LIMIT fallos seguidos (señal de cuota diaria agotada).
         if gemini_key and not gemini_disabled:
             import time
-            print("Sleeping 6.0s to respect Gemini API rate limits...")
-            time.sleep(6.0)
-            # Let Gemini process and check relevance
+            time.sleep(6.0)  # respeta el límite de velocidad de Gemini
             processed_item = process_with_gemini(item, gemini_key)
-            
-            # If Gemini successfully determined that the item is NOT relevant
-            if processed_item and processed_item.get("skipped"):
-                print(f"Gemini classified item as not relevant. Skipping.")
-                continue
-                
-            # If Gemini failed (returned None), disable it for the rest of the run
-            if processed_item is None:
-                print("Gemini failed with a persistent error or rate limit. Disabling Gemini for this run.")
+
+            if processed_item == AUTH_ERROR:
+                print("Gemini deshabilitado este run: credencial o modelo inválido.")
                 gemini_disabled = True
-        
-        # 2. Try Groq if Gemini failed or was not tried
+                processed_item = None
+            elif isinstance(processed_item, dict) and processed_item.get("skipped"):
+                print("Gemini classified item as not relevant. Skipping.")
+                continue
+            elif processed_item is None:
+                gemini_fails += 1
+                print(f"Gemini falló (transitorio/cuota) {gemini_fails}/{AI_FAIL_LIMIT}.")
+                if gemini_fails >= AI_FAIL_LIMIT:
+                    print("Gemini: demasiados fallos seguidos (¿cuota agotada?). Deshabilitado este run.")
+                    gemini_disabled = True
+            else:
+                gemini_fails = 0  # éxito: reinicia el contador de fallos
+
+        # 2. Groq (si Gemini no resolvió). Misma política de cooldown.
         if processed_item is None and groq_key and not groq_disabled:
             print("Trying Groq API (Llama 3.1 8B)...")
             processed_item = process_with_groq(item, groq_key)
-            
-            if processed_item and processed_item.get("skipped"):
-                print(f"Groq classified item as not relevant. Skipping.")
-                continue
-                
-            if processed_item is None:
-                print("Groq failed. Disabling Groq for this run.")
-                groq_disabled = True
 
-        # 3. Try DeepSeek if Gemini and Groq failed or were not tried
+            if processed_item == AUTH_ERROR:
+                print("Groq deshabilitado este run: credencial inválida (regenera GROQ_API_KEY).")
+                groq_disabled = True
+                processed_item = None
+            elif isinstance(processed_item, dict) and processed_item.get("skipped"):
+                print("Groq classified item as not relevant. Skipping.")
+                continue
+            elif processed_item is None:
+                groq_fails += 1
+                print(f"Groq falló (transitorio) {groq_fails}/{AI_FAIL_LIMIT}.")
+                if groq_fails >= AI_FAIL_LIMIT:
+                    print("Groq: demasiados fallos seguidos. Deshabilitado este run.")
+                    groq_disabled = True
+            else:
+                groq_fails = 0
+
+        # 3. DeepSeek (último recurso IA antes del heurístico local).
         if processed_item is None and deepseek_key:
             print("Trying DeepSeek API...")
             processed_item = process_with_deepseek(item, deepseek_key)
-            
-            if processed_item and processed_item.get("skipped"):
-                print(f"DeepSeek classified item as not relevant. Skipping.")
+
+            if processed_item == AUTH_ERROR:
+                print("DeepSeek: credencial inválida (revisa DEEPSEEK_API_KEY).")
+                processed_item = None
+            elif isinstance(processed_item, dict) and processed_item.get("skipped"):
+                print("DeepSeek classified item as not relevant. Skipping.")
                 continue
-                
-            if processed_item is None:
+            elif processed_item is None:
                 print("DeepSeek failed as well.")
                 
         # 4. Fallback to local heuristic parsing if all APIs were tried and failed, or none are configured
