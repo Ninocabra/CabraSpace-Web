@@ -27,6 +27,10 @@ def print(*args, **kwargs):
 DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "equipamiento.json")
 MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
 MAX_DB_SIZE = 150         # Keep DB file size balanced
+# Prioridad de canales oficiales sobre terceros (reviewers/foros):
+MAX_OTHER_ITEMS = 5       # Tope de items de fuentes NO oficiales por run (reserva capacidad para oficiales)
+MFG_MAX_AGE_DAYS = 14     # Ventana de antigüedad para fuentes oficiales (más amplia: publican con menos frecuencia)
+OTHER_MAX_AGE_DAYS = 3    # Ventana de antigüedad para terceros (corta: evita captar reviews tardías como novedad)
 
 # Load Centralized YouTubers/Creators
 TOOLS_DIR = os.path.dirname(__file__)
@@ -70,38 +74,66 @@ if not YOUTUBE_SOURCES:
         {"name": "Astrobackyard", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCn3npsPixgoi_xLdCg9J-LQ", "is_youtube": True, "is_mfg": False}
     ]
 
-# Scraping Sources
-SOURCES = [
-    # Manufacturer Feeds (RSS/Atom)
-    {"name": "ZWO", "url": "https://www.zwoastro.com/feed/", "is_youtube": False, "is_mfg": True},
-    {"name": "Pegasus Astro", "url": "https://pegasusastro.com/feed/", "is_youtube": False, "is_mfg": True},
-    {"name": "Player One Astronomy", "url": "https://player-one-astronomy.com/feed/", "is_youtube": False, "is_mfg": True},
-    {"name": "PrimaLuceLab", "url": "https://www.primalucelab.com/blog/feed/", "is_youtube": False, "is_mfg": True},
-    {"name": "Planewave", "url": "https://planewave.com/feed/", "is_youtube": False, "is_mfg": True},
-    {"name": "William Optics", "url": "https://williamoptics.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-    {"name": "Celestron", "url": "https://www.celestron.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-    {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-    {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
-    {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+# MFG-SOURCES-JSON-BEGIN
+def load_mfg_sources():
+    """Carga las fuentes de canales OFICIALES de fabricantes desde fabricantes_fuentes.json.
+    Cada entrada puede tener 'rss' y/o 'youtube_channel_id'; se genera una fuente por cada uno.
+    Devuelve [] si el fichero falta o está vacío (entonces se usa el fallback hardcodeado)."""
+    fuentes_file = os.path.join(TOOLS_DIR, "fabricantes_fuentes.json")
+    sources = []
+    if os.path.exists(fuentes_file):
+        try:
+            with open(fuentes_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for m in data:
+                name = (m.get("name") or "").strip()
+                if not name:
+                    continue
+                if m.get("rss"):
+                    sources.append({"name": name, "url": m["rss"], "is_youtube": False, "is_mfg": True})
+                if m.get("youtube_channel_id"):
+                    sources.append({
+                        "name": f"{name} (YouTube)",
+                        "url": f"https://www.youtube.com/feeds/videos.xml?channel_id={m['youtube_channel_id']}",
+                        "is_youtube": True, "is_mfg": True
+                    })
+        except Exception as e:
+            print(f"Error loading fabricantes_fuentes.json: {e}")
+    return sources
+
+# Canales OFICIALES de fabricantes (preferidos). Se cargan del JSON; añadir uno = editar el JSON.
+MFG_SOURCES = load_mfg_sources()
+
+# Fuentes comunitarias / terceros (foros, agregadores) — NO oficiales.
+COMMUNITY_SOURCES = [
     {"name": "Stargazers Lounge", "url": "https://stargazerslounge.com/discover/all.xml/", "is_youtube": False, "is_mfg": False},
     {"name": "Reddit r/astrophotography", "url": "https://www.reddit.com/r/astrophotography/new/.rss", "is_youtube": False, "is_mfg": False},
     {"name": "Reddit r/telescopes", "url": "https://www.reddit.com/r/telescopes/new/.rss", "is_youtube": False, "is_mfg": False}
-] + YOUTUBE_SOURCES + [
-    # YouTube Channel Feeds (Manufacturers / Brands)
-    {"name": "Sharpstar Optics (Askar)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},
-    {"name": "ToupTek Astro", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True, "is_mfg": True},
-    {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True, "is_mfg": True},
-    {"name": "Pegasus Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCbrUkaBOELOQywEUvdiJGyA", "is_youtube": True, "is_mfg": True},
-    {"name": "Player One Astronomy (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCGJbQ-wBD1lqVhNMqCbWoMA", "is_youtube": True, "is_mfg": True},
-    {"name": "PrimaLuceLab (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCeXafWw7n66SysjmrfRsLjg", "is_youtube": True, "is_mfg": True},
-    {"name": "Celestron (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCSZErIkrEARb28wBG3wRXow", "is_youtube": True, "is_mfg": True},
-    {"name": "Sky-Watcher USA (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCp6O7O6Nt3Fg7UQXvnq6WcQ", "is_youtube": True, "is_mfg": True},
-    {"name": "Explore Scientific (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC4AR7eOxPBo7UHoJOZcgrTQ", "is_youtube": True, "is_mfg": True},
-    {"name": "William Optics (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_YbaZ47wZNSLu_JQl9djKg", "is_youtube": True, "is_mfg": True},
-    {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True, "is_mfg": True},
-    {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True, "is_mfg": True},
-    {"name": "Lunt Solar Systems (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCIP-sBB1PuiKgRqJB_iJ9kg", "is_youtube": True, "is_mfg": True}
 ]
+
+# Fallback hardcodeado: solo se usa si fabricantes_fuentes.json falta o está vacío.
+if not MFG_SOURCES:
+    MFG_SOURCES = [
+        {"name": "ZWO", "url": "https://www.zwoastro.com/feed/", "is_youtube": False, "is_mfg": True},
+        {"name": "Pegasus Astro", "url": "https://pegasusastro.com/feed/", "is_youtube": False, "is_mfg": True},
+        {"name": "Player One Astronomy", "url": "https://player-one-astronomy.com/feed/", "is_youtube": False, "is_mfg": True},
+        {"name": "PrimaLuceLab", "url": "https://www.primalucelab.com/blog/feed/", "is_youtube": False, "is_mfg": True},
+        {"name": "Planewave", "url": "https://planewave.com/feed/", "is_youtube": False, "is_mfg": True},
+        {"name": "William Optics", "url": "https://williamoptics.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+        {"name": "Celestron", "url": "https://www.celestron.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+        {"name": "Sky-Watcher USA", "url": "https://www.skywatcherusa.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+        {"name": "Explore Scientific", "url": "https://explorescientific.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+        {"name": "Lunt Solar Systems", "url": "https://luntsolarsystems.com/blogs/news.atom", "is_youtube": False, "is_mfg": True},
+        {"name": "Sharpstar Optics (Askar) (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCx5_u4lWL-h4AaWHWUShNQ", "is_youtube": True, "is_mfg": True},
+        {"name": "ToupTek Astro (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCW18EYF2VsFbqAsx6wUT3fw", "is_youtube": True, "is_mfg": True},
+        {"name": "ZWO (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCAmDsyAh8Y0BeCN2Gs5pxrg", "is_youtube": True, "is_mfg": True},
+        {"name": "QHYCCD (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCnnNYIoCenqfQS7viiex9ww", "is_youtube": True, "is_mfg": True},
+        {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True, "is_mfg": True}
+    ]
+
+# Composición final. El orden no afecta a la prioridad: main() reordena por is_mfg (oficiales primero).
+SOURCES = MFG_SOURCES + COMMUNITY_SOURCES + YOUTUBE_SOURCES
+# MFG-SOURCES-JSON-END
 
 
 GITHUB_REPOS = [
@@ -830,8 +862,10 @@ def process_fallback(item):
         "tags": list(dict.fromkeys(tags))[:6] # Unique elements, limit to 6
     }
 
-def extract_known_models(db):
-    """Extracts unique model names from the database tags, excluding brands and generic words."""
+def extract_known_models(db, source_type=None):
+    """Extracts unique model names from the database tags, excluding brands and generic words.
+    If source_type is given ("official"/"reviewer"), only counts entries from that origin.
+    Entries without an explicit source_type (legacy) are treated as "reviewer"."""
     brands = {b.lower() for b in FABRICANTES} | {
         "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron", 
         "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one", 
@@ -912,6 +946,8 @@ def extract_known_models(db):
     
     known_models = set()
     for entry in db:
+        if source_type is not None and entry.get("source_type", "reviewer") != source_type:
+            continue
         for tag in entry.get("tags", []):
             tag_clean = tag.strip().lower()
             # Exclude brand names, generic words, or tags that are empty/too short
@@ -1097,7 +1133,8 @@ def main():
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
     known_models = extract_known_models(db)
-    print(f"Extracted {len(known_models)} known product models from database tags.")
+    known_models_official = extract_known_models(db, source_type="official")
+    print(f"Extracted {len(known_models)} known product models from database tags ({len(known_models_official)} already covered by official sources).")
     
     # Gather candidates from all feeds
     candidates = []
@@ -1138,7 +1175,10 @@ def main():
         try:
             item_date = datetime.strptime(c['date'], "%Y-%m-%d")
             days_diff = (current_date - item_date).days
-            if days_diff <= 3:
+            # Ventana más amplia para canales oficiales: publican con menos frecuencia y no
+            # queremos que un anuncio del fabricante caduque mientras sí entran reviews posteriores.
+            max_age = MFG_MAX_AGE_DAYS if c.get('is_mfg', False) else OTHER_MAX_AGE_DAYS
+            if days_diff <= max_age:
                 new_candidates.append(c)
                 seen_urls_this_run.add(c['url'])
         except Exception:
@@ -1157,20 +1197,32 @@ def main():
         return
         
     processed_count = 0
+    other_count = 0
     updates_to_add = []
-    
+
     gemini_disabled = False
     groq_disabled = False
-    
+
     for item in new_candidates:
         if processed_count >= MAX_ITEMS_TO_PROCESS:
             print("Reached processing limit for this run.")
             break
-            
+
         # Check if candidate is from a manufacturer feed
         is_mfg = item.get('is_mfg', False)
         is_forum = item['source'] in ["Stargazers Lounge", "Reddit r/astrophotography", "Reddit r/telescopes"]
-        
+
+        # Reserva de capacidad: limita cuántos items de terceros se procesan por run para que
+        # los canales oficiales (procesados primero por el orden mfg-first) no se queden sin slots.
+        if not is_mfg and other_count >= MAX_OTHER_ITEMS:
+            print(f"Skipping third-party item (official quota reserved, {other_count}/{MAX_OTHER_ITEMS} used): '{item['title']}' from {item['source']}")
+            continue
+
+        # Deduplicación consciente del origen: un anuncio OFICIAL solo se descarta si el modelo ya
+        # lo cubre OTRA fuente oficial — no si solo aparecía en un reviewer (así el oficial puede
+        # 'rellenar' ese modelo). Un item de TERCEROS se descarta si el modelo ya lo cubre cualquiera.
+        dedup_set = known_models_official if is_mfg else known_models
+
         # Pre-filter candidates using keyword check to save Gemini API quota and avoid rate limits
         if is_forum:
             if not check_forum_relevance(item['title']):
@@ -1180,9 +1232,9 @@ def main():
             if not check_relevance_fallback(item['title']):
                 print(f"Skipping off-topic candidate (pre-filtered): '{item['title']}' from {item['source']}")
                 continue
-            
+
         # Check if candidate is a duplicate product introduction
-        is_dup, matched_m = is_duplicate_product_introduction(item['title'], known_models)
+        is_dup, matched_m = is_duplicate_product_introduction(item['title'], dedup_set)
         if is_dup:
             print(f"Skipping duplicate product introduction (pre-filtered): '{item['title']}' matches known model '{matched_m}'")
             continue
@@ -1314,7 +1366,7 @@ def main():
                     
             # If the candidate has product model tags, check if they are all already known
             if candidate_models:
-                if candidate_models.issubset(known_models):
+                if candidate_models.issubset(dedup_set):
                     # Check if it's a software/firmware update
                     software_keywords = ["firmware", "software", "driver", "controlador", "update", "actualización", "version", "versión", "release"]
                     title_lower = processed_item['title_en'].lower()
@@ -1324,9 +1376,14 @@ def main():
                         print(f"Skipping duplicate product entry (post-filtered): '{processed_item['title_en']}' only references known models {candidate_models}")
                         continue
                 
+            # Marca el origen para la deduplicación futura (preferencia oficial sobre reviewer).
+            processed_item['source_type'] = "official" if is_mfg else "reviewer"
+            processed_item['source'] = item['source']
             updates_to_add.append(processed_item)
             processed_count += 1
-            
+            if not is_mfg:
+                other_count += 1
+
     if updates_to_add:
         # Prepend new updates
         db = updates_to_add + db
