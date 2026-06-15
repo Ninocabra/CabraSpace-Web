@@ -1190,7 +1190,7 @@
           <div class="piw-section collapsed" id="sectionGradient">
             <h3 class="piw-section-title">Gradient Correction</h3>
             <select class="piw-select" id="selGradientAlgo">
-              <option value="graxpert_ia" selected>GraXpert IA (Neural Network WASM)</option>
+              <option value="graxpert_ia" selected>GraXpert (Extracción de fondo IA)</option>
               <option value="graxpert">GraXpert (Simulado)</option>
               <option value="abe">ABE (Automatic Background Extractor)</option>
               <option value="dbe">AutoDBE (SetiAstro)</option>
@@ -1202,12 +1202,12 @@
                 <div class="piw-subcard-header">AutoDBE Settings</div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
-                    <span class="piw-label">Paths</span>
-                    <span class="piw-value" id="valAdbePaths">50</span>
+                    <span class="piw-label">Densidad de muestreo</span>
+                    <span class="piw-value" id="valAdbePaths">8</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldAdbePaths" min="10" max="200" step="5" value="50">
+                  <input type="range" class="piw-slider" id="sldAdbePaths" min="4" max="16" step="1" value="8">
                 </div>
-                <div class="piw-control-group">
+                <div class="piw-control-group" style="display:none;">
                   <div class="piw-label-row">
                     <span class="piw-label">Tolerance</span>
                     <span class="piw-value" id="valAdbeTol">2.00</span>
@@ -1219,7 +1219,16 @@
                     <span class="piw-label">Smoothness</span>
                     <span class="piw-value" id="valAdbeSmooth">0.25</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldAdbeSmooth" min="0.1" max="0.8" step="0.05" value="0.25">
+                  <input type="range" class="piw-slider" id="sldAdbeSmooth" min="0.05" max="1.0" step="0.05" value="0.25">
+                </div>
+                <div class="piw-control-group">
+                  <div class="piw-label-row">
+                    <span class="piw-label">Corrección</span>
+                  </div>
+                  <select class="piw-select" id="selAdbeCorrection">
+                    <option value="subtraction">Resta (Subtraction)</option>
+                    <option value="division">División (Division)</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -1312,6 +1321,20 @@
             </div>
 
             <button class="piw-btn" id="btnCompareColor" disabled style="margin-top: 8px;">Comparar Métodos</button>
+
+            <!-- SCNR-PRE-BEGIN -->
+            <div class="piw-subcard" style="margin-top:12px;">
+              <div class="piw-subcard-header">SCNR Green (Lineal)</div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label">Intensidad k</span>
+                  <span class="piw-value" id="valScnrIntPre">0.90</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldScnrIntPre" min="0" max="1" step="0.05" value="0.90" disabled>
+              </div>
+              <button class="piw-btn primary" id="btnApplyScnrPre" disabled>Aplicar SCNR Green</button>
+            </div>
+            <!-- SCNR-PRE-END -->
           </div>
 
           <!-- SECCIÓN 6: Deconvolución (Activa / Parcial) -->
@@ -1372,10 +1395,11 @@
             <label class="piw-checkbox-row">
               <input type="checkbox" id="chkStarlessView"> Trabajar capa sin estrellas (Starless)
             </label>
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
               <button class="piw-btn" id="btnLoadStarless" style="flex: 1; font-size: 0.65rem;">Cargar Starless</button>
               <button class="piw-btn" id="btnLoadStars" style="flex: 1; font-size: 0.65rem;">Cargar Estrellas</button>
             </div>
+            <button class="piw-btn primary" id="btnRunNox" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Quitar estrellas (nox)</button>
             <input type="file" id="fileInputStarless" accept="image/*,.fit,.fits,.fts,.xisf,.tif,.tiff" style="display:none;" />
             <input type="file" id="fileInputStars" accept="image/*,.fit,.fits,.fts,.xisf,.tif,.tiff" style="display:none;" />
           </div>
@@ -1445,6 +1469,54 @@
               <path d="" fill="rgba(207, 171, 74, 0.15)" stroke="var(--gold-primary)" stroke-width="1" id="histogramPath"></path>
             </svg>
           </div>
+
+          <!-- SASPRO-TO-STRETCH-BEGIN -->
+          <!-- SECCIÓN 14: SAS Pro (Pyodide WASM) -->
+          <div class="piw-section collapsed" id="sectionSaspro">
+            <h3 class="piw-section-title">Statistical / Star Stretch (SAS Pro)</h3>
+            <div style="margin-bottom: 8px;">
+              <button class="piw-btn primary" id="btnInitSaspro" style="width:100%;">Inicializar Entorno Python</button>
+              <div class="piw-readout-lbl" id="lblSasproStatus" style="font-size:0.65rem; margin-top:4px; text-align:center;">● No Inicializado</div>
+            </div>
+
+            <div id="saspro-controls" style="display:none; margin-top:12px;">
+              <label class="piw-label">Algoritmo SASPro</label>
+              <select class="piw-select" id="selSasproAlgo">
+                <option value="statistical_stretch" selected>Statistical Stretch</option>
+                <option value="star_stretch">Star Stretch</option>
+              </select>
+
+              <!-- Parámetros Statistical / Star Stretch -->
+              <div id="saspro-stretch-params">
+                <div class="piw-row" style="margin-bottom:8px;">
+                  <span class="piw-label">Target Median</span>
+                  <span class="piw-value" id="valSasproTgt">0.15</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldSasproTgt" min="0.05" max="0.30" step="0.01" value="0.15">
+
+                <div class="piw-row" style="margin-bottom:8px;">
+                  <span class="piw-label">Clipping Sigmas</span>
+                  <span class="piw-value" id="valSasproSigma">2.8</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldSasproSigma" min="1.0" max="6.0" step="0.1" value="2.8">
+
+                <!-- Específico Star Stretch -->
+                <div id="saspro-star-spec" style="display:none;">
+                  <div class="piw-row" style="margin-bottom:8px;">
+                    <span class="piw-label">Preservación Color</span>
+                    <span class="piw-value" id="valSasproCp">0.80</span>
+                  </div>
+                  <input type="range" class="piw-slider" id="sldSasproCp" min="0.1" max="1.5" step="0.05" value="0.80">
+                </div>
+              </div>
+
+              <div style="margin-top:14px; border-top:1px solid var(--border-color); padding-top:12px;">
+                <button class="piw-btn primary" id="btnSasproUploadTrigger" style="width:100%;">Procesar Imagen FITS/TIFF</button>
+                <input type="file" id="fileInputSaspro" accept=".fits,.fit,.fts,.tif,.tiff" style="display:none;">
+              </div>
+            </div>
+          </div>
+          <!-- SASPRO-TO-STRETCH-END -->
         </div>
 
         <!-- Contenido Tab 2: Post-Procesado -->
@@ -1593,15 +1665,15 @@
             </div>
 
             <!-- GraXpert Denoise Controls -->
-            <div id="post-noise-graxpert-controls" class="piw-disabled-control" style="display:none;">
+            <div id="post-noise-graxpert-controls" class="" style="display:none;">
               <div class="piw-subcard">
-                <div class="piw-subcard-header">GraXpert Denoise Settings</div>
+                <div class="piw-subcard-header">Parámetros de GraXpert Denoise</div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
-                    <span class="piw-label">Strength</span>
+                    <span class="piw-label">Fuerza</span>
                     <span class="piw-value" id="valPostGraXpertStrength">1.00</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostGraXpertStrength" min="0" max="2" step="0.05" value="1.00" disabled>
+                  <input type="range" class="piw-slider" id="sldPostGraXpertStrength" min="0" max="1" step="0.05" value="1.00">
                 </div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
@@ -1977,6 +2049,32 @@
               <input type="checkbox" id="chkPostColorUseMask" disabled> Usar máscara activa
             </label>
             <button class="piw-btn" id="btnApplyPostColor" disabled>Aplicar Balance de Color</button>
+
+            <!-- SCNR-SAT-IN-CB-BEGIN -->
+            <div class="piw-subcard" style="margin-top: 12px;">
+              <div class="piw-subcard-header">SCNR Green (Ruido Verde)</div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label">Intensidad k</span>
+                  <span class="piw-value" id="valScnrInt">0.90</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldScnrInt" min="0" max="1" step="0.05" value="0.90">
+              </div>
+              <button class="piw-btn primary" id="btnApplyScnr" disabled>Aplicar SCNR Green</button>
+            </div>
+
+            <div class="piw-subcard">
+              <div class="piw-subcard-header">Color y Saturación</div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label">Saturación Cromática</span>
+                  <span class="piw-value" id="valSatBoost">1.00</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldSatBoost" min="0.5" max="2.5" step="0.05" value="1.00">
+              </div>
+              <button class="piw-btn" id="btnApplySat" disabled>Aplicar Saturación</button>
+            </div>
+            <!-- SCNR-SAT-IN-CB-END -->
           </div>
 
           <!-- SECCIÓN 4: Curvas (Curves) - Desactivado -->
@@ -2042,19 +2140,6 @@
             </div>
             <div class="piw-readout-lbl" id="lblPostCurvesHint" style="font-size:0.6rem; margin-bottom:8px;">Curvas: click izquierdo añade/arrastra, click derecho elimina.</div>
             <button class="piw-btn" id="btnApplyPostCurves" disabled>Aplicar Curvas</button>
-          </div>
-
-          <!-- SECCIÓN 5: SCNR Green (Activa) -->
-          <div class="piw-section">
-            <h3 class="piw-section-title">SCNR Green (Ruido Verde)</h3>
-            <div class="piw-control-group">
-              <div class="piw-label-row">
-                <span class="piw-label">Intensidad k</span>
-                <span class="piw-value" id="valScnrInt">0.90</span>
-              </div>
-              <input type="range" class="piw-slider" id="sldScnrInt" min="0" max="1" step="0.05" value="0.90">
-            </div>
-            <button class="piw-btn primary" id="btnApplyScnr" disabled>Aplicar SCNR Green</button>
           </div>
 
           <!-- SECCIÓN 6: Generador de Máscaras (Activa / Parcial) -->
@@ -2173,19 +2258,6 @@
               <button class="piw-btn primary" id="btnApplyMask" disabled style="flex:1;">Guardar Máscara</button>
             </div>
           </div>
-
-          <!-- SECCIÓN 7: Color y Saturación (Activa) -->
-          <div class="piw-section">
-            <h3 class="piw-section-title">Color y Saturación</h3>
-            <div class="piw-control-group">
-              <div class="piw-label-row">
-                <span class="piw-label">Saturación Cromática</span>
-                <span class="piw-value" id="valSatBoost">1.00</span>
-              </div>
-              <input type="range" class="piw-slider" id="sldSatBoost" min="0.5" max="2.5" step="0.05" value="1.00">
-            </div>
-            <button class="piw-btn" id="btnApplySat" disabled>Aplicar Saturación</button>
-          </div>
         </div>
 
         <!-- Contenido Tab 3: Mezcla de Canales -->
@@ -2254,61 +2326,6 @@
             </div>
           </div>
 
-          <!-- SECCIÓN 14: SAS Pro (Pyodide WASM) -->
-          <div class="piw-section collapsed" id="sectionSaspro">
-            <h3 class="piw-section-title">SAS Pro (Python WASM)</h3>
-            <div style="margin-bottom: 8px;">
-              <button class="piw-btn primary" id="btnInitSaspro" style="width:100%;">Inicializar Entorno Python</button>
-              <div class="piw-readout-lbl" id="lblSasproStatus" style="font-size:0.65rem; margin-top:4px; text-align:center;">● No Inicializado</div>
-            </div>
-
-            <div id="saspro-controls" style="display:none; margin-top:12px;">
-              <label class="piw-label">Algoritmo SASPro</label>
-              <select class="piw-select" id="selSasproAlgo">
-                <option value="statistical_stretch" selected>Statistical Stretch</option>
-                <option value="star_stretch">Star Stretch</option>
-                <option value="scnr">SCNR Green</option>
-              </select>
-
-              <!-- Parámetros Statistical / Star Stretch -->
-              <div id="saspro-stretch-params">
-                <div class="piw-row" style="margin-bottom:8px;">
-                  <span class="piw-label">Target Median</span>
-                  <span class="piw-value" id="valSasproTgt">0.15</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldSasproTgt" min="0.05" max="0.30" step="0.01" value="0.15">
-
-                <div class="piw-row" style="margin-bottom:8px;">
-                  <span class="piw-label">Clipping Sigmas</span>
-                  <span class="piw-value" id="valSasproSigma">2.8</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldSasproSigma" min="1.0" max="6.0" step="0.1" value="2.8">
-
-                <!-- Específico Star Stretch -->
-                <div id="saspro-star-spec" style="display:none;">
-                  <div class="piw-row" style="margin-bottom:8px;">
-                    <span class="piw-label">Preservación Color</span>
-                    <span class="piw-value" id="valSasproCp">0.80</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldSasproCp" min="0.1" max="1.5" step="0.05" value="0.80">
-                </div>
-              </div>
-
-              <!-- Parámetro SCNR -->
-              <div id="saspro-scnr-params" style="display:none;">
-                <div class="piw-row" style="margin-bottom:8px;">
-                  <span class="piw-label">Cantidad (Amount)</span>
-                  <span class="piw-value" id="valSasproAmt">1.00</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldSasproAmt" min="0.0" max="1.0" step="0.05" value="1.00">
-              </div>
-
-              <div style="margin-top:14px; border-top:1px solid var(--border-color); padding-top:12px;">
-                <button class="piw-btn primary" id="btnSasproUploadTrigger" style="width:100%;">Procesar Imagen FITS/TIFF</button>
-                <input type="file" id="fileInputSaspro" accept=".fits,.fit,.fts,.tif,.tiff" style="display:none;">
-              </div>
-            </div>
-          </div>
 
           <div class="piw-section">
             <button class="piw-btn primary" id="btnGenerateBlend" disabled>Componer y Renderizar Mezcla</button>
@@ -2367,7 +2384,11 @@
               <button class="piw-tool-btn active" id="btnToolViewCurrent" title="Ver imagen activa actual">Imagen</button>
               <button class="piw-tool-btn" id="btnToolViewMask" title="Ver máscara activa actual">Máscara</button>
               <button class="piw-tool-btn" id="btnToolViewGradient" style="display:none;" title="Ver modelo de gradiente sustraído">Gradiente</button>
+              <button class="piw-tool-btn" id="btnToolToggleAB" title="Alternar vista entre antes/después (A/B)">Toggle A/B</button>
               <button class="piw-tool-btn" id="btnToolSplitView" title="Activar cortinilla de comparación A/B">Split A/B</button>
+              <!-- RESET-BTN-BEGIN -->
+              <button class="piw-tool-btn" id="btnToolReset" title="Reiniciar imagen de trabajo y empezar de cero">Reset</button>
+              <!-- RESET-BTN-END -->
               <span style="border-left:1px solid var(--border-color); margin: 0 4px;"></span>
               <button class="piw-tool-btn" id="btnToolZoomFit" title="Ajustar imagen al panel">Ajustar</button>
               <button class="piw-tool-btn" id="btnToolZoomReset" title="Zoom 100%">1:1</button>
@@ -2418,8 +2439,17 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script src="onnx-engine.js"></script>
+  <script src="nox.js"></script>
   <script src="autoghs.js"></script>
   <script src="saspro-pyodide.js"></script>
+  <script src="lut.js"></script>
+  <script src="resample.js"></script>
+  <script src="background.js"></script>
+  <script src="graxpert.js"></script>
+  <!-- USM-SHARP-BEGIN -->
+  <script src="sharpening.js"></script>
+  <!-- USM-SHARP-END -->
   <script src="pi-workflow.js"></script>
   <script src="mobile-menu.js"></script>
 </body>

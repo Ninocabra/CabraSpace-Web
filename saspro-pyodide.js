@@ -864,37 +864,41 @@ import numpy as np
 import scipy.signal
 import scipy.ndimage
 
+# DECON-FIX-BEGIN
 def apply_cosmic_clarity_decon(img, mode="both", stellar_amt=0.9, ns_strength=3.0, ns_amount=0.5, remove_aberration=False, stellar_ai=None, nonstellar_ai=None):
     nc = img.shape[0] if len(img.shape) == 3 else 1
     h, w = img.shape[-2], img.shape[-1]
     
-    result = np.zeros_like(img)
-    
-    for c in range(nc):
-        ch = img[c]
+    # Bug 1 Fix: Usar canal de Luminancia para deconv color
+    if nc >= 3:
+        L = np.mean(img, axis=0)
         
-        # 1. GENERATE STAR MASK (to isolate stars and apply Lucy-Richardson decon exclusively to them)
-        bg_sky = scipy.ndimage.median_filter(ch, size=11)
-        stars_extracted = np.maximum(0, ch - bg_sky)
-        
-        # Threshold to create mask
-        med_val = np.median(ch)
-        std_val = np.std(ch)
+        # 1. Generar mascara de estrellas sobre la Luminancia
+        bg_sky = scipy.ndimage.median_filter(L, size=11)
+        stars_extracted = np.maximum(0, L - bg_sky)
+        med_val = np.median(L)
+        std_val = np.std(L)
         star_threshold = med_val + 1.2 * std_val
-        
         star_mask = np.where(stars_extracted > star_threshold, stars_extracted, 0)
-        # Dilate and blur the star mask for smooth blending
-        star_mask = scipy.ndimage.gaussian_filter(star_mask, sigma=1.5)
-        max_mask = np.max(star_mask)
-        if max_mask > 0:
-            star_mask = np.clip(star_mask / max_mask, 0.0, 1.0)
+        
+        # Bug 2 Fix: Dilatar la mascara para proteger halos
+        star_mask_dilated = scipy.ndimage.maximum_filter(star_mask, size=15)
+        star_mask_dilated = scipy.ndimage.gaussian_filter(star_mask_dilated, sigma=2.0)
+        max_dil = np.max(star_mask_dilated)
+        if max_dil > 0:
+            star_mask_dilated = np.clip(star_mask_dilated / max_dil, 0.0, 1.0)
             
-        # 2. STELLAR SHARPENING (Lucy-Richardson Deconvolution)
+        # Mascara base para blend estelar
+        star_mask_base = scipy.ndimage.gaussian_filter(star_mask, sigma=1.5)
+        max_base = np.max(star_mask_base)
+        if max_base > 0:
+            star_mask_base = np.clip(star_mask_base / max_base, 0.0, 1.0)
+            
+        # 2. Deconvolucion Lucy-Richardson sobre Luminancia
         if mode in ["both", "stellar"] and stellar_amt > 0.01:
             if stellar_ai is not None:
-                decon_ch = np.clip(stellar_ai[c], 0.0, 1.0)
+                decon_L = np.mean(stellar_ai, axis=0)
             else:
-                # Generate a 2D Gaussian PSF representing the star blur (average PSF diameter = 3 pixels)
                 psf_size = 7
                 x_psf = np.linspace(-3, 3, psf_size)
                 y_psf = np.linspace(-3, 3, psf_size)
@@ -903,47 +907,101 @@ def apply_cosmic_clarity_decon(img, mode="both", stellar_amt=0.9, ns_strength=3.
                 psf = np.exp(-(x_psf**2 + y_psf**2) / (2 * psf_sigma**2))
                 psf /= np.sum(psf)
                 
-                # Run Lucy-Richardson Deconvolution (5 iterations for fast and stable results in WASM)
+                decon_L = np.copy(L)
+                psf_mirror = psf[::-1, ::-1]
+                for _ in range(5):
+                    conv = scipy.signal.fftconvolve(decon_L, psf, mode='same')
+                    conv = np.where(conv < 1e-10, 1e-10, conv)
+                    relative_blur = L / conv
+                    decon_L *= scipy.signal.fftconvolve(relative_blur, psf_mirror, mode='same')
+                    decon_L = np.clip(decon_L, 0.0, 1.0)
+            
+            stellar_sharp_L = L * (1.0 - star_mask_base * stellar_amt) + decon_L * (star_mask_base * stellar_amt)
+        else:
+            stellar_sharp_L = np.copy(L)
+            
+        # Re-aplicar Luminancia preservando el ratio cromatico
+        stellar_sharp = np.zeros_like(img)
+        ratio = np.where(L > 1e-6, stellar_sharp_L / (L + 1e-10), 1.0)
+        ratio = np.clip(ratio, 0.0, 5.0)
+        for c in range(nc):
+            stellar_sharp[c] = np.clip(img[c] * ratio, 0.0, 1.0)
+            
+        # 3. Non-stellar sharpening
+        result = np.zeros_like(img)
+        for c in range(nc):
+            if mode in ["both", "nonstellar"] and ns_amount > 0.01:
+                if nonstellar_ai is not None:
+                    detail_layer = np.clip(nonstellar_ai[c], 0.0, 1.0) - img[c]
+                    # Bug 2 Fix: Evitar detalles negativos (resta) en el halo de la estrella
+                    detail_layer = np.where(star_mask_dilated > 0.01, np.maximum(0.0, detail_layer), detail_layer)
+                else:
+                    sigma_val = max(0.5, min(5.0, ns_strength / 2.0))
+                    base_layer = scipy.ndimage.gaussian_filter(img[c], sigma=sigma_val)
+                    detail_layer = img[c] - base_layer
+                
+                nebulosity_mask = scipy.ndimage.gaussian_filter(img[c], sigma=6.0)
+                nebulosity_mask = np.clip(nebulosity_mask / (np.max(nebulosity_mask) + 1e-6) * 2.0, 0.0, 1.0)
+                non_stellar_mask = (1.0 - star_mask_base) * nebulosity_mask
+                result[c] = np.clip(stellar_sharp[c] + ns_amount * detail_layer * non_stellar_mask, 0.0, 1.0)
+            else:
+                result[c] = stellar_sharp[c]
+        return result
+    else:
+        # Canal mono
+        ch = img[0]
+        bg_sky = scipy.ndimage.median_filter(ch, size=11)
+        stars_extracted = np.maximum(0, ch - bg_sky)
+        med_val = np.median(ch)
+        std_val = np.std(ch)
+        star_threshold = med_val + 1.2 * std_val
+        star_mask = np.where(stars_extracted > star_threshold, stars_extracted, 0)
+        
+        star_mask_dilated = scipy.ndimage.maximum_filter(star_mask, size=15)
+        star_mask_dilated = scipy.ndimage.gaussian_filter(star_mask_dilated, sigma=2.0)
+        max_dil = np.max(star_mask_dilated)
+        if max_dil > 0:
+            star_mask_dilated = np.clip(star_mask_dilated / max_dil, 0.0, 1.0)
+            
+        star_mask_base = scipy.ndimage.gaussian_filter(star_mask, sigma=1.5)
+        max_base = np.max(star_mask_base)
+        if max_base > 0:
+            star_mask_base = np.clip(star_mask_base / max_base, 0.0, 1.0)
+            
+        if mode in ["both", "stellar"] and stellar_amt > 0.01:
+            if stellar_ai is not None:
+                decon_ch = np.clip(stellar_ai[0], 0.0, 1.0)
+            else:
+                psf = np.exp(-np.sum(np.square(np.indices((7, 7)) - 3), axis=0) / (2 * 1.2**2))
+                psf /= np.sum(psf)
                 decon_ch = np.copy(ch)
                 psf_mirror = psf[::-1, ::-1]
                 for _ in range(5):
-                    conv = scipy.signal.fftconvolve(decon_ch, psf, mode='same')
-                    conv = np.where(conv < 1e-10, 1e-10, conv)
-                    relative_blur = ch / conv
-                    decon_ch *= scipy.signal.fftconvolve(relative_blur, psf_mirror, mode='same')
-                    decon_ch = np.clip(decon_ch, 0.0, 1.0)
-                
-            # Blend stellar sharpening using the star mask
-            stellar_sharp = ch * (1.0 - star_mask * stellar_amt) + decon_ch * (star_mask * stellar_amt)
+                    conv = np.where(scipy.signal.fftconvolve(decon_ch, psf, mode='same') < 1e-10, 1e-10, scipy.signal.fftconvolve(decon_ch, psf, mode='same'))
+                    decon_ch = np.clip(decon_ch * scipy.signal.fftconvolve(ch / conv, psf_mirror, mode='same'), 0.0, 1.0)
+            stellar_sharp = ch * (1.0 - star_mask_base * stellar_amt) + decon_ch * (star_mask_base * stellar_amt)
         else:
             stellar_sharp = np.copy(ch)
             
-        # 3. NON-STELLAR SHARPENING (Unsharp Mask / Detail Enhancement for Nebulae/Galaxies)
         if mode in ["both", "nonstellar"] and ns_amount > 0.01:
             if nonstellar_ai is not None:
-                # The AI model output contains the sharpened non-stellar details
-                detail_layer = np.clip(nonstellar_ai[c], 0.0, 1.0) - ch
+                detail_layer = np.clip(nonstellar_ai[0], 0.0, 1.0) - ch
+                detail_layer = np.where(star_mask_dilated > 0.01, np.maximum(0.0, detail_layer), detail_layer)
             else:
                 sigma_val = max(0.5, min(5.0, ns_strength / 2.0))
-                # Smooth the channel to find the base layer
                 base_layer = scipy.ndimage.gaussian_filter(ch, sigma=sigma_val)
                 detail_layer = ch - base_layer
-            
-            # Noise gate: to prevent sharpening background noise, we only sharpen where there is signal.
             nebulosity_mask = scipy.ndimage.gaussian_filter(ch, sigma=6.0)
             nebulosity_mask = np.clip(nebulosity_mask / (np.max(nebulosity_mask) + 1e-6) * 2.0, 0.0, 1.0)
-            
-            # Avoid sharpening stars in the non-stellar layer
-            non_stellar_mask = (1.0 - star_mask) * nebulosity_mask
-            
-            # Apply detail boost
+            non_stellar_mask = (1.0 - star_mask_base) * nebulosity_mask
             ns_sharp = stellar_sharp + ns_amount * detail_layer * non_stellar_mask
         else:
             ns_sharp = np.copy(stellar_sharp)
             
-        result[c] = np.clip(ns_sharp, 0.0, 1.0)
-        
-    return result
+        result = np.zeros_like(img)
+        result[0] = np.clip(ns_sharp, 0.0, 1.0)
+        return result
+# DECON-FIX-END
 `;
 
     pyodideInstance.FS.writeFile("/target/saspro/__init__.py", "");

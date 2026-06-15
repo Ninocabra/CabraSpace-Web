@@ -54,6 +54,9 @@
     splitPercent: 0.5, // 0.0 a 1.0 (posición del control deslizante)
     isDraggingSplit: false,
     splitCompareImage: null, // Imagen contra la que se compara (ej. Slot o Original)
+    previousImage: null,
+    viewingPrevious: false,
+    _lastImgRef: null,
 
     // Hue Rueda de color
     selectedHue: 180,
@@ -488,11 +491,31 @@
 
   // --- PLATE SOLVING CON ASTROMETRY.NET ---
   const ASTROMETRY_API_KEY = "coqpscljnloiluyi";
+  // CF-WORKER-BEGIN
+  let ASTROMETRY_PROXY_URL = "https://astrometry-proxy.vercel.app";
+  // CF-WORKER-END
 
   // Redirige a través del proxy CORS local (puerto 8010) para gestionar OPTIONS y subidas de archivos
   function corsFetch(url, options = {}) {
-    const proxyUrl = url.replace("https://nova.astrometry.net", "http://localhost:8010");
-    return fetch(proxyUrl, options);
+    // CF-WORKER-BEGIN
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      const proxyUrl = url.replace("https://nova.astrometry.net", "http://localhost:8010");
+      return fetch(proxyUrl, options);
+    } else {
+      if (ASTROMETRY_PROXY_URL) {
+        // Rewrite request URL to point to the Cloudflare Worker
+        const proxyUrl = url.replace("https://nova.astrometry.net", ASTROMETRY_PROXY_URL);
+        return fetch(proxyUrl, options);
+      } else {
+        const errMsg = document.documentElement.lang === "es"
+          ? "El plate solve en producción requiere configurar ASTROMETRY_PROXY_URL (Cloudflare Worker). Consulta cloudflare-worker/README.md."
+          : "Plate solving in production requires configuring ASTROMETRY_PROXY_URL (Cloudflare Worker). Refer to cloudflare-worker/README.md.";
+        logConsole(errMsg, "error");
+        return Promise.reject(new Error(errMsg));
+      }
+    }
+    // CF-WORKER-END
   }
 
   async function getSessionKey() {
@@ -1138,22 +1161,35 @@
           const srcImg = state.stepInputImage || state.activeImage;
           if (algo === "graxpert_ia" || algo === "dbe") {
             let params = {};
+            // GRAXPERT-AI-BEGIN
             if (algo === "graxpert_ia") {
               params = {
                 correction: el("selGraXpertCorrection").value,
-                smoothness: parseFloat(el("sldGraXpertSmooth").value)
+                smoothing: parseFloat(el("sldGraXpertSmooth").value)
               };
-            } else {
-              params = {
-                paths: parseInt(el("sldAdbePaths").value, 10),
-                tolerance: parseFloat(el("sldAdbeTol").value),
-                smoothness: parseFloat(el("sldAdbeSmooth").value)
-              };
+              const res = await window.GraXpert.applyGraXpertBG(srcImg, params);
+              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+              if (res.bgCh) {
+                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              }
             }
-            const res = await SASProPyodide.processImageRaw(srcImg, algo, params);
-            corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-            if (res.bgCh) {
-              state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+            // GRAXPERT-AI-END
+            else {
+              const density = parseInt(el("sldAdbePaths").value, 10);
+              params = {
+                targetW: 250,
+                gridCols: density,
+                gridRows: density,
+                smoothness: parseFloat(el("sldAdbeSmooth").value),
+                correction: el("selAdbeCorrection").value
+              };
+              // RBF-OPT-BEGIN
+              const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(srcImg, params);
+              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+              if (res.bgCh) {
+                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              }
+              // RBF-OPT-END
             }
           } else {
             corrected = applyGradientCorrection(srcImg);
@@ -1199,22 +1235,35 @@
           const srcImg = state.stepInputImage || state.activeImage;
           if (algo === "graxpert_ia" || algo === "dbe") {
             let params = {};
+            // GRAXPERT-AI-BEGIN
             if (algo === "graxpert_ia") {
               params = {
                 correction: el("selGraXpertCorrection").value,
-                smoothness: parseFloat(el("sldGraXpertSmooth").value)
+                smoothing: parseFloat(el("sldGraXpertSmooth").value)
               };
-            } else {
-              params = {
-                paths: parseInt(el("sldAdbePaths").value, 10),
-                tolerance: parseFloat(el("sldAdbeTol").value),
-                smoothness: parseFloat(el("sldAdbeSmooth").value)
-              };
+              const res = await window.GraXpert.applyGraXpertBG(srcImg, params);
+              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+              if (res.bgCh) {
+                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              }
             }
-            const res = await SASProPyodide.processImageRaw(srcImg, algo, params);
-            corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-            if (res.bgCh) {
-              state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+            // GRAXPERT-AI-END
+            else {
+              const density = parseInt(el("sldAdbePaths").value, 10);
+              params = {
+                targetW: 250,
+                gridCols: density,
+                gridRows: density,
+                smoothness: parseFloat(el("sldAdbeSmooth").value),
+                correction: el("selAdbeCorrection").value
+              };
+              // RBF-OPT-BEGIN
+              const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(srcImg, params);
+              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
+              if (res.bgCh) {
+                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              }
+              // RBF-OPT-END
             }
           } else {
             corrected = applyGradientCorrection(srcImg);
@@ -1254,22 +1303,35 @@
           for (const key of Object.keys(state.workflowImages)) {
             if (algo === "graxpert_ia" || algo === "dbe") {
               let params = {};
+              // GRAXPERT-AI-BEGIN
               if (algo === "graxpert_ia") {
                 params = {
                   correction: el("selGraXpertCorrection").value,
-                  smoothness: parseFloat(el("sldGraXpertSmooth").value)
+                  smoothing: parseFloat(el("sldGraXpertSmooth").value)
                 };
-              } else {
-                params = {
-                  paths: parseInt(el("sldAdbePaths").value, 10),
-                  tolerance: parseFloat(el("sldAdbeTol").value),
-                  smoothness: parseFloat(el("sldAdbeSmooth").value)
-                };
+                const res = await window.GraXpert.applyGraXpertBG(state.workflowImages[key], params);
+                state.workflowImages[key] = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: state.workflowImages[key].wcs };
+                if (key === state.activeWorkflowKey && res.bgCh) {
+                  state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+                }
               }
-              const res = await SASProPyodide.processImageRaw(state.workflowImages[key], algo, params);
-              state.workflowImages[key] = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: state.workflowImages[key].wcs };
-              if (key === state.activeWorkflowKey && res.bgCh) {
-                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+              // GRAXPERT-AI-END
+              else {
+                const density = parseInt(el("sldAdbePaths").value, 10);
+                params = {
+                  targetW: 250,
+                  gridCols: density,
+                  gridRows: density,
+                  smoothness: parseFloat(el("sldAdbeSmooth").value),
+                  correction: el("selAdbeCorrection").value
+                };
+                // RBF-OPT-BEGIN
+                const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(state.workflowImages[key], params);
+                state.workflowImages[key] = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: state.workflowImages[key].wcs };
+                if (key === state.activeWorkflowKey && res.bgCh) {
+                  state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+                }
+                // RBF-OPT-END
               }
             } else {
               state.workflowImages[key] = applyGradientCorrection(state.workflowImages[key]);
@@ -1758,10 +1820,49 @@
     state.activeImage = state.workflowImages[key];
     state.originalImage = cloneImage(state.activeImage);
     
+    // MONO-RGB-VIS-BEGIN
+    el("piwHint").style.display = "none";
+    el("piwToolbar").style.display = "flex";
+    if (state.activeImage && !state.activeImage.hasTransforms) {
+      state.screenStretchMode = true;
+    }
+    const btnAutoStf = el("btnToolAutoSTF");
+    if (btnAutoStf) {
+      if (state.screenStretchMode) {
+        btnAutoStf.classList.add("active");
+      } else {
+        btnAutoStf.classList.remove("active");
+      }
+    }
+    // MONO-RGB-VIS-END
+    
+    // Reset A/B comparison for the new workflow key context
+    state.previousImage = null;
+    state._lastImgRef = state.activeImage;
+    state.viewingPrevious = false;
+    const btnToggle = el("btnToolToggleAB");
+    if (btnToggle) {
+      btnToggle.classList.remove("active");
+      btnToggle.textContent = "Toggle A/B";
+    }
+    state.splitViewMode = false;
+    const btnSplit = el("btnToolSplitView");
+    if (btnSplit) {
+      btnSplit.classList.remove("active");
+    }
+    el("piwSplitSlider").style.display = "none";
+    
     // Si la imagen es a color, habilitar SCNR/Saturación, etc.
     el("btnApplyScnr").disabled = !state.activeImage.isColor;
     el("btnApplySat").disabled = !state.activeImage.isColor;
-    
+    // SCNR-PRE-BEGIN
+    el("btnApplyScnrPre").disabled = !state.activeImage.isColor;
+    el("sldScnrIntPre").disabled = !state.activeImage.isColor;
+    // SCNR-PRE-END
+    el("btnApplyPostSharp").disabled = false;
+    el("btnApplyPostCurves").disabled = false;
+    el("btnApplyPostColor").disabled = false;
+
     // Forzar redibujado de la pantalla
     render();
     drawHistogram();
@@ -1774,6 +1875,22 @@
     state.activeImage = img;
     state.originalImage = cloneImage(img);
     state.stepInputImage = cloneImage(img);
+    
+    // Reset A/B comparison
+    state.previousImage = null;
+    state._lastImgRef = img;
+    state.viewingPrevious = false;
+    const btnToggle = el("btnToolToggleAB");
+    if (btnToggle) {
+      btnToggle.classList.remove("active");
+      btnToggle.textContent = "Toggle A/B";
+    }
+    state.splitViewMode = false;
+    const btnSplit = el("btnToolSplitView");
+    if (btnSplit) {
+      btnSplit.classList.remove("active");
+    }
+    el("piwSplitSlider").style.display = "none";
     
     // AutoSTF habilitado por defecto para ver imágenes lineales combinadas/cargadas
     state.screenStretchMode = true;
@@ -1818,11 +1935,19 @@
     el("btnApplyDecon").disabled = false;
     el("btnApplyStretch").disabled = false;
     el("btnApplyScnr").disabled = !img.isColor;
+    // SCNR-PRE-BEGIN
+    el("btnApplyScnrPre").disabled = !img.isColor;
+    el("sldScnrIntPre").disabled = !img.isColor;
+    // SCNR-PRE-END
     el("btnPreviewMask").disabled = false;
     el("btnApplyMask").disabled = false;
     el("btnApplySat").disabled = !img.isColor;
     el("btnDownloadPNG").disabled = false;
     el("btnGenerateBlend").disabled = false;
+    el("btnApplyPostNR").disabled = false;
+    el("btnApplyPostSharp").disabled = false;
+    el("btnApplyPostCurves").disabled = false;
+    el("btnApplyPostColor").disabled = false;
 
     el("piwHint").style.display = "none";
     el("piwToolbar").style.display = "flex";
@@ -1964,34 +2089,37 @@
   }
 
   // Background Neutralization helper function
+  // BN-JS-BEGIN
   async function runBackgroundNeutralization() {
     if (!state.activeImage) return;
     const lang = document.documentElement.lang || "es";
     showLoader(lang === "es" ? "Neutralizando fondo (SetiAstro)..." : "Neutralizing background (SetiAstro)...");
-    try {
-      const srcImg = state.stepInputImage || state.activeImage;
-      const res = await window.SASProPyodide.processImageRaw(srcImg, "background_neutralization", {});
-      
-      const wcsCopy = srcImg.wcs;
-      state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
-      state.activeImage.hasTransforms = true;
-      
-      render();
-      drawHistogram();
-      refreshPathBar();
-      
-      if (res.extra && res.extra.bg_vals) {
-        const bg = res.extra.bg_vals;
-        const bgStr = bg.map(v => v.toFixed(4)).join(", ");
+    
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        const { bgVals } = window.BackgroundExtraction.findBackgroundSetiAstro(srcImg);
+        const res = window.BackgroundExtraction.applyBackgroundNeutralization(srcImg, bgVals);
+        
+        const wcsCopy = srcImg.wcs;
+        state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
+        state.activeImage.hasTransforms = true;
+        
+        render();
+        drawHistogram();
+        refreshPathBar();
+        
+        const bgStr = Array.from(bgVals).map(v => v.toFixed(4)).join(", ");
         logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
+        logConsole(lang === "es" ? "Neutralización de fondo (SetiAstro) completada" : "Background Neutralization (SetiAstro) completed", "info");
+      } catch (err) {
+        logConsole(`Error en Neutralización: ${err.message}`, "err");
+      } finally {
+        hideLoader();
       }
-      logConsole(lang === "es" ? "Neutralización de fondo (SetiAstro) completada" : "Background Neutralization (SetiAstro) completed", "info");
-    } catch (err) {
-      logConsole(`Error en Neutralización: ${err.message}`, "err");
-    } finally {
-      hideLoader();
-    }
+    }, 50);
   }
+  // BN-JS-END
 
   // Web-SPCC helper function
   async function runSPCC() {
@@ -2170,6 +2298,31 @@
     });
   }
 
+  // SCNR-PRE-BEGIN
+  el("btnApplyScnrPre").addEventListener("click", () => {
+    if (!state.activeImage || !state.activeImage.isColor) return;
+    const k = parseFloat(el("sldScnrIntPre").value);
+    showLoader("Eliminando cast verde (SCNR)...");
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        for (let i = 0; i < n; ++i) {
+          const limit = (img.ch[0][i] + img.ch[2][i]) / 2;
+          if (img.ch[1][i] > limit) img.ch[1][i] = (1 - k) * img.ch[1][i] + k * limit;
+        }
+        state.activeImage = img;
+        state.activeImage.hasTransforms = true;
+        render(); refreshPathBar();
+        logConsole("SCNR Green (lineal) aplicado", "info");
+      } catch (err) {
+        logConsole(`Error SCNR: ${err.message}`, "err");
+      } finally { hideLoader(); }
+    }, 50);
+  });
+  // SCNR-PRE-END
+
   // --- COSMIC CLARITY IA / STANDARD DECONVOLUTION ENGINE ---
   const STELLAR_MODEL_URL = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_sharp_stellar_cnn_AI3_5s.onnx";
   const NONSTELLAR_MODEL_URLS = {
@@ -2179,166 +2332,10 @@
     radius_8: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_8AI3_5s.onnx"
   };
 
-  function openModelDB() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("cosmic-clarity-models-db", 1);
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains("models")) {
-          db.createObjectStore("models", { keyPath: "url" });
-        }
-      };
-      request.onsuccess = (e) => resolve(e.target.result);
-      request.onerror = (e) => reject(e.target.error);
-    });
-  }
-
-  async function getCachedModel(url) {
-    try {
-      const db = await openModelDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction("models", "readonly");
-        const store = tx.objectStore("models");
-        const req = store.get(url);
-        req.onsuccess = () => resolve(req.result ? req.result.data : null);
-        req.onerror = () => reject(req.error);
-      });
-    } catch (err) {
-      console.warn("IndexedDB error:", err);
-      return null;
-    }
-  }
-
-  async function cacheModel(url, arrayBuffer) {
-    try {
-      const db = await openModelDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction("models", "readwrite");
-        const store = tx.objectStore("models");
-        const req = store.put({ url: url, data: arrayBuffer });
-        req.onsuccess = () => resolve(true);
-        req.onerror = () => reject(req.error);
-      });
-    } catch (err) {
-      console.warn("Caching error:", err);
-    }
-  }
-
-  async function fetchModelWithCache(url, onProgress) {
-    const cached = await getCachedModel(url);
-    if (cached) return cached;
-
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error ${response.status} fetching model`);
-
-    const contentLength = response.headers.get("content-length");
-    const total = contentLength ? parseInt(contentLength, 10) : 0;
-
-    const reader = response.body.getReader();
-    let received = 0;
-    const chunks = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      received += value.length;
-      if (total && onProgress) {
-        onProgress(received / total);
-      }
-    }
-
-    const blob = new Blob(chunks);
-    const arrayBuffer = await blob.arrayBuffer();
-    cacheModel(url, arrayBuffer).catch((e) => console.warn("Cache write failed:", e));
-    return arrayBuffer;
-  }
-
-  async function runOnnxModelTiled(session, imgData, tileSize = 512, overlap = 32) {
-    const W = imgData.w;
-    const H = imgData.h;
-    const nc = imgData.nc;
-    const outCh = [];
-    for (let c = 0; c < nc; ++c) {
-      outCh.push(new Float32Array(W * H));
-    }
-
-    const step = tileSize - 2 * overlap;
-    const inputName = session.inputNames[0];
-    const outputName = session.outputNames[0];
-
-    for (let y = 0; y < H; y += step) {
-      for (let x = 0; x < W; x += step) {
-        const x_start = Math.max(0, x - overlap);
-        const y_start = Math.max(0, y - overlap);
-        const x_end = Math.min(W, x + tileSize - overlap);
-        const y_end = Math.min(H, y + tileSize - overlap);
-
-        const tw = x_end - x_start;
-        const th = y_end - y_start;
-
-        const pw = Math.ceil(tw / 32) * 32;
-        const ph = Math.ceil(th / 32) * 32;
-
-        const tileData = new Float32Array(3 * ph * pw);
-
-        for (let row = 0; row < ph; ++row) {
-          let imgY = y_start + row;
-          if (imgY >= H) imgY = H - 1;
-
-          for (let col = 0; col < pw; ++col) {
-            let imgX = x_start + col;
-            if (imgX >= W) imgX = W - 1;
-
-            const pixelIdx = imgY * W + imgX;
-            if (nc === 3) {
-              tileData[0 * ph * pw + row * pw + col] = imgData.ch[0][pixelIdx];
-              tileData[1 * ph * pw + row * pw + col] = imgData.ch[1][pixelIdx];
-              tileData[2 * ph * pw + row * pw + col] = imgData.ch[2][pixelIdx];
-            } else {
-              const val = imgData.ch[0][pixelIdx];
-              tileData[0 * ph * pw + row * pw + col] = val;
-              tileData[1 * ph * pw + row * pw + col] = val;
-              tileData[2 * ph * pw + row * pw + col] = val;
-            }
-          }
-        }
-
-        const inputTensor = new ort.Tensor("float32", tileData, [1, 3, ph, pw]);
-        const results = await session.run({ [inputName]: inputTensor });
-        const outData = results[outputName].data;
-
-        const col_start = (x_start === 0) ? 0 : overlap;
-        const col_end = (x_end === W) ? tw : (tw - overlap);
-        const row_start = (y_start === 0) ? 0 : overlap;
-        const row_end = (y_end === H) ? th : (th - overlap);
-
-        for (let r = row_start; r < row_end; ++r) {
-          const globalY = y_start + r;
-          if (globalY >= H) continue;
-
-          for (let c = col_start; c < col_end; ++c) {
-            const globalX = x_start + c;
-            if (globalX >= W) continue;
-
-            const globalIdx = globalY * W + globalX;
-            const tileIdxR = 0 * ph * pw + r * pw + c;
-            const tileIdxG = 1 * ph * pw + r * pw + c;
-            const tileIdxB = 2 * ph * pw + r * pw + c;
-
-            if (nc === 3) {
-              outCh[0][globalIdx] = outData[tileIdxR];
-              outCh[1][globalIdx] = outData[tileIdxG];
-              outCh[2][globalIdx] = outData[tileIdxB];
-            } else {
-              outCh[0][globalIdx] = (outData[tileIdxR] + outData[tileIdxG] + outData[tileIdxB]) / 3.0;
-            }
-          }
-        }
-      }
-    }
-    return outCh;
-  }
+  // ONNX-ENGINE-REF-BEGIN
+  // Las funciones openModelDB, getCachedModel, cacheModel, fetchModelWithCache y runOnnxModelTiled
+  // han sido movidas al módulo independiente 'onnx-engine.js' para modularidad y reutilización en nox/GraXpert.
+  // ONNX-ENGINE-REF-END
 
   // Event Listener para Deconvolución
   el("btnApplyDecon").addEventListener("click", () => {
@@ -2360,11 +2357,12 @@
         let nonstellarAiCh = null;
 
         if (algo === "cosmic_ia") {
+          // ONNX-ENGINE-REF-BEGIN
           // 1. CARGAR E INFERIR ESTRELLAS
           if (mode === "both" || mode === "stellar") {
             if (stellarAmt > 0.01) {
               showLoader(lang === "es" ? "Cargando modelo de estrellas IA..." : "Loading AI stellar model...");
-              const stellarModelData = await fetchModelWithCache(STELLAR_MODEL_URL, (p) => {
+              const stellarModelData = await window.OnnxEngine.fetchModelWithCache(STELLAR_MODEL_URL, (p) => {
                 showLoader(lang === "es" 
                   ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` 
                   : `Downloading stellar model: ${(p * 100).toFixed(0)}%`
@@ -2372,16 +2370,10 @@
               });
 
               showLoader(lang === "es" ? "Inicializando sesión ONNX (estrellas)..." : "Initializing ONNX session (stars)...");
-              let session;
-              try {
-                session = await ort.InferenceSession.create(stellarModelData, { executionProviders: ["webgpu", "wasm"] });
-              } catch (e) {
-                console.warn("Failed with WebGPU provider, trying WASM only:", e);
-                session = await ort.InferenceSession.create(stellarModelData, { executionProviders: ["wasm"] });
-              }
+              const session = await window.OnnxEngine.createSession(stellarModelData);
 
               showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
-              stellarAiCh = await runOnnxModelTiled(session, srcImg);
+              stellarAiCh = await window.OnnxEngine.runOnnxModelTiled(session, srcImg);
             }
           }
 
@@ -2396,7 +2388,7 @@
 
               const nonstellarUrl = NONSTELLAR_MODEL_URLS[modelKey];
               showLoader(lang === "es" ? `Cargando modelo de nebulosa IA (${modelKey})...` : `Loading AI nebula model (${modelKey})...`);
-              const nonstellarModelData = await fetchModelWithCache(nonstellarUrl, (p) => {
+              const nonstellarModelData = await window.OnnxEngine.fetchModelWithCache(nonstellarUrl, (p) => {
                 showLoader(lang === "es"
                   ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%`
                   : `Downloading nebula model: ${(p * 100).toFixed(0)}%`
@@ -2404,18 +2396,13 @@
               });
 
               showLoader(lang === "es" ? "Inicializando sesión ONNX (nebulosa)..." : "Initializing ONNX session (nebula)...");
-              let session;
-              try {
-                session = await ort.InferenceSession.create(nonstellarModelData, { executionProviders: ["webgpu", "wasm"] });
-              } catch (e) {
-                console.warn("Failed with WebGPU provider, trying WASM only:", e);
-                session = await ort.InferenceSession.create(nonstellarModelData, { executionProviders: ["wasm"] });
-              }
+              const session = await window.OnnxEngine.createSession(nonstellarModelData);
 
               showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
-              nonstellarAiCh = await runOnnxModelTiled(session, srcImg);
+              nonstellarAiCh = await window.OnnxEngine.runOnnxModelTiled(session, srcImg);
             }
           }
+          // ONNX-ENGINE-REF-END
         }
 
         // 3. EJECUTAR MEZCLA EN PYODIDE
@@ -2525,11 +2512,13 @@
       if (m > 0 && m < 1) {
         const m1 = m - 1;
         const m2 = 2 * m - 1;
-        for (let i = 0; i < n; ++i) {
-          const x = rescaledCh[i];
+        // LUT-MTF-BEGIN
+        const mtfLut = window.LUT.buildLUT(x => {
           const den = m2 * x - m;
-          ch[i] = Math.abs(den) > 1e-12 ? Math.min(1, Math.max(0, (m1 * x) / den)) : x;
-        }
+          return Math.abs(den) > 1e-12 ? Math.min(1, Math.max(0, (m1 * x) / den)) : x;
+        }, 65536);
+        img.ch[c] = window.LUT.applyLUT(rescaledCh, mtfLut);
+        // LUT-MTF-END
         logConsole(`Canal ${c} estirado con STF: bp = ${c0.toFixed(4)}, m = ${m.toFixed(4)}`, "info");
       }
     }
@@ -2555,9 +2544,11 @@
             nc: loaded.nc,
             isColor: loaded.isColor
           };
+          state.workflowImages["Starless"] = state.starlessImage;
           el("btnLoadStarless").classList.add("primary");
           logConsole(`Imagen sin estrellas (Starless) cargada: ${file.name}`, "info");
           updateMixSourceOptions();
+          refreshPathBar();
         } catch (err) {
           logConsole(`Error al cargar Starless: ${err.message}`, "err");
         } finally {
@@ -2587,9 +2578,11 @@
             nc: loaded.nc,
             isColor: loaded.isColor
           };
+          state.workflowImages["Stars"] = state.starsImage;
           el("btnLoadStars").classList.add("primary");
           logConsole(`Imagen de estrellas cargada: ${file.name}`, "info");
           updateMixSourceOptions();
+          refreshPathBar();
         } catch (err) {
           logConsole(`Error al cargar Estrellas: ${err.message}`, "err");
         } finally {
@@ -2598,6 +2591,189 @@
       }, 50);
     }
   });
+
+  // Escuchar cambios en el checkbox de Starless para refrescar la visualización
+  el("chkStarlessView").addEventListener("change", () => {
+    render();
+    drawHistogram();
+  });
+
+  // NOX-INTEGRATION-BEGIN
+  el("btnRunNox").addEventListener("click", () => {
+    if (!state.activeImage) {
+      logConsole(window.location.pathname.includes("-en.html")
+        ? "Please load an image before running nox."
+        : "Carga una imagen antes de ejecutar nox.", "err");
+      return;
+    }
+
+    const runExecution = () => {
+      const lang = window.location.pathname.includes("-en.html") ? "en" : "es";
+      showLoader(lang === "es" ? "Cargando modelo nox..." : "Loading nox model...");
+
+      setTimeout(async () => {
+        try {
+          const isLinear = state.screenStretchMode === true;
+          let inputImg = state.activeImage;
+          let shadows = null;
+          let midtones = null;
+
+          if (isLinear) {
+            logConsole(lang === "es" ? "Imagen lineal detectada. Aplicando STF temporal..." : "Linear image detected. Applying temporary STF...", "info");
+            const nc = state.activeImage.nc;
+            const n = state.activeImage.ch[0].length;
+            shadows = [];
+            midtones = [];
+            const stretchedCh = [];
+            const TB = 0.25;
+
+            function mtfPure(m, x) {
+              if (x <= 0) return 0;
+              if (x >= 1) return 1;
+              const denom = (2 * m - 1) * x - m;
+              if (Math.abs(denom) < 1e-12) return x;
+              return (m - 1) * x / denom;
+            }
+
+            for (let c = 0; c < nc; c++) {
+              const src = state.activeImage.ch[c];
+              const median = fastSampledMedian(src);
+              const mad    = Math.max(0.0005, fastSampledMAD(src, median));
+              const shadow = Math.max(0.0, median - 1.25 * mad);
+              const sh     = isFinite(shadow) ? shadow : 0.0;
+              const mt     = optMadMidtone(median, sh, TB);
+              shadows.push(sh);
+              midtones.push(mt);
+
+              const dst = new Float32Array(n);
+              const scale = sh >= 1.0 ? 1.0 : (1.0 - sh);
+              for (let i = 0; i < n; i++) {
+                const x = Math.max(0.0, Math.min(1.0, (src[i] - sh) / scale));
+                dst[i] = mtfPure(mt, x);
+              }
+              stretchedCh.push(dst);
+            }
+
+            inputImg = {
+              ch: stretchedCh,
+              w: state.activeImage.w,
+              h: state.activeImage.h,
+              nc: state.activeImage.nc,
+              isColor: state.activeImage.isColor
+            };
+          }
+
+          const result = await window.NoxStarRemoval.runNox(
+            inputImg,
+            // Callback para progreso de descarga
+            (p) => {
+              showLoader(lang === "es"
+                ? `Descargando modelo nox: ${(p * 100).toFixed(0)}%`
+                : `Downloading nox model: ${(p * 100).toFixed(0)}%`
+              );
+            },
+            // Callback para progreso de tiles
+            (completed, total) => {
+              showLoader(lang === "es"
+                ? `Procesando tiles: ${completed}/${total}`
+                : `Processing tiles: ${completed}/${total}`
+              );
+            }
+          );
+
+          let starlessOut = result.starless;
+          let starsOut = result.stars;
+
+          if (isLinear) {
+            logConsole(lang === "es" ? "Invirtiendo STF temporal para obtener datos lineales..." : "Inverting temporary STF to obtain linear data...", "info");
+            const nc = state.activeImage.nc;
+            const n = state.activeImage.ch[0].length;
+            const starlessLinearCh = [];
+            const starsLinearCh = [];
+
+            function mtfPure(m, x) {
+              if (x <= 0) return 0;
+              if (x >= 1) return 1;
+              const denom = (2 * m - 1) * x - m;
+              if (Math.abs(denom) < 1e-12) return x;
+              return (m - 1) * x / denom;
+            }
+
+            for (let c = 0; c < nc; c++) {
+              const sh = shadows[c];
+              const mt = midtones[c];
+              const starlessStretched = result.starless.ch[c];
+              const starlessLinear = new Float32Array(n);
+              const invMt = 1.0 - mt;
+
+              for (let i = 0; i < n; i++) {
+                const val = sh + (1.0 - sh) * mtfPure(invMt, starlessStretched[i]);
+                starlessLinear[i] = val < 0.0 ? 0.0 : (val > 1.0 ? 1.0 : val);
+              }
+              starlessLinearCh.push(starlessLinear);
+
+              // stars_linear = max(0, original_linear - starless_linear)
+              const origLinear = state.activeImage.ch[c];
+              const starsLinear = new Float32Array(n);
+              for (let i = 0; i < n; i++) {
+                const diff = origLinear[i] - starlessLinear[i];
+                starsLinear[i] = diff > 0.0 ? diff : 0.0;
+              }
+              starsLinearCh.push(starsLinear);
+            }
+
+            starlessOut = {
+              ch: starlessLinearCh,
+              w: state.activeImage.w,
+              h: state.activeImage.h,
+              nc: nc,
+              isColor: state.activeImage.isColor
+            };
+            starsOut = {
+              ch: starsLinearCh,
+              w: state.activeImage.w,
+              h: state.activeImage.h,
+              nc: nc,
+              isColor: state.activeImage.isColor
+            };
+          }
+
+          state.starlessImage = starlessOut;
+          state.starsImage = starsOut;
+
+          // Registrar en workflowImages de forma que sean seleccionables en la barra de flujo
+          state.workflowImages["Starless"] = starlessOut;
+          state.workflowImages["Stars"] = starsOut;
+
+          // Activar el checkbox de visualización "Starless"
+          const chkStarless = el("chkStarlessView");
+          if (chkStarless) {
+            chkStarless.checked = true;
+          }
+
+          logConsole(lang === "es"
+            ? "Eliminación de estrellas (nox) completada con éxito."
+            : "Star removal (nox) completed successfully.",
+            "info"
+          );
+
+          el("btnLoadStarless").classList.add("primary");
+          el("btnLoadStars").classList.add("primary");
+
+          updateMixSourceOptions();
+          selectWorkflowKey("Starless"); // Cambiar automáticamente la vista a Starless
+        } catch (err) {
+          logConsole(`Error en nox: ${err.message}`, "err");
+          console.error(err);
+        } finally {
+          hideLoader();
+        }
+      }, 50);
+    };
+
+    runExecution();
+  });
+  // NOX-INTEGRATION-END
 
   // Mostrar u ocultar controles dinámicos de estirado según algoritmo seleccionado
   el("selStretchAlgo").addEventListener("change", (e) => {
@@ -2638,14 +2814,12 @@
           logConsole("Estirado AutoGHS completado:\n" + res.log.join("\n"), "info");
         } else if (algo === "stars") {
           const amt = parseFloat(el("sldStarsStretch").value);
-          const n = img.w * img.h;
-          const normFactor = 1 / Math.asinh(amt);
+          // LUT-ASINH-BEGIN
+          const asinhLut = window.LUT.buildLUT(x => Math.asinh(amt * x) / Math.asinh(amt), 65536);
           for (let c = 0; c < img.nc; ++c) {
-            const ch = img.ch[c];
-            for (let i = 0; i < n; ++i) {
-              ch[i] = Math.asinh(amt * ch[i]) * normFactor;
-            }
+            img.ch[c] = window.LUT.applyLUT(img.ch[c], asinhLut);
           }
+          // LUT-ASINH-END
           logConsole(`Estirado de estrellas asinh aplicado (Intensidad ${amt.toFixed(2)})`, "info");
         }
 
@@ -2712,6 +2886,362 @@
       }
     }, 50);
   });
+
+  // WEB-WORKER-BEGIN
+  let denoiseWorker = null;
+  let usmWorker     = null;
+
+  // GRAXPERT-DENOISE-BEGIN
+  el("btnApplyPostNR").addEventListener("click", () => {
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg) return;
+
+    const algo = el("selPostNoiseAlgo").value;
+    const lang = document.documentElement.lang || "es";
+
+    if (algo === "graxpert") {
+      showLoader(lang === "es" ? "Cargando modelo GraXpert Denoise..." : "Loading GraXpert Denoise model...");
+
+      if (!denoiseWorker) denoiseWorker = new Worker("denoise-worker.js");
+
+      // Copiar canales antes de transferir (no desalojar srcImg)
+      const chCopy = srcImg.ch.map(c => new Float32Array(c));
+      const strength = parseFloat(el("sldPostGraXpertStrength").value);
+
+      denoiseWorker.onmessage = (e) => {
+        const d = e.data;
+        if (d.type === "status" || d.type === "progress") {
+          const txt = d.type === "status" ? d.message
+            : (lang === "es" ? `Procesando mosaico ${d.idx}/${d.total}...` : `Processing tile ${d.idx}/${d.total}...`);
+          el("piwLoaderText").textContent = txt;
+          return;
+        }
+        if (d.type === "error") {
+          logConsole(`Error en GraXpert Denoise: ${d.message}`, "err");
+          hideLoader();
+          return;
+        }
+        // type === "result"
+        state.activeImage = { ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor, hasTransforms: true };
+        render();
+        refreshPathBar();
+        logConsole(
+          lang === "es" ? "Reducción de ruido GraXpert IA aplicada con éxito." : "GraXpert AI Noise Reduction applied successfully.",
+          "ok"
+        );
+        hideLoader();
+      };
+
+      denoiseWorker.postMessage(
+        { ch: chCopy, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, opts: { strength } },
+        chCopy.map(c => c.buffer)
+      );
+    } else {
+      const msg = messages[lang].btnApplyPostNR || "Función no disponible en la versión web.";
+      logConsole(msg, "warn");
+    }
+  });
+  // GRAXPERT-DENOISE-END
+
+  // USM-SHARP-BEGIN
+  el("btnApplyPostSharp").addEventListener("click", () => {
+    const algo = el("selPostSharpAlgo").value;
+    const lang = document.documentElement.lang || "es";
+    if (algo !== "usm") {
+      const msgs = {
+        es: "Solo el algoritmo USM está implementado en la versión web. BlurXTerminator requiere PixInsight local.",
+        en: "Only the USM algorithm is implemented in the web version. BlurXTerminator requires local PixInsight."
+      };
+      alert(msgs[lang] ?? msgs.es);
+      return;
+    }
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg) {
+      alert(lang === "en" ? "No active image." : "No hay imagen activa.");
+      return;
+    }
+    const sigma       = parseFloat(el("sldPostUsmSigma").value);
+    const amount      = parseFloat(el("sldPostUsmAmount").value);
+    const deringDark  = el("chkPostUsmDeringing").checked ? parseFloat(el("sldPostUsmDeringDark").value)   : 0;
+    const deringBright= el("chkPostUsmDeringing").checked ? parseFloat(el("sldPostUsmDeringBright").value) : 0;
+
+    showLoader(lang === "es" ? "Aplicando USM Sharpening..." : "Applying USM Sharpening...");
+
+    if (!usmWorker) usmWorker = new Worker("usm-worker.js");
+
+    // Copiar canales antes de transferir
+    const chCopy = srcImg.ch.map(c => new Float32Array(c));
+
+    usmWorker.onmessage = (e) => {
+      const d = e.data;
+      if (d.type === "error") {
+        logConsole(`Error en USM Sharpening: ${d.message}`, "err");
+        hideLoader();
+        return;
+      }
+      // type === "result"
+      state.activeImage = { ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor, hasTransforms: true };
+      render();
+      refreshPathBar();
+      logConsole(
+        lang === "es" ? "Enfoque USM Sharpening aplicado con éxito." : "USM Sharpening applied successfully.",
+        "ok"
+      );
+      hideLoader();
+    };
+
+    usmWorker.postMessage(
+      { ch: chCopy, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, opts: { sigma, amount, deringDark, deringBright } },
+      chCopy.map(c => c.buffer)
+    );
+  });
+  // USM-SHARP-END
+  // WEB-WORKER-END
+
+  // CURVES-BEGIN
+  el("btnApplyPostCurves").addEventListener("click", () => {
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg) return;
+
+    const lang = document.documentElement.lang || "es";
+    showLoader(lang === "es" ? "Aplicando curvas..." : "Applying curves...");
+
+    setTimeout(() => {
+      try {
+        // Build LUTs for each channel
+        const lutK = window.LUT.buildLUT(getCubicSpline(state.curves.K));
+        const lutR = window.LUT.buildLUT(getCubicSpline(state.curves.R));
+        const lutG = window.LUT.buildLUT(getCubicSpline(state.curves.G));
+        const lutB = window.LUT.buildLUT(getCubicSpline(state.curves.B));
+        const lutS = window.LUT.buildLUT(getCubicSpline(state.curves.S));
+
+        const w = srcImg.w;
+        const h = srcImg.h;
+        const nc = srcImg.nc;
+        const isColor = srcImg.isColor || nc === 3;
+        const size = w * h;
+
+        const dstCh = [];
+        for (let c = 0; c < nc; c++) {
+          dstCh.push(new Float32Array(size));
+        }
+
+        // Helper: clamp and index
+        const clampIdx = (val) => {
+          let idx = Math.round(val * 65535);
+          return idx < 0 ? 0 : (idx > 65535 ? 65535 : idx);
+        };
+
+        if (isColor && nc === 3) {
+          const rSrc = srcImg.ch[0];
+          const gSrc = srcImg.ch[1];
+          const bSrc = srcImg.ch[2];
+
+          const rDst = dstCh[0];
+          const gDst = dstCh[1];
+          const bDst = dstCh[2];
+
+          // Check if saturation spline is modified
+          const isSatModified = state.curves.S.some(p => Math.abs(p.x - p.y) > 1e-4);
+
+          for (let i = 0; i < size; i++) {
+            let r = rSrc[i];
+            let g = gSrc[i];
+            let b = bSrc[i];
+
+            // 1. Master/Luminance curve
+            r = lutK[clampIdx(r)];
+            g = lutK[clampIdx(g)];
+            b = lutK[clampIdx(b)];
+
+            // 2. Individual channel curves
+            r = lutR[clampIdx(r)];
+            g = lutG[clampIdx(g)];
+            b = lutB[clampIdx(b)];
+
+            // 3. Saturation curve
+            if (isSatModified) {
+              // RGB to HSL
+              let max = r, min = r;
+              if (g > max) max = g;
+              if (b > max) max = b;
+              if (g < min) min = g;
+              if (b < min) min = b;
+
+              let h = 0, s = 0, l = (max + min) / 2;
+              if (max !== min) {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                if (max === r) {
+                  h = (g - b) / d + (g < b ? 6 : 0);
+                } else if (max === g) {
+                  h = (b - r) / d + 2;
+                } else {
+                  h = (r - g) / d + 4;
+                }
+                h /= 6;
+              }
+
+              // Apply Saturation curve
+              s = lutS[clampIdx(s)];
+
+              // HSL to RGB
+              if (s === 0) {
+                r = g = b = l;
+              } else {
+                const hue2rgb = (p, q, t) => {
+                  if (t < 0) t += 1;
+                  if (t > 1) t -= 1;
+                  if (t < 1/6) return p + (q - p) * 6 * t;
+                  if (t < 1/2) return q;
+                  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                  return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+              }
+            }
+
+            // Clamp results to [0, 1]
+            rDst[i] = r < 0 ? 0 : (r > 1 ? 1 : r);
+            gDst[i] = g < 0 ? 0 : (g > 1 ? 1 : g);
+            bDst[i] = b < 0 ? 0 : (b > 1 ? 1 : b);
+          }
+        } else {
+          // Grayscale or single channel image
+          const srcCh = srcImg.ch[0];
+          const dstCh0 = dstCh[0];
+          for (let i = 0; i < size; i++) {
+            const v = lutK[clampIdx(srcCh[i])];
+            dstCh0[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+          }
+        }
+
+        state.activeImage = {
+          ch: dstCh,
+          w,
+          h,
+          nc,
+          isColor,
+          hasTransforms: true
+        };
+
+        render();
+        refreshPathBar();
+        logConsole(
+          lang === "es"
+            ? "Ajuste de curvas aplicado con éxito."
+            : "Curves adjustment applied successfully.",
+          "ok"
+        );
+      } catch (err) {
+        logConsole(`Error al aplicar curvas: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+  // CURVES-END
+
+  // COLOR-WHEEL-BEGIN
+  el("btnApplyPostColor").addEventListener("click", () => {
+    if (!state.activeImage) return;
+
+    const rMult   = parseFloat(el("sldPostBalanceR").value);
+    const gMult   = parseFloat(el("sldPostBalanceG").value);
+    const bMult   = parseFloat(el("sldPostBalanceB").value);
+    const satMult = parseFloat(el("sldPostBalanceSat").value);
+    const doScnr  = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
+    const scnrAmt = doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0;
+
+    const noRGB = (rMult === 1 && gMult === 1 && bMult === 1);
+    const noSat = (satMult === 1);
+    if (noRGB && noSat && !doScnr) {
+      const lang = document.documentElement.lang || "es";
+      logConsole(lang === "es" ? "Balance de color: ajuste neutro, sin cambios." : "Color balance: neutral adjustment, no changes.", "info");
+      return;
+    }
+
+    const lang = document.documentElement.lang || "es";
+    showLoader(lang === "es" ? "Aplicando balance de color..." : "Applying color balance...");
+
+    setTimeout(() => {
+      try {
+        const srcImg = state.stepInputImage || state.activeImage;
+        const img = cloneImage(srcImg);
+        const n = img.w * img.h;
+        const isColor = img.isColor;
+
+        // 1. Multiplicadores RGB por canal
+        const rCh = img.ch[0];
+        if (rMult !== 1) {
+          for (let i = 0; i < n; ++i) { rCh[i] = rCh[i] * rMult; if (rCh[i] > 1) rCh[i] = 1; else if (rCh[i] < 0) rCh[i] = 0; }
+        }
+        if (isColor) {
+          const gCh = img.ch[1];
+          if (gMult !== 1) {
+            for (let i = 0; i < n; ++i) { gCh[i] = gCh[i] * gMult; if (gCh[i] > 1) gCh[i] = 1; else if (gCh[i] < 0) gCh[i] = 0; }
+          }
+          const bCh = img.ch[2];
+          if (bMult !== 1) {
+            for (let i = 0; i < n; ++i) { bCh[i] = bCh[i] * bMult; if (bCh[i] > 1) bCh[i] = 1; else if (bCh[i] < 0) bCh[i] = 0; }
+          }
+        }
+
+        // 2. Ajuste de saturación vía HSL
+        if (satMult !== 1 && isColor) {
+          const rCh = img.ch[0], gCh = img.ch[1], bCh = img.ch[2];
+          const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1; if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+          };
+          for (let i = 0; i < n; ++i) {
+            const rv = rCh[i], gv = gCh[i], bv = bCh[i];
+            const mx = Math.max(rv, gv, bv);
+            const mn = Math.min(rv, gv, bv);
+            const d = mx - mn;
+            if (d === 0) continue;
+            const l = (mx + mn) / 2;
+            const s = d / (l < 0.5 ? mx + mn : 2 - mx - mn);
+            const sNew = s * satMult > 1 ? 1 : s * satMult < 0 ? 0 : s * satMult;
+            const h = rv === mx ? ((gv - bv) / d + (gv < bv ? 6 : 0)) / 6
+                    : gv === mx ? ((bv - rv) / d + 2) / 6
+                    :             ((rv - gv) / d + 4) / 6;
+            const q2 = l < 0.5 ? l * (1 + sNew) : l + sNew - l * sNew;
+            const p2 = 2 * l - q2;
+            rCh[i] = hue2rgb(p2, q2, h + 1/3);
+            gCh[i] = hue2rgb(p2, q2, h);
+            bCh[i] = hue2rgb(p2, q2, h - 1/3);
+          }
+        }
+
+        // 3. SCNR Green (opcional)
+        if (doScnr && isColor) {
+          const rCh = img.ch[0], gCh = img.ch[1], bCh = img.ch[2];
+          for (let i = 0; i < n; ++i) {
+            const limit = (rCh[i] + bCh[i]) / 2;
+            if (gCh[i] > limit) gCh[i] = (1 - scnrAmt) * gCh[i] + scnrAmt * limit;
+          }
+        }
+
+        state.activeImage = img;
+        state.activeImage.hasTransforms = true;
+        render(); refreshPathBar();
+        logConsole(`Balance de color: R×${rMult.toFixed(3)} G×${gMult.toFixed(3)} B×${bMult.toFixed(3)} Sat×${satMult.toFixed(2)}${doScnr ? ` + SCNR(${(scnrAmt*100).toFixed(0)}%)` : ""}`, "info");
+      } catch (err) {
+        logConsole(`Error en balance de color: ${err.message}`, "err");
+      } finally {
+        hideLoader();
+      }
+    }, 50);
+  });
+  // COLOR-WHEEL-END
 
   // Rueda de color en Color Mask
   const wheel = el("maskColorWheel");
@@ -2933,16 +3463,23 @@
 
   // Actualiza los selectores de las capas de mezcla según las imágenes disponibles
   function updateMixSourceOptions() {
+    const isEn = window.location.pathname.includes("-en.html");
     const options = [];
-    options.push('<option value="none">-- Sin imagen --</option>');
-    if (state.activeImage) options.push('<option value="active">Imagen de Trabajo Activa</option>');
-    if (state.starlessImage) options.push('<option value="starless">Capa Sin Estrellas (Starless)</option>');
-    if (state.starsImage) options.push('<option value="stars">Capa de Estrellas (Stars)</option>');
+    options.push(isEn ? '<option value="none">-- No image --</option>' : '<option value="none">-- Sin imagen --</option>');
+    if (state.activeImage) {
+      options.push(isEn ? '<option value="active">Active Working Image</option>' : '<option value="active">Imagen de Trabajo Activa</option>');
+    }
+    if (state.starlessImage) {
+      options.push(isEn ? '<option value="starless">Starless Layer (Starless)</option>' : '<option value="starless">Capa Sin Estrellas (Starless)</option>');
+    }
+    if (state.starsImage) {
+      options.push(isEn ? '<option value="stars">Stars Layer (Stars)</option>' : '<option value="stars">Capa de Estrellas (Stars)</option>');
+    }
 
     // Añadir ranuras rellenas
     for (let i = 0; i < 8; ++i) {
       if (state.imageSlots[i]) {
-        options.push(`<option value="slot-${i}">Slot de Memoria ${i + 1}</option>`);
+        options.push(isEn ? `<option value="slot-${i}">Memory Slot ${i + 1}</option>` : `<option value="slot-${i}">Slot de Memoria ${i + 1}</option>`);
       }
     }
 
@@ -3209,13 +3746,40 @@
   // --- VISUALIZADOR Y DIBUJO ---
 
   function render() {
-    if (!state.activeImage) {
+    // Detect change of activeImage reference
+    if (state.activeImage && state.activeImage !== state._lastImgRef) {
+      if (state._lastImgRef) {
+        state.previousImage = state._lastImgRef;
+      }
+      state._lastImgRef = state.activeImage;
+      
+      // Reset A/B viewing toggle and split when a new image operation runs
+      state.viewingPrevious = false;
+      const btnToggle = el("btnToolToggleAB");
+      if (btnToggle) {
+        btnToggle.classList.remove("active");
+        btnToggle.textContent = "Toggle A/B";
+      }
+      
+      state.splitViewMode = false;
+      const btnSplit = el("btnToolSplitView");
+      if (btnSplit) {
+        btnSplit.classList.remove("active");
+      }
+      el("piwSplitSlider").style.display = "none";
+    }
+
+    // Determine which image is active source
+    const imgSource = (state.viewingPrevious && state.previousImage) ? state.previousImage : state.activeImage;
+    const img = (el("chkStarlessView").checked && state.starlessImage) ? state.starlessImage : imgSource;
+
+    if (!img) {
       const btn = el("btnBigApply");
       if (btn) btn.style.display = "none";
       return;
     }
     updateBigApply();
-    if (state.activeWorkflowKey) {
+    if (state.activeWorkflowKey && !state.viewingPrevious) {
       state.workflowImages[state.activeWorkflowKey] = state.activeImage;
     }
 
@@ -3233,7 +3797,6 @@
       }
     }
 
-    const img = state.activeImage;
     cv.width = img.w;
     cv.height = img.h;
 
@@ -3321,9 +3884,9 @@
 
   // Dibujar Histograma SVG
   function drawHistogram() {
-    if (!state.activeImage) return;
+    const img = (el("chkStarlessView").checked && state.starlessImage) ? state.starlessImage : state.activeImage;
+    if (!img) return;
 
-    const img = state.activeImage;
     const n = img.w * img.h;
     const bins = new Uint32Array(256).fill(0);
 
@@ -3566,28 +4129,107 @@
     });
   }
 
-  // Toggle Cortinilla A/B
+  // Toggle A/B (Vista Alternada)
+  el("btnToolToggleAB").addEventListener("click", () => {
+    const lang = document.documentElement.lang || "es";
+    if (!state.previousImage) {
+      logConsole(lang === "es" ? "No hay imagen anterior para comparar" : "No previous image to compare", "err");
+      return;
+    }
+    state.viewingPrevious = !state.viewingPrevious;
+    if (state.viewingPrevious) {
+      el("btnToolToggleAB").classList.add("active");
+      el("btnToolToggleAB").textContent = "Toggle A/B (A)";
+      
+      // Desactivar splitViewMode si estaba activo
+      if (state.splitViewMode) {
+        state.splitViewMode = false;
+        el("btnToolSplitView").classList.remove("active");
+        el("piwSplitSlider").style.display = "none";
+      }
+      logConsole(lang === "es" ? "Mostrando imagen anterior (A)" : "Showing previous image (A)", "info");
+    } else {
+      el("btnToolToggleAB").classList.remove("active");
+      el("btnToolToggleAB").textContent = "Toggle A/B (B)";
+      logConsole(lang === "es" ? "Mostrando imagen activa (B)" : "Showing active image (B)", "info");
+    }
+    render();
+  });
+
+  // Toggle Cortinilla A/B (Split A/B)
   el("btnToolSplitView").addEventListener("click", () => {
+    const lang = document.documentElement.lang || "es";
+    if (!state.previousImage) {
+      logConsole(lang === "es" ? "No hay imagen anterior para comparar" : "No previous image to compare", "err");
+      return;
+    }
     state.splitViewMode = !state.splitViewMode;
     
     if (state.splitViewMode) {
       el("btnToolSplitView").classList.add("active");
+      state.splitCompareImage = state.previousImage;
       
-      // Comparar contra el original por defecto, o el primer slot disponible
-      state.splitCompareImage = state.originalImage;
-      for (let i = 0; i < 8; ++i) {
-        if (state.imageSlots[i]) {
-          state.splitCompareImage = state.imageSlots[i];
-          break;
+      // Desactivar toggle A/B si estaba activo para no crear confusión
+      if (state.viewingPrevious) {
+        state.viewingPrevious = false;
+        const btnToggle = el("btnToolToggleAB");
+        if (btnToggle) {
+          btnToggle.classList.remove("active");
+          btnToggle.textContent = "Toggle A/B";
         }
       }
-      logConsole("Cortinilla de comparación A/B activada", "info");
+      logConsole(lang === "es" ? "Cortinilla de comparación A/B activada (Antes vs Después)" : "Split compare A/B activated (Before vs After)", "info");
     } else {
       el("btnToolSplitView").classList.remove("active");
       el("piwSplitSlider").style.display = "none";
     }
     render();
   });
+
+  // RESET-BTN-BEGIN
+  el("btnToolReset").addEventListener("click", () => {
+    const lang = document.documentElement.lang || "es";
+    const confirmed = confirm(lang === "es" ? "¿Seguro que deseas reiniciar el espacio de trabajo actual?" : "Are you sure you want to reset the current workspace?");
+    if (!confirmed) return;
+
+    state.activeImage = null;
+    state.previousImage = null;
+    state.stepInputImage = null;
+    state.subtractedGradient = null;
+    state.activeMask = null;
+    state.splitViewMode = false;
+    state.viewingPrevious = false;
+    state.previewMaskMode = false;
+    state.previewGradientMode = false;
+    state._lastImgRef = null;
+    state.workflowImages = {};
+    state.activeWorkflowKey = "";
+
+    // Limpiar canvas
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    cv.width = 800;
+    cv.height = 500;
+    ctx.fillStyle = "#020202";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+
+    // Ocultar slider y toolbar, mostrar el hint de arrastrar/soltar
+    el("piwSplitSlider").style.display = "none";
+    el("piwToolbar").style.display = "none";
+    el("piwHint").style.display = "block";
+
+    // Limpiar histograma
+    const histPath = el("histogramPath");
+    if (histPath) histPath.setAttribute("d", "");
+
+    // Refrescar la path bar
+    refreshPathBar();
+
+    logConsole(lang === "es" ? "Imagen reiniciada" : "Image reset", "info");
+    console.log("Imagen reiniciada");
+    
+    render();
+  });
+  // RESET-BTN-END
 
   // Arrastrar Cortinilla Split View
   const splitSlider = el("piwSplitSlider");
@@ -3651,6 +4293,9 @@
     { s: "sldGhsInt", v: "valGhsInt", p: 2 },
     { s: "sldStarsStretch", v: "valStarsStretch", p: 2 },
     { s: "sldScnrInt", v: "valScnrInt", p: 2 },
+    // SCNR-PRE-BEGIN
+    { s: "sldScnrIntPre", v: "valScnrIntPre", p: 2 },
+    // SCNR-PRE-END
     { s: "sldMaskLow", v: "valMaskLow", p: 2 },
     { s: "sldMaskHigh", v: "valMaskHigh", p: 2 },
     { s: "sldMaskFuzz", v: "valMaskFuzz", p: 2 },
@@ -3658,7 +4303,8 @@
     { s: "sldSatBoost", v: "valSatBoost", p: 2 },
     { s: "sldMixOpacity1", v: "valMixOpacity1", p: 2 },
     { s: "sldMixOpacity2", v: "valMixOpacity2", p: 2 },
-    { s: "sldMixOpacity3", v: "valMixOpacity3", p: 2 }
+    { s: "sldMixOpacity3", v: "valMixOpacity3", p: 2 },
+    { s: "sldPostGraXpertStrength", v: "valPostGraXpertStrength", p: 2 }
   ];
 
   dynamicSliders.forEach(({ s, v, p }) => {
@@ -4055,8 +4701,8 @@
 
   // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
   const mockButtons = [
-    "btnCompareColor", "btnApplyPostNR", "btnComparePostNR", 
-    "btnApplyPostSharp", "btnComparePostSharp", "btnApplyPostColor", "btnApplyPostCurves",
+    "btnCompareColor", "btnComparePostNR",
+    "btnComparePostSharp",
     "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
   ];
   mockButtons.forEach(id => {
@@ -4909,5 +5555,29 @@
   window.updateBigApply = updateBigApply;
 
   updateBigApply();
+
+  // E2E-HOOK-BEGIN
+  if (typeof window !== "undefined" && window.location.search.includes("e2ehook=1")) {
+    window.__piwTest = {
+      setActiveImage: (img) => { setActiveImage(img); },
+      getActiveImage: () => state.activeImage,
+      getWorkflowImages: () => state.workflowImages,
+      getStarlessImage: () => state.starlessImage,
+      getStarsImage: () => state.starsImage,
+      getScreenStretchMode: () => state.screenStretchMode,
+      getPreviousImage: () => state.previousImage,
+      getViewingPrevious: () => state.viewingPrevious,
+      getSplitViewMode: () => state.splitViewMode,
+      getSplitPercent: () => state.splitPercent,
+      refreshPathBar: () => { refreshPathBar(); },
+      selectWorkflowKey: (key) => { selectWorkflowKey(key); },
+      getCurves: () => state.curves,
+      setCurves: (curves) => { state.curves = curves; drawCurvesWidget(); },
+      // CF-WORKER-BEGIN
+      setAstrometryProxyUrl: (url) => { ASTROMETRY_PROXY_URL = url; }
+      // CF-WORKER-END
+    };
+  }
+  // E2E-HOOK-END
 
 })();
