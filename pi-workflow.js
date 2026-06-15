@@ -111,8 +111,52 @@
     if (img.hasTransforms) {
       copy.hasTransforms = img.hasTransforms;
     }
+    if (Array.isArray(img.stages)) {
+      copy.stages = img.stages.slice();
+    }
     return copy;
   }
+
+  // IMAGE-MODEL-BEGIN
+  // Punto único de confirmación de una imagen procesada. Análogo conceptual a
+  // commitCandidate → store.setView() del script PJSR. Unifica cuatro cosas que antes
+  // estaban dispersas e inconsistentes entre operaciones:
+  //   1. Forma del objeto imagen (siempre { ch, w, h, nc, isColor, wcs?, hasTransforms, stages }).
+  //   2. Preservación de la solución astrométrica (wcs): del resultado si la trae, si no se
+  //      hereda del origen — evita que denoise/USM/curvas/blend pierdan el plate-solve.
+  //   3. Registro del stage aplicado (historial acumulado en img.stages, como rec.stages del script).
+  //   4. Persistencia EXPLÍCITA en workflowImages bajo la clave activa (ya no por efecto
+  //      secundario de render()).
+  // `result` debe traer al menos { ch, w, h, nc, isColor }. `sourceImg` es el origen del que
+  // heredar wcs e historial (por defecto, la entrada del paso actual).
+  function commitActiveImage(result, stageLabel, sourceImg) {
+    const src = sourceImg || state.stepInputImage || state.activeImage;
+    const img = {
+      ch: result.ch,
+      w: result.w,
+      h: result.h,
+      nc: result.nc,
+      isColor: result.isColor,
+      hasTransforms: true
+    };
+    if (result.wcs) {
+      img.wcs = result.wcs;
+    } else if (src && src.wcs) {
+      img.wcs = { ...src.wcs };
+    }
+    const stages = (src && Array.isArray(src.stages)) ? src.stages.slice() : [];
+    if (stageLabel) {
+      stages.push(stageLabel);
+    }
+    img.stages = stages;
+
+    state.activeImage = img;
+    if (state.activeWorkflowKey) {
+      state.workflowImages[state.activeWorkflowKey] = img;
+    }
+    return img;
+  }
+  // IMAGE-MODEL-END
 
   // -------------------------------------------------------------------------
   // Auto STF MAD — Port exacto de PI Workflow (optMadMidtone + optApplyMadAutoStretch)
@@ -408,7 +452,7 @@
   function cropApplyToImage(imgObj, rect) {
     const { x, y, width: w, height: h } = rect;
     const srcW = imgObj.w;
-    const result = { w, h, nc: imgObj.nc, isColor: imgObj.isColor, ch: [] };
+    const result = { w, h, nc: imgObj.nc, isColor: imgObj.isColor, ch: [], hasTransforms: true };
     for (let c = 0; c < imgObj.nc; c++) {
       const dst = new Float32Array(w * h);
       for (let row = 0; row < h; row++) {
@@ -417,6 +461,12 @@
       }
       result.ch.push(dst);
     }
+    // El recorte cambia la geometría: la solución astrométrica (wcs) deja de ser válida y NO se
+    // propaga — hay que volver a resolver. Es coherente con la salvaguarda del script, que descarta
+    // la astrometría dependiente de dimensiones tras un crop. El historial de stages sí se preserva.
+    const stages = Array.isArray(imgObj.stages) ? imgObj.stages.slice() : [];
+    stages.push("Crop");
+    result.stages = stages;
     return result;
   }
 
@@ -459,12 +509,15 @@
       if (state.activeWorkflowKey) {
         state.workflowImages[state.activeWorkflowKey] = cropped;
       }
+      const hadWcs = !!state.wcs;
+      state.wcs = null; // geometría cambiada → plate-solve invalidado
       cropState.rect = null;
       cropUpdateStatus();
       refreshPathBar();
       render();
       const lang = document.documentElement.lang || "es";
       logConsole(lang === "es" ? `Crop aplicado a imagen actual (${cropped.w}×${cropped.h} px)` : `Crop applied to current image (${cropped.w}×${cropped.h} px)`, "info");
+      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de SPCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before SPCC.", "warn");
     });
   }
 
@@ -480,12 +533,15 @@
       } else {
         state.activeImage = cropApplyToImage(state.activeImage, rect);
       }
+      const hadWcs = !!state.wcs;
+      state.wcs = null; // geometría cambiada → plate-solve invalidado
       cropState.rect = null;
       cropUpdateStatus();
       refreshPathBar();
       render();
       const lang = document.documentElement.lang || "es";
       logConsole(lang === "es" ? `Crop aplicado a todo el flujo (${state.activeImage.w}×${state.activeImage.h} px)` : `Crop applied to all workflow images (${state.activeImage.w}×${state.activeImage.h} px)`, "info");
+      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de SPCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before SPCC.", "warn");
     });
   }
 
@@ -1195,7 +1251,7 @@
             corrected = applyGradientCorrection(srcImg);
           }
           
-          state.activeImage = corrected;
+          commitActiveImage(corrected, "Background Extraction", srcImg);
           // Activar estirado automático de pantalla (AutoSTF) para que el resultado lineal no se vea negro
           state.screenStretchMode = true;
           const stfBtn = el("btnToolAutoSTF");
@@ -1823,7 +1879,12 @@
     // MONO-RGB-VIS-BEGIN
     el("piwHint").style.display = "none";
     el("piwToolbar").style.display = "flex";
-    if (state.activeImage && !state.activeImage.hasTransforms) {
+    // Autostretch al revisitar SOLO si la imagen sigue siendo lineal (no se le aplicó un
+    // estirado permanente). Se deriva del historial de stages (modelo del script), no de
+    // hasTransforms — que ahora marca "se aplicó cualquier proceso", incluidos los lineales (PRE).
+    const isStretched = state.activeImage && Array.isArray(state.activeImage.stages)
+      && state.activeImage.stages.indexOf("Stretch") >= 0;
+    if (state.activeImage && !isStretched) {
       state.screenStretchMode = true;
     }
     const btnAutoStf = el("btnToolAutoSTF");
@@ -1987,8 +2048,7 @@
             logConsole(`Canal ${c === 0 ? "Rojo" : "Azul"} alineado: factor ${scale.toFixed(4)}, shift ${(refStats.median - tgtStats.median * scale).toFixed(4)}`, "info");
           }
         }
-        img.hasTransforms = true;
-        state.activeImage = img;
+        commitActiveImage(img, "Linear Fit", srcImg);
         render();
         drawHistogram();
         refreshPathBar();
@@ -2074,8 +2134,7 @@
             : `Channel ${c === 0 ? "Red" : "Blue"} aligned via optimal transport`, "info");
         }
         
-        img.hasTransforms = true;
-        state.activeImage = img;
+        commitActiveImage(img, "Optimal Transport", srcImg);
         render();
         drawHistogram();
         refreshPathBar();
@@ -2101,14 +2160,12 @@
         const { bgVals } = window.BackgroundExtraction.findBackgroundSetiAstro(srcImg);
         const res = window.BackgroundExtraction.applyBackgroundNeutralization(srcImg, bgVals);
         
-        const wcsCopy = srcImg.wcs;
-        state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
-        state.activeImage.hasTransforms = true;
-        
+        commitActiveImage(res, "Background Neutralization", srcImg);
+
         render();
         drawHistogram();
         refreshPathBar();
-        
+
         const bgStr = Array.from(bgVals).map(v => v.toFixed(4)).join(", ");
         logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
         logConsole(lang === "es" ? "Neutralización de fondo (SetiAstro) completada" : "Background Neutralization (SetiAstro) completed", "info");
@@ -2201,14 +2258,12 @@
         }
       });
       
-      const wcsCopy = srcImg.wcs;
-      state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
-      state.activeImage.hasTransforms = true;
-      
+      commitActiveImage(res, "SPCC", srcImg);
+
       render();
       drawHistogram();
       refreshPathBar();
-      
+
       if (res.extra && res.extra.factors) {
         const k = res.extra.factors;
         logConsole(lang === "es" 
@@ -2312,8 +2367,7 @@
           const limit = (img.ch[0][i] + img.ch[2][i]) / 2;
           if (img.ch[1][i] > limit) img.ch[1][i] = (1 - k) * img.ch[1][i] + k * limit;
         }
-        state.activeImage = img;
-        state.activeImage.hasTransforms = true;
+        commitActiveImage(img, "SCNR", srcImg);
         render(); refreshPathBar();
         logConsole("SCNR Green (lineal) aplicado", "info");
       } catch (err) {
@@ -2419,9 +2473,7 @@
 
         const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
 
-        const wcsCopy = srcImg.wcs;
-        state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
-        state.activeImage.hasTransforms = true;
+        commitActiveImage(res, "Deconvolution", srcImg);
 
         render();
         refreshPathBar();
@@ -2456,15 +2508,13 @@
             };
             const res = await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
             
-            const wcsCopy = srcImg.wcs;
-            state.activeImage = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: wcsCopy };
-            state.activeImage.hasTransforms = true;
-            
+            commitActiveImage(res, "Deconvolution", srcImg);
+
             render();
             refreshPathBar();
-            
-            logConsole(lang === "es" 
-              ? "Deconvolución Estándar (Fallback) aplicada correctamente." 
+
+            logConsole(lang === "es"
+              ? "Deconvolución Estándar (Fallback) aplicada correctamente."
               : "Standard Deconvolution (Fallback) applied successfully.", 
               "info"
             );
@@ -2823,13 +2873,13 @@
           logConsole(`Estirado de estrellas asinh aplicado (Intensidad ${amt.toFixed(2)})`, "info");
         }
 
-        // Si se actualizó starless, forzar la imagen activa
+        // Confirmar el estirado. Si se trabajó sobre la capa Starless, mantenerla sincronizada
+        // y heredar de ella (no de srcImg) el wcs/historial.
+        const stretchSrc = (el("chkStarlessView").checked && state.starlessImage) ? state.starlessImage : srcImg;
         if (el("chkStarlessView").checked && state.starlessImage) {
           state.starlessImage = img;
-          state.activeImage = img;
-        } else {
-          state.activeImage = img;
         }
+        commitActiveImage(img, "Stretch", stretchSrc);
 
         // Una vez aplicado el estirado permanente, desactivar el estirado de pantalla AutoGHS
         state.screenStretchMode = false;
@@ -2874,8 +2924,7 @@
           }
         }
 
-        state.activeImage = img;
-        state.activeImage.hasTransforms = true;
+        commitActiveImage(img, "SCNR", srcImg);
         render();
         refreshPathBar();
         logConsole(`SCNR Green aplicado al ${(k*100).toFixed(0)}%`, "info");
@@ -2922,7 +2971,7 @@
           return;
         }
         // type === "result"
-        state.activeImage = { ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor, hasTransforms: true };
+        commitActiveImage({ ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor }, "GraXpert Denoise", srcImg);
         render();
         refreshPathBar();
         logConsole(
@@ -2980,7 +3029,7 @@
         return;
       }
       // type === "result"
-      state.activeImage = { ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor, hasTransforms: true };
+      commitActiveImage({ ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor }, "USM Sharpening", srcImg);
       render();
       refreshPathBar();
       logConsole(
@@ -3120,14 +3169,7 @@
           }
         }
 
-        state.activeImage = {
-          ch: dstCh,
-          w,
-          h,
-          nc,
-          isColor,
-          hasTransforms: true
-        };
+        commitActiveImage({ ch: dstCh, w, h, nc, isColor }, "Curves", srcImg);
 
         render();
         refreshPathBar();
@@ -3230,8 +3272,7 @@
           }
         }
 
-        state.activeImage = img;
-        state.activeImage.hasTransforms = true;
+        commitActiveImage(img, "Color Balance", srcImg);
         render(); refreshPathBar();
         logConsole(`Balance de color: R×${rMult.toFixed(3)} G×${gMult.toFixed(3)} B×${bMult.toFixed(3)} Sat×${satMult.toFixed(2)}${doScnr ? ` + SCNR(${(scnrAmt*100).toFixed(0)}%)` : ""}`, "info");
       } catch (err) {
@@ -3446,8 +3487,7 @@
           b[i] = Math.max(0, Math.min(1, luma + (bv - luma) * localBoost));
         }
 
-        state.activeImage = img;
-        state.activeImage.hasTransforms = true;
+        commitActiveImage(img, "Saturation", srcImg);
         render();
         refreshPathBar();
         logConsole(`Saturación ajustada (factor ${boost.toFixed(2)})`, "info");
@@ -3611,15 +3651,8 @@
           }
         }
 
-        // Reemplazar la imagen activa con la composición
-        state.activeImage = {
-          ch: [outR, outG, outB],
-          w: w,
-          h: h,
-          nc: 3,
-          isColor: true,
-          hasTransforms: true
-        };
+        // Reemplazar la imagen activa con la composición (hereda wcs/historial de la capa base).
+        commitActiveImage({ ch: [outR, outG, outB], w: w, h: h, nc: 3, isColor: true }, "Blend", img1);
 
         render();
         drawHistogram();
@@ -3779,9 +3812,8 @@
       return;
     }
     updateBigApply();
-    if (state.activeWorkflowKey && !state.viewingPrevious) {
-      state.workflowImages[state.activeWorkflowKey] = state.activeImage;
-    }
+    // La persistencia en workflowImages ya NO ocurre aquí (era un efecto secundario frágil):
+    // ahora se hace explícitamente en commitActiveImage() al confirmar cada operación.
 
     // Mostrar/ocultar el botón de ver gradiente
     if (el("btnToolViewGradient")) {
