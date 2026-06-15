@@ -9,8 +9,16 @@
   
   <link rel="stylesheet" href="index.css?v=1.2">
   <link rel="stylesheet" href="support.css">
+
+  <!-- REDISEÑO-FASE1B: fuentes del cockpit (Space Grotesk UI + JetBrains Mono datos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+    /* REDISEÑO-FASE1B: baja ~1 punto el tamaño base de fuentes (solo en esta página) */
+    html { font-size: 15px; }
+
     /* Estilos específicos de PI Workflow */
     .piw-path-bar {
       display: flex;
@@ -29,7 +37,7 @@
       font-family: var(--font-sans);
       font-size: 0.7rem;
       padding: 4px 10px;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -85,9 +93,31 @@
       color: var(--gold-primary);
     }
     .piw-container {
-      padding-top: 110px;
-      padding-bottom: 50px;
-      min-height: calc(100vh - 120px);
+      padding-top: 86px;
+      padding-bottom: 14px;
+      padding-left: 22px;
+      padding-right: 22px;
+      max-width: 1760px;
+      min-height: calc(100vh - 100px);
+      /* REDISEÑO-FASE1B: paleta cálida scoped al cockpit (NO toca el :root global del sitio) */
+      --piw-panel: #1a1815;
+      --piw-panel-border: #2a2723;
+      --piw-radius: 16px;
+      background: radial-gradient(140% 120% at 50% -10%, #16140f 0%, #100f0d 55%, #0c0b0a 100%);
+      /* Fuentes scoped: UI en Space Grotesk, datos técnicos en JetBrains Mono */
+      --font-sans: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-display: 'Space Grotesk', 'Inter', sans-serif;
+      --piw-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    /* Datos técnicos en monoespaciada (consola, slots, lecturas, valores, path) */
+    .piw-container .piw-console,
+    .piw-container .piw-console *,
+    .piw-container .piw-slot-btn,
+    .piw-container .piw-value,
+    .piw-container .piw-readout-lbl,
+    .piw-container .piw-slots-label,
+    .piw-container .piw-path-btn {
+      font-family: var(--piw-mono, 'JetBrains Mono', monospace);
     }
 
     .piw-grid {
@@ -98,18 +128,58 @@
     }
 
     @media (min-width: 1100px) {
+      /* REDISEÑO-FASE1-BEGIN: imagen protagonista a alto completo */
       .piw-grid {
-        grid-template-columns: 310px 1fr;
+        grid-template-columns: 230px 1fr;
+        height: calc(100vh - 100px);
+        align-items: stretch;
       }
+      /* Sidebar y panel derecho llenan la altura; el cockpit no hace scroll de página */
+      .piw-grid > .piw-card,
+      .piw-grid > .piw-preview-panel {
+        min-height: 0;
+        height: 100%;
+      }
+      aside.piw-card {
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gold-border) transparent;
+      }
+      aside.piw-card::-webkit-scrollbar {
+        width: 8px;
+      }
+      aside.piw-card::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      aside.piw-card::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 8px;
+      }
+      aside.piw-card::-webkit-scrollbar-thumb:hover {
+        background: var(--gold-primary);
+      }
+      /* El visor crece para ocupar el alto disponible (sin aspect-ratio fijo) */
+      .piw-viewport-card {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .piw-viewport-card .piw-canvas-container {
+        aspect-ratio: auto;
+        flex: 1;
+        min-height: 0;
+      }
+      /* REDISEÑO-FASE1-END */
     }
 
     /* Tarjetas y Paneles */
     .piw-card {
-      background: #070709;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
+      background: var(--piw-panel, #1a1815);
+      border: 1px solid var(--piw-panel-border, #2a2723);
+      border-radius: var(--piw-radius, 16px);
       padding: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
       position: relative;
     }
 
@@ -117,11 +187,12 @@
     .piw-tabs-nav {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      border-bottom: 1px solid var(--border-color);
+      gap: 2px;
       margin-bottom: 20px;
-      background: #020203;
-      border-radius: 4px;
-      padding: 3px;
+      background: var(--bg-color, #100f0d);
+      border: 1px solid var(--piw-panel-border, #2a2723);
+      border-radius: 11px;
+      padding: 4px;
     }
 
     .piw-tab-btn {
@@ -133,9 +204,9 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 10px 4px;
+      padding: 9px 4px;
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: 8px;
       transition: var(--transition-smooth);
       text-align: center;
     }
@@ -146,10 +217,9 @@
     }
 
     .piw-tab-btn.active {
-      color: var(--gold-primary);
-      background: var(--gold-dark);
-      box-shadow: inset 0 0 0 1px var(--gold-border);
-      font-weight: 600;
+      color: #1c1709;
+      background: var(--gold-primary);
+      font-weight: 700;
     }
 
     .piw-tab-content {
@@ -205,7 +275,7 @@
       justify-content: space-between;
       background: #020202;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 6px 12px;
       font-size: 0.8rem;
       cursor: pointer;
@@ -282,9 +352,9 @@
       width: 100%;
       -webkit-appearance: none;
       appearance: none;
-      height: 4px;
+      height: 3px;
       border-radius: 2px;
-      background: var(--border-color);
+      background: #34302b;
       outline: none;
       margin: 8px 0;
     }
@@ -292,17 +362,27 @@
     .piw-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       background: var(--gold-primary);
       cursor: pointer;
-      box-shadow: 0 0 6px var(--gold-glow);
-      transition: transform 0.1s;
+      box-shadow: 0 0 0 3px rgba(207, 171, 74, 0.18);
+      transition: box-shadow 0.15s;
     }
 
     .piw-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
+      box-shadow: 0 0 0 4px rgba(207, 171, 74, 0.28);
+    }
+
+    .piw-slider::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border: none;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(207, 171, 74, 0.18);
     }
 
     /* Botones de Acción */
@@ -310,7 +390,7 @@
       width: 100%;
       background: transparent;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 10px 14px;
       font-size: 0.76rem;
       font-weight: 600;
@@ -352,7 +432,7 @@
     .piw-preview-panel {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
     }
 
     .piw-canvas-container {
@@ -360,8 +440,8 @@
       width: 100%;
       aspect-ratio: 16/10;
       background: #020202;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border: 1px solid var(--piw-panel-border, #2a2723);
+      border-radius: var(--piw-radius, 16px);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -419,7 +499,7 @@
       padding: 6px 18px;
       font-size: 0.8rem;
       font-weight: 700;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(207, 171, 74, 0.25);
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -447,12 +527,12 @@
       display: flex;
       gap: 6px;
       z-index: 15;
-      background: rgba(7, 7, 9, 0.85);
-      border: 1px solid var(--border-color);
+      background: rgba(16, 15, 13, 0.7);
+      border: 1px solid var(--piw-panel-border, #2a2723);
       padding: 4px;
-      border-radius: 4px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      border-radius: 11px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .piw-tool-btn {
@@ -461,7 +541,7 @@
       color: var(--text-secondary);
       font-size: 0.75rem;
       padding: 4px 8px;
-      border-radius: 3px;
+      border-radius: 7px;
       cursor: pointer;
       font-weight: 500;
       transition: var(--transition-smooth);
@@ -516,12 +596,12 @@
     .piw-slots-container {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
-      background: #070709;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 12px;
-      margin-bottom: 10px;
+      gap: 10px;
+      background: var(--piw-panel, #1a1815);
+      border: 1px solid var(--piw-panel-border, #2a2723);
+      border-radius: var(--piw-radius, 16px);
+      padding: 10px 12px;
+      margin-bottom: 0;
     }
     @media (min-width: 600px) {
       .piw-slots-container {
@@ -540,17 +620,17 @@
     .piw-slots-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     .piw-slot-btn {
-      aspect-ratio: 1;
-      background: #020202;
-      border: 1px solid var(--border-color);
-      border-radius: 3px;
+      height: 26px;
+      background: #100f0d;
+      border: 1px solid #2c2823;
+      border-radius: 8px;
       color: var(--text-muted);
-      font-family: monospace;
-      font-size: 0.82rem;
+      font-family: var(--piw-mono, monospace);
+      font-size: 0.7rem;
       cursor: pointer;
       transition: var(--transition-smooth);
       position: relative;
@@ -572,8 +652,8 @@
     }
 
     .piw-slot-btn.active-slot {
-      box-shadow: 0 0 8px var(--gold-glow);
-      border-color: var(--gold-light);
+      box-shadow: inset 0 0 0 1.5px var(--gold-primary);
+      border-color: var(--gold-primary);
     }
 
     .piw-slot-btn::after {
@@ -608,7 +688,7 @@
     .piw-console {
       background: #020202;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 14px;
       font-family: monospace;
       font-size: 0.72rem;
@@ -694,7 +774,7 @@
       border: 1px solid var(--border-color);
       color: var(--text-primary);
       padding: 10px;
-      border-radius: 4px;
+      border-radius: 8px;
       font-family: inherit;
       font-size: 0.8rem;
       outline: none;
@@ -726,7 +806,7 @@
     .piw-mix-layer {
       border: 1px solid var(--border-color);
       background: #020202;
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 10px;
       margin-bottom: 10px;
     }
@@ -752,7 +832,7 @@
       height: 60px;
       background: #020202;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       margin-top: 10px;
     }
 
@@ -770,7 +850,7 @@
     .piw-subcard {
       background: #0d0d10;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 12px;
       margin-bottom: 10px;
     }
@@ -793,7 +873,7 @@
       gap: 12px;
       background: #020202;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 10px 14px;
       margin-bottom: 8px;
       cursor: pointer;
@@ -888,7 +968,7 @@
       margin-bottom: 10px;
       border: 1px solid var(--border-color);
       background: #020202;
-      border-radius: 4px;
+      border-radius: 8px;
     }
 
     #curvesCanvas {
@@ -939,7 +1019,7 @@
       grid-template-columns: repeat(3, 1fr);
       background: #020202;
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 3px;
       margin-bottom: 12px;
     }
@@ -2370,7 +2450,7 @@
         <!-- Barra de canales del flujo de trabajo (path buttons) -->
         <div class="piw-path-bar" id="piwPathBar" style="display:none;"></div>
 
-        <div class="piw-card" style="padding: 10px; width: 100%;">
+        <div class="piw-card piw-viewport-card" style="padding: 10px; width: 100%;">
           <div class="piw-canvas-container" id="canvasContainer">
             <div class="piw-loader" id="piwLoader" style="display:none;">
               <div class="spinner"></div>
