@@ -18,6 +18,29 @@
 
     if (!hamburgerBtn || !navMenu) return;
 
+    // Resaltado de la seccion actual por URL. El menu se genera identico en todas las paginas
+    // (tools/sync_nav.py) sin la clase `active` incrustada; aqui se marca el enlace que coincide
+    // con la pagina actual y todos sus toggles ancestros.
+    (function highlightActive() {
+      var current = (location.pathname.split('/').pop() || 'index.html');
+      var links = navMenu.querySelectorAll('a[href]');
+      links.forEach(function(link) {
+        var href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        var file = href.split('/').pop().split('?')[0].split('#')[0];
+        if (file !== current) return;
+        link.classList.add('active');
+        var el = link.parentElement;
+        while (el && el !== navMenu) {
+          if (el.classList && (el.classList.contains('dropdown') || el.classList.contains('dropdown-submenu'))) {
+            var toggle = el.querySelector(':scope > a.dropdown-toggle');
+            if (toggle) toggle.classList.add('active');
+          }
+          el = el.parentElement;
+        }
+      });
+    })();
+
     function isMobileView() {
       return window.innerWidth <= MOBILE_BREAKPOINT;
     }
