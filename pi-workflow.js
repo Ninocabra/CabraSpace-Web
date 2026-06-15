@@ -548,7 +548,9 @@
   // --- PLATE SOLVING CON ASTROMETRY.NET ---
   const ASTROMETRY_API_KEY = "coqpscljnloiluyi";
   // CF-WORKER-BEGIN
-  let ASTROMETRY_PROXY_URL = "https://astrometry-proxy.vercel.app";
+  // Proxy CORS para Astrometry.net en producción (Vercel Edge Function).
+  // Código y despliegue: vercel-proxy/. Vacío = en producción muestra el mensaje guía.
+  let ASTROMETRY_PROXY_URL = "https://astronomy-proxy.vercel.app";
   // CF-WORKER-END
 
   // Redirige a través del proxy CORS local (puerto 8010) para gestionar OPTIONS y subidas de archivos
@@ -565,8 +567,8 @@
         return fetch(proxyUrl, options);
       } else {
         const errMsg = document.documentElement.lang === "es"
-          ? "El plate solve en producción requiere configurar ASTROMETRY_PROXY_URL (Cloudflare Worker). Consulta cloudflare-worker/README.md."
-          : "Plate solving in production requires configuring ASTROMETRY_PROXY_URL (Cloudflare Worker). Refer to cloudflare-worker/README.md.";
+          ? "El plate solve en producción requiere configurar ASTROMETRY_PROXY_URL (proxy Vercel). Consulta vercel-proxy/README.md."
+          : "Plate solving in production requires configuring ASTROMETRY_PROXY_URL (Vercel proxy). Refer to vercel-proxy/README.md.";
         logConsole(errMsg, "error");
         return Promise.reject(new Error(errMsg));
       }
