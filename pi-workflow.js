@@ -40,6 +40,9 @@
     imageSlots: new Array(8).fill(null),
     maskSlots: new Array(8).fill(null),
     activeSlotIdx: -1,
+    // Tras "Comparar Métodos" de Color Calibration: permite que "Aplicar Calibración"
+    // esté activo aunque no haya card seleccionada, para confirmar el slot elegido.
+    calibCompareReady: false,
 
     // Visualización
     zoom: 1,
@@ -154,6 +157,31 @@
     if (state.activeWorkflowKey) {
       state.workflowImages[state.activeWorkflowKey] = img;
     }
+    return img;
+  }
+
+  // Previsualización NO destructiva: aplica un resultado a la imagen activa para MOSTRARLO,
+  // pero NO lo persiste en workflowImages ni cambia stepInputImage (la Imagen Inicial). El
+  // commit real lo hace el botón "Aplicar" de la ventana de imagen (btnBigApply → commitPreview).
+  // Mantiene la misma forma de objeto que commitActiveImage (wcs heredado, stages acumulado)
+  // para que, al confirmar, el resultado quede consistente.
+  function previewActiveImage(result, sourceImg, stageLabel) {
+    const src = sourceImg || state.stepInputImage || state.activeImage;
+    const img = {
+      ch: result.ch, w: result.w, h: result.h, nc: result.nc, isColor: result.isColor,
+      hasTransforms: true
+    };
+    if (result.wcs) {
+      img.wcs = result.wcs;
+    } else if (src && src.wcs) {
+      img.wcs = { ...src.wcs };
+    }
+    const stages = (src && Array.isArray(src.stages)) ? src.stages.slice() : [];
+    if (stageLabel) {
+      stages.push(stageLabel);
+    }
+    img.stages = stages;
+    state.activeImage = img;
     return img;
   }
   // IMAGE-MODEL-END
@@ -1186,6 +1214,34 @@
     return img;
   }
 
+  // GRADIENT-COMPUTE-BEGIN
+  // Calcula la corrección de gradiente para un algoritmo EXPLÍCITO sobre srcImg, sin depender
+  // del valor actual del desplegable (lo necesita "Comparar" para iterar los 4 algoritmos).
+  // Devuelve { corrected, bgCh } (bgCh = mapa de fondo si el algoritmo lo produce, si no null).
+  async function computeGradient(algo, srcImg) {
+    if (algo === "graxpert_ia") {
+      const params = { correction: el("selGraXpertCorrection").value, smoothing: parseFloat(el("sldGraXpertSmooth").value) };
+      const res = await window.GraXpert.applyGraXpertBG(srcImg, params);
+      return { corrected: { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs }, bgCh: res.bgCh || null };
+    }
+    if (algo === "dbe") {
+      const density = parseInt(el("sldAdbePaths").value, 10);
+      const params = { targetW: 250, gridCols: density, gridRows: density, smoothness: parseFloat(el("sldAdbeSmooth").value), correction: el("selAdbeCorrection").value };
+      const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(srcImg, params);
+      return { corrected: { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs }, bgCh: res.bgCh || null };
+    }
+    if (algo === "abe") {
+      const degree = parseInt(el("sldAbeDegree").value, 10);
+      const fitDegree = degree <= 2 ? 1 : 2;
+      return { corrected: applyABE(srcImg, fitDegree, el("selAbeCorrection").value, el("chkAbeNormalize").checked), bgCh: null };
+    }
+    if (algo === "graxpert") {
+      return { corrected: applyGraXpert(srcImg, el("selGraXpertCorrection").value, parseFloat(el("sldGraXpertSmooth").value)), bgCh: null };
+    }
+    return { corrected: srcImg, bgCh: null };
+  }
+  // GRADIENT-COMPUTE-END
+
   // Bind de sliders dinámicos del gradiente
   const gradSliders = [
     { s: "sldAdbePaths", v: "valAdbePaths", p: 0 },
@@ -1214,55 +1270,28 @@
       
       setTimeout(async () => {
         try {
+          // PROBAR-GRADIENTE-BEGIN
+          // "Probar Gradiente": aplica el algoritmo seleccionado a la Imagen Inicial
+          // (state.stepInputImage) y muestra el resultado como PREVIEW no destructivo.
+          // No persiste en el flujo; el commit lo hace el botón "Aplicar Gradiente"
+          // (btnBigApply). Cambiar de algoritmo siempre parte de la Imagen Inicial.
           const algo = el("selGradientAlgo").value;
-          let corrected;
           const srcImg = state.stepInputImage || state.activeImage;
-          if (algo === "graxpert_ia" || algo === "dbe") {
-            let params = {};
-            // GRAXPERT-AI-BEGIN
-            if (algo === "graxpert_ia") {
-              params = {
-                correction: el("selGraXpertCorrection").value,
-                smoothing: parseFloat(el("sldGraXpertSmooth").value)
-              };
-              const res = await window.GraXpert.applyGraXpertBG(srcImg, params);
-              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-              if (res.bgCh) {
-                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
-              }
-            }
-            // GRAXPERT-AI-END
-            else {
-              const density = parseInt(el("sldAdbePaths").value, 10);
-              params = {
-                targetW: 250,
-                gridCols: density,
-                gridRows: density,
-                smoothness: parseFloat(el("sldAdbeSmooth").value),
-                correction: el("selAdbeCorrection").value
-              };
-              // RBF-OPT-BEGIN
-              const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(srcImg, params);
-              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-              if (res.bgCh) {
-                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
-              }
-              // RBF-OPT-END
-            }
-          } else {
-            corrected = applyGradientCorrection(srcImg);
+          const { corrected, bgCh } = await computeGradient(algo, srcImg);
+          if (bgCh) {
+            state.subtractedGradient = { ch: bgCh, w: corrected.w, h: corrected.h, nc: corrected.nc, isColor: corrected.isColor };
           }
-          
-          commitActiveImage(corrected, "Background Extraction", srcImg);
+          previewActiveImage(corrected, srcImg, "Background Extraction");
           // Activar estirado automático de pantalla (AutoSTF) para que el resultado lineal no se vea negro
           state.screenStretchMode = true;
           const stfBtn = el("btnToolAutoSTF");
           if (stfBtn) stfBtn.classList.add("active");
-          
+
           hideLoader();
           render();
           drawHistogram();
-          logConsole(lang === "es" ? "Vista previa de gradiente calculada (AutoSTF habilitado)" : "Gradient preview calculated (AutoSTF enabled)", "info");
+          logConsole(lang === "es" ? "Vista previa de gradiente (Probar). Pulsa 'Aplicar Gradiente' para confirmar." : "Gradient preview (Test). Press 'Apply Gradient' to commit.", "info");
+          // PROBAR-GRADIENTE-END
         } catch (e) {
           hideLoader();
           logConsole(`Error: ${e.message}`, "err");
@@ -1271,76 +1300,48 @@
     });
   }
 
+  // COMPARE-SLOTS-BEGIN
+  // "Comparar": corre los 4 algoritmos con sus argumentos actuales sobre la Imagen Inicial
+  // y guarda cada resultado en un Slot de Memoria (1-4) para poder compararlos. No commitea.
   if (el("btnCompareGradient")) {
     el("btnCompareGradient").addEventListener("click", () => {
       if (!state.activeImage) return;
       const lang = document.documentElement.lang || "es";
-      
-      if (state.splitViewMode) {
-        // Desactivar cortinilla
-        state.splitViewMode = false;
-        el("btnCompareGradient").classList.remove("active");
-        render();
-        return;
-      }
+      showLoader(lang === "es" ? "Comparando algoritmos de gradiente..." : "Comparing gradient algorithms...");
 
-      showLoader(lang === "es" ? "Generando modelo de gradiente..." : "Generating gradient model...");
-      
       setTimeout(async () => {
         try {
-          const algo = el("selGradientAlgo").value;
-          let corrected;
           const srcImg = state.stepInputImage || state.activeImage;
-          if (algo === "graxpert_ia" || algo === "dbe") {
-            let params = {};
-            // GRAXPERT-AI-BEGIN
-            if (algo === "graxpert_ia") {
-              params = {
-                correction: el("selGraXpertCorrection").value,
-                smoothing: parseFloat(el("sldGraXpertSmooth").value)
-              };
-              const res = await window.GraXpert.applyGraXpertBG(srcImg, params);
-              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-              if (res.bgCh) {
-                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
-              }
+          const algos = [
+            { id: "graxpert_ia", name: "GraXpert IA" },
+            { id: "graxpert",    name: "GraXpert (Sim)" },
+            { id: "abe",         name: "ABE" },
+            { id: "dbe",         name: "AutoDBE" }
+          ];
+          for (let i = 0; i < algos.length; i++) {
+            const { corrected } = await computeGradient(algos[i].id, srcImg);
+            state.imageSlots[i] = cloneImage({
+              ch: corrected.ch, w: corrected.w, h: corrected.h, nc: corrected.nc,
+              isColor: corrected.isColor, wcs: corrected.wcs || (srcImg && srcImg.wcs)
+            });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) {
+              slotBtn.classList.add("filled");
+              slotBtn.title = (lang === "es" ? "Gradiente: " : "Gradient: ") + algos[i].name;
             }
-            // GRAXPERT-AI-END
-            else {
-              const density = parseInt(el("sldAdbePaths").value, 10);
-              params = {
-                targetW: 250,
-                gridCols: density,
-                gridRows: density,
-                smoothness: parseFloat(el("sldAdbeSmooth").value),
-                correction: el("selAdbeCorrection").value
-              };
-              // RBF-OPT-BEGIN
-              const res = window.BackgroundExtraction.applyOptimizedBackgroundExtraction(srcImg, params);
-              corrected = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor, wcs: srcImg.wcs };
-              if (res.bgCh) {
-                state.subtractedGradient = { ch: res.bgCh, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
-              }
-              // RBF-OPT-END
-            }
-          } else {
-            corrected = applyGradientCorrection(srcImg);
+            logConsole(`Slot ${i + 1} ← ${algos[i].name}`, "info");
           }
-          
-          // Entrar en modo cortinilla comparando imagen activa original contra la corregida
-          state.splitCompareImage = corrected;
-          state.splitViewMode = true;
-          state.splitPercent = 0.5;
-          el("btnCompareGradient").classList.add("active");
-          
-          // Activar estirado automático de pantalla (AutoSTF)
+          updateMixSourceOptions();
+
+          // Estirado de pantalla para que los resultados lineales no se vean negros al cargarlos
           state.screenStretchMode = true;
           const stfBtn = el("btnToolAutoSTF");
           if (stfBtn) stfBtn.classList.add("active");
 
           hideLoader();
-          render();
-          logConsole(lang === "es" ? "Comparación del modelo de gradiente activada (AutoSTF habilitado)" : "Gradient model comparison activated (AutoSTF enabled)", "info");
+          logConsole(lang === "es"
+            ? "Comparación lista: 4 algoritmos guardados en Slots 1-4. Pulsa un slot para verlo."
+            : "Comparison ready: 4 algorithms saved to Slots 1-4. Click a slot to view it.", "ok");
         } catch (e) {
           hideLoader();
           logConsole(`Error: ${e.message}`, "err");
@@ -1348,6 +1349,7 @@
       }, 50);
     });
   }
+  // COMPARE-SLOTS-END
 
   if (el("btnGradientApplyAll")) {
     el("btnGradientApplyAll").addEventListener("click", () => {
@@ -1938,7 +1940,8 @@
     state.activeImage = img;
     state.originalImage = cloneImage(img);
     state.stepInputImage = cloneImage(img);
-    
+    state.calibCompareReady = false;
+
     // Reset A/B comparison
     state.previousImage = null;
     state._lastImgRef = img;
@@ -1995,6 +1998,8 @@
         cardOT.classList.add("disabled");
       }
     }
+    const btnCmpColor = el("btnCompareColor");
+    if (btnCmpColor) btnCmpColor.disabled = !img.isColor;
     el("btnApplyDecon").disabled = false;
     el("btnApplyStretch").disabled = false;
     el("btnApplyScnr").disabled = !img.isColor;
@@ -2028,33 +2033,118 @@
   // --- OPERACIONES DE PRE-PROCESADO (TAB 0) ---
 
   // Auto Linear Fit helper function
+  // CALIB-COMPUTE-BEGIN
+  // Funciones puras por método de calibración (devuelven la imagen corregida) para reusar
+  // tanto en el preview de cada card como en "Comparar Métodos", sin duplicar la matemática.
+  function computeLinearFit(srcImg) {
+    const img = cloneImage(srcImg);
+    const n = img.w * img.h;
+    const refCh = img.ch[1];
+    const refStats = AutoGHS.medianMAD(refCh, n, 200000);
+    for (let c of [0, 2]) {
+      const tgtCh = img.ch[c];
+      const tgtStats = AutoGHS.medianMAD(tgtCh, n, 200000);
+      if (tgtStats.sigma > 1e-6) {
+        const scale = refStats.sigma / tgtStats.sigma;
+        for (let i = 0; i < n; ++i) {
+          const val = (tgtCh[i] - tgtStats.median) * scale + refStats.median;
+          tgtCh[i] = val < 0 ? 0 : (val > 1 ? 1 : val);
+        }
+      }
+    }
+    return img;
+  }
+
+  function computeOptimalTransport(srcImg) {
+    const img = cloneImage(srcImg);
+    const n = img.w * img.h;
+    const refCh = img.ch[1];
+    const numBins = 65536;
+    const refHist = new Float64Array(numBins);
+    for (let i = 0; i < n; i++) {
+      const bin = Math.min(numBins - 1, Math.max(0, Math.floor(refCh[i] * (numBins - 1))));
+      refHist[bin]++;
+    }
+    const refCDF = new Float64Array(numBins);
+    refCDF[0] = refHist[0] / n;
+    for (let b = 1; b < numBins; b++) refCDF[b] = refCDF[b - 1] + refHist[b] / n;
+    for (const c of [0, 2]) {
+      const tgtCh = img.ch[c];
+      const tgtHist = new Float64Array(numBins);
+      for (let i = 0; i < n; i++) {
+        const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
+        tgtHist[bin]++;
+      }
+      const tgtCDF = new Float64Array(numBins);
+      tgtCDF[0] = tgtHist[0] / n;
+      for (let b = 1; b < numBins; b++) tgtCDF[b] = tgtCDF[b - 1] + tgtHist[b] / n;
+      const lut = new Float32Array(numBins);
+      let refIdx = 0;
+      for (let b = 0; b < numBins; b++) {
+        while (refIdx < numBins - 1 && refCDF[refIdx] < tgtCDF[b]) refIdx++;
+        if (refIdx > 0 && refCDF[refIdx] > tgtCDF[b]) {
+          const d0 = tgtCDF[b] - refCDF[refIdx - 1];
+          const d1 = refCDF[refIdx] - tgtCDF[b];
+          const frac = d0 / (d0 + d1 + 1e-12);
+          lut[b] = ((refIdx - 1) + frac) / (numBins - 1);
+        } else {
+          lut[b] = refIdx / (numBins - 1);
+        }
+      }
+      for (let i = 0; i < n; i++) {
+        const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
+        tgtCh[i] = lut[bin];
+      }
+    }
+    return img;
+  }
+
+  function computeBackgroundNeutralizationCalib(srcImg) {
+    const { bgVals } = window.BackgroundExtraction.findBackgroundSetiAstro(srcImg);
+    return { img: window.BackgroundExtraction.applyBackgroundNeutralization(srcImg, bgVals), bgVals };
+  }
+
+  // SPCC: consulta Gaia DR3 (VizieR) + calibración en Pyodide. Requiere WCS (plate-solved).
+  async function computeSPCC(srcImg, wcsData) {
+    const radiusArcmin = wcsData.radius * 60;
+    const url = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/355/gaiadr3&-c=${wcsData.ra}+${wcsData.dec}&-c.r=${radiusArcmin}&-out=RA_ICRS&-out=DE_ICRS&-out=Gmag&-out=BPmag&-out=RPmag&-out.max=250`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+    const tsvText = await response.text();
+    const stars = [];
+    const lines = tsvText.split('\n');
+    let dataStarted = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      if (line.startsWith('----') || line.startsWith('====')) { dataStarted = true; continue; }
+      if (!dataStarted || line.startsWith('#')) continue;
+      const parts = line.split('\t');
+      if (parts.length >= 5) {
+        const s_ra = parseFloat(parts[0]), s_dec = parseFloat(parts[1]), g = parseFloat(parts[2]), bp = parseFloat(parts[3]), rp = parseFloat(parts[4]);
+        if (!isNaN(s_ra) && !isNaN(s_dec) && !isNaN(g) && !isNaN(bp) && !isNaN(rp)) stars.push({ ra: s_ra, dec: s_dec, g, bp, rp });
+      }
+    }
+    if (stars.length === 0) throw new Error("No se encontraron estrellas Gaia DR3 en la zona");
+    return await window.SASProPyodide.processImageRaw(srcImg, "spcc", {
+      catalogStars: stars,
+      wcsMeta: { ra: wcsData.ra, dec: wcsData.dec, pixscale: wcsData.pixscale, orientation: wcsData.orientation, parity: wcsData.parity }
+    });
+  }
+  // CALIB-COMPUTE-END
+
   function runLinearFit() {
     const srcImg = state.stepInputImage || state.activeImage;
     if (!srcImg || !srcImg.isColor) return;
     showLoader("Alineando canales (Linear Fit)...");
     setTimeout(() => {
       try {
-        const img = cloneImage(srcImg);
-        const n = img.w * img.h;
-        const refCh = img.ch[1];
-        const refStats = AutoGHS.medianMAD(refCh, n, 200000);
-        for (let c of [0, 2]) {
-          const tgtCh = img.ch[c];
-          const tgtStats = AutoGHS.medianMAD(tgtCh, n, 200000);
-          if (tgtStats.sigma > 1e-6) {
-            const scale = refStats.sigma / tgtStats.sigma;
-            for (let i = 0; i < n; ++i) {
-              const val = (tgtCh[i] - tgtStats.median) * scale + refStats.median;
-              tgtCh[i] = val < 0 ? 0 : (val > 1 ? 1 : val);
-            }
-            logConsole(`Canal ${c === 0 ? "Rojo" : "Azul"} alineado: factor ${scale.toFixed(4)}, shift ${(refStats.median - tgtStats.median * scale).toFixed(4)}`, "info");
-          }
-        }
-        commitActiveImage(img, "Linear Fit", srcImg);
+        const img = computeLinearFit(srcImg);
+        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
+        previewActiveImage(img, srcImg, "Linear Fit");
         render();
         drawHistogram();
-        refreshPathBar();
-        logConsole("Alineación de canales completada", "info");
+        logConsole("Vista previa Linear Fit (Probar). Pulsa 'Aplicar Calibración' para confirmar.", "info");
       } catch (err) {
         logConsole(`Error en Linear Fit: ${err.message}`, "err");
       } finally {
@@ -2071,76 +2161,12 @@
     showLoader(lang === "es" ? "Aplicando Optimal Transport (Wasserstein 1D)..." : "Applying Optimal Transport (1D Wasserstein)...");
     setTimeout(() => {
       try {
-        const img = cloneImage(srcImg);
-        const n = img.w * img.h;
-        
-        // Referencia: canal verde (índice 1)
-        const refCh = img.ch[1];
-        
-        // Construir CDF del canal de referencia
-        const numBins = 65536;
-        const refHist = new Float64Array(numBins);
-        for (let i = 0; i < n; i++) {
-          const bin = Math.min(numBins - 1, Math.max(0, Math.floor(refCh[i] * (numBins - 1))));
-          refHist[bin]++;
-        }
-        // Normalizar a CDF
-        const refCDF = new Float64Array(numBins);
-        refCDF[0] = refHist[0] / n;
-        for (let b = 1; b < numBins; b++) {
-          refCDF[b] = refCDF[b - 1] + refHist[b] / n;
-        }
-        
-        // Para cada canal objetivo (R=0, B=2), hacer histogram matching vía transporte 1D
-        for (const c of [0, 2]) {
-          const tgtCh = img.ch[c];
-          
-          // Construir CDF del canal objetivo
-          const tgtHist = new Float64Array(numBins);
-          for (let i = 0; i < n; i++) {
-            const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
-            tgtHist[bin]++;
-          }
-          const tgtCDF = new Float64Array(numBins);
-          tgtCDF[0] = tgtHist[0] / n;
-          for (let b = 1; b < numBins; b++) {
-            tgtCDF[b] = tgtCDF[b - 1] + tgtHist[b] / n;
-          }
-          
-          // Construir LUT de transporte: para cada bin del target, encontrar el bin del ref con CDF más cercana
-          const lut = new Float32Array(numBins);
-          let refIdx = 0;
-          for (let b = 0; b < numBins; b++) {
-            while (refIdx < numBins - 1 && refCDF[refIdx] < tgtCDF[b]) {
-              refIdx++;
-            }
-            // Interpolar para mayor precisión
-            if (refIdx > 0 && refCDF[refIdx] > tgtCDF[b]) {
-              const d0 = tgtCDF[b] - refCDF[refIdx - 1];
-              const d1 = refCDF[refIdx] - tgtCDF[b];
-              const frac = d0 / (d0 + d1 + 1e-12);
-              lut[b] = ((refIdx - 1) + frac) / (numBins - 1);
-            } else {
-              lut[b] = refIdx / (numBins - 1);
-            }
-          }
-          
-          // Aplicar LUT
-          for (let i = 0; i < n; i++) {
-            const bin = Math.min(numBins - 1, Math.max(0, Math.floor(tgtCh[i] * (numBins - 1))));
-            tgtCh[i] = lut[bin];
-          }
-          
-          logConsole(lang === "es" 
-            ? `Canal ${c === 0 ? "Rojo" : "Azul"} alineado por transporte óptimo` 
-            : `Channel ${c === 0 ? "Red" : "Blue"} aligned via optimal transport`, "info");
-        }
-        
-        commitActiveImage(img, "Optimal Transport", srcImg);
+        const img = computeOptimalTransport(srcImg);
+        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
+        previewActiveImage(img, srcImg, "Optimal Transport");
         render();
         drawHistogram();
-        refreshPathBar();
-        logConsole(lang === "es" ? "Optimal Transport (Wasserstein 1D) completado" : "Optimal Transport (1D Wasserstein) completed", "info");
+        logConsole(lang === "es" ? "Vista previa Optimal Transport (Probar). Pulsa 'Aplicar Calibración' para confirmar." : "Optimal Transport preview (Test). Press 'Apply Calibration' to commit.", "info");
       } catch (err) {
         logConsole(`Error en Optimal Transport: ${err.message}`, "err");
       } finally {
@@ -2159,14 +2185,13 @@
     setTimeout(() => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        const { bgVals } = window.BackgroundExtraction.findBackgroundSetiAstro(srcImg);
-        const res = window.BackgroundExtraction.applyBackgroundNeutralization(srcImg, bgVals);
-        
-        commitActiveImage(res, "Background Neutralization", srcImg);
+        const { img: res, bgVals } = computeBackgroundNeutralizationCalib(srcImg);
+
+        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
+        previewActiveImage(res, srcImg, "Background Neutralization");
 
         render();
         drawHistogram();
-        refreshPathBar();
 
         const bgStr = Array.from(bgVals).map(v => v.toFixed(4)).join(", ");
         logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
@@ -2198,73 +2223,14 @@
     showLoader(lang === "es" ? "Consultando catálogo Gaia DR3 en VizieR..." : "Querying Gaia DR3 catalog on VizieR...");
     
     try {
-      const ra = wcsData.ra;
-      const dec = wcsData.dec;
-      const radiusArcmin = wcsData.radius * 60; // radius in arcminutes
-      
-      // Consultar VizieR
-      const url = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/355/gaiadr3&-c=${ra}+${dec}&-c.r=${radiusArcmin}&-out=RA_ICRS&-out=DE_ICRS&-out=Gmag&-out=BPmag&-out=RPmag&-out.max=250`;
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-      const tsvText = await response.text();
-      
-      // Parsear
-      const stars = [];
-      const lines = tsvText.split('\n');
-      let dataStarted = false;
-      
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        if (line.startsWith('----') || line.startsWith('====')) {
-          dataStarted = true;
-          continue;
-        }
-        if (!dataStarted) continue;
-        if (line.startsWith('#')) continue;
-        
-        const parts = line.split('\t');
-        if (parts.length >= 5) {
-          const s_ra = parseFloat(parts[0]);
-          const s_dec = parseFloat(parts[1]);
-          const g = parseFloat(parts[2]);
-          const bp = parseFloat(parts[3]);
-          const rp = parseFloat(parts[4]);
-          
-          if (!isNaN(s_ra) && !isNaN(s_dec) && !isNaN(g) && !isNaN(bp) && !isNaN(rp)) {
-            stars.push({ ra: s_ra, dec: s_dec, g, bp, rp });
-          }
-        }
-      }
-      
-      if (stars.length === 0) {
-        throw new Error(lang === "es" ? "No se encontraron estrellas del catálogo Gaia DR3 en esta zona." : "No Gaia DR3 catalog stars found in this region.");
-      }
-      
-      logConsole(lang === "es" ? `Descargadas ${stars.length} estrellas de Gaia DR3. Ejecutando fotometría y calibración en Pyodide...` : `Downloaded ${stars.length} Gaia DR3 stars. Running photometry and calibration in Pyodide...`, "info");
-      
-      showLoader(lang === "es" ? "Calculando calibración espectrofotométrica..." : "Calculating spectrophotometric calibration...");
-      
       const srcImg = state.stepInputImage || state.activeImage;
-      const res = await window.SASProPyodide.processImageRaw(srcImg, "spcc", {
-        catalogStars: stars,
-        wcsMeta: {
-          ra: wcsData.ra,
-          dec: wcsData.dec,
-          pixscale: wcsData.pixscale,
-          orientation: wcsData.orientation,
-          parity: wcsData.parity
-        }
-      });
-      
-      commitActiveImage(res, "SPCC", srcImg);
+      const res = await computeSPCC(srcImg, wcsData);
+
+      // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
+      previewActiveImage(res, srcImg, "SPCC");
 
       render();
       drawHistogram();
-      refreshPathBar();
 
       if (res.extra && res.extra.factors) {
         const k = res.extra.factors;
@@ -2350,10 +2316,76 @@
       const cSPCC = el("cardSPCC");
       if (cSPCC) cSPCC.classList.remove("active-cc");
       updateBigApply();
-      
+
       runOptimalTransport();
     });
   }
+
+  // CALIB-COMPARE-BEGIN
+  // "Comparar Métodos": corre los métodos de calibración sobre la Imagen Inicial y guarda
+  // cada resultado en un Slot de Memoria (1..N) para compararlos. No commitea.
+  // Los 3 locales (Linear Fit, Optimal Transport, Bkg. Neutralization) siempre; SPCC solo si
+  // la imagen está resuelta (plate-solved); si no, se omite con aviso.
+  if (el("btnCompareColor")) {
+    el("btnCompareColor").addEventListener("click", () => {
+      if (el("btnCompareColor").disabled || !state.activeImage || !state.activeImage.isColor) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Comparando métodos de calibración..." : "Comparing calibration methods...");
+
+      setTimeout(async () => {
+        try {
+          const srcImg = state.stepInputImage || state.activeImage;
+          const wcsData = state.wcs || srcImg.wcs;
+          const results = [
+            { name: "Linear Fit", img: computeLinearFit(srcImg) },
+            { name: "Optimal Transport", img: computeOptimalTransport(srcImg) },
+            { name: "Bkg. Neutralization", img: computeBackgroundNeutralizationCalib(srcImg).img }
+          ];
+          if (wcsData) {
+            try {
+              results.push({ name: "SPCC", img: await computeSPCC(srcImg, wcsData) });
+            } catch (e) {
+              logConsole((lang === "es" ? "SPCC omitido: " : "SPCC skipped: ") + e.message, "warn");
+            }
+          } else {
+            logConsole(lang === "es" ? "SPCC omitido: la imagen no está resuelta (Plate Solving)." : "SPCC skipped: image is not plate-solved.", "warn");
+          }
+
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            state.imageSlots[i] = cloneImage({
+              ch: r.img.ch, w: r.img.w, h: r.img.h, nc: r.img.nc,
+              isColor: r.img.isColor, wcs: r.img.wcs || (srcImg && srcImg.wcs)
+            });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) {
+              slotBtn.classList.add("filled");
+              slotBtn.title = (lang === "es" ? "Calibración: " : "Calibration: ") + r.name;
+            }
+            logConsole(`Slot ${i + 1} ← ${r.name}`, "info");
+          }
+          updateMixSourceOptions();
+
+          // Habilita "Aplicar Calibración" para poder confirmar el slot que se elija
+          state.calibCompareReady = true;
+          updateBigApply();
+
+          state.screenStretchMode = true;
+          const stfBtn = el("btnToolAutoSTF");
+          if (stfBtn) stfBtn.classList.add("active");
+
+          hideLoader();
+          logConsole(lang === "es"
+            ? `Comparación lista: ${results.length} métodos en Slots 1-${results.length}. Carga un slot y pulsa 'Aplicar Calibración'.`
+            : `Comparison ready: ${results.length} methods in Slots 1-${results.length}. Load a slot and press 'Apply Calibration'.`, "ok");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+  // CALIB-COMPARE-END
 
   // SCNR-PRE-BEGIN
   el("btnApplyScnrPre").addEventListener("click", () => {
@@ -4735,7 +4767,7 @@
 
   // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
   const mockButtons = [
-    "btnCompareColor", "btnComparePostNR",
+    "btnComparePostNR",
     "btnComparePostSharp",
     "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
   ];
@@ -5515,7 +5547,9 @@
       btnText = lang === "es" ? "Aplicar Gradiente" : "Apply Gradient";
     } else if (titleText.includes("calibration") || titleText.includes("calibración")) {
       const activeCard = activeSection.querySelector(".piw-action-card.active-cc");
-      if (activeCard) {
+      // Botón activo si hay un método previsualizado (card) o si se hizo "Comparar Métodos"
+      // (para poder cargar un slot y aplicarlo).
+      if (activeCard || state.calibCompareReady) {
         action = () => {
           commitPreview();
         };
