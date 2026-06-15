@@ -19,6 +19,17 @@
     /* REDISEÑO-FASE1B: baja ~1 punto el tamaño base de fuentes (solo en esta página) */
     html { font-size: 15px; }
 
+    /* REDISEÑO: grano de película vintage (overlay fijo, muy sutil) */
+    .piw-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.04;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
     /* Estilos específicos de PI Workflow */
     .piw-path-bar {
       display: flex;
@@ -437,6 +448,7 @@
 
     .piw-canvas-container {
       position: relative;
+      z-index: 100;
       width: 100%;
       aspect-ratio: 16/10;
       background: #020202;
@@ -1133,6 +1145,8 @@
 
   <!-- Main Content -->
   <main class="container piw-container">
+    <!-- REDISEÑO: grano vintage del cockpit (no cubre la imagen, ver z-index) -->
+    <div class="piw-grain" aria-hidden="true"></div>
     <div class="piw-grid">
       <!-- Barra lateral izquierda (Workflow Panel) -->
       <aside class="piw-card" style="padding: 16px;">
