@@ -62,6 +62,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## INDI Library
 
 ### SOFTWARE
+- **Modelo: Hotfix**
+  - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
 - **Modelo: Wanderer**
   - [Liberada la versión 2.2.2 de la biblioteca INDI](https://github.com/indilib/indi/releases/tag/v2.2.2) (2026-06-01)
 
@@ -110,6 +112,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: NightVis**
   - [NightVis: Pronóstico astronómico que te dice exactamente por qué esta noche es buena o mala](https://www.reddit.com/r/telescopes/comments/1tw7xg3/nightvis_astro_forecast_that_tells_you_exactly/) (2026-06-04)
+- **Modelo: Script**
+  - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
 - **Modelo: scripts**
   - [Elementos y scripts no descargados al actualizar PixInsight a la versión 1.9.4](https://stargazerslounge.com/topic/445730-what-items-or-scripts-are-not-downloaded-when-up-grading-pixinsight-to-latest-version-v194/) (2026-06-04)
 
@@ -145,6 +149,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Player One
 
 ### CAMERAS
+- **Modelo: Astrofotografía Solar**
+  - [Manual del Observador Solar de Mark Johnston: Detalles ardientes con Cámaras Player One](https://player-one-astronomy.com/%e3%80%8anasa-solar-system-ambassador-mark-johnstons-solar-observers-handbook-the-fiery-details-through-player-one-cameras%e3%80%8b/) (2026-06-12)
 - **Modelo: Player One Astronomy**
   - [Reseña de la cámara Player One Zeus: una opción destacada para astrofotógrafos](https://player-one-astronomy.com/player-one-astronomy-is-fast-becoming-a-top-choice-among-imagers-see-why-in-this-latest-review-featuring-our-zeus-mono-camera/) (2025-12-05)
 
@@ -157,6 +163,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Actualización del Takahashi Epsilon 160ED con el enfocador robótico ESATTO 3.5" LP](https://www.youtube.com/watch?v=xsQ3W9nTESk) (2026-01-07)
 - **Modelo: Eagle**
   - [Filippo y Zoltan discuten astrofotografía moderna y control remoto en AstroFest Europeo 2026](https://www.youtube.com/watch?v=0gWm3hn2HkU) (2026-02-09)
+- **Modelo: OUTPOST 3M**
+  - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
 - **Modelo: PL GSS**
   - [PL GSS debuta en SATShow 2026, Washington DC](https://www.youtube.com/watch?v=T4mLiczmSJg) (2026-03-27)
 - **Modelo: SESTO SENSO 3**
@@ -237,6 +245,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevas actualizaciones de equipamiento SVBONY con Arie Nouwen](https://www.youtube.com/watch?v=mE3kjkS2vi0) (2026-05-28)
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
+- **Modelo: Prime Day**
+  - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
 - **Modelo: SA207**
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
   - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
@@ -251,6 +261,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: COOLCAM SC571CC**
   - [COOLCAM SC571CC: Cámara enfriada económica para astrofotografía - Revisión de Pros y Contras](https://www.youtube.com/watch?v=_LEwLFKDZIE) (2026-06-01)
 - **Modelo: SC571CC**
+  - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
   - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
   - [Comparativa APS-C vs. Formato Cuadrado: ¿Cómo elegir entre Svbony SC571CC y SV605CC?](https://www.youtube.com/watch?v=G1-ojw_hRbc) (2026-05-21)
 - **Modelo: SV535**
@@ -258,6 +269,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV605CC**
   - [Clase magistral reeditada: aprovecha al máximo la cámara SV605CC de SVBONY](https://www.youtube.com/watch?v=NTTvTVdlxK8) (2026-05-29)
   - [Cámaras enfriadas SV605CC y SC571CC de Svbony: transmisión en vivo](https://www.youtube.com/watch?v=GyJ-faxMcYk) (2026-05-21)
+
+### SOFTWARE
+- **Modelo: INDI Library**
+  - [Lanzamiento de la Librería INDI v2.2.3](https://github.com/indilib/indi/releases/tag/v2.2.3) (2026-06-14)
 
 ### TELESCOPES
 - **Modelo: Mak 127**
@@ -308,11 +323,20 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### TELESCOPES
 - **Modelo: HOPE D60**
+  - [ToupTek Astro Presenta el Dispositivo de Astrofotografía HOPE D60](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
   - [Unboxing del telescopio HOPE D60 de ToupTek](https://www.youtube.com/shorts/OlJ7FbLOPVo) (2026-04-27)
+
+## Vixen
+
+### TELESCOPES
+- **Modelo: 100EDsf**
+  - [Análisis del Vixen 100EDsf y telescopios similares: opción confiable en el mercado nuevo y usado](https://www.youtube.com/watch?v=mqR1mDJ0bjE) (2026-06-14)
 
 ## ZWO
 
 ### ACCESSORIES
+- **Modelo: Willie Stickley**
+  - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
 - **Modelo: star tracker**
   - [Ya no necesitas una Star Tracker para Astrofotografía](https://www.youtube.com/watch?v=tvPlLafd7sk) (2026-06-07)
 
