@@ -34,6 +34,8 @@ OTHER_MAX_AGE_DAYS = 3    # Ventana de antigüedad para terceros (corta: evita c
 # Cascada de IA: distinguir error de credencial (deshabilitar ya) de error transitorio (reintentar).
 AUTH_ERROR = "AUTH_ERROR"     # Sentinela: HTTP 401/403/404 (key inválida o modelo inexistente)
 AI_FAIL_LIMIT = 2             # Nº de fallos transitorios consecutivos antes de deshabilitar un proveedor
+# User-Agent de navegador: sin él, el WAF de Groq (Cloudflare) responde 403 (error 1010).
+BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 # Load Centralized YouTubers/Creators
 TOOLS_DIR = os.path.dirname(__file__)
@@ -423,7 +425,7 @@ def process_with_gemini(item, api_key):
         }
     }
     
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json', 'User-Agent': BROWSER_UA}
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
     
@@ -543,7 +545,8 @@ URL: {item['url']}
     
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {api_key}'
+        'Authorization': f'Bearer {api_key}',
+        'User-Agent': BROWSER_UA
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
@@ -662,7 +665,8 @@ URL: {item['url']}
     
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {api_key}'
+        'Authorization': f'Bearer {api_key}',
+        'User-Agent': BROWSER_UA
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
