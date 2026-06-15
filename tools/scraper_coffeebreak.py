@@ -468,8 +468,11 @@ def main():
         "last_updated": time.strftime("%Y-%m-%d %H:%M:%S")
     }
 
+    # Minificado (sin indent): el fichero lo descarga el navegador en cada visita a la pagina
+    # de Coffee Break. gzip de GitHub Pages ya reduce la transferencia, pero compactar recorta
+    # ~17% el tamano descomprimido y por tanto el coste de parseo en movil.
     with open("fragments_data.json", "w", encoding="utf-8") as f_out:
-        json.dump(output_data, f_out, indent=2, ensure_ascii=False)
+        json.dump(output_data, f_out, ensure_ascii=False, separators=(',', ':'))
     print("Saved final grouped fragments data to fragments_data.json")
 
 if __name__ == "__main__":
