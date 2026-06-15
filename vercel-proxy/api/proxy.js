@@ -1,7 +1,8 @@
-// Proxy CORS para Astrometry.net — Vercel Edge Function.
-// Catch-all: cubre /api/login, /api/upload, /api/submissions/*, /api/jobs/*/info|calibration.
-// El cliente (pi-workflow.js) reescribe el dominio nova.astrometry.net -> ASTROMETRY_PROXY_URL
-// conservando el path, así que aquí reconstruimos el upstream con el pathname original.
+// Proxy CORS para Astrometry.net — Vercel Edge Function (función única).
+// El routing lo hace vercel.json con un rewrite /api/:path* -> /api/proxy?__upstreamPath=:path*
+// (el catch-all dinámico [...path].js no captura rutas multi-segmento en runtime edge).
+// El cliente (pi-workflow.js) reescribe SOLO el dominio nova.astrometry.net -> ASTROMETRY_PROXY_URL,
+// conservando el path; aquí reconstruimos el upstream a partir de __upstreamPath.
 
 export const config = { runtime: "edge" };
 
@@ -10,13 +11,23 @@ const UPSTREAM = "https://nova.astrometry.net";
 function resolveAllowedOrigin(origin) {
   if (!origin) return "*";
   const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-  const isGithubPages = origin === "https://ninocabra.github.io";
-  return (isLocalhost || isGithubPages) ? origin : "*";
+  const isAllowedHost =
+    origin === "https://ninocabra.github.io" ||
+    origin === "https://cabraspace.com" ||
+    origin === "https://www.cabraspace.com";
+  return (isLocalhost || isAllowedHost) ? origin : "*";
 }
 
 export default async function handler(request) {
   const url = new URL(request.url);
-  const targetUrl = UPSTREAM + url.pathname + url.search;
+
+  // Ruta upstream inyectada por el rewrite de vercel.json (p. ej. "submissions/123").
+  const upstreamPath = url.searchParams.get("__upstreamPath") || "";
+  // Resto de query params originales (sin el reservado) por si los hubiera.
+  const passthrough = new URLSearchParams(url.search);
+  passthrough.delete("__upstreamPath");
+  const qs = passthrough.toString();
+  const targetUrl = `${UPSTREAM}/api/${upstreamPath}` + (qs ? `?${qs}` : "");
 
   const origin = request.headers.get("Origin");
   const allowedOrigin = resolveAllowedOrigin(origin);
@@ -36,23 +47,22 @@ export default async function handler(request) {
     });
   }
 
-  // Cabeceras de reenvío (reescribimos host para el upstream)
   const headers = new Headers(request.headers);
   headers.set("host", "nova.astrometry.net");
 
-  // Cuerpo: lo bufferizamos para evitar problemas de streaming/duplex en Edge.
+  // Cuerpo bufferizado (evita problemas de streaming/duplex en edge).
   let outBody = null;
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   if (hasBody) {
-    const secretApiKey = (typeof process !== "undefined" && process.env)
-      ? process.env.ASTROMETRY_API_KEY
-      : undefined;
+    const secretApiKey =
+      (typeof process !== "undefined" && process.env)
+        ? process.env.ASTROMETRY_API_KEY
+        : undefined;
     const contentType = request.headers.get("content-type") || "";
-    const isLogin = url.pathname === "/api/login" && request.method === "POST";
+    const isLogin = upstreamPath === "login" && request.method === "POST";
 
     if (isLogin && secretApiKey && contentType.includes("application/x-www-form-urlencoded")) {
-      // Hardening opcional: inyectar la API key desde el secreto del entorno,
-      // ocultándola del cliente.
+      // Hardening opcional: inyectar la API key desde el secreto del entorno.
       try {
         const text = await request.text();
         const params = new URLSearchParams(text);
@@ -67,7 +77,6 @@ export default async function handler(request) {
           outBody = text;
         }
       } catch (e) {
-        // Si algo falla, reenviamos el cuerpo original sin tocar.
         outBody = await request.arrayBuffer();
       }
     } else {
