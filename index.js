@@ -29,10 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (swContainer && hwContainer) {
     const isEn = document.documentElement.lang.startsWith('en');
     
-    Promise.all([
-      fetch('novedades.json').then(r => r.json()).catch(e => { console.error(e); return []; }),
-      fetch('equipamiento.json').then(r => r.json()).catch(e => { console.error(e); return []; })
-    ]).then(([swData, hwData]) => {
+    // Dashboard ligero: latest.json (3+3 items, ~2 KB) en vez de las dos BD completas
+    // (~217 KB). Lo regenera tools/build_latest.py al final del scraper.
+    fetch('latest.json').then(r => r.json()).then((data) => {
+      const swData = data.software || [];
+      const hwData = data.hardware || [];
       // Render software column (top 3)
       if (swData.length > 0) {
         swContainer.innerHTML = swData.slice(0, 3).map(item => {
