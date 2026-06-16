@@ -3,6 +3,12 @@
 <head>
   <link rel="icon" href="favicon_cabra.png" type="image/png">
   <meta charset="UTF-8">
+  <!-- COI-SW-BEGIN: cross-origin isolation (SharedArrayBuffer) para WASM multihilo en ONNX/Pyodide.
+       credentialless = no rompe Pyodide/CDN en Chrome/Edge; si el navegador no lo soporta, no aísla (sin acelerar) pero no rompe nada.
+       Reversible: borra este bloque en ambos .html + el archivo coi-serviceworker.min.js. -->
+  <script>window.coi = { coepCredentialless: () => true };</script>
+  <script src="coi-serviceworker.min.js"></script>
+  <!-- COI-SW-END -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PI Workflow (BETA) - CabraSpace</title>
   <meta name="description" content="Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.">
