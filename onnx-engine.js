@@ -336,6 +336,10 @@ window.OnnxEngine = (function () {
         if (onProgress) {
           onProgress(completedTiles, totalTiles);
         }
+        // PERF — ceder al event loop (macrotarea) entre tiles: evita que el hilo principal quede
+        // bloqueado en cadena y dispare el diálogo "La página no responde" en inferencias pesadas
+        // (Cosmic Decon, DeepSNR). Coste ~unos ms por tile, despreciable frente a la inferencia.
+        await new Promise((r) => setTimeout(r));
       }
     }
     // PERF — tiempo total de inferencia (todos los tiles) para diagnosticar velocidad por backend.
