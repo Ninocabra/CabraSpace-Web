@@ -6,7 +6,7 @@
  * de computeDenoiseGraXpert de graxpert.js sin dependencias de window/DOM.
  * ============================================================================= */
 
-importScripts('https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js');
+importScripts('https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.min.js');
 
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 const DENOISE_MODEL_URL = IS_LOCAL
