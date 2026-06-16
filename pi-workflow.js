@@ -2419,19 +2419,20 @@
   // SCNR-PRE-END
 
   // --- COSMIC CLARITY IA / STANDARD DECONVOLUTION ENGINE ---
-  const STELLAR_MODEL_URL = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_sharp_stellar_cnn_AI3_5s.onnx";
+  // Modelos hospedados en la Release propia (models-v1). En localhost, resolveCosmicModelUrl tira de scratch/.
+  const RELEASE_BASE = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/";
+  const STELLAR_MODEL_URL = RELEASE_BASE + "deep_sharp_stellar_cnn_AI3_5s.onnx";
+  // En la Release solo está el nonstellar radius_2; todas las opciones de radio usan ese modelo.
   const NONSTELLAR_MODEL_URLS = {
-    radius_1: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_1AI3_5s.onnx",
-    radius_2: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
-    radius_4: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_4AI3_5s.onnx",
-    radius_8: "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_nonstellar_sharp_cnn_radius_8AI3_5s.onnx"
+    radius_1: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
+    radius_2: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
+    radius_4: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
+    radius_8: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx"
   };
 
   // COSMIC-MODEL-ROUTING-BEGIN
-  // En localhost usa las copias locales de scratch/ (la Release de setiastro no permite fetch
-  // cross-origin por CORS → "Failed to fetch"). En producción seguiría apuntando a la Release;
-  // para que funcione en producción habría que re-hospedar los modelos en una Release propia con
-  // CORS (GATE humano), igual que se hizo con nox/GraXpert.
+  // En localhost usa las copias locales de scratch/; en producción usa la Release propia models-v1
+  // (RELEASE_BASE), que sí permite fetch cross-origin (CORS).
   function resolveCosmicModelUrl(url) {
     const host = window.location.hostname;
     if (host === "localhost" || host === "127.0.0.1") {
@@ -3053,9 +3054,9 @@
 
   // Routing de modelos de denoise: en localhost usa scratch/ (los .onnx de terceros no dan CORS;
   // en producción habría que re-hospedarlos con CORS — GATE humano).
-  const COSMIC_DENOISE_COLOR_PROD = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_denoise_cnn_AI3_5c.onnx";
-  const COSMIC_DENOISE_MONO_PROD = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_denoise_cnn_AI3_5.onnx";
-  const DEEPSNR_PROD = "models-v1/deepsnr_v2.onnx"; // placeholder: re-hospedar (DeepSNR no se distribuye suelto)
+  const COSMIC_DENOISE_COLOR_PROD = RELEASE_BASE + "cosmic_denoise_color.onnx";
+  const COSMIC_DENOISE_MONO_PROD = RELEASE_BASE + "cosmic_denoise_mono.onnx";
+  const DEEPSNR_PROD = RELEASE_BASE + "deepsnr_v2.onnx";
   function resolveDenoiseModel(prodUrl, scratchFile) {
     const host = window.location.hostname;
     return (host === "localhost" || host === "127.0.0.1") ? ("scratch/" + scratchFile) : prodUrl;
