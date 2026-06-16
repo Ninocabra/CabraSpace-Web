@@ -1887,12 +1887,11 @@
           <div class="piw-section collapsed">
             <h3 class="piw-section-title">Sharpening & Detail</h3>
             <select class="piw-select" id="selPostSharpAlgo">
-              <option value="bxt">BlurXTerminator</option>
               <option value="usm">Unsharp Mask</option>
+              <option value="cosmic">Cosmic Clarity</option>
               <option value="hdr">HDR Multiscale Transform</option>
               <option value="lhe">Local Histogram Equalization</option>
               <option value="dse">Dark Structure Enhance</option>
-              <option value="cosmic">Cosmic Clarity</option>
             </select>
 
             <!-- BXT controls -->
@@ -1959,26 +1958,9 @@
                 <div class="piw-control-group">
                   <div class="piw-label-row">
                     <span class="piw-label">Amount</span>
-                    <span class="piw-value" id="valPostUsmAmount">0.50</span>
+                    <span class="piw-value" id="valPostUsmAmount">0.65</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostUsmAmount" min="0.01" max="1" step="0.01" value="0.50" disabled>
-                </div>
-                <label class="piw-checkbox-row" style="margin-bottom:8px;">
-                  <input type="checkbox" id="chkPostUsmDeringing" disabled> Deringing
-                </label>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Dark dering</span>
-                    <span class="piw-value" id="valPostUsmDeringDark">0.100</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostUsmDeringDark" min="0" max="1" step="0.01" value="0.10" disabled>
-                </div>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Brt dering</span>
-                    <span class="piw-value" id="valPostUsmDeringBright">0.000</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostUsmDeringBright" min="0" max="1" step="0.01" value="0.00" disabled>
+                  <input type="range" class="piw-slider" id="sldPostUsmAmount" min="0.01" max="1" step="0.01" value="0.65" disabled>
                 </div>
               </div>
             </div>
@@ -1990,23 +1972,16 @@
                 <div class="piw-control-group">
                   <div class="piw-label-row">
                     <span class="piw-label">Layers</span>
-                    <span class="piw-value" id="valPostHdrLayers">6</span>
+                    <span class="piw-value" id="valPostHdrLayers">5</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostHdrLayers" min="1" max="12" step="1" value="6" disabled>
+                  <input type="range" class="piw-slider" id="sldPostHdrLayers" min="2" max="8" step="1" value="5" disabled>
                 </div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
-                    <span class="piw-label">Iterations</span>
-                    <span class="piw-value" id="valPostHdrIter">1</span>
+                    <span class="piw-label">Strength</span>
+                    <span class="piw-value" id="valPostHdrOverdrive">0.40</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostHdrIter" min="1" max="10" step="1" value="1" disabled>
-                </div>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Overdrive</span>
-                    <span class="piw-value" id="valPostHdrOverdrive">0.00</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostHdrOverdrive" min="0" max="1" step="0.05" value="0.00" disabled>
+                  <input type="range" class="piw-slider" id="sldPostHdrOverdrive" min="0" max="1" step="0.05" value="0.40" disabled>
                 </div>
                 <label class="piw-checkbox-row" style="margin-bottom:6px;">
                   <input type="checkbox" id="chkPostHdrMedian" disabled> Median transform
@@ -2030,17 +2005,10 @@
                 </div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
-                    <span class="piw-label">Ctr. Limit</span>
-                    <span class="piw-value" id="valPostLheSlope">2.0</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostLheSlope" min="1" max="100" step="0.5" value="2.0" disabled>
-                </div>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
                     <span class="piw-label">Amount</span>
-                    <span class="piw-value" id="valPostLheAmount">0.70</span>
+                    <span class="piw-value" id="valPostLheAmount">0.35</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostLheAmount" min="0" max="1" step="0.05" value="0.70" disabled>
+                  <input type="range" class="piw-slider" id="sldPostLheAmount" min="0" max="1" step="0.05" value="0.35" disabled>
                 </div>
                 <label class="piw-checkbox-row" style="margin-bottom:0;">
                   <input type="checkbox" id="chkPostLheCircular" checked disabled> Circular kernel
@@ -2055,9 +2023,9 @@
                 <div class="piw-control-group">
                   <div class="piw-label-row">
                     <span class="piw-label">Amount</span>
-                    <span class="piw-value" id="valPostDseAmount">0.18</span>
+                    <span class="piw-value" id="valPostDseAmount">0.30</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostDseAmount" min="0" max="1" step="0.01" value="0.18" disabled>
+                  <input type="range" class="piw-slider" id="sldPostDseAmount" min="0" max="1" step="0.01" value="0.30" disabled>
                 </div>
               </div>
             </div>
@@ -2102,7 +2070,7 @@
               <input type="checkbox" id="chkPostSharpUseMask" disabled> Use active mask
             </label>
             <div style="display: flex; gap: 8px;">
-              <button class="piw-btn" id="btnApplyPostSharp" disabled style="flex:2;">Apply Sharpening</button>
+              <button class="piw-btn" id="btnApplyPostSharp" disabled style="flex:2;">Preview Sharpening</button>
               <button class="piw-btn" id="btnComparePostSharp" disabled style="flex:1;">Compare</button>
             </div>
           </div>

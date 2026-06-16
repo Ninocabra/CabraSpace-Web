@@ -1925,6 +1925,7 @@
     el("sldScnrIntPre").disabled = !state.activeImage.isColor;
     // SCNR-PRE-END
     el("btnApplyPostSharp").disabled = false;
+    { const b = el("btnComparePostSharp"); if (b) b.disabled = false; }
     el("btnApplyPostCurves").disabled = false;
     el("btnApplyPostColor").disabled = false;
 
@@ -2016,6 +2017,7 @@
     el("btnApplyPostNR").disabled = false;
     { const b = el("btnComparePostNR"); if (b) b.disabled = false; }
     el("btnApplyPostSharp").disabled = false;
+    { const b = el("btnComparePostSharp"); if (b) b.disabled = false; }
     el("btnApplyPostCurves").disabled = false;
     el("btnApplyPostColor").disabled = false;
 
@@ -3230,57 +3232,201 @@
   // DENOISE-PATTERN-END
 
   // USM-SHARP-BEGIN
+  // SHARPEN-PATTERN: Preview/Apply/Comparar para Enfoque/Detalles.
+  // Habilita los controles de los algoritmos de enfoque implementados.
+  document.querySelectorAll('[id^="post-sharp-"][id$="-controls"]').forEach((c) => {
+    c.classList.remove("piw-disabled-control");
+    c.querySelectorAll("input,select").forEach((i) => { i.disabled = false; });
+  });
+
+  // --- Helpers de enfoque (clásicos, operan en luminancia para preservar color) ---
+  function sharpLum(srcImg) {
+    if (srcImg.isColor && srcImg.nc >= 3) {
+      const n = srcImg.w * srcImg.h, L = new Float32Array(n);
+      const r = srcImg.ch[0], g = srcImg.ch[1], b = srcImg.ch[2];
+      for (let i = 0; i < n; i++) L[i] = 0.2126 * r[i] + 0.7152 * g[i] + 0.0722 * b[i];
+      return L;
+    }
+    return Float32Array.from(srcImg.ch[0]);
+  }
+  function sharpApplyLum(srcImg, Lnew, Lold) {
+    const n = srcImg.w * srcImg.h;
+    if (!(srcImg.isColor && srcImg.nc >= 3)) {
+      return { ch: [Lnew], w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor };
+    }
+    const out = srcImg.ch.map((src) => {
+      const dst = new Float32Array(n);
+      for (let i = 0; i < n; i++) {
+        const ratio = Lold[i] > 1e-6 ? Lnew[i] / Lold[i] : 1;
+        let v = src[i] * ratio;
+        dst[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+      }
+      return dst;
+    });
+    return { ch: out, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor };
+  }
+  function sharpGaussCh(ch, w, h, sigma) {
+    return window.Sharpening.gaussianBlur({ ch: [ch], w, h, nc: 1, isColor: false }, sigma).ch[0];
+  }
+
+  // HDR Multiscale: descompone L en capas de detalle (à-trous) + residual; realza el detalle.
+  function computeSharpHDR(srcImg) {
+    const w = srcImg.w, h = srcImg.h;
+    const L = sharpLum(srcImg);
+    const layers = Math.max(2, Math.min(8, parseInt(el("sldPostHdrLayers").value, 10)));
+    const overdrive = parseFloat(el("sldPostHdrOverdrive").value);
+    let cur = Float32Array.from(L);
+    const details = [];
+    for (let s = 0; s < layers; s++) {
+      const blur = sharpGaussCh(cur, w, h, Math.pow(2, s));
+      const det = new Float32Array(L.length);
+      for (let i = 0; i < L.length; i++) det[i] = cur[i] - blur[i];
+      details.push(det);
+      cur = blur;
+    }
+    const boost = 1 + overdrive * 1.5;
+    const Lnew = new Float32Array(L.length);
+    for (let i = 0; i < L.length; i++) {
+      let v = cur[i];
+      for (const det of details) v += det[i] * boost;
+      Lnew[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+    return sharpApplyLum(srcImg, Lnew, L);
+  }
+
+  // Local Histogram Equalization (equivalente CLAHE): realce de contraste local adaptativo
+  // limitado por 'slope' (clip) y mezclado por 'amount'.
+  function computeSharpLHE(srcImg) {
+    const w = srcImg.w, h = srcImg.h;
+    const L = sharpLum(srcImg);
+    const radius = Math.max(8, parseInt(el("sldPostLheRadius").value, 10));
+    const amount = parseFloat(el("sldPostLheAmount").value);
+    const slope = 3.0; // fijo (simplificación de UI)
+    const sigma = radius / 3;
+    const mean = sharpGaussCh(L, w, h, sigma);
+    const L2 = new Float32Array(L.length);
+    for (let i = 0; i < L.length; i++) L2[i] = L[i] * L[i];
+    const mean2 = sharpGaussCh(L2, w, h, sigma);
+    const Lnew = new Float32Array(L.length);
+    for (let i = 0; i < L.length; i++) {
+      const std = Math.sqrt(Math.max(1e-6, mean2[i] - mean[i] * mean[i]));
+      const gain = Math.min(slope, 1 + amount * 2 / (std + 0.05));
+      const enhanced = mean[i] + (L[i] - mean[i]) * gain;
+      let v = L[i] * (1 - amount) + enhanced * amount;
+      Lnew[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+    return sharpApplyLum(srcImg, Lnew, L);
+  }
+
+  // Dark Structure Enhance: oscurece más las estructuras más oscuras que su entorno (polvo, nebulosa oscura).
+  function computeSharpDSE(srcImg) {
+    const w = srcImg.w, h = srcImg.h;
+    const L = sharpLum(srcImg);
+    const amount = parseFloat(el("sldPostDseAmount").value);
+    const blur = sharpGaussCh(L, w, h, 2.0);
+    const Lnew = new Float32Array(L.length);
+    for (let i = 0; i < L.length; i++) {
+      const dark = Math.max(0, blur[i] - L[i]);
+      let v = L[i] - amount * dark;
+      Lnew[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+    return sharpApplyLum(srcImg, Lnew, L);
+  }
+
+  // Dispatcher: devuelve la imagen enfocada para un algoritmo EXPLÍCITO. Reusado por Preview y Comparar.
+  async function computeSharpen(algo, srcImg) {
+    const lang = document.documentElement.lang || "es";
+    if (algo === "usm") {
+      showLoader(lang === "es" ? "Aplicando USM Sharpening..." : "Applying USM Sharpening...");
+      const opts = {
+        sigma: parseFloat(el("sldPostUsmSigma").value),
+        amount: parseFloat(el("sldPostUsmAmount").value),
+        // Deringing automático fijo (limita halos oscuros/claros sin exponer sliders)
+        deringDark: 0.02,
+        deringBright: 0.02
+      };
+      return window.Sharpening.computeUSM(srcImg, opts);
+    }
+    if (algo === "cosmic") {
+      // Cosmic Clarity = el mismo sharpen IA de la deconvolución (modelos stellar/nonstellar + estirado).
+      return await computeDeconv("cosmic_ia", srcImg);
+    }
+    if (algo === "hdr") {
+      showLoader(lang === "es" ? "Aplicando HDR Multiscale..." : "Applying HDR Multiscale...");
+      return computeSharpHDR(srcImg);
+    }
+    if (algo === "lhe") {
+      showLoader(lang === "es" ? "Aplicando Local Histogram Eq...." : "Applying Local Histogram Eq....");
+      return computeSharpLHE(srcImg);
+    }
+    if (algo === "dse") {
+      showLoader(lang === "es" ? "Aplicando Dark Structure Enhance..." : "Applying Dark Structure Enhance...");
+      return computeSharpDSE(srcImg);
+    }
+    throw new Error(`Algoritmo de enfoque desconocido: ${algo}`);
+  }
+
+  // "Preview Enfoque": preview no destructivo sobre la Imagen Inicial.
   el("btnApplyPostSharp").addEventListener("click", () => {
+    const srcImg = state.stepInputImage || state.activeImage;
+    if (!srcImg) return;
     const algo = el("selPostSharpAlgo").value;
     const lang = document.documentElement.lang || "es";
-    if (algo !== "usm") {
-      const msgs = {
-        es: "Solo el algoritmo USM está implementado en la versión web. BlurXTerminator requiere PixInsight local.",
-        en: "Only the USM algorithm is implemented in the web version. BlurXTerminator requires local PixInsight."
-      };
-      alert(msgs[lang] ?? msgs.es);
-      return;
-    }
-    const srcImg = state.stepInputImage || state.activeImage;
-    if (!srcImg) {
-      alert(lang === "en" ? "No active image." : "No hay imagen activa.");
-      return;
-    }
-    const sigma       = parseFloat(el("sldPostUsmSigma").value);
-    const amount      = parseFloat(el("sldPostUsmAmount").value);
-    const deringDark  = el("chkPostUsmDeringing").checked ? parseFloat(el("sldPostUsmDeringDark").value)   : 0;
-    const deringBright= el("chkPostUsmDeringing").checked ? parseFloat(el("sldPostUsmDeringBright").value) : 0;
-
-    showLoader(lang === "es" ? "Aplicando USM Sharpening..." : "Applying USM Sharpening...");
-
-    if (!usmWorker) usmWorker = new Worker("usm-worker.js");
-
-    // Copiar canales antes de transferir
-    const chCopy = srcImg.ch.map(c => new Float32Array(c));
-
-    usmWorker.onmessage = (e) => {
-      const d = e.data;
-      if (d.type === "error") {
-        logConsole(`Error en USM Sharpening: ${d.message}`, "err");
+    setTimeout(async () => {
+      try {
+        const res = await computeSharpen(algo, srcImg);
+        previewActiveImage(res, srcImg, "Sharpening");
+        render();
+        drawHistogram();
+        logConsole(lang === "es" ? "Vista previa de enfoque (Preview). Pulsa 'Aplicar Enfoque' para confirmar." : "Sharpening preview. Press 'Apply Sharpen' to commit.", "info");
+      } catch (e) {
+        logConsole(`Enfoque: ${e.message}`, "warn");
+      } finally {
         hideLoader();
-        return;
       }
-      // type === "result"
-      commitActiveImage({ ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor }, "USM Sharpening", srcImg);
-      render();
-      refreshPathBar();
-      logConsole(
-        lang === "es" ? "Enfoque USM Sharpening aplicado con éxito." : "USM Sharpening applied successfully.",
-        "ok"
-      );
-      hideLoader();
-    };
-
-    usmWorker.postMessage(
-      { ch: chCopy, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, opts: { sigma, amount, deringDark, deringBright } },
-      chCopy.map(c => c.buffer)
-    );
+    }, 50);
   });
+
+  // "Comparar": corre los algoritmos disponibles sobre la Imagen Inicial y los guarda en Slots.
+  if (el("btnComparePostSharp")) {
+    el("btnComparePostSharp").addEventListener("click", () => {
+      const srcImg = state.stepInputImage || state.activeImage;
+      if (!srcImg) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Comparando enfoques..." : "Comparing sharpening...");
+      setTimeout(async () => {
+        try {
+          const variants = [
+            { name: "USM", algo: "usm" },
+            { name: "Cosmic Clarity", algo: "cosmic" },
+            { name: "HDR Multiscale", algo: "hdr" },
+            { name: "Local Hist. Eq.", algo: "lhe" },
+            { name: "Dark Struct.", algo: "dse" }
+          ];
+          const results = [];
+          for (const v of variants) {
+            try { results.push({ name: v.name, img: await computeSharpen(v.algo, srcImg) }); }
+            catch (e) { logConsole((lang === "es" ? `${v.name} omitido: ` : `${v.name} skipped: `) + e.message, "warn"); }
+          }
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            state.imageSlots[i] = cloneImage({ ch: r.img.ch, w: r.img.w, h: r.img.h, nc: r.img.nc, isColor: r.img.isColor, wcs: srcImg && srcImg.wcs });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) { slotBtn.classList.add("filled"); slotBtn.title = "Sharpen: " + r.name; }
+            logConsole(`Slot ${i + 1} ← ${r.name}`, "info");
+          }
+          updateMixSourceOptions();
+          hideLoader();
+          logConsole(lang === "es"
+            ? `Comparación lista: ${results.length} en Slots 1-${results.length}. Carga un slot y pulsa 'Aplicar Enfoque'.`
+            : `Comparison ready: ${results.length} in Slots 1-${results.length}.`, "ok");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
   // USM-SHARP-END
   // WEB-WORKER-END
 
@@ -4979,7 +5125,6 @@
 
   // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
   const mockButtons = [
-    "btnComparePostSharp",
     "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
   ];
   mockButtons.forEach(id => {
