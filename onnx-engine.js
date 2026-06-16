@@ -11,6 +11,31 @@ window.OnnxEngine = (function () {
   const DB_NAME = "cosmic-clarity-models-db";
   const STORE_NAME = "models";
 
+  // PERF-INIT-BEGIN — configuración del runtime ONNX + telemetría de backend.
+  // (Para revertir: borra este bloque; createSession y runOnnxModelTiled funcionan sin él.)
+  const ORT_DIST = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
+  let lastBackend = "?"; // último EP solicitado (informativo)
+  (function initOrtEnv() {
+    try {
+      if (typeof ort === "undefined" || !ort.env) return;
+      // Los .wasm/.mjs deben venir de la MISMA versión pineada que ort.min.js (evita mismatch/404).
+      ort.env.wasm.wasmPaths = ORT_DIST;
+      ort.env.wasm.simd = true;
+      // El multihilo WASM SOLO funciona con cross-origin isolation (SharedArrayBuffer disponible).
+      const isolated = (typeof crossOriginIsolated !== "undefined") && crossOriginIsolated;
+      const cores = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 4;
+      ort.env.wasm.numThreads = isolated ? Math.min(cores, 8) : 1;
+      const hasGPU = (typeof navigator !== "undefined") && !!navigator.gpu;
+      console.info(
+        `[OnnxEngine] crossOriginIsolated=${isolated} · wasm.numThreads=${ort.env.wasm.numThreads}` +
+        ` · navigator.gpu=${hasGPU} (WebGPU ${hasGPU ? "disponible" : "NO disponible"})`
+      );
+    } catch (e) {
+      console.warn("[OnnxEngine] no se pudo configurar ort.env:", e);
+    }
+  })();
+  // PERF-INIT-END
+
   function openModelDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, 1);
@@ -88,12 +113,20 @@ window.OnnxEngine = (function () {
 
   async function createSession(modelData, options = {}) {
     const executionProviders = options.executionProviders ?? ["webgpu", "wasm"];
+    const t0 = (typeof performance !== "undefined") ? performance.now() : Date.now();
+    const ms = () => Math.round(((typeof performance !== "undefined") ? performance.now() : Date.now()) - t0);
     try {
-      return await ort.InferenceSession.create(modelData, { executionProviders });
+      const s = await ort.InferenceSession.create(modelData, { executionProviders });
+      lastBackend = executionProviders.join(">");
+      console.info(`[OnnxEngine] sesión creada (EP solicitado: ${lastBackend}) en ${ms()}ms`);
+      return s;
     } catch (e) {
       if (executionProviders.includes("webgpu") && executionProviders.includes("wasm")) {
         console.warn("Failed with WebGPU provider, trying WASM only:", e);
-        return await ort.InferenceSession.create(modelData, { executionProviders: ["wasm"] });
+        const s = await ort.InferenceSession.create(modelData, { executionProviders: ["wasm"] });
+        lastBackend = "wasm(fallback)";
+        console.info(`[OnnxEngine] sesión creada (EP: wasm, fallback tras fallo WebGPU) en ${ms()}ms`);
+        return s;
       }
       throw e;
     }
@@ -145,6 +178,7 @@ window.OnnxEngine = (function () {
       }
     }
     let completedTiles = 0;
+    const __tRun0 = (typeof performance !== "undefined") ? performance.now() : Date.now(); // PERF
 
     for (let y = 0; y < H; y += step) {
       for (let x = 0; x < W; x += step) {
@@ -304,6 +338,12 @@ window.OnnxEngine = (function () {
         }
       }
     }
+    // PERF — tiempo total de inferencia (todos los tiles) para diagnosticar velocidad por backend.
+    const __tRunMs = Math.round(((typeof performance !== "undefined") ? performance.now() : Date.now()) - __tRun0);
+    console.info(
+      `[OnnxEngine] inferencia: ${totalTiles} tile(s) ${tileSize}px (${W}x${H}, ${nc}ch) ` +
+      `en ${__tRunMs}ms (${totalTiles ? Math.round(__tRunMs / totalTiles) : 0}ms/tile) · EP=${lastBackend}`
+    );
     return outCh;
   }
 
