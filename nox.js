@@ -78,11 +78,8 @@ window.NoxStarRemoval = (function () {
     const isColor = imgData.isColor || imgData.nc === 3;
     const modelUrl = isColor ? MODEL_URL_COLOR : MODEL_URL_GRAY;
 
-    // 1. Descarga/Caché del modelo
-    const modelData = await window.OnnxEngine.fetchModelWithCache(modelUrl, onDownloadProgress);
-
-    // 2. Inicialización de sesión ONNX
-    const session = await window.OnnxEngine.createSession(modelData);
+    // 1+2. Modelo (descarga/caché) + sesión ONNX REUTILIZABLE (cacheada por URL; no recompila por clic)
+    const session = await window.OnnxEngine.loadSession(modelUrl, {}, onDownloadProgress);
 
     // 3. Ejecución por tiles con normalización
     // Entrada: [0, 1] -> [-1, 1] (scaleIn: 2.0, offsetIn: -1.0)
@@ -113,8 +110,7 @@ window.NoxStarRemoval = (function () {
       throw new Error("No hay datos de imagen de entrada válidos.");
     }
     const isColor = imgData.isColor || imgData.nc === 3;
-    const modelData = await window.OnnxEngine.fetchModelWithCache(MODEL_URL_STARNET2, onDownloadProgress);
-    const session = await window.OnnxEngine.createSession(modelData);
+    const session = await window.OnnxEngine.loadSession(MODEL_URL_STARNET2, {}, onDownloadProgress);
     const options = {
       tileSize: 512, overlap: 64, padMode: "reflect", layout: "NHWC",
       scaleIn: 1.0, offsetIn: 0.0, scaleOut: 1.0, offsetOut: 0.0,

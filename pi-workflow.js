@@ -2478,11 +2478,9 @@
       // ONNX-ENGINE-REF-BEGIN
       if ((mode === "both" || mode === "stellar") && stellarAmt > 0.01) {
         showLoader(lang === "es" ? "Cargando modelo de estrellas IA..." : "Loading AI stellar model...");
-        const stellarModelData = await window.OnnxEngine.fetchModelWithCache(resolveCosmicModelUrl(STELLAR_MODEL_URL), (p) => {
+        const session = await window.OnnxEngine.loadSession(resolveCosmicModelUrl(STELLAR_MODEL_URL), {}, (p) => {
           showLoader(lang === "es" ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` : `Downloading stellar model: ${(p * 100).toFixed(0)}%`);
         });
-        showLoader(lang === "es" ? "Inicializando sesión ONNX (estrellas)..." : "Initializing ONNX session (stars)...");
-        const session = await window.OnnxEngine.createSession(stellarModelData);
         showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
         stellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
       }
@@ -2494,11 +2492,9 @@
         else modelKey = "radius_8";
         const nonstellarUrl = NONSTELLAR_MODEL_URLS[modelKey];
         showLoader(lang === "es" ? `Cargando modelo de nebulosa IA (${modelKey})...` : `Loading AI nebula model (${modelKey})...`);
-        const nonstellarModelData = await window.OnnxEngine.fetchModelWithCache(resolveCosmicModelUrl(nonstellarUrl), (p) => {
+        const session = await window.OnnxEngine.loadSession(resolveCosmicModelUrl(nonstellarUrl), {}, (p) => {
           showLoader(lang === "es" ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%` : `Downloading nebula model: ${(p * 100).toFixed(0)}%`);
         });
-        showLoader(lang === "es" ? "Inicializando sesión ONNX (nebulosa)..." : "Initializing ONNX session (nebula)...");
-        const session = await window.OnnxEngine.createSession(nonstellarModelData);
         showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
         nonstellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
       }
@@ -3171,10 +3167,9 @@
       showLoader(lang === "es" ? "Cargando Cosmic Clarity Denoise..." : "Loading Cosmic Clarity Denoise...");
       const url = resolveDenoiseModel(isColor ? COSMIC_DENOISE_COLOR_PROD : COSMIC_DENOISE_MONO_PROD,
         isColor ? "cosmic_denoise_color.onnx" : "cosmic_denoise_mono.onnx");
-      const modelData = await window.OnnxEngine.fetchModelWithCache(url, (p) => {
+      const session = await window.OnnxEngine.loadSession(url, {}, (p) => {
         showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
       });
-      const session = await window.OnnxEngine.createSession(modelData);
       showLoader(lang === "es" ? "Procesando Cosmic Clarity Denoise..." : "Processing Cosmic Clarity Denoise...");
       // Estirar -> inferir -> des-estirar (modelo entrenado con datos estirados; robustez a luminancia).
       const m = piwStretchMidtone(srcImg);
@@ -3186,11 +3181,10 @@
     if (algo === "deepsnr") {
       showLoader(lang === "es" ? "Cargando DeepSNR..." : "Loading DeepSNR...");
       const url = resolveDenoiseModel(DEEPSNR_PROD, "deepsnr_v2.onnx");
-      const modelData = await window.OnnxEngine.fetchModelWithCache(url, (p) => {
+      // DeepSNR tiene ops que WebGPU no ejecuta (Mul broadcast) -> forzar WASM (CPU).
+      const session = await window.OnnxEngine.loadSession(url, { executionProviders: ["wasm"] }, (p) => {
         showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
       });
-      // DeepSNR tiene ops que WebGPU no ejecuta (Mul broadcast) -> forzar WASM (CPU).
-      const session = await window.OnnxEngine.createSession(modelData, { executionProviders: ["wasm"] });
       showLoader(lang === "es" ? "Procesando DeepSNR..." : "Processing DeepSNR...");
       const ai = await window.OnnxEngine.runOnnxModelTiled(session, srcImg, { tileSize: 512, fixedTile: 512, overlap: 32, layout: "NHWC" });
       return blendDenoise(srcImg, ai, parseFloat(el("sldPostDeepSNRAmount").value));

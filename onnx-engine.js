@@ -347,9 +347,30 @@ window.OnnxEngine = (function () {
     return outCh;
   }
 
+  // PERF-SESSION-CACHE-BEGIN — reutiliza la InferenceSession entre clics (descarga + compilación
+  // de kernels solo una vez por modelo; el compile de shaders WebGPU es lo más caro). Nadie llama a
+  // session.release(), así que mantenerlas vivas es seguro. Clave = url + execution providers.
+  // (Para revertir: borra loadSession + esta exportación; los callers pueden volver a fetch+createSession.)
+  const sessionCache = new Map();
+  async function loadSession(url, options = {}, onProgress) {
+    const epKey = (options.executionProviders || ["webgpu", "wasm"]).join(",");
+    const key = url + "|" + epKey;
+    const cached = sessionCache.get(key);
+    if (cached) {
+      console.info(`[OnnxEngine] sesión reutilizada (cache) para ${url}`);
+      return cached;
+    }
+    const data = await fetchModelWithCache(url, onProgress);
+    const session = await createSession(data, options);
+    sessionCache.set(key, session);
+    return session;
+  }
+  // PERF-SESSION-CACHE-END
+
   return {
     fetchModelWithCache,
     createSession,
+    loadSession,
     runOnnxModelTiled
   };
 })();
