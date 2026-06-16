@@ -2014,6 +2014,7 @@
     el("btnDownloadPNG").disabled = false;
     el("btnGenerateBlend").disabled = false;
     el("btnApplyPostNR").disabled = false;
+    { const b = el("btnComparePostNR"); if (b) b.disabled = false; }
     el("btnApplyPostSharp").disabled = false;
     el("btnApplyPostCurves").disabled = false;
     el("btnApplyPostColor").disabled = false;
@@ -3010,57 +3011,223 @@
   let denoiseWorker = null;
   let usmWorker     = null;
 
-  // GRAXPERT-DENOISE-BEGIN
+  // DENOISE-PATTERN-BEGIN (patrón Preview/Apply/Comparar para Noise Reduction)
+
+  // Habilita los controles de todos los algoritmos de denoise implementados
+  document.querySelectorAll('[id^="post-noise-"][id$="-controls"]').forEach((c) => {
+    c.classList.remove("piw-disabled-control");
+    c.querySelectorAll("input,select").forEach((i) => { i.disabled = false; });
+  });
+
+  // Routing de modelos de denoise: en localhost usa scratch/ (los .onnx de terceros no dan CORS;
+  // en producción habría que re-hospedarlos con CORS — GATE humano).
+  const COSMIC_DENOISE_COLOR_PROD = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_denoise_cnn_AI3_5c.onnx";
+  const COSMIC_DENOISE_MONO_PROD = "https://github.com/setiastro/cosmicclarity/releases/download/Windows/deep_denoise_cnn_AI3_5.onnx";
+  const DEEPSNR_PROD = "models-v1/deepsnr_v2.onnx"; // placeholder: re-hospedar (DeepSNR no se distribuye suelto)
+  function resolveDenoiseModel(prodUrl, scratchFile) {
+    const host = window.location.hostname;
+    return (host === "localhost" || host === "127.0.0.1") ? ("scratch/" + scratchFile) : prodUrl;
+  }
+  // Estirado MTF a mediana objetivo 0.25 + su inverso (m -> 1-m). Hace robustos a la luminancia
+  // de entrada los modelos SetiAstro (entrenados con datos estirados).
+  function piwStretchMidtone(srcImg) {
+    const lumCh = (srcImg.isColor && srcImg.nc >= 2) ? srcImg.ch[1] : srcImg.ch[0];
+    return optMadMidtone(fastSampledMedian(lumCh), 0, 0.25);
+  }
+  function piwMtfStretchChans(chans, m) {
+    return chans.map((src) => {
+      const dst = new Float32Array(src.length);
+      for (let i = 0; i < src.length; i++) {
+        const x = src[i];
+        const d = (2 * m - 1) * x - m;
+        let v = Math.abs(d) < 1e-12 ? x : (m - 1) * x / d;
+        dst[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+      }
+      return dst;
+    });
+  }
+
+  // Mezcla el resultado denoised con el original según strength (0..1). aiCh = canales del modelo.
+  function blendDenoise(srcImg, aiCh, strength) {
+    const s = Math.max(0, Math.min(1, strength));
+    const out = srcImg.ch.map((src, c) => {
+      const ai = aiCh[c] || aiCh[0];
+      const dst = new Float32Array(src.length);
+      for (let i = 0; i < src.length; i++) {
+        let v = src[i] * (1 - s) + ai[i] * s;
+        dst[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+      }
+      return dst;
+    });
+    return { ch: out, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor };
+  }
+
+  // TV denoise (Rudin-Osher-Fatemi vía Chambolle) por canal. Equivalente clásico a TGV.
+  // lambda mayor = más suavizado. Resultado = src - lambda*div(p).
+  function tvDenoiseChannel(src, w, h, lambda, iters) {
+    const n = w * h;
+    const px = new Float32Array(n), py = new Float32Array(n), div = new Float32Array(n);
+    const tau = 0.25;
+    for (let it = 0; it < iters; it++) {
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const i = y * w + x;
+        let d = px[i] + py[i];
+        if (x > 0) d -= px[i - 1];
+        if (y > 0) d -= py[i - w];
+        div[i] = d - src[i] / lambda;
+      }
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const i = y * w + x;
+        const gx = (x < w - 1) ? div[i + 1] - div[i] : 0;
+        const gy = (y < h - 1) ? div[i + w] - div[i] : 0;
+        const npx = px[i] + tau * gx;
+        const npy = py[i] + tau * gy;
+        const norm = Math.max(1, Math.sqrt(npx * npx + npy * npy));
+        px[i] = npx / norm;
+        py[i] = npy / norm;
+      }
+    }
+    const out = new Float32Array(n);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      let d = px[i] + py[i];
+      if (x > 0) d -= px[i - 1];
+      if (y > 0) d -= py[i - w];
+      let v = src[i] - lambda * d;
+      out[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+    }
+    return out;
+  }
+
+  function computeTGVDenoise(srcImg) {
+    const lumStr = parseFloat(el("sldPostTgvStrengthL").value); // 1..20
+    const chrStr = parseFloat(el("sldPostTgvStrengthC").value); // 0..20
+    const itSlider = parseInt(el("sldPostTgvIter").value, 10);  // 100..3000
+    // Cap de iteraciones (hilo principal; más = bloqueo notable). λ mapeado para efecto visible.
+    const iters = Math.max(12, Math.min(40, Math.round(itSlider / 15)));
+    const lamL = Math.max(1e-3, lumStr / 50);
+    const lamC = Math.max(1e-3, chrStr / 50);
+    const w = srcImg.w, h = srcImg.h;
+    const out = srcImg.ch.map((ch, c) => {
+      const lambda = (srcImg.isColor && srcImg.nc >= 3 && c !== 1 && chrStr > 0) ? lamC : lamL;
+      return tvDenoiseChannel(ch, w, h, lambda, iters);
+    });
+    return { ch: out, w, h, nc: srcImg.nc, isColor: srcImg.isColor };
+  }
+
+  // Dispatcher: devuelve la imagen denoised para un algoritmo EXPLÍCITO. Reusado por Preview y Comparar.
+  async function computeDenoise(algo, srcImg) {
+    const lang = document.documentElement.lang || "es";
+    if (algo === "tgv") {
+      showLoader(lang === "es" ? "Aplicando TGV Denoise..." : "Applying TGV Denoise...");
+      return computeTGVDenoise(srcImg);
+    }
+    if (algo === "graxpert") {
+      // Hilo principal (el worker fallaba al init de WASM; el ORT del hilo principal sí funciona).
+      showLoader(lang === "es" ? "Cargando modelo GraXpert Denoise..." : "Loading GraXpert Denoise model...");
+      const strength = parseFloat(el("sldPostGraXpertStrength").value);
+      const d = await window.GraXpert.computeDenoiseGraXpert(srcImg, { strength }, (idx, total) => {
+        const lt = el("piwLoaderText");
+        if (lt) lt.textContent = (lang === "es" ? `Procesando mosaico ${idx}/${total}...` : `Processing tile ${idx}/${total}...`);
+      });
+      return { ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor };
+    }
+    if (algo === "cosmic") {
+      const isColor = srcImg.isColor && srcImg.nc >= 3;
+      showLoader(lang === "es" ? "Cargando Cosmic Clarity Denoise..." : "Loading Cosmic Clarity Denoise...");
+      const url = resolveDenoiseModel(isColor ? COSMIC_DENOISE_COLOR_PROD : COSMIC_DENOISE_MONO_PROD,
+        isColor ? "cosmic_denoise_color.onnx" : "cosmic_denoise_mono.onnx");
+      const modelData = await window.OnnxEngine.fetchModelWithCache(url, (p) => {
+        showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
+      });
+      const session = await window.OnnxEngine.createSession(modelData);
+      showLoader(lang === "es" ? "Procesando Cosmic Clarity Denoise..." : "Processing Cosmic Clarity Denoise...");
+      // Estirar -> inferir -> des-estirar (modelo entrenado con datos estirados; robustez a luminancia).
+      const m = piwStretchMidtone(srcImg);
+      const stretchedSrc = { w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, ch: piwMtfStretchChans(srcImg.ch, m) };
+      const aiS = await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32, layout: "NCHW" });
+      const ai = piwMtfStretchChans(aiS, 1 - m);
+      return blendDenoise(srcImg, ai, parseFloat(el("sldPostCcnrLuma").value));
+    }
+    if (algo === "deepsnr") {
+      showLoader(lang === "es" ? "Cargando DeepSNR..." : "Loading DeepSNR...");
+      const url = resolveDenoiseModel(DEEPSNR_PROD, "deepsnr_v2.onnx");
+      const modelData = await window.OnnxEngine.fetchModelWithCache(url, (p) => {
+        showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
+      });
+      // DeepSNR tiene ops que WebGPU no ejecuta (Mul broadcast) -> forzar WASM (CPU).
+      const session = await window.OnnxEngine.createSession(modelData, { executionProviders: ["wasm"] });
+      showLoader(lang === "es" ? "Procesando DeepSNR..." : "Processing DeepSNR...");
+      const ai = await window.OnnxEngine.runOnnxModelTiled(session, srcImg, { tileSize: 512, fixedTile: 512, overlap: 32, layout: "NHWC" });
+      return blendDenoise(srcImg, ai, parseFloat(el("sldPostDeepSNRAmount").value));
+    }
+    throw new Error(`Algoritmo de denoise desconocido: ${algo}`);
+  }
+
+  // "Preview Noise Reduction": preview no destructivo sobre la Imagen Inicial.
   el("btnApplyPostNR").addEventListener("click", () => {
     const srcImg = state.stepInputImage || state.activeImage;
     if (!srcImg) return;
-
     const algo = el("selPostNoiseAlgo").value;
     const lang = document.documentElement.lang || "es";
-
-    if (algo === "graxpert") {
-      showLoader(lang === "es" ? "Cargando modelo GraXpert Denoise..." : "Loading GraXpert Denoise model...");
-
-      if (!denoiseWorker) denoiseWorker = new Worker("denoise-worker.js");
-
-      // Copiar canales antes de transferir (no desalojar srcImg)
-      const chCopy = srcImg.ch.map(c => new Float32Array(c));
-      const strength = parseFloat(el("sldPostGraXpertStrength").value);
-
-      denoiseWorker.onmessage = (e) => {
-        const d = e.data;
-        if (d.type === "status" || d.type === "progress") {
-          const txt = d.type === "status" ? d.message
-            : (lang === "es" ? `Procesando mosaico ${d.idx}/${d.total}...` : `Processing tile ${d.idx}/${d.total}...`);
-          el("piwLoaderText").textContent = txt;
-          return;
-        }
-        if (d.type === "error") {
-          logConsole(`Error en GraXpert Denoise: ${d.message}`, "err");
-          hideLoader();
-          return;
-        }
-        // type === "result"
-        commitActiveImage({ ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor }, "GraXpert Denoise", srcImg);
+    setTimeout(async () => {
+      try {
+        const res = await computeDenoise(algo, srcImg);
+        previewActiveImage(res, srcImg, "Noise Reduction");
         render();
-        refreshPathBar();
-        logConsole(
-          lang === "es" ? "Reducción de ruido GraXpert IA aplicada con éxito." : "GraXpert AI Noise Reduction applied successfully.",
-          "ok"
-        );
+        drawHistogram();
+        logConsole(lang === "es" ? "Vista previa de reducción de ruido (Preview). Pulsa 'Apply Denoise' para confirmar." : "Noise reduction preview. Press 'Apply Denoise' to commit.", "info");
+      } catch (e) {
+        logConsole(`Reducción de ruido: ${e.message}`, "warn");
+      } finally {
         hideLoader();
-      };
-
-      denoiseWorker.postMessage(
-        { ch: chCopy, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, opts: { strength } },
-        chCopy.map(c => c.buffer)
-      );
-    } else {
-      const msg = messages[lang].btnApplyPostNR || "Función no disponible en la versión web.";
-      logConsole(msg, "warn");
-    }
+      }
+    }, 50);
   });
-  // GRAXPERT-DENOISE-END
+
+  // "Comparar": corre los algoritmos disponibles sobre la Imagen Inicial y los guarda en Slots.
+  if (el("btnComparePostNR")) {
+    el("btnComparePostNR").addEventListener("click", () => {
+      const srcImg = state.stepInputImage || state.activeImage;
+      if (!srcImg) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Comparando reducciones de ruido..." : "Comparing noise reductions...");
+      setTimeout(async () => {
+        try {
+          const variants = [
+            { name: "TGV", algo: "tgv" },
+            { name: "GraXpert", algo: "graxpert" },
+            { name: "Cosmic Clarity", algo: "cosmic" },
+            { name: "DeepSNR", algo: "deepsnr" }
+          ];
+          const results = [];
+          for (const v of variants) {
+            try {
+              results.push({ name: v.name, img: await computeDenoise(v.algo, srcImg) });
+            } catch (e) {
+              logConsole((lang === "es" ? `${v.name} omitido: ` : `${v.name} skipped: `) + e.message, "warn");
+            }
+          }
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            state.imageSlots[i] = cloneImage({ ch: r.img.ch, w: r.img.w, h: r.img.h, nc: r.img.nc, isColor: r.img.isColor, wcs: srcImg && srcImg.wcs });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) { slotBtn.classList.add("filled"); slotBtn.title = "Denoise: " + r.name; }
+            logConsole(`Slot ${i + 1} ← ${r.name}`, "info");
+          }
+          updateMixSourceOptions();
+          hideLoader();
+          logConsole(lang === "es"
+            ? `Comparación lista: ${results.length} en Slots 1-${results.length}. Carga un slot y pulsa 'Apply Denoise'.`
+            : `Comparison ready: ${results.length} in Slots 1-${results.length}.`, "ok");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+  // DENOISE-PATTERN-END
 
   // USM-SHARP-BEGIN
   el("btnApplyPostSharp").addEventListener("click", () => {
@@ -4656,6 +4823,15 @@
           // Descolapsar esta sección y colapsar todas las demás
           document.querySelectorAll(".piw-section").forEach(s => s.classList.add("collapsed"));
           section.classList.remove("collapsed");
+          // PREVIEW-DISCARD: al cambiar de sección, descartar cualquier preview NO aplicado.
+          // La Imagen Inicial de la nueva sección es la imagen COMMITTED del flujo (no un preview
+          // sin confirmar). Tras "Aplicar", committed === activeImage, así que el cambio persiste.
+          if (state.activeWorkflowKey && state.workflowImages[state.activeWorkflowKey] &&
+              state.activeImage !== state.workflowImages[state.activeWorkflowKey]) {
+            state.activeImage = state.workflowImages[state.activeWorkflowKey];
+            render();
+            drawHistogram();
+          }
           if (state.activeImage) {
             state.stepInputImage = cloneImage(state.activeImage);
           }
@@ -4803,7 +4979,6 @@
 
   // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
   const mockButtons = [
-    "btnComparePostNR",
     "btnComparePostSharp",
     "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
   ];
