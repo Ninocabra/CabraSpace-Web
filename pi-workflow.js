@@ -2934,7 +2934,40 @@
     });
   }
 
-  // Aplicar estirado
+  // STRETCH-COMPARE-BEGIN
+  // Motor de estirado reutilizable (Preview y Comparar). No destructivo: clona srcImg y devuelve img.
+  // Lee los valores actuales de los sliders de cada algoritmo.
+  async function computeStretch(algo, srcImg) {
+    const lang = document.documentElement.lang || "es";
+    let img = cloneImage(srcImg);
+    if (algo === "stf") {
+      const bg = parseFloat(el("sldStfBg").value);
+      const clip = parseFloat(el("sldStfClip").value);
+      runAutoSTF(img, bg, clip);
+    } else if (algo === "ghs") {
+      const cfg = AutoGHS.defaultConfig();
+      cfg.sigmasFromCenter = parseFloat(el("sldGhsSig").value);
+      cfg.stretchIntensity = parseFloat(el("sldGhsInt").value);
+      cfg.colorMode = img.isColor ? "luminance" : "rgb";
+      const res = AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, cfg);
+      img.ch = res.channels;
+    } else if (algo === "stars") {
+      const amt = parseFloat(el("sldStarsStretch").value);
+      const asinhLut = window.LUT.buildLUT(x => Math.asinh(amt * x) / Math.asinh(amt), 65536);
+      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], asinhLut);
+    } else if (algo === "statistical_stretch") {
+      const tgt = parseFloat(el("sldStretchStatTgt").value);
+      const sig = parseFloat(el("sldStretchStatSigma").value);
+      const res = await window.SASProPyodide.processImageRaw(img, "statistical_stretch", { target_median: tgt, sigma_clip: sig });
+      img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+    } else if (algo === "curves") {
+      const lut = window.LUT.buildLUT((x) => curveEval(x), 65536);
+      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
+    }
+    return img;
+  }
+
+  // Aplicar estirado (Preview no destructivo)
   el("btnApplyStretch").addEventListener("click", () => {
     if (!state.activeImage) return;
     const algo = el("selStretchAlgo").value;
@@ -2944,44 +2977,11 @@
     setTimeout(async () => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        let img = cloneImage(srcImg);
-
-        if (algo === "stf") {
-          const bg = parseFloat(el("sldStfBg").value);
-          const clip = parseFloat(el("sldStfClip").value);
-          runAutoSTF(img, bg, clip);
-        } else if (algo === "ghs") {
-          const cfg = AutoGHS.defaultConfig();
-          cfg.sigmasFromCenter = parseFloat(el("sldGhsSig").value);
-          cfg.stretchIntensity = parseFloat(el("sldGhsInt").value);
-          cfg.colorMode = img.isColor ? "luminance" : "rgb";
-          
-          const res = AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, cfg);
-          img.ch = res.channels;
-          logConsole("Estirado AutoGHS completado:\n" + res.log.join("\n"), "info");
-        } else if (algo === "stars") {
-          const amt = parseFloat(el("sldStarsStretch").value);
-          // LUT-ASINH-BEGIN
-          const asinhLut = window.LUT.buildLUT(x => Math.asinh(amt * x) / Math.asinh(amt), 65536);
-          for (let c = 0; c < img.nc; ++c) {
-            img.ch[c] = window.LUT.applyLUT(img.ch[c], asinhLut);
-          }
-          // LUT-ASINH-END
-          logConsole(`Estirado de estrellas asinh aplicado (Intensidad ${amt.toFixed(2)})`, "info");
-        } else if (algo === "statistical_stretch") {
-          // Statistical Stretch de SetiAstro vía Pyodide (auto-inicializa Python la 1ª vez).
+        if (algo === "statistical_stretch") {
           showLoader(lang === "es" ? "Statistical Stretch (Pyodide, puede tardar la 1ª vez)..." : "Statistical Stretch (Pyodide, may take a while first run)...");
-          const tgt = parseFloat(el("sldStretchStatTgt").value);
-          const sig = parseFloat(el("sldStretchStatSigma").value);
-          const res = await window.SASProPyodide.processImageRaw(img, "statistical_stretch", { target_median: tgt, sigma_clip: sig });
-          img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
-          logConsole(lang === "es" ? `Statistical Stretch aplicado (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})` : `Statistical Stretch applied (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})`, "info");
-        } else if (algo === "curves") {
-          // Curva Manual / Sigmoide: spline por los puntos editables (sembrados por los sliders).
-          const lut = window.LUT.buildLUT((x) => curveEval(x), 65536);
-          for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
-          logConsole(lang === "es" ? `Curva manual aplicada (${stretchPoints.length} puntos)` : `Manual curve applied (${stretchPoints.length} points)`, "info");
         }
+        const img = await computeStretch(algo, srcImg);
+        logConsole(lang === "es" ? `Estirado aplicado: ${algo}` : `Stretch applied: ${algo}`, "info");
 
         // Preview NO destructivo sobre la Imagen Inicial; el commit lo hace el botón grande "Aplicar Estirado".
         previewActiveImage(img, srcImg, "Stretch");
@@ -2999,6 +2999,51 @@
       }
     }, 50);
   });
+
+  // "Comparar estirados": ejecuta todos los algoritmos y guarda cada resultado en un Slot de memoria.
+  if (el("btnCompareStretch")) {
+    el("btnCompareStretch").addEventListener("click", () => {
+      const srcImg = state.stepInputImage || state.activeImage;
+      if (!srcImg) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Comparando estirados (puede tardar por Statistical Stretch)..." : "Comparing stretches (may take a while for Statistical Stretch)...");
+      setTimeout(async () => {
+        try {
+          const variants = [
+            { name: "STF", algo: "stf" },
+            { name: "AutoGHS", algo: "ghs" },
+            { name: "Statistical Stretch", algo: "statistical_stretch" },
+            { name: lang === "es" ? "Estrellas (asinh)" : "Stars (asinh)", algo: "stars" },
+            { name: lang === "es" ? "Curva Manual" : "Manual Curve", algo: "curves" }
+          ];
+          const results = [];
+          for (const v of variants) {
+            try {
+              results.push({ name: v.name, img: await computeStretch(v.algo, srcImg) });
+            } catch (e) {
+              logConsole((lang === "es" ? `${v.name} omitido: ` : `${v.name} skipped: `) + e.message, "warn");
+            }
+          }
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            state.imageSlots[i] = cloneImage({ ch: r.img.ch, w: r.img.w, h: r.img.h, nc: r.img.nc, isColor: r.img.isColor, wcs: srcImg && srcImg.wcs });
+            const slotBtn = document.querySelector(`.piw-slot-btn[data-slot="${i + 1}"]`);
+            if (slotBtn) { slotBtn.classList.add("filled"); slotBtn.title = "Stretch: " + r.name; }
+            logConsole(`Slot ${i + 1} ← ${r.name}`, "info");
+          }
+          updateMixSourceOptions();
+          hideLoader();
+          logConsole(lang === "es"
+            ? `Comparación lista: ${results.length} estirados en Slots 1-${results.length}. Carga un slot para verlo.`
+            : `Comparison ready: ${results.length} stretches in Slots 1-${results.length}.`, "ok");
+        } catch (e) {
+          hideLoader();
+          logConsole(`Error: ${e.message}`, "err");
+        }
+      }, 50);
+    });
+  }
+  // STRETCH-COMPARE-END
 
   // --- OPERACIONES DE POST-PROCESADO (TAB 2) ---
 
