@@ -2904,6 +2904,22 @@
     el("stretch-stars-controls").style.display = val === "stars" ? "block" : "none";
     const statCtl = el("stretch-stat-controls");
     if (statCtl) statCtl.style.display = val === "statistical_stretch" ? "block" : "none";
+    const curvesCtl = el("stretch-curves-controls");
+    if (curvesCtl) {
+      curvesCtl.style.display = val === "curves" ? "block" : "none";
+      if (val === "curves") drawHistogram();
+    }
+  });
+
+  // Sliders de la Curva Manual: actualizan el valor y redibujan la curva en vivo.
+  ["Black", "Mid", "Contrast"].forEach((suffix) => {
+    const sld = el("sldStretch" + suffix);
+    if (!sld) return;
+    sld.addEventListener("input", () => {
+      const v = el("valStretch" + suffix);
+      if (v) v.textContent = parseFloat(sld.value).toFixed(2);
+      drawStretchCurve();
+    });
   });
 
   // Aplicar estirado
@@ -2948,6 +2964,14 @@
           const res = await window.SASProPyodide.processImageRaw(img, "statistical_stretch", { target_median: tgt, sigma_clip: sig });
           img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
           logConsole(lang === "es" ? `Statistical Stretch aplicado (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})` : `Statistical Stretch applied (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})`, "info");
+        } else if (algo === "curves") {
+          // Curva Manual / Sigmoide definida por los sliders Punto Negro / Medios / Contraste.
+          const black = parseFloat(el("sldStretchBlack").value);
+          const mid = parseFloat(el("sldStretchMid").value);
+          const contrast = parseFloat(el("sldStretchContrast").value);
+          const lut = window.LUT.buildLUT((x) => stretchCurveValue(x, black, mid, contrast), 65536);
+          for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
+          logConsole(lang === "es" ? `Curva manual aplicada (Negro ${black.toFixed(2)}, Medios ${mid.toFixed(2)}, Contraste ${contrast.toFixed(2)})` : `Manual curve applied`, "info");
         }
 
         // Preview NO destructivo sobre la Imagen Inicial; el commit lo hace el botón grande "Aplicar Estirado".
@@ -4334,7 +4358,43 @@
     points.push(`${width},${height}`);
 
     el("histogramPath").setAttribute("d", `M ${points.join(" L ")} Z`);
+    drawStretchCurve();
   }
+
+  // STRETCH-CURVE-BEGIN
+  // Curva de estirado "Curva Manual / Sigmoide" definida por sliders (los estirados más usados):
+  // Punto Negro (clip de sombras), Medios (MTF midtone, <0.5 = más brillante) y Contraste (sigmoide).
+  function stretchCurveValue(x, black, mid, contrast) {
+    let v = (x - black) / Math.max(1e-6, 1.0 - black);
+    if (v < 0) v = 0; else if (v > 1) v = 1;
+    if (Math.abs(mid - 0.5) > 1e-4) {
+      const m = mid;
+      const den = (2 * m - 1) * v - m;
+      if (Math.abs(den) > 1e-12) v = ((m - 1) * v) / den;
+    }
+    if (Math.abs(contrast) > 1e-4) {
+      const k = contrast * 6;
+      const sig = (t) => 1 / (1 + Math.exp(-k * (t - 0.5)));
+      const s0 = sig(0), s1 = sig(1);
+      v = (sig(v) - s0) / (s1 - s0);
+    }
+    return v < 0 ? 0 : (v > 1 ? 1 : v);
+  }
+  function drawStretchCurve() {
+    const path = el("stretchCurvePath");
+    if (!path) return;
+    const black = parseFloat(el("sldStretchBlack").value);
+    const mid = parseFloat(el("sldStretchMid").value);
+    const contrast = parseFloat(el("sldStretchContrast").value);
+    const W = 330, H = 60, pts = [];
+    for (let i = 0; i <= 64; i++) {
+      const x = i / 64;
+      const v = stretchCurveValue(x, black, mid, contrast);
+      pts.push(`${(x * W).toFixed(1)},${((1 - v) * H).toFixed(1)}`);
+    }
+    path.setAttribute("d", `M ${pts.join(" L ")}`);
+  }
+  // STRETCH-CURVE-END
 
   // --- CONTROLES DE ZOOM, PAN Y SPLIT SLIDER ---
 
