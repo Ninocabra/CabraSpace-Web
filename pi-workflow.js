@@ -1879,7 +1879,10 @@
     state.activeWorkflowKey = key;
     state.activeImage = state.workflowImages[key];
     state.originalImage = cloneImage(state.activeImage);
-    
+    // La imagen seleccionada pasa a ser la Imagen Inicial de las operaciones (estirado, etc.),
+    // para que se apliquen sobre lo que el usuario tiene seleccionado (RGB/Starless/Stars/…).
+    state.stepInputImage = cloneImage(state.activeImage);
+
     // MONO-RGB-VIS-BEGIN
     el("piwHint").style.display = "none";
     el("piwToolbar").style.display = "flex";
@@ -2864,27 +2867,22 @@
           state.starlessImage = starlessOut;
           state.starsImage = starsOut;
 
-          // Registrar en workflowImages de forma que sean seleccionables en la barra de flujo
-          state.workflowImages["Starless"] = starlessOut;
-          state.workflowImages["Stars"] = starsOut;
-
-          // Activar el checkbox de visualización "Starless"
-          const chkStarless = el("chkStarlessView");
-          if (chkStarless) {
-            chkStarless.checked = true;
-          }
+          // Nombrar por ORIGEN: "Starless <key>" / "Stars <key>" para soportar splits de varias
+          // fuentes (RGB, MonoRGB, ...). Cada una mantiene su propio par seleccionable en el flujo.
+          const srcKey = state.activeWorkflowKey || "RGB";
+          const starlessKey = "Starless " + srcKey;
+          const starsKey = "Stars " + srcKey;
+          state.workflowImages[starlessKey] = starlessOut;
+          state.workflowImages[starsKey] = starsOut;
 
           logConsole(lang === "es"
-            ? "Eliminación de estrellas (nox) completada con éxito."
-            : "Star removal (nox) completed successfully.",
+            ? `Eliminación de estrellas (nox) completada: creados "${starlessKey}" y "${starsKey}".`
+            : `Star removal (nox) completed: created "${starlessKey}" and "${starsKey}".`,
             "info"
           );
 
-          el("btnLoadStarless").classList.add("primary");
-          el("btnLoadStars").classList.add("primary");
-
           updateMixSourceOptions();
-          selectWorkflowKey("Starless"); // Cambiar automáticamente la vista a Starless
+          selectWorkflowKey(starlessKey); // ver el starless de esa fuente
         } catch (err) {
           logConsole(`Error en nox: ${err.message}`, "err");
           console.error(err);
@@ -2904,23 +2902,21 @@
     el("stretch-stf-controls").style.display = val === "stf" ? "block" : "none";
     el("stretch-ghs-controls").style.display = val === "ghs" ? "block" : "none";
     el("stretch-stars-controls").style.display = val === "stars" ? "block" : "none";
+    const statCtl = el("stretch-stat-controls");
+    if (statCtl) statCtl.style.display = val === "statistical_stretch" ? "block" : "none";
   });
 
   // Aplicar estirado
   el("btnApplyStretch").addEventListener("click", () => {
     if (!state.activeImage) return;
     const algo = el("selStretchAlgo").value;
-    showLoader("Estirando imagen...");
+    const lang = document.documentElement.lang || "es";
+    showLoader(lang === "es" ? "Estirando imagen (Preview)..." : "Stretching image (Preview)...");
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
         let img = cloneImage(srcImg);
-        
-        // Si el usuario marcó trabajar sobre capa Starless, trabajamos sobre ella
-        if (el("chkStarlessView").checked && state.starlessImage) {
-          img = cloneImage(state.starlessImage);
-        }
 
         if (algo === "stf") {
           const bg = parseFloat(el("sldStfBg").value);
@@ -2944,26 +2940,25 @@
           }
           // LUT-ASINH-END
           logConsole(`Estirado de estrellas asinh aplicado (Intensidad ${amt.toFixed(2)})`, "info");
+        } else if (algo === "statistical_stretch") {
+          // Statistical Stretch de SetiAstro vía Pyodide (auto-inicializa Python la 1ª vez).
+          showLoader(lang === "es" ? "Statistical Stretch (Pyodide, puede tardar la 1ª vez)..." : "Statistical Stretch (Pyodide, may take a while first run)...");
+          const tgt = parseFloat(el("sldStretchStatTgt").value);
+          const sig = parseFloat(el("sldStretchStatSigma").value);
+          const res = await window.SASProPyodide.processImageRaw(img, "statistical_stretch", { target_median: tgt, sigma_clip: sig });
+          img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+          logConsole(lang === "es" ? `Statistical Stretch aplicado (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})` : `Statistical Stretch applied (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})`, "info");
         }
 
-        // Confirmar el estirado. Si se trabajó sobre la capa Starless, mantenerla sincronizada
-        // y heredar de ella (no de srcImg) el wcs/historial.
-        const stretchSrc = (el("chkStarlessView").checked && state.starlessImage) ? state.starlessImage : srcImg;
-        if (el("chkStarlessView").checked && state.starlessImage) {
-          state.starlessImage = img;
-        }
-        commitActiveImage(img, "Stretch", stretchSrc);
-
-        // Una vez aplicado el estirado permanente, desactivar el estirado de pantalla AutoGHS
+        // Preview NO destructivo sobre la Imagen Inicial; el commit lo hace el botón grande "Aplicar Estirado".
+        previewActiveImage(img, srcImg, "Stretch");
+        // Tras estirar, desactivar el estirado de pantalla AutoSTF (vemos los datos ya estirados, no doble)
         state.screenStretchMode = false;
         const btnAutoStf = el("btnToolAutoSTF");
         if (btnAutoStf) btnAutoStf.classList.remove("active");
-        logConsole("Estirado permanente aplicado. Se desactiva el estirado de pantalla AutoSTF.", "info");
-
-        state.activeImage.hasTransforms = true;
         render();
         drawHistogram();
-        refreshPathBar();
+        logConsole(lang === "es" ? "Vista previa de estirado (Preview). Pulsa 'Aplicar Estirado' para confirmar." : "Stretch preview. Press 'Apply Stretch' to commit.", "info");
       } catch (err) {
         logConsole(`Error en estirado: ${err.message}`, "err");
       } finally {

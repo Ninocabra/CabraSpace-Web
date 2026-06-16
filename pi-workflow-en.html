@@ -1521,10 +1521,10 @@
         <div class="piw-tab-content" id="tab-stretch">
           <div class="piw-section collapsed">
             <h3 class="piw-section-title">Star Split (Separation)</h3>
-            <label class="piw-checkbox-row">
+            <label class="piw-checkbox-row" style="display:none;">
               <input type="checkbox" id="chkStarlessView"> Work with starless layer (Starless)
             </label>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <div style="display: none; gap: 8px; margin-bottom: 8px;">
               <button class="piw-btn" id="btnLoadStarless" style="flex: 1; font-size: 0.65rem;">Load Starless</button>
               <button class="piw-btn" id="btnLoadStars" style="flex: 1; font-size: 0.65rem;">Load Stars</button>
             </div>
@@ -1538,6 +1538,7 @@
             <select class="piw-select" id="selStretchAlgo">
               <option value="stf">Auto STF (PixInsight Screen Transfer)</option>
               <option value="ghs">AutoGHS (Generalised Hyperbolic)</option>
+              <option value="statistical_stretch">Statistical Stretch (SetiAstro)</option>
               <option value="stars">Stars Stretch (Hyperbolic)</option>
               <option value="curves">Manual Curve / Sigmoidal</option>
             </select>
@@ -1578,6 +1579,24 @@
               </div>
             </div>
 
+            <!-- Statistical Stretch (SetiAstro / Pyodide) controls -->
+            <div id="stretch-stat-controls" style="display:none;">
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label">Target Median</span>
+                  <span class="piw-value" id="valStretchStatTgt">0.15</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldStretchStatTgt" min="0.05" max="0.30" step="0.01" value="0.15">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label">Clipping Sigmas</span>
+                  <span class="piw-value" id="valStretchStatSigma">2.8</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldStretchStatSigma" min="1.0" max="6.0" step="0.1" value="2.8">
+              </div>
+            </div>
+
             <!-- Dynamic Stars Stretch controls -->
             <div id="stretch-stars-controls" style="display:none;">
               <div class="piw-control-group">
@@ -1589,7 +1608,7 @@
               </div>
             </div>
 
-            <button class="piw-btn primary" id="btnApplyStretch" disabled>Apply Stretch</button>
+            <button class="piw-btn primary" id="btnApplyStretch" disabled>Preview Stretch</button>
           </div>
 
           <div class="piw-section">
@@ -1601,7 +1620,7 @@
 
           <!-- SASPRO-TO-STRETCH-BEGIN -->
           <!-- SECTION 14: SAS Pro (Pyodide WASM) -->
-          <div class="piw-section collapsed" id="sectionSaspro">
+          <div class="piw-section collapsed" id="sectionSaspro" style="display:none;">
             <h3 class="piw-section-title">Statistical / Star Stretch (SAS Pro)</h3>
             <div style="margin-bottom: 8px;">
               <button class="piw-btn primary" id="btnInitSaspro" style="width:100%;">Initialize Python Env</button>
