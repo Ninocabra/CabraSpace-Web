@@ -2419,8 +2419,9 @@
   // SCNR-PRE-END
 
   // --- COSMIC CLARITY IA / STANDARD DECONVOLUTION ENGINE ---
-  // Modelos hospedados en la Release propia (models-v1). En localhost, resolveCosmicModelUrl tira de scratch/.
-  const RELEASE_BASE = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/";
+  // Modelos servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
+  // En localhost, resolveCosmicModelUrl tira de scratch/.
+  const RELEASE_BASE = "https://astronomy-proxy.vercel.app/m/";
   const STELLAR_MODEL_URL = RELEASE_BASE + "deep_sharp_stellar_cnn_AI3_5s.onnx";
   // En la Release solo está el nonstellar radius_2; todas las opciones de radio usan ese modelo.
   const NONSTELLAR_MODEL_URLS = {

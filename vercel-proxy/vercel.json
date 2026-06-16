@@ -3,6 +3,7 @@
   "buildCommand": null,
   "outputDirectory": null,
   "rewrites": [
+    { "source": "/m/:file", "destination": "/api/model?file=:file" },
     { "source": "/api/:path*", "destination": "/api/proxy?__upstreamPath=:path*" }
   ]
 }

@@ -8,9 +8,10 @@
 window.NoxStarRemoval = (function () {
   "use strict";
 
-  let MODEL_URL_COLOR = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/nox_color.fp16.onnx";
-  let MODEL_URL_GRAY = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/nox_gray.fp16.onnx";
-  let MODEL_URL_STARNET2 = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/starnet2.onnx";
+  // Servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
+  let MODEL_URL_COLOR = "https://astronomy-proxy.vercel.app/m/nox_color.fp16.onnx";
+  let MODEL_URL_GRAY = "https://astronomy-proxy.vercel.app/m/nox_gray.fp16.onnx";
+  let MODEL_URL_STARNET2 = "https://astronomy-proxy.vercel.app/m/starnet2.onnx";
 
   // Usar modelos locales al probar en entorno de desarrollo local
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {

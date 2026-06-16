@@ -11,7 +11,7 @@ importScripts('https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js');
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 const DENOISE_MODEL_URL = IS_LOCAL
   ? 'scratch/graxpert_denoise.onnx'
-  : 'https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/graxpert_denoise.onnx';
+  : 'https://astronomy-proxy.vercel.app/m/graxpert_denoise.onnx'; // proxy Vercel (CORS sobre Release)
 
 // --- IndexedDB helpers (mismo esquema que onnx-engine.js) ---
 const DB_NAME   = 'cosmic-clarity-models-db';

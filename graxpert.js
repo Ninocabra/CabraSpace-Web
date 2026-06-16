@@ -5,8 +5,9 @@
 window.GraXpert = (function () {
   "use strict";
 
-  let MODEL_URL = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/graxpert_bg.onnx";
-  let DENOISE_MODEL_URL = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/graxpert_denoise.onnx";
+  // Servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
+  let MODEL_URL = "https://astronomy-proxy.vercel.app/m/graxpert_bg.onnx";
+  let DENOISE_MODEL_URL = "https://astronomy-proxy.vercel.app/m/graxpert_denoise.onnx";
 
   // Usar modelo local al probar en desarrollo local
   if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
