@@ -2804,7 +2804,9 @@
                 ? `Procesando tiles: ${completed}/${total}`
                 : `Processing tiles: ${completed}/${total}`
               );
-            }
+            },
+            // Recuperación de detalle de nebulosa (slider; 0 = starless crudo del modelo)
+            (el("sldNoxRecover") ? parseFloat(el("sldNoxRecover").value) : 0)
           );
 
           let starlessOut = result.starless;
@@ -2918,9 +2920,19 @@
     sld.addEventListener("input", () => {
       const v = el("valStretch" + suffix);
       if (v) v.textContent = parseFloat(sld.value).toFixed(2);
+      setStretchPointsFromSliders(); // los sliders re-siembran la curva por puntos
       drawStretchCurve();
     });
   });
+
+  // Slider "Recuperar nebulosa" del star split (nox)
+  {
+    const sldRec = el("sldNoxRecover");
+    if (sldRec) sldRec.addEventListener("input", () => {
+      const v = el("valNoxRecover");
+      if (v) v.textContent = parseFloat(sldRec.value).toFixed(2);
+    });
+  }
 
   // Aplicar estirado
   el("btnApplyStretch").addEventListener("click", () => {
@@ -2965,13 +2977,10 @@
           img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
           logConsole(lang === "es" ? `Statistical Stretch aplicado (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})` : `Statistical Stretch applied (Target ${tgt.toFixed(2)}, Sigma ${sig.toFixed(1)})`, "info");
         } else if (algo === "curves") {
-          // Curva Manual / Sigmoide definida por los sliders Punto Negro / Medios / Contraste.
-          const black = parseFloat(el("sldStretchBlack").value);
-          const mid = parseFloat(el("sldStretchMid").value);
-          const contrast = parseFloat(el("sldStretchContrast").value);
-          const lut = window.LUT.buildLUT((x) => stretchCurveValue(x, black, mid, contrast), 65536);
+          // Curva Manual / Sigmoide: spline por los puntos editables (sembrados por los sliders).
+          const lut = window.LUT.buildLUT((x) => curveEval(x), 65536);
           for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
-          logConsole(lang === "es" ? `Curva manual aplicada (Negro ${black.toFixed(2)}, Medios ${mid.toFixed(2)}, Contraste ${contrast.toFixed(2)})` : `Manual curve applied`, "info");
+          logConsole(lang === "es" ? `Curva manual aplicada (${stretchPoints.length} puntos)` : `Manual curve applied (${stretchPoints.length} points)`, "info");
         }
 
         // Preview NO destructivo sobre la Imagen Inicial; el commit lo hace el botón grande "Aplicar Estirado".
@@ -4362,8 +4371,12 @@
   }
 
   // STRETCH-CURVE-BEGIN
-  // Curva de estirado "Curva Manual / Sigmoide" definida por sliders (los estirados más usados):
-  // Punto Negro (clip de sombras), Medios (MTF midtone, <0.5 = más brillante) y Contraste (sigmoide).
+  // Curva de estirado "Curva Manual / Sigmoide". Dos formas de definirla:
+  //  - Sliders (rápidos): Punto Negro, Medios (MTF midtone) y Contraste (sigmoide) -> siembran puntos.
+  //  - Editor de puntos: añadir (clic), arrastrar y quitar (doble clic) puntos sobre el histograma.
+  // La curva final es una spline cúbica monótona (PCHIP) por los puntos. mover un slider re-siembra.
+  let stretchPoints = [[0, 0], [1, 1]];
+
   function stretchCurveValue(x, black, mid, contrast) {
     let v = (x - black) / Math.max(1e-6, 1.0 - black);
     if (v < 0) v = 0; else if (v > 1) v = 1;
@@ -4380,20 +4393,119 @@
     }
     return v < 0 ? 0 : (v > 1 ? 1 : v);
   }
-  function drawStretchCurve() {
-    const path = el("stretchCurvePath");
-    if (!path) return;
+
+  function setStretchPointsFromSliders() {
     const black = parseFloat(el("sldStretchBlack").value);
     const mid = parseFloat(el("sldStretchMid").value);
     const contrast = parseFloat(el("sldStretchContrast").value);
+    stretchPoints = [];
+    for (let i = 0; i <= 8; i++) {
+      const x = i / 8;
+      stretchPoints.push([x, stretchCurveValue(x, black, mid, contrast)]);
+    }
+  }
+
+  // Spline cúbica monótona (Hermite con tangentes acotadas) por stretchPoints (ordenados por x).
+  function curveEval(x) {
+    const P = stretchPoints;
+    const last = P.length - 1;
+    if (x <= P[0][0]) return P[0][1];
+    if (x >= P[last][0]) return P[last][1];
+    let i = 0;
+    while (i < last && x > P[i + 1][0]) i++;
+    const x0 = P[i][0], y0 = P[i][1], x1 = P[i + 1][0], y1 = P[i + 1][1];
+    const h = x1 - x0;
+    if (h <= 1e-9) return y0;
+    const sec = (a, b) => (P[b][1] - P[a][1]) / Math.max(1e-9, P[b][0] - P[a][0]);
+    const s = sec(i, i + 1);
+    let m0 = (i > 0) ? (sec(i - 1, i) + s) / 2 : s;
+    let m1 = (i < last - 1) ? (s + sec(i + 1, i + 2)) / 2 : s;
+    if (s === 0) { m0 = 0; m1 = 0; } else {
+      if (m0 / s < 0) m0 = 0; if (m1 / s < 0) m1 = 0;
+      const a = m0 / s, b = m1 / s;
+      if (a * a + b * b > 9) { const tau = 3 / Math.sqrt(a * a + b * b); m0 = tau * a * s; m1 = tau * b * s; }
+    }
+    const t = (x - x0) / h, t2 = t * t, t3 = t2 * t;
+    let v = (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m0 + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m1;
+    return v < 0 ? 0 : (v > 1 ? 1 : v);
+  }
+
+  function drawStretchCurve() {
+    const path = el("stretchCurvePath");
+    if (!path) return;
     const W = 330, H = 60, pts = [];
-    for (let i = 0; i <= 64; i++) {
-      const x = i / 64;
-      const v = stretchCurveValue(x, black, mid, contrast);
-      pts.push(`${(x * W).toFixed(1)},${((1 - v) * H).toFixed(1)}`);
+    for (let i = 0; i <= 80; i++) {
+      const x = i / 80;
+      pts.push(`${(x * W).toFixed(1)},${((1 - curveEval(x)) * H).toFixed(1)}`);
     }
     path.setAttribute("d", `M ${pts.join(" L ")}`);
+    const svg = path.ownerSVGElement;
+    if (!svg) return;
+    svg.querySelectorAll("circle.stretch-pt").forEach((c) => c.remove());
+    const NS = "http://www.w3.org/2000/svg";
+    stretchPoints.forEach((p) => {
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("class", "stretch-pt");
+      c.setAttribute("cx", (p[0] * W).toFixed(1));
+      c.setAttribute("cy", ((1 - p[1]) * H).toFixed(1));
+      c.setAttribute("r", "2.5");
+      c.setAttribute("fill", "var(--gold-primary)");
+      svg.appendChild(c);
+    });
   }
+
+  // Editor interactivo de puntos sobre el SVG del histograma de estirado.
+  function setupStretchCurveEditor() {
+    const svg = el("stretchCurvePath") && el("stretchCurvePath").ownerSVGElement;
+    if (!svg) return;
+    let dragIdx = -1;
+    const toNorm = (ev) => {
+      const r = svg.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / r.width;
+      const y = 1 - (ev.clientY - r.top) / r.height;
+      return [Math.max(0, Math.min(1, x)), Math.max(0, Math.min(1, y))];
+    };
+    const findNear = (x, y) => {
+      for (let i = 0; i < stretchPoints.length; i++) {
+        const dx = stretchPoints[i][0] - x, dy = stretchPoints[i][1] - y;
+        if (dx * dx + dy * dy < 0.0016) return i;
+      }
+      return -1;
+    };
+    svg.style.cursor = "crosshair";
+    svg.addEventListener("mousedown", (ev) => {
+      const [x, y] = toNorm(ev);
+      let idx = findNear(x, y);
+      if (idx < 0) {
+        stretchPoints.push([x, y]);
+        stretchPoints.sort((a, b) => a[0] - b[0]);
+        idx = stretchPoints.findIndex((p) => p[0] === x && p[1] === y);
+      }
+      dragIdx = idx;
+      drawStretchCurve();
+      ev.preventDefault();
+    });
+    window.addEventListener("mousemove", (ev) => {
+      if (dragIdx < 0) return;
+      const [x, y] = toNorm(ev);
+      const isEnd = dragIdx === 0 || dragIdx === stretchPoints.length - 1;
+      const px = isEnd ? stretchPoints[dragIdx][0]
+        : Math.max(stretchPoints[dragIdx - 1][0] + 0.005, Math.min(stretchPoints[dragIdx + 1][0] - 0.005, x));
+      stretchPoints[dragIdx] = [px, y];
+      drawStretchCurve();
+    });
+    window.addEventListener("mouseup", () => { dragIdx = -1; });
+    svg.addEventListener("dblclick", (ev) => {
+      const [x, y] = toNorm(ev);
+      const idx = findNear(x, y);
+      if (idx > 0 && idx < stretchPoints.length - 1) {
+        stretchPoints.splice(idx, 1);
+        drawStretchCurve();
+      }
+    });
+  }
+  setStretchPointsFromSliders();
+  setupStretchCurveEditor();
   // STRETCH-CURVE-END
 
   // --- CONTROLES DE ZOOM, PAN Y SPLIT SLIDER ---
