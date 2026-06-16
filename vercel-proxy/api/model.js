@@ -55,26 +55,22 @@ export default async function handler(request) {
 
   const targetUrl = RELEASE_BASE + file;
 
-  // Reenvía Range si el cliente lo usa (no es el caso de fetchModelWithCache, pero por robustez).
-  const fwdHeaders = new Headers();
-  const range = request.headers.get("Range");
-  if (range) fwdHeaders.set("Range", range);
-
+  // IMPORTANTE: NO reenviamos Range ni devolvemos 206. El cliente (fetchModelWithCache) siempre
+  // descarga el modelo entero; servir respuestas parciales permitiría que el CDN de Vercel cachee
+  // un trozo (p.ej. 1 byte) y lo sirva a todos -> "protobuf parsing failed". Siempre GET completo -> 200.
   try {
     const upstream = await fetch(targetUrl, {
       method: request.method === "HEAD" ? "HEAD" : "GET",
-      headers: fwdHeaders,
       redirect: "follow",
     });
 
     const headers = new Headers();
     headers.set("Access-Control-Allow-Origin", allowedOrigin);
-    headers.set("Access-Control-Expose-Headers",
-      "Content-Length, Content-Range, Accept-Ranges, ETag");
+    headers.set("Access-Control-Expose-Headers", "Content-Length, ETag");
     headers.set("Vary", "Origin");
     headers.set("Content-Type", "application/octet-stream");
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
-    for (const h of ["content-length", "content-range", "accept-ranges", "etag"]) {
+    for (const h of ["content-length", "etag"]) {
       const v = upstream.headers.get(h);
       if (v) headers.set(h, v);
     }
