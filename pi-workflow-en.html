@@ -1528,7 +1528,11 @@
               <button class="piw-btn" id="btnLoadStarless" style="flex: 1; font-size: 0.65rem;">Load Starless</button>
               <button class="piw-btn" id="btnLoadStars" style="flex: 1; font-size: 0.65rem;">Load Stars</button>
             </div>
-            <button class="piw-btn primary" id="btnRunNox" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Remove stars (nox)</button>
+            <select class="piw-select" id="selStarAlgo" style="margin-bottom:8px;">
+              <option value="starnet2" selected>StarNet2</option>
+              <option value="nox">nox</option>
+            </select>
+            <button class="piw-btn primary" id="btnRunNox" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Remove stars</button>
             <div class="piw-control-group">
               <div class="piw-label-row">
                 <span class="piw-label" title="Keeps nebula texture the model smooths. 0 = raw starless (max star removal).">Recover nebula</span>

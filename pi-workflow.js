@@ -2789,7 +2789,9 @@
             };
           }
 
-          const result = await window.NoxStarRemoval.runNox(
+          const starAlgo = el("selStarAlgo") ? el("selStarAlgo").value : "starnet2";
+          const runFn = (starAlgo === "nox") ? window.NoxStarRemoval.runNox : window.NoxStarRemoval.runStarNet2;
+          const result = await runFn(
             inputImg,
             // Callback para progreso de descarga
             (p) => {

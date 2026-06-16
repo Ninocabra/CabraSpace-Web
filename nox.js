@@ -10,11 +10,13 @@ window.NoxStarRemoval = (function () {
 
   let MODEL_URL_COLOR = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/nox_color.fp16.onnx";
   let MODEL_URL_GRAY = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/nox_gray.fp16.onnx";
+  let MODEL_URL_STARNET2 = "https://github.com/Ninocabra/CabraSpace-Web/releases/download/models-v1/starnet2.onnx";
 
   // Usar modelos locales al probar en entorno de desarrollo local
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
     MODEL_URL_COLOR = "scratch/nox_color.fp16.onnx";
     MODEL_URL_GRAY = "scratch/nox_gray.fp16.onnx";
+    MODEL_URL_STARNET2 = "scratch/starnet2.onnx";
   }
 
   /**
@@ -101,47 +103,45 @@ window.NoxStarRemoval = (function () {
 
     let starlessCh = await window.OnnxEngine.runOnnxModelTiled(session, imgData, options);
 
-    // 3b. Recuperación de detalle de nebulosa (blend enmascarado) si recover > 0
+    return finishStarRemoval(imgData, starlessCh, recover, isColor);
+  }
+
+  // StarNet2: starless directo. NHWC 512x512 fijo, normalización [0,1] (sin escalado).
+  async function runStarNet2(imgData, onDownloadProgress, onTileProgress, recover) {
+    if (!imgData || !imgData.ch || imgData.ch.length === 0) {
+      throw new Error("No hay datos de imagen de entrada válidos.");
+    }
+    const isColor = imgData.isColor || imgData.nc === 3;
+    const modelData = await window.OnnxEngine.fetchModelWithCache(MODEL_URL_STARNET2, onDownloadProgress);
+    const session = await window.OnnxEngine.createSession(modelData);
+    const options = {
+      tileSize: 512, overlap: 64, padMode: "reflect", layout: "NHWC",
+      scaleIn: 1.0, offsetIn: 0.0, scaleOut: 1.0, offsetOut: 0.0,
+      onProgress: onTileProgress, channels: 3, fixedTile: 512
+    };
+    let starlessCh = await window.OnnxEngine.runOnnxModelTiled(session, imgData, options);
+    return finishStarRemoval(imgData, starlessCh, recover, isColor);
+  }
+
+  // Post-proceso común: recuperación de nebulosa (opcional) + capa de estrellas = max(0, orig - starless).
+  function finishStarRemoval(imgData, starlessCh, recover, isColor) {
     if (typeof recover === "number" && recover > 0) {
       starlessCh = applyNebulaRecover(imgData, starlessCh, recover);
     }
-
-    // 4. Calcular capa de estrellas: stars = max(0, original - starless)
-    const nc = imgData.nc;
-    const len = imgData.w * imgData.h;
-    const starsCh = [];
-
+    const nc = imgData.nc, len = imgData.w * imgData.h, starsCh = [];
     for (let c = 0; c < nc; ++c) {
-      const orig = imgData.ch[c];
-      const starless = starlessCh[c];
-      const stars = new Float32Array(len);
-
-      for (let i = 0; i < len; ++i) {
-        const diff = orig[i] - starless[i];
-        stars[i] = diff > 0.0 ? diff : 0.0;
-      }
+      const orig = imgData.ch[c], starless = starlessCh[c], stars = new Float32Array(len);
+      for (let i = 0; i < len; ++i) { const d = orig[i] - starless[i]; stars[i] = d > 0 ? d : 0; }
       starsCh.push(stars);
     }
-
     return {
-      starless: {
-        ch: starlessCh,
-        w: imgData.w,
-        h: imgData.h,
-        nc: nc,
-        isColor: isColor
-      },
-      stars: {
-        ch: starsCh,
-        w: imgData.w,
-        h: imgData.h,
-        nc: nc,
-        isColor: isColor
-      }
+      starless: { ch: starlessCh, w: imgData.w, h: imgData.h, nc: nc, isColor: isColor },
+      stars: { ch: starsCh, w: imgData.w, h: imgData.h, nc: nc, isColor: isColor }
     };
   }
 
   return {
-    runNox
+    runNox,
+    runStarNet2
   };
 })();
