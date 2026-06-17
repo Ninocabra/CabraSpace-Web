@@ -604,14 +604,39 @@
     // CF-WORKER-END
   }
 
+  // PLATE-SOLVE-HARDEN-BEGIN
+  // Lee una respuesta del plate solve como JSON con error CLARO si llega HTML/no-OK (en vez del
+  // críptico "Unexpected token '<'"). Reintenta en fallos transitorios (solo peticiones idempotentes).
+  async function solveFetchJson(url, options, label, retries = 0) {
+    let lastErr;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const res = await corsFetch(url, options);
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          const snip = (text || "").trim().slice(0, 140).replace(/\s+/g, " ");
+          throw new Error(`${label} → respuesta no-JSON (HTTP ${res.status}). Servidor devolvió: "${snip}…"`);
+        }
+        if (!res.ok) throw new Error(`${label} → HTTP ${res.status}: ${data.errmessage || data.error || "error del servidor"}`);
+        return data;
+      } catch (e) {
+        lastErr = e;
+        if (attempt < retries) { await new Promise(r => setTimeout(r, 1500)); continue; }
+      }
+    }
+    throw lastErr;
+  }
+
   async function getSessionKey() {
-    const res = await corsFetch("https://nova.astrometry.net/api/login", {
+    const data = await solveFetchJson("https://nova.astrometry.net/api/login", {
       method: "POST",
       body: new URLSearchParams({
         "request-json": JSON.stringify({ apikey: ASTROMETRY_API_KEY })
       })
-    });
-    const data = await res.json();
+    }, "Login");
     if (data.status !== "success") {
       throw new Error(data.errmessage || "Login fallido");
     }
@@ -677,11 +702,10 @@
     }));
     form.append("file", jpegBlob, "solve_img.jpg");
 
-    const res = await corsFetch("https://nova.astrometry.net/api/upload", {
+    const data = await solveFetchJson("https://nova.astrometry.net/api/upload", {
       method: "POST",
       body: form
-    });
-    const data = await res.json();
+    }, "Upload");
     if (data.status !== "success") {
       throw new Error(data.errmessage || "Upload fallido");
     }
@@ -692,9 +716,8 @@
     const url = `https://nova.astrometry.net/api/submissions/${subid}`;
     // Intentos de polling con reintento cada 5 segundos
     for (let i = 0; i < 40; i++) {
-      const res = await corsFetch(url);
-      const data = await res.json();
-      
+      const data = await solveFetchJson(url, undefined, "Estado de envío", 2);
+
       if (data.processing_finished === "true" || data.jobs && data.jobs.length > 0) {
         const job = data.jobs[0];
         if (job) return job;
@@ -707,8 +730,7 @@
 
   async function checkJobSolved(jobId) {
     const url = `https://nova.astrometry.net/api/jobs/${jobId}/info`;
-    const res = await corsFetch(url);
-    const data = await res.json();
+    const data = await solveFetchJson(url, undefined, "Info del job", 2);
     if (data.status === "success") {
       return data;
     }
@@ -717,10 +739,10 @@
 
   async function getCalibrationData(jobId) {
     const url = `https://nova.astrometry.net/api/jobs/${jobId}/calibration`;
-    const res = await corsFetch(url);
-    const data = await res.json();
+    const data = await solveFetchJson(url, undefined, "Calibración", 2);
     return data;
   }
+  // PLATE-SOLVE-HARDEN-END
 
   // Ejecución principal del solved
   async function performPlateSolving() {
