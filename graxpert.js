@@ -7,12 +7,13 @@ window.GraXpert = (function () {
 
   // Servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
   let MODEL_URL = "https://astronomy-proxy.vercel.app/m/graxpert_bg.onnx";
-  let DENOISE_MODEL_URL = "https://astronomy-proxy.vercel.app/m/graxpert_denoise.onnx";
+  // DENOISE fp16 (477->240MB, paridad imperceptible). Requiere subir graxpert_denoise.fp16.onnx al Release.
+  let DENOISE_MODEL_URL = "https://astronomy-proxy.vercel.app/m/graxpert_denoise.fp16.onnx";
 
   // Usar modelo local al probar en desarrollo local
   if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
     MODEL_URL = "scratch/graxpert_bg.onnx";
-    DENOISE_MODEL_URL = "scratch/graxpert_denoise.onnx";
+    DENOISE_MODEL_URL = "scratch/graxpert_denoise.fp16.onnx";
   }
 
   let session = null;
@@ -382,11 +383,12 @@ window.GraXpert = (function () {
       stats.push(stat);
 
       const norm = normalizeBG(srcCh, stat.median, stat.mad, 10.0);
-      const padded = padReflect(norm, origW, origH, 64);
+      // DN-TILE-OPT: contexto (pad) 64->32 -> bloque central 128->192 -> ~2.25x menos tiles (mas rapido).
+      const padded = padReflect(norm, origW, origH, 32);
       paddedChannels.push(padded);
     }
 
-    const paddedW = origW + 128; // w + 2*pad
+    const paddedW = origW + 64; // w + 2*pad (pad=32)
     const paddedR = paddedChannels[0];
     const paddedG = paddedChannels[1];
     const paddedB = paddedChannels[2];
@@ -397,7 +399,7 @@ window.GraXpert = (function () {
     const accumB = new Float32Array(origW * origH);
 
     // 4. Obtener posiciones de los tiles
-    const positions = getTilePositions(origW, origH, 256, 128, 64);
+    const positions = getTilePositions(origW, origH, 256, 192, 32); // DN-TILE-OPT: stride 128->192, pad 64->32
     const totalTiles = positions.length;
 
     // DN-BATCH-BEGIN
@@ -446,9 +448,9 @@ window.GraXpert = (function () {
         }
 
         // e) Colocar el bloque central
-        placeCentral(accumR, origW, origH, tileOutR, pos.tx, pos.ty, 64, 128);
-        placeCentral(accumG, origW, origH, tileOutG, pos.tx, pos.ty, 64, 128);
-        placeCentral(accumB, origW, origH, tileOutB, pos.tx, pos.ty, 64, 128);
+        placeCentral(accumR, origW, origH, tileOutR, pos.tx, pos.ty, 32, 192); // DN-TILE-OPT
+        placeCentral(accumG, origW, origH, tileOutG, pos.tx, pos.ty, 32, 192);
+        placeCentral(accumB, origW, origH, tileOutB, pos.tx, pos.ty, 32, 192);
 
         if (onTileProgress) {
           onTileProgress(b + i + 1, totalTiles);

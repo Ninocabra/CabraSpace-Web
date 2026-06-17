@@ -10,8 +10,8 @@ importScripts('https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.min.
 
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 const DENOISE_MODEL_URL = IS_LOCAL
-  ? 'scratch/graxpert_denoise.onnx'
-  : 'https://astronomy-proxy.vercel.app/m/graxpert_denoise.onnx'; // proxy Vercel (CORS sobre Release)
+  ? 'scratch/graxpert_denoise.fp16.onnx'
+  : 'https://astronomy-proxy.vercel.app/m/graxpert_denoise.fp16.onnx'; // fp16 (240MB); subir al Release
 
 // --- IndexedDB helpers (mismo esquema que onnx-engine.js) ---
 const DB_NAME   = 'cosmic-clarity-models-db';
