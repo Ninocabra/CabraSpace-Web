@@ -29,6 +29,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: 9.25 Edge HD**
   - [Celestron 9.25 Edge HD como telescopio visual](https://www.reddit.com/r/telescopes/comments/1tx6ezv/celestron_925_edge_as_a_visual_telescope/) (2026-06-05)
+- **Modelo: CPC Deluxe HD**
+  - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Celestron Origin**
   - [Tutorial Celestron Origin: La Magia del Dithering con el Dr. Sasse](https://www.youtube.com/watch?v=qOxpzE5EwL8) (2026-05-21)
 - **Modelo: EdgeHD 925**
