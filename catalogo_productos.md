@@ -193,6 +193,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Actualizaciones Generales / Revisiones:**
   - [Siril 1.4.2: Nueva versión del software de astrofotografía con correcciones y mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.2) (2026-05-02)
+- **Modelo: Procesamiento de Imágenes**
+  - [Siril Versión 1.4.4: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.4) (2026-06-16)
 
 ## Sky-Watcher
 
