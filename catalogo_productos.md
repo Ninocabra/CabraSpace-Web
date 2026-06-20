@@ -330,6 +330,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ToupTek Astro Presenta el Dispositivo de Astrofotografía HOPE D60](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
   - [Unboxing del telescopio HOPE D60 de ToupTek](https://www.youtube.com/shorts/OlJ7FbLOPVo) (2026-04-27)
 
+## Vaonis
+
+### TELESCOPES
+- **Modelo: Vespera Pro II**
+  - [Análisis del Telescopio Inteligente Vaonis Vespera Pro II de $3000](https://www.youtube.com/watch?v=HqQunRqZO0A) (2026-06-20)
+
 ## Vixen
 
 ### TELESCOPES
