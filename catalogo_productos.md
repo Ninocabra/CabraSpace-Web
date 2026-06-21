@@ -283,6 +283,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
 - **Modelo: SV535**
   - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
+- **Modelo: SV555**
+  - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
 
 ## Takahashi
 
