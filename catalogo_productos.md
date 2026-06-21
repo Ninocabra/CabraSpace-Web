@@ -128,6 +128,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
   - [Consejos sobre telescopios y astrofotografía](https://stargazerslounge.com/topic/445738-telescope-and-astrophotography-advice/) (2026-06-04)
   - [Mi primer telescopio](https://www.reddit.com/r/telescopes/comments/1tvo6ah/my_first_telescope/) (2026-06-03)
+- **Modelo: Marketing**
+  - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: StellaLyra**
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
   - [Nuevo telescopio Newtoniano StellaLyra 8" f/5 M-LRN con enfocador de doble velocidad de 2"](https://stargazerslounge.com/topic/445765-stellalyra-8-f5-m-lrn-newt-2-dual-speed-focuser/) (2026-06-05)
