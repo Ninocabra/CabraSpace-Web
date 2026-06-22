@@ -252,6 +252,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
 - **Modelo: Prime Day**
+  - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
   - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
 - **Modelo: SA207**
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
@@ -306,6 +307,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### CAMERAS
 - **Modelo: AE676C**
+  - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
   - [ToupTek AE676C: nueva cámara astronómica multiuso](https://www.youtube.com/shorts/TVxn5QNvEwY) (2026-05-22)
   - [Nueva Cámara Astronómica ToupTek AE676C Multiusos](https://www.youtube.com/watch?v=Brq_MnkY5a4) (2026-05-21)
