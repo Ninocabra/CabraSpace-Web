@@ -47,64 +47,72 @@ export default async function handler(request) {
     });
   }
 
-  const headers = new Headers(request.headers);
-  headers.set("host", "nova.astrometry.net");
+  // IMPORTANTE: NO copiamos las cabeceras del navegador. En el runtime Edge, reenviar el conjunto
+  // completo del navegador (content-length desfasado tras re-bufferizar, host, origin, referer,
+  // sec-fetch-*, client-hints, cookie...) puede tumbar la funcion -> 503 "Service Unavailable".
+  // Astrometry solo necesita el Content-Type para parsear el multipart/urlencoded. Construimos un
+  // set minimo y pedimos respuesta SIN comprimir (evita lios de content-encoding al re-emitir).
+  try {
+    let outBody = null;
+    const outHeaders = new Headers();
+    outHeaders.set("accept-encoding", "identity");
+    const hasBody = request.method !== "GET" && request.method !== "HEAD";
+    if (hasBody) {
+      const contentType = request.headers.get("content-type") || "";
+      const secretApiKey =
+        (typeof process !== "undefined" && process.env) ? process.env.ASTROMETRY_API_KEY : undefined;
+      const isLogin = upstreamPath === "login" && request.method === "POST";
 
-  // Cuerpo bufferizado (evita problemas de streaming/duplex en edge).
-  let outBody = null;
-  const hasBody = request.method !== "GET" && request.method !== "HEAD";
-  if (hasBody) {
-    const secretApiKey =
-      (typeof process !== "undefined" && process.env)
-        ? process.env.ASTROMETRY_API_KEY
-        : undefined;
-    const contentType = request.headers.get("content-type") || "";
-    const isLogin = upstreamPath === "login" && request.method === "POST";
-
-    if (isLogin && secretApiKey && contentType.includes("application/x-www-form-urlencoded")) {
-      // Hardening opcional: inyectar la API key desde el secreto del entorno.
-      try {
-        const text = await request.text();
-        const params = new URLSearchParams(text);
-        const reqJsonStr = params.get("request-json");
-        if (reqJsonStr) {
-          const reqJson = JSON.parse(reqJsonStr);
-          reqJson.apikey = secretApiKey;
-          params.set("request-json", JSON.stringify(reqJson));
-          outBody = params.toString();
-          headers.delete("content-length");
-        } else {
-          outBody = text;
+      if (isLogin && secretApiKey && contentType.includes("application/x-www-form-urlencoded")) {
+        // Hardening opcional: inyectar la API key desde el secreto del entorno.
+        try {
+          const text = await request.text();
+          const params = new URLSearchParams(text);
+          const reqJsonStr = params.get("request-json");
+          if (reqJsonStr) {
+            const reqJson = JSON.parse(reqJsonStr);
+            reqJson.apikey = secretApiKey;
+            params.set("request-json", JSON.stringify(reqJson));
+            outBody = params.toString();
+          } else {
+            outBody = text;
+          }
+        } catch (e) {
+          outBody = await request.arrayBuffer();
         }
-      } catch (e) {
+      } else {
         outBody = await request.arrayBuffer();
       }
-    } else {
-      outBody = await request.arrayBuffer();
+      // El Content-Type (con su boundary) es imprescindible para el multipart.
+      if (contentType) outHeaders.set("content-type", contentType);
     }
-  }
 
-  try {
     const response = await fetch(targetUrl, {
       method: request.method,
-      headers,
+      headers: outHeaders,
       body: outBody,
-      redirect: "manual",
+      redirect: "follow",
     });
 
-    const corsHeaders = new Headers(response.headers);
+    const corsHeaders = new Headers();
     corsHeaders.set("Access-Control-Allow-Origin", allowedOrigin);
     corsHeaders.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     corsHeaders.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    corsHeaders.set("Vary", "Origin");
+    const upstreamCT = response.headers.get("content-type");
+    if (upstreamCT) corsHeaders.set("content-type", upstreamCT);
 
-    return new Response(response.body, {
+    // Bufferizamos el cuerpo para no depender del streaming en Edge.
+    const buf = await response.arrayBuffer();
+    return new Response(buf, {
       status: response.status,
       statusText: response.statusText,
       headers: corsHeaders,
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
+    // Nunca devolver un 503/HTML a secas: el cliente recibe JSON con CORS y el motivo.
+    return new Response(JSON.stringify({ status: "error", proxy_error: String((err && err.message) || err) }), {
+      status: 502,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": allowedOrigin,
