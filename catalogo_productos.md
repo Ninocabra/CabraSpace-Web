@@ -258,6 +258,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Prime Day**
   - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
   - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
+- **Modelo: Rumak**
+  - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
   - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
@@ -286,6 +288,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Lanzamiento de la Librería INDI v2.2.3](https://github.com/indilib/indi/releases/tag/v2.2.3) (2026-06-14)
 
 ### TELESCOPES
+- **Modelo: MK127**
+  - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
 - **Modelo: Mak 127**
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
 - **Modelo: SV535**
