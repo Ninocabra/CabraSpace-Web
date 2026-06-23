@@ -9,6 +9,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Actualizaciones Generales / Revisiones:**
   - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
+- **Modelo: N160**
+  - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
 - **Modelo: SQA130**
   - [Análisis del Askar SQA130: El telescopio de astrofotografía de $5000](https://www.youtube.com/watch?v=dfo6W2LiXSo) (2026-06-05)
 
