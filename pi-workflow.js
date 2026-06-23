@@ -2276,11 +2276,14 @@
       // SCNR verde "average neutral": ninguna estrella es realmente verde; tras calibrar+neutralizar
       // queda un leve exceso verde (estrellas verdes / tinte) que es el artefacto clasico de astrofoto.
       // Validado sobre imagen real: esto lo elimina y deja colores correctos. (G = min(G, (R+B)/2)).
+      // SCNR a fuerza MODERADA (0.5): a plena fuerza (1.0) desatura y vuelve marron la nebulosa
+      // (validado en imagen real); 0.5 quita las estrellas verdes y el tinte sin embarrar el color.
       if (bn.isColor && bn.nc >= 3) {
+        const SCNR_AMT = 0.5;
         const n = bn.w * bn.h, R = bn.ch[0], G = bn.ch[1], B = bn.ch[2];
         for (let i = 0; i < n; i++) {
           const lim = (R[i] + B[i]) * 0.5;
-          if (G[i] > lim) G[i] = lim;
+          if (G[i] > lim) G[i] = G[i] + SCNR_AMT * (lim - G[i]);
         }
       }
       bn.wcs = res.wcs || (srcImg && srcImg.wcs);
