@@ -2273,6 +2273,16 @@
     const res = await computeSPCC(srcImg, wcsData);
     try {
       const bn = computeBackgroundNeutralizationCalib(res).img;
+      // SCNR verde "average neutral": ninguna estrella es realmente verde; tras calibrar+neutralizar
+      // queda un leve exceso verde (estrellas verdes / tinte) que es el artefacto clasico de astrofoto.
+      // Validado sobre imagen real: esto lo elimina y deja colores correctos. (G = min(G, (R+B)/2)).
+      if (bn.isColor && bn.nc >= 3) {
+        const n = bn.w * bn.h, R = bn.ch[0], G = bn.ch[1], B = bn.ch[2];
+        for (let i = 0; i < n; i++) {
+          const lim = (R[i] + B[i]) * 0.5;
+          if (G[i] > lim) G[i] = lim;
+        }
+      }
       bn.wcs = res.wcs || (srcImg && srcImg.wcs);
       bn.extra = res.extra;
       return bn;
@@ -2311,8 +2321,8 @@
       if (res.extra && res.extra.factors) {
         const k = res.extra.factors;
         logConsole(lang === "es"
-          ? `SSSC + fondo neutralizado. Ganancias Fase 1 (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`
-          : `SSSC + background neutralized. Stage 1 gains (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`,
+          ? `SSSC + fondo neutralizado + SCNR verde. Ganancias Fase 1 (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`
+          : `SSSC + background neutralized + green SCNR. Stage 1 gains (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`,
           "ok"
         );
       } else {
@@ -5123,7 +5133,7 @@
       btnPostFameNext: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameUndo: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameReset: "El enmascaramiento FAME requiere el script de PixInsight local.",
-      cardSPCC: "SSSC: calibración de color por estrellas (Gaia DR3, respuesta dependiente del color) + neutralización de fondo. Requiere Plate Solving.",
+      cardSPCC: "SSSC: calibración de color por estrellas (Gaia DR3, respuesta dependiente del color) + neutralización de fondo + SCNR verde. Requiere Plate Solving.",
       cardOT: "Optimal Transport requiere integración local. Use Auto Linear Fit en la versión web."
     },
     en: {
@@ -5142,7 +5152,7 @@
       btnPostFameNext: "FAME masking requires the local PixInsight script.",
       btnPostFameUndo: "FAME masking requires the local PixInsight script.",
       btnPostFameReset: "FAME masking requires the local PixInsight script.",
-      cardSPCC: "SSSC: star-based color calibration (Gaia DR3, color-dependent response) + background neutralization. Requires Plate Solving.",
+      cardSPCC: "SSSC: star-based color calibration (Gaia DR3, color-dependent response) + background neutralization + green SCNR. Requires Plate Solving.",
       cardOT: "Optimal Transport requires local integration. Please use Auto Linear Fit in the web version."
     }
   };
