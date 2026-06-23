@@ -739,6 +739,18 @@
     return null;
   }
 
+  // Espera a que el JOB termine de resolver (no basta con que exista). El job pasa por estados
+  // "solving" -> "success"/"failure". Sondea /info cada 3s hasta terminar o agotar el tiempo.
+  async function pollJobUntilSolved(jobId) {
+    for (let i = 0; i < 60; i++) {
+      const data = await solveFetchJson(`https://nova.astrometry.net/api/jobs/${jobId}/info`, undefined, "Estado del job", 2);
+      if (data.status === "success") return true;
+      if (data.status === "failure") return false;
+      await new Promise(r => setTimeout(r, 3000));
+    }
+    throw new Error("Timeout esperando que Astrometry.net resuelva el campo.");
+  }
+
   async function getCalibrationData(jobId) {
     const url = `https://nova.astrometry.net/api/jobs/${jobId}/calibration`;
     const data = await solveFetchJson(url, undefined, "Calibración", 2);
@@ -770,9 +782,16 @@
       // Polling para esperar a que termine el procesamiento y nos devuelva el id del Job
       showLoader(lang === "es" ? "Resolviendo campo (espera de 10-30s)..." : "Solving field (waiting 10-30s)...");
       const jobId = await pollSubmissionStatus(subid);
-      logConsole(lang === "es" ? `Job ID asignado: ${jobId}. Recuperando resultados...` : `Job ID assigned: ${jobId}. Fetching results...`, "info");
-      
-      const jobInfo = await checkJobSolved(jobId);
+      logConsole(lang === "es" ? `Job ID asignado: ${jobId}. Esperando a que resuelva...` : `Job ID assigned: ${jobId}. Waiting for solve...`, "info");
+
+      // Esperar a que el job termine de RESOLVER (no basta con que exista; tarda 15-60s).
+      showLoader(lang === "es" ? "Resolviendo campo (puede tardar 15-60s)..." : "Solving field (may take 15-60s)...");
+      const solved = await pollJobUntilSolved(jobId);
+      if (!solved) {
+        throw new Error(lang === "es"
+          ? "Astrometry.net no pudo resolver la imagen (campo no reconocido: prueba con más estrellas/menos procesada)."
+          : "Astrometry.net could not solve the image (field not recognized: try a less-processed image with more stars).");
+      }
       const calibration = await getCalibrationData(jobId);
       
       hideLoader();
