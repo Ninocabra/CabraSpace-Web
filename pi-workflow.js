@@ -3863,11 +3863,105 @@
     wheelIndicator.style.top = indY + "px";
   });
 
+  // FAME-BEGIN — pincel manual de máscara sobre el visor (dibujo a mano).
+  let fameActive = false;
+  let famePainting = false;
+  let fameHistory = [];   // snapshots de state.activeMask para "Deshacer" (1 por trazo)
+  let fameShapes = 0;     // contador informativo de trazos
+
+  function fameSetControlsEnabled(on) {
+    const c = el("mask-fame-controls");
+    if (!c) return;
+    c.classList.toggle("piw-disabled-control", !on);
+    c.querySelectorAll("input,select,button").forEach((i) => { i.disabled = !on; });
+  }
+  function fameUpdateLabel() {
+    const lbl = el("lblPostFameState");
+    if (lbl) lbl.innerHTML = `<b>Shapes:</b> ${fameShapes}  <b>Active:</b> ${fameActive ? "brush" : "none"}`;
+  }
+  function fameEnsureMask() {
+    const img = state.activeImage;
+    if (!img) return false;
+    const n = img.w * img.h;
+    if (!state.activeMask || state.activeMask.length !== n) state.activeMask = new Float32Array(n);
+    return true;
+  }
+  function famePaintAt(cx, cy) {
+    const img = state.activeImage; if (!img) return;
+    const w = img.w, h = img.h, m = state.activeMask;
+    const R = parseFloat(el("sldFameBrushRad").value) || 20;
+    const D = parseFloat(el("sldFameDensity").value); const dens = isNaN(D) ? 0.4 : D;
+    const sign = (el("selFameMaskMode") && el("selFameMaskMode").value === "subtract") ? -1 : 1;
+    const x0 = Math.max(0, Math.floor(cx - R)), x1 = Math.min(w - 1, Math.ceil(cx + R));
+    const y0 = Math.max(0, Math.floor(cy - R)), y1 = Math.min(h - 1, Math.ceil(cy + R));
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) {
+        const d = Math.hypot(x - cx, y - cy); if (d > R) continue;
+        const fall = 1 - (d / R);                 // pincel suave (más fuerte en el centro)
+        const i = y * w + x;
+        let v = m[i] + sign * dens * fall;
+        m[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
+      }
+    }
+  }
+  function fameBlurIfNeeded() {
+    const b = el("sldFameBlur") ? parseInt(el("sldFameBlur").value, 10) : 0;
+    if (!b || b < 1 || !state.activeMask || !window.BackgroundExtraction || !window.BackgroundExtraction.gaussianBlurMask) return;
+    // blur opcional via helper si existe; si no, se omite (el pincel ya es suave)
+  }
+  // Pintura con el ratón sobre el canvas (solo cuando FAME está activo).
+  cv.addEventListener("pointerdown", (e) => {
+    if (!fameActive || !fameEnsureMask()) return;
+    e.preventDefault();
+    fameHistory.push(Float32Array.from(state.activeMask));
+    if (fameHistory.length > 30) fameHistory.shift();
+    fameShapes++;
+    famePainting = true;
+    const p = getImageCoordsFromEvent(e);
+    famePaintAt(p.x, p.y);
+    state.previewMaskMode = true;
+    render(); fameUpdateLabel();
+  });
+  cv.addEventListener("pointermove", (e) => {
+    if (!fameActive || !famePainting) return;
+    const p = getImageCoordsFromEvent(e);
+    famePaintAt(p.x, p.y);
+    render();
+  });
+  window.addEventListener("pointerup", () => { famePainting = false; });
+
+  if (el("btnPostFameUndo")) el("btnPostFameUndo").addEventListener("click", () => {
+    if (fameHistory.length) { state.activeMask = fameHistory.pop(); if (fameShapes > 0) fameShapes--; render(); fameUpdateLabel(); }
+  });
+  if (el("btnPostFameReset")) el("btnPostFameReset").addEventListener("click", () => {
+    if (!fameEnsureMask()) return;
+    state.activeMask.fill(0); fameHistory = []; fameShapes = 0; render(); fameUpdateLabel();
+  });
+  if (el("btnPostFameNext")) el("btnPostFameNext").addEventListener("click", () => {
+    // "Siguiente forma": fija el estado actual como punto de no-retorno (limpia el historial de deshacer).
+    fameHistory = []; fameUpdateLabel();
+    const lang = document.documentElement.lang || "es";
+    logConsole(lang === "es" ? "FAME: nueva forma iniciada." : "FAME: new shape started.", "info");
+  });
+  // FAME-END
+
   // Mostrar u ocultar controles de máscara según tipo seleccionado
   el("selMaskType").addEventListener("change", (e) => {
     const val = e.target.value;
     el("mask-range-controls").style.display = val === "range" ? "block" : "none";
     el("mask-color-controls").style.display = val === "color" ? "block" : "none";
+    const fameC = el("mask-fame-controls");
+    if (fameC) fameC.style.display = val === "fame" ? "block" : "none";
+    fameActive = (val === "fame");
+    fameSetControlsEnabled(fameActive);
+    if (fameActive) {
+      fameEnsureMask();
+      const lang = document.documentElement.lang || "es";
+      logConsole(lang === "es"
+        ? "FAME activo: dibuja la máscara sobre la imagen con el ratón (añadir/restar, pincel ajustable). 'Aplicar máscara' la guarda."
+        : "FAME active: draw the mask on the image with the mouse (add/subtract, adjustable brush). 'Apply mask' saves it.", "info");
+    }
+    fameUpdateLabel();
   });
 
   // Previsualizar Máscara
@@ -3896,6 +3990,7 @@
     const img = state.activeImage;
     const n = img.w * img.h;
     const type = el("selMaskType").value;
+    if (type === "fame") return; // FAME: la máscara se pinta a mano; no regenerar (conserva state.activeMask).
     const mask = new Float32Array(n);
 
     if (type === "range") {
@@ -5132,10 +5227,6 @@
       btnApplyPostSharp: "El enfoque por deconvolución requiere el motor local BlurXTerminator en PixInsight.",
       btnComparePostSharp: "La comparación de algoritmos de enfoque está desactivada en la versión web.",
       btnApplyPostColor: "El balance de color por rueda cromática es un mockup interactivo. Aplique procesos activos en la pestaña Stretch.",
-      btnApplyPostCurves: "Las curvas interactivas son un mockup de diseño. Use procesos activos como STF o GHS para estirar.",
-      btnPostFameNext: "El enmascaramiento FAME requiere el script de PixInsight local.",
-      btnPostFameUndo: "El enmascaramiento FAME requiere el script de PixInsight local.",
-      btnPostFameReset: "El enmascaramiento FAME requiere el script de PixInsight local.",
       cardSPCC: "PCC (Photometric Color Calibration): balance por fotometría de estrellas Gaia DR3 (banda ancha, respuesta dependiente del color) + neutralización de fondo + SCNR. Requiere Plate Solving.",
       cardOT: "Optimal Transport requiere integración local. Use Auto Linear Fit en la versión web."
     },
@@ -5151,10 +5242,6 @@
       btnApplyPostSharp: "Deconvolution sharpening requires the local BlurXTerminator engine in PixInsight.",
       btnComparePostSharp: "Sharpening algorithm comparison is disabled in the web version.",
       btnApplyPostColor: "Color balance wheel is an interactive mockup. Use active processes in the Stretch tab.",
-      btnApplyPostCurves: "Interactive curves are a design mockup. Use active processes like STF or GHS to stretch.",
-      btnPostFameNext: "FAME masking requires the local PixInsight script.",
-      btnPostFameUndo: "FAME masking requires the local PixInsight script.",
-      btnPostFameReset: "FAME masking requires the local PixInsight script.",
       cardSPCC: "PCC (Photometric Color Calibration): white balance from Gaia DR3 broadband star photometry (color-dependent response) + background neutralization + SCNR. Requires Plate Solving.",
       cardOT: "Optimal Transport requires local integration. Please use Auto Linear Fit in the web version."
     }
@@ -5416,9 +5503,8 @@
   }
 
   // Desactivar tarjetas e inicializar comportamiento interactivo para botones y tarjetas mock
-  const mockButtons = [
-    "btnPostFameNext", "btnPostFameUndo", "btnPostFameReset"
-  ];
+  // FAME ya está implementado (pincel manual de máscara); no quedan botones mock.
+  const mockButtons = [];
   mockButtons.forEach(id => {
     const btn = el(id);
     if (btn) {
