@@ -4547,7 +4547,9 @@
     // No se aplica durante la pintura interactiva de FAME (para no ralentizar el pincel).
     const _dispW = cv.getBoundingClientRect().width || cv.width;
     const _dispRatio = _dispW > 0 ? cv.width / _dispW : 1;
-    const _aaR = (_dispRatio >= 1.8 && !famePainting) ? Math.max(1, Math.round(_dispRatio / 2)) : 0;
+    // Radio SUAVE y acotado (máx 2): antialias el downscale sin emborronar; evita sobre-suavizar
+    // cuando el visor es pequeño (ratios muy altos).
+    const _aaR = (_dispRatio >= 1.8 && !famePainting) ? Math.min(2, Math.max(1, Math.round((_dispRatio - 1) / 2.5))) : 0;
     if (_aaR) displayAntiAlias(id, _aaR);
 
     if (state.splitViewMode && state.splitCompareImage) {
