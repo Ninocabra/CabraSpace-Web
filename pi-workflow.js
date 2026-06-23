@@ -2265,6 +2265,22 @@
   }
   // BN-JS-END
 
+  // SPCC-BN-CHAIN: SPCC (calibración por estrellas) + Neutralización de Fondo encadenada.
+  // Validado en imágenes reales (ASI2600MM+RGB): tras calibrar las estrellas, el verde residual es
+  // luz parásita de fondo sin neutralizar; al neutralizarla el fondo queda gris (como el SPCC real
+  // de PixInsight, que integra la neutralización). Preserva wcs y los factores (extra) para el log.
+  async function computeSPCCNeutralized(srcImg, wcsData) {
+    const res = await computeSPCC(srcImg, wcsData);
+    try {
+      const bn = computeBackgroundNeutralizationCalib(res).img;
+      bn.wcs = res.wcs || (srcImg && srcImg.wcs);
+      bn.extra = res.extra;
+      return bn;
+    } catch (e) {
+      return res; // si la neutralización falla, devolvemos al menos la calibración por estrellas
+    }
+  }
+
   // Web-SPCC helper function
   async function runSPCC() {
     if (!state.activeImage) return;
@@ -2284,7 +2300,7 @@
     
     try {
       const srcImg = state.stepInputImage || state.activeImage;
-      const res = await computeSPCC(srcImg, wcsData);
+      const res = await computeSPCCNeutralized(srcImg, wcsData);
 
       // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
       previewActiveImage(res, srcImg, "SPCC");
@@ -2294,9 +2310,9 @@
 
       if (res.extra && res.extra.factors) {
         const k = res.extra.factors;
-        logConsole(lang === "es" 
-          ? `Web-SPCC Completado. Factores calculados (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]` 
-          : `Web-SPCC Completed. Calculated factors (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`, 
+        logConsole(lang === "es"
+          ? `Photometric CC + fondo neutralizado. Factores (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`
+          : `Photometric CC + background neutralized. Factors (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`,
           "ok"
         );
       } else {
@@ -2403,7 +2419,7 @@
           ];
           if (wcsData) {
             try {
-              results.push({ name: "SPCC", img: await computeSPCC(srcImg, wcsData) });
+              results.push({ name: "Photometric CC", img: await computeSPCCNeutralized(srcImg, wcsData) });
             } catch (e) {
               logConsole((lang === "es" ? "SPCC omitido: " : "SPCC skipped: ") + e.message, "warn");
             }
