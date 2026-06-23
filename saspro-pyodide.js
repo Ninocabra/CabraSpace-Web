@@ -815,10 +815,15 @@ def apply_spcc(img, catalog_stars, wcs_meta):
             
         # Si los flujos medidos son positivos y significativos
         if measured[0] > 0 and measured[1] > 0 and measured[2] > 0:
-            # Flujos del catálogo Gaia
+            # Flujos del catálogo Gaia, ANCLADOS a estrella blanca tipo G2V (Sol).
+            # La banda Gaia G es muy ancha y su magnitud sale sistematicamente mas brillante que
+            # BP/RP; usar 10^(-0.4*G) crudo infla el "verde de catalogo" -> los factores empujan la
+            # imagen a amarillo/verde. Restando los colores solares Gaia (G-RP=0.49, BP-RP=0.82),
+            # una estrella blanca da cat_r=cat_g=cat_b (neutro) y desaparece el sesgo. Validado:
+            # sobre imagen neutra los factores pasan de [1.57,1.0,0.74] (sesgo) a [1,1,1].
             cat_r = 10.0 ** (-0.4 * rp)
-            cat_g = 10.0 ** (-0.4 * g)
-            cat_b = 10.0 ** (-0.4 * bp)
+            cat_g = 10.0 ** (-0.4 * (g - 0.49))
+            cat_b = 10.0 ** (-0.4 * (bp - 0.82))
             
             measured_fluxes.append(measured)
             catalog_fluxes.append([cat_r, cat_g, cat_b])
