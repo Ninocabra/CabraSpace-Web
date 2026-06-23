@@ -4409,6 +4409,45 @@
 
   // --- VISUALIZADOR Y DIBUJO ---
 
+  // DISPLAY-AA-BEGIN: el canvas se renderiza a resolución completa y el navegador lo reduce por CSS
+  // al tamaño del visor (~1075px). A resoluciones altas (p.ej. 4000px) ese downscale bilineal del
+  // navegador produce ALIASING del campo estelar (se ve peor que a 2000px). Pre-filtramos la COPIA de
+  // display (box blur separable, NO toca los datos de trabajo/exportación) proporcional al ratio de
+  // reducción → el reescalado del navegador queda limpio. Solo afecta a lo que se ve en pantalla.
+  function displayAntiAlias(id, r) {
+    if (r < 1) return;
+    const w = id.width, h = id.height, d = id.data;
+    const tmp = new Uint8ClampedArray(d.length);
+    for (let y = 0; y < h; y++) {
+      const off = y * w * 4;
+      for (let c = 0; c < 3; c++) {
+        let sum = 0;
+        for (let k = 0; k <= r && k < w; k++) sum += d[off + k * 4 + c];
+        for (let xx = 0; xx < w; xx++) {
+          const cnt = Math.min(xx + r, w - 1) - Math.max(xx - r, 0) + 1;
+          tmp[off + xx * 4 + c] = sum / cnt;
+          const add = xx + r + 1, sub = xx - r;
+          if (add < w) sum += d[off + add * 4 + c];
+          if (sub >= 0) sum -= d[off + sub * 4 + c];
+        }
+      }
+    }
+    for (let x = 0; x < w; x++) {
+      for (let c = 0; c < 3; c++) {
+        let sum = 0;
+        for (let k = 0; k <= r && k < h; k++) sum += tmp[(k * w + x) * 4 + c];
+        for (let yy = 0; yy < h; yy++) {
+          const cnt = Math.min(yy + r, h - 1) - Math.max(yy - r, 0) + 1;
+          d[(yy * w + x) * 4 + c] = sum / cnt;
+          const add = yy + r + 1, sub = yy - r;
+          if (add < h) sum += tmp[(add * w + x) * 4 + c];
+          if (sub >= 0) sum -= tmp[(sub * w + x) * 4 + c];
+        }
+      }
+    }
+  }
+  // DISPLAY-AA-END
+
   function render() {
     // Detect change of activeImage reference
     if (state.activeImage && state.activeImage !== state._lastImgRef) {
@@ -4504,6 +4543,13 @@
       id = AutoGHS.channelsToImageData(channelsToDraw, img.w, img.h, img.nc);
     }
 
+    // DISPLAY-AA: antialias de la vista si el canvas se reduce mucho por CSS (p.ej. 4000px → ~1075px).
+    // No se aplica durante la pintura interactiva de FAME (para no ralentizar el pincel).
+    const _dispW = cv.getBoundingClientRect().width || cv.width;
+    const _dispRatio = _dispW > 0 ? cv.width / _dispW : 1;
+    const _aaR = (_dispRatio >= 1.8 && !famePainting) ? Math.max(1, Math.round(_dispRatio / 2)) : 0;
+    if (_aaR) displayAntiAlias(id, _aaR);
+
     if (state.splitViewMode && state.splitCompareImage) {
       // Renderizar vista dividida A/B
       let compChannelsToDraw = state.splitCompareImage.ch;
@@ -4515,6 +4561,7 @@
         }
       }
       const compId = AutoGHS.channelsToImageData(compChannelsToDraw, img.w, img.h, img.nc);
+      if (_aaR) displayAntiAlias(compId, _aaR);
       const splitX = Math.round(img.w * state.splitPercent);
       
       const tempCanvasA = document.createElement("canvas");
