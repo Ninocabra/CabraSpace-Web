@@ -835,31 +835,80 @@ def apply_spcc(img, catalog_stars, wcs_meta):
     measured_fluxes = np.array(measured_fluxes)
     catalog_fluxes = np.array(catalog_fluxes)
     
-    # Calcular ratios
-    ratios_r = catalog_fluxes[:, 0] / measured_fluxes[:, 0]
-    ratios_g = catalog_fluxes[:, 1] / measured_fluxes[:, 1]
-    ratios_b = catalog_fluxes[:, 2] / measured_fluxes[:, 2]
-    
-    k_r = np.median(ratios_r)
-    k_g = np.median(ratios_g)
-    k_b = np.median(ratios_b)
-    
-    # Normalizar para mantener el canal verde como referencia 1.0
-    if k_g > 0:
-        factor_r = k_r / k_g
-        factor_g = 1.0
-        factor_b = k_b / k_g
-    else:
-        factor_r, factor_g, factor_b = 1.0, 1.0, 1.0
-        
-    factors = [float(factor_r), float(factor_g), float(factor_b)]
-    
-    # Aplicar factores
+    # === Estilo SSSC (SetiAstro): Fase 1 (ganancias escalares) + Fase 2 (respuesta dependiente
+    # del color) ===. En vez de un factor fijo por canal (que sobre-corregia el azul y enverdecia
+    # las estrellas azules), se ajusta una relacion color-dependiente exp = poly(meas) por canal y se
+    # aplica POR PIXEL escalando alrededor de la mediana (pivot scale). Validado sobre imagen real
+    # (ASI2600MM+RGB): Fase 2 deja fondo neutro y estrellas con color correcto donde Fase 1 enverdecia.
+    eps = 1e-30
+    meas_RG = measured_fluxes[:, 0] / measured_fluxes[:, 1]
+    meas_BG = measured_fluxes[:, 2] / measured_fluxes[:, 1]
+    exp_RG  = catalog_fluxes[:, 0] / catalog_fluxes[:, 1]
+    exp_BG  = catalog_fluxes[:, 2] / catalog_fluxes[:, 1]
+    ok = (np.isfinite(meas_RG) & np.isfinite(meas_BG) & np.isfinite(exp_RG) & np.isfinite(exp_BG)
+          & (meas_RG > 0) & (meas_BG > 0) & (exp_RG > 0) & (exp_BG > 0))
+    meas_RG, meas_BG = meas_RG[ok], meas_BG[ok]
+    exp_RG, exp_BG = exp_RG[ok], exp_BG[ok]
+    if len(meas_RG) < 3:
+        return img, [1.0, 1.0, 1.0]
+
+    # Fase 1: ganancias escalares (mediana de ratios), G de referencia.
+    k_R = float(np.clip(np.median(meas_RG / exp_RG), 0.1, 10.0))
+    k_B = float(np.clip(np.median(meas_BG / exp_BG), 0.1, 10.0))
+
+    # Fase 2: sigma-clip de outliers + ajuste exp = poly(meas) (recta / afin / cuadratica, mejor RMS).
+    r_RG = (meas_RG / (k_R * exp_RG)) - 1.0
+    r_BG = (meas_BG / (k_B * exp_BG)) - 1.0
+    raw = np.abs(r_RG) + np.abs(r_BG)
+    med_r = np.median(raw)
+    mad_r = np.median(np.abs(raw - med_r)) * 1.4826
+    keep = (raw < med_r + 3.0 * mad_r) if mad_r > 0 else np.ones(len(raw), dtype=bool)
+
+    def _rms(pred, ev):
+        return float(np.sqrt(np.mean(((pred / np.where(ev > eps, ev, eps)) - 1.0) ** 2)))
+
+    def _fit_best(mr, er):
+        den = float(np.sum(mr * mr))
+        s = (float(np.sum(mr * er)) / den) if den > 0 else 1.0
+        best = ((0.0, float(s), 0.0), _rms(s * mr, er))
+        try:
+            ma, ba = np.linalg.lstsq(np.vstack([mr, np.ones_like(mr)]).T, er, rcond=None)[0]
+            ca = ((0.0, float(ma), float(ba)), _rms(ma * mr + ba, er))
+            if ca[1] < best[1]:
+                best = ca
+        except Exception:
+            pass
+        if len(mr) >= 6:
+            try:
+                a, b, c = np.polyfit(mr, er, 2)
+                pr = a * mr ** 2 + b * mr + c
+                if np.all(pr > 0):
+                    cq = ((float(a), float(b), float(c)), _rms(pr, er))
+                    if cq[1] < best[1]:
+                        best = cq
+            except Exception:
+                pass
+        return best[0]
+
+    cR = _fit_best(meas_RG[keep], exp_RG[keep])
+    cB = _fit_best(meas_BG[keep], exp_BG[keep])
+
+    # Aplicar Fase 2 por pixel, escalando R y B alrededor de su mediana (pivot scale, como SSSC/SFCC).
+    def _pivot(ch, gain, pv):
+        return pv + (ch - pv) * gain
+
+    Gc = np.maximum(img[1], 1e-8)
+    RG_px = img[0] / Gc
+    BG_px = img[2] / Gc
+    mR = np.clip(cR[0] * RG_px ** 2 + cR[1] * RG_px + cR[2], 0.25, 4.0)
+    mB = np.clip(cB[0] * BG_px ** 2 + cB[1] * BG_px + cB[2], 0.25, 4.0)
+
     calibrated = np.zeros_like(img)
-    calibrated[0] = np.clip(img[0] * factors[0], 0.0, 1.0)
-    calibrated[1] = np.clip(img[1] * factors[1], 0.0, 1.0)
-    calibrated[2] = np.clip(img[2] * factors[2], 0.0, 1.0)
-    
+    calibrated[1] = img[1]
+    calibrated[0] = np.clip(_pivot(img[0], mR / np.maximum(RG_px, 1e-8), float(np.median(img[0]))), 0.0, 1.0)
+    calibrated[2] = np.clip(_pivot(img[2], mB / np.maximum(BG_px, 1e-8), float(np.median(img[2]))), 0.0, 1.0)
+
+    factors = [float(k_R), 1.0, float(k_B)]
     return calibrated, factors
 `;
 
