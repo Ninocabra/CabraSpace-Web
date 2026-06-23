@@ -618,7 +618,9 @@
           data = JSON.parse(text);
         } catch (e) {
           const snip = (text || "").trim().slice(0, 140).replace(/\s+/g, " ");
-          throw new Error(`${label} → respuesta no-JSON (HTTP ${res.status}). Servidor devolvió: "${snip}…"`);
+          const server = res.headers.get("server") || "?";
+          const sw = (typeof navigator !== "undefined" && navigator.serviceWorker && navigator.serviceWorker.controller) ? "SW-activo" : "sin-SW";
+          throw new Error(`${label} → no-JSON (HTTP ${res.status}, server=${server}, ${sw}). Servidor devolvió: "${snip}…"`);
         }
         if (!res.ok) throw new Error(`${label} → HTTP ${res.status}: ${data.errmessage || data.error || "error del servidor"}`);
         return data;

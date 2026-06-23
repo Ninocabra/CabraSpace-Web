@@ -3,12 +3,17 @@
 <head>
   <link rel="icon" href="favicon_cabra.png" type="image/png">
   <meta charset="UTF-8">
-  <!-- COI-SW-BEGIN: cross-origin isolation (SharedArrayBuffer) para WASM multihilo en ONNX/Pyodide.
-       credentialless = no rompe Pyodide/CDN en Chrome/Edge; si el navegador no lo soporta, no aísla (sin acelerar) pero no rompe nada.
-       Reversible: borra este bloque en ambos .html + el archivo coi-serviceworker.min.js. -->
-  <script>window.coi = { coepCredentialless: () => true };</script>
-  <script src="coi-serviceworker.min.js"></script>
-  <!-- COI-SW-END -->
+  <!-- COI-SW-REMOVED: el service worker de cross-origin isolation interceptaba/re-emitía las peticiones
+       y rompía el POST multipart del plate solve (HTTP 503). Se desactiva y se DESREGISTRA cualquier SW
+       previo (los usuarios que ya lo tenían registrado lo pierden en la próxima recarga). WASM vuelve a
+       monohilo; WebGPU (la IA principal) intacto. Para reactivar isolation algún día, ver coi-serviceworker.min.js. -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); })
+        .catch(function () {});
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PI Workflow (BETA) - CabraSpace</title>
   <meta name="description" content="Sistema web de procesamiento y análisis de imágenes astronómicas basado en el cockpit de PixInsight. Estirado, calibración y mezcla en tiempo real.">
