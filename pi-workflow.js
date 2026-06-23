@@ -2311,8 +2311,8 @@
       if (res.extra && res.extra.factors) {
         const k = res.extra.factors;
         logConsole(lang === "es"
-          ? `Photometric CC + fondo neutralizado. Factores (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`
-          : `Photometric CC + background neutralized. Factors (R,G,B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`,
+          ? `SSSC + fondo neutralizado. Ganancias Fase 1 (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`
+          : `SSSC + background neutralized. Stage 1 gains (k_R,k_G,k_B): [${k[0].toFixed(4)}, ${k[1].toFixed(4)}, ${k[2].toFixed(4)}]`,
           "ok"
         );
       } else {
@@ -2419,7 +2419,7 @@
           ];
           if (wcsData) {
             try {
-              results.push({ name: "Photometric CC", img: await computeSPCCNeutralized(srcImg, wcsData) });
+              results.push({ name: "SSSC", img: await computeSPCCNeutralized(srcImg, wcsData) });
             } catch (e) {
               logConsole((lang === "es" ? "SPCC omitido: " : "SPCC skipped: ") + e.message, "warn");
             }
@@ -5123,7 +5123,7 @@
       btnPostFameNext: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameUndo: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameReset: "El enmascaramiento FAME requiere el script de PixInsight local.",
-      cardSPCC: "Calibración fotométrica con Gaia DR3 (consulta online). Requiere haber resuelto la imagen antes (Plate Solving).",
+      cardSPCC: "SSSC: calibración de color por estrellas (Gaia DR3, respuesta dependiente del color) + neutralización de fondo. Requiere Plate Solving.",
       cardOT: "Optimal Transport requiere integración local. Use Auto Linear Fit en la versión web."
     },
     en: {
@@ -5142,7 +5142,7 @@
       btnPostFameNext: "FAME masking requires the local PixInsight script.",
       btnPostFameUndo: "FAME masking requires the local PixInsight script.",
       btnPostFameReset: "FAME masking requires the local PixInsight script.",
-      cardSPCC: "Photometric calibration with Gaia DR3 (online query). Requires a solved image first (Plate Solving).",
+      cardSPCC: "SSSC: star-based color calibration (Gaia DR3, color-dependent response) + background neutralization. Requires Plate Solving.",
       cardOT: "Optimal Transport requires local integration. Please use Auto Linear Fit in the web version."
     }
   };
