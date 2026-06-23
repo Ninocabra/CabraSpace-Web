@@ -370,6 +370,25 @@
       font-weight: bold;
     }
 
+    /* Resolution dropdown inlined in the label row: same small gold font as .piw-value */
+    .piw-res-inline {
+      width: auto;
+      background: transparent;
+      border: none;
+      color: var(--gold-primary);
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 0.76rem;
+      padding: 0 2px;
+      margin: 0;
+      cursor: pointer;
+      text-align: right;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .piw-res-inline:focus { outline: none; }
+    .piw-res-inline option { background: #0a0a0a; color: var(--text-primary); }
+
     .piw-slider {
       width: 100%;
       -webkit-appearance: none;
@@ -1195,29 +1214,28 @@
             <h3 class="piw-section-title">Selection & Load</h3>
             
             <div class="piw-segmented-control">
-              <button class="piw-segment-btn active" data-mode="rgb-split">R+G+B</button>
+              <button class="piw-segment-btn" data-mode="rgb-split">R+G+B</button>
               <button class="piw-segment-btn" data-mode="nb-split">NB</button>
-              <button class="piw-segment-btn" data-mode="rgb-color">RGB</button>
+              <button class="piw-segment-btn active" data-mode="rgb-color">RGB</button>
             </div>
 
             <!-- WORK-RES-SELECTOR-BEGIN -->
             <div class="piw-control-group" style="margin-top:10px;">
               <div class="piw-label-row">
                 <span class="piw-label">Working resolution</span>
-                <span class="piw-value" id="valWorkRes">2000 px</span>
+                <select class="piw-res-inline" id="selWorkRes" title="Maximum long-edge size of the working image. Higher = more detail but slower and more memory. Applied when loading the image.">
+                  <option value="1000">1000 px</option>
+                  <option value="1500">1500 px</option>
+                  <option value="2000" selected>2000 px</option>
+                  <option value="3000">3000 px</option>
+                  <option value="4000">4000 px</option>
+                </select>
               </div>
-              <select class="piw-select" id="selWorkRes" title="Maximum long-edge size of the working image. Higher = more detail but slower and more memory. Applied when loading the image.">
-                <option value="1000">1000 px (fast)</option>
-                <option value="1500">1500 px</option>
-                <option value="2000" selected>2000 px (balanced)</option>
-                <option value="3000">3000 px</option>
-                <option value="4000">4000 px (max quality)</option>
-              </select>
             </div>
             <!-- WORK-RES-SELECTOR-END -->
 
             <!-- R+G+B Subzone -->
-            <div id="loading-rgb-split" class="piw-loading-subzone">
+            <div id="loading-rgb-split" class="piw-loading-subzone" style="display: none;">
               <div class="piw-channel-slots">
                 <div class="piw-channel-row piw-drop-target" data-channel="0" draggable="false">
                   <span class="piw-channel-dot r"></span>
@@ -1289,7 +1307,7 @@
             </div>
 
             <!-- RGB Subzone (Direct Color Image) -->
-            <div id="loading-rgb-color" class="piw-loading-subzone" style="display: none;">
+            <div id="loading-rgb-color" class="piw-loading-subzone">
               <div class="piw-channel-slots">
                 <div class="piw-channel-row piw-drop-target" data-channel="7" draggable="false">
                   <span class="piw-channel-dot r"></span>
@@ -1420,7 +1438,7 @@
           </div>
 
           <!-- SECTION 5: Color Calibration (Active / Partial) -->
-          <div class="piw-section">
+          <div class="piw-section collapsed">
             <h3 class="piw-section-title">Color Calibration</h3>
             <span class="piw-eyebrow">CHOOSE A METHOD</span>
             
@@ -1554,7 +1572,7 @@
             <input type="file" id="fileInputStars" accept="image/*,.fit,.fits,.fts,.xisf,.tif,.tiff" style="display:none;" />
           </div>
 
-          <div class="piw-section">
+          <div class="piw-section collapsed">
             <h3 class="piw-section-title">Stretch Algorithm</h3>
             <select class="piw-select" id="selStretchAlgo">
               <option value="stf">Auto STF (PixInsight Screen Transfer)</option>
@@ -2411,7 +2429,7 @@
 
         <!-- Tab 3: Channel Blending -->
         <div class="piw-tab-content" id="tab-combine">
-          <div class="piw-section" style="max-height:360px; overflow-y:auto; padding-right:4px;">
+          <div class="piw-section collapsed" style="max-height:360px; overflow-y:auto; padding-right:4px;">
             <h3 class="piw-section-title">Blending Layers</h3>
             
             <!-- Layer 1: Base (Nebula/Starless) -->
