@@ -2156,7 +2156,17 @@
 
   // SPCC: consulta Gaia DR3 (VizieR) + calibración en Pyodide. Requiere WCS (plate-solved).
   async function computeSPCC(srcImg, wcsData) {
-    const radiusArcmin = wcsData.radius * 60;
+    // Radio de búsqueda en Gaia. Preferimos el radius del plate solve; si falta, lo derivamos del
+    // pixscale (arcsec/px) y la diagonal de la imagen (evita que la consulta a Gaia falle).
+    let radiusArcmin;
+    if (wcsData.radius && wcsData.radius > 0) {
+      radiusArcmin = wcsData.radius * 60;
+    } else if (wcsData.pixscale && wcsData.pixscale > 0) {
+      const diagPx = Math.sqrt(srcImg.w * srcImg.w + srcImg.h * srcImg.h);
+      radiusArcmin = (diagPx * wcsData.pixscale) / 120; // medio-diagonal en arcmin
+    } else {
+      radiusArcmin = 30;
+    }
     const url = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/355/gaiadr3&-c=${wcsData.ra}+${wcsData.dec}&-c.r=${radiusArcmin}&-out=RA_ICRS&-out=DE_ICRS&-out=Gmag&-out=BPmag&-out=RPmag&-out.max=250`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
@@ -5097,7 +5107,7 @@
       btnPostFameNext: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameUndo: "El enmascaramiento FAME requiere el script de PixInsight local.",
       btnPostFameReset: "El enmascaramiento FAME requiere el script de PixInsight local.",
-      cardSPCC: "SPCC requiere catálogos Gaia DR3 locales. Use Auto Linear Fit en la versión web.",
+      cardSPCC: "Calibración fotométrica con Gaia DR3 (consulta online). Requiere haber resuelto la imagen antes (Plate Solving).",
       cardOT: "Optimal Transport requiere integración local. Use Auto Linear Fit en la versión web."
     },
     en: {
@@ -5116,7 +5126,7 @@
       btnPostFameNext: "FAME masking requires the local PixInsight script.",
       btnPostFameUndo: "FAME masking requires the local PixInsight script.",
       btnPostFameReset: "FAME masking requires the local PixInsight script.",
-      cardSPCC: "SPCC requires local Gaia DR3 catalogs. Please use Auto Linear Fit in the web version.",
+      cardSPCC: "Photometric calibration with Gaia DR3 (online query). Requires a solved image first (Plate Solving).",
       cardOT: "Optimal Transport requires local integration. Please use Auto Linear Fit in the web version."
     }
   };
