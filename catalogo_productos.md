@@ -243,6 +243,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Stellarium
 
 ### SOFTWARE
+- **Modelo: Planetario**
+  - [Lanzamiento de Stellarium v26.2: Nuevas Culturas Celestes y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.2) (2026-06-24)
 - **Modelo: planet visibility**
   - [Aplicaciones para ver disponibilidad de planetas](https://www.reddit.com/r/telescopes/comments/1tv5iua/hi_is_there_an_app_to_see_when_the_planet_be/) (2026-06-02)
 - **Modelo: planetarium software**
