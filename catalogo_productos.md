@@ -114,6 +114,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
 
 ### SOFTWARE
+- **Modelo: AI Denoise**
+  - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: NightVis**
@@ -274,6 +276,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: COOLCAM SC571CC**
   - [COOLCAM SC571CC: Cámara enfriada económica para astrofotografía - Revisión de Pros y Contras](https://www.youtube.com/watch?v=_LEwLFKDZIE) (2026-06-01)
 - **Modelo: SC571CC**
+  - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
   - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
   - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
   - [Comparativa APS-C vs. Formato Cuadrado: ¿Cómo elegir entre Svbony SC571CC y SV605CC?](https://www.youtube.com/watch?v=G1-ojw_hRbc) (2026-05-21)
@@ -298,6 +301,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
 
 ## Takahashi
+
+### ACCESSORIES
+- **Modelo: Hi-LE**
+  - [Anuncio de nuevos oculares Takahashi](https://stargazerslounge.com/topic/411644-new-takahashi-eyepieces-announced/) (2026-06-24)
 
 ### TELESCOPES
 - **Actualizaciones Generales / Revisiones:**
