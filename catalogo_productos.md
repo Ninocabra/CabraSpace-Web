@@ -275,6 +275,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Guía de uso del SV535 como telescopio guía](https://www.youtube.com/watch?v=Vg8XNKfpFMc) (2026-06-03)
 
 ### CAMERAS
+- **Modelo: Astro Camera**
+  - [Sv535 Sc571cc, una nueva cámara astrofotográfica de Svbony](https://www.youtube.com/watch?v=LvS19OipaJc) (2026-06-24)
 - **Modelo: COOLCAM SC571CC**
   - [COOLCAM SC571CC: Cámara enfriada económica para astrofotografía - Revisión de Pros y Contras](https://www.youtube.com/watch?v=_LEwLFKDZIE) (2026-06-01)
 - **Modelo: SC571CC**
