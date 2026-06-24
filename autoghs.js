@@ -162,12 +162,24 @@
   function capChannels(ch, w, h, nc, maxDim) {
     var lng = Math.max(w, h);
     if (lng <= maxDim) return { ch: ch, w: w, h: h };
-    var s = Math.ceil(lng / maxDim);
-    var nw = Math.floor(w / s), nh = Math.floor(h / s);
+    // Reescala a EXACTAMENTE el cap (lado largo = maxDim) con promediado por AREA (alta calidad),
+    // en vez del antiguo factor entero + vecino-mas-cercano (que daba p.ej. 6012->3006 y aliasing).
+    var scale = maxDim / lng;
+    var nw = Math.max(1, Math.round(w * scale));
+    var nh = Math.max(1, Math.round(h * scale));
+    var sx = w / nw, sy = h / nh; // tamaño de celda fuente por pixel destino (>= 1)
     var out = [];
     for (var c = 0; c < nc; ++c) {
       var a = ch[c], o = new Float32Array(nw * nh);
-      for (var y = 0; y < nh; ++y) for (var x = 0; x < nw; ++x) o[y*nw + x] = a[(y*s)*w + (x*s)];
+      for (var y = 0; y < nh; ++y) {
+        var y0 = (y * sy) | 0, y1 = Math.min(h, ((y + 1) * sy) | 0); if (y1 <= y0) y1 = y0 + 1;
+        for (var x = 0; x < nw; ++x) {
+          var x0 = (x * sx) | 0, x1 = Math.min(w, ((x + 1) * sx) | 0); if (x1 <= x0) x1 = x0 + 1;
+          var sum = 0, cnt = 0;
+          for (var yy = y0; yy < y1; ++yy) { var row = yy * w; for (var xx = x0; xx < x1; ++xx) { sum += a[row + xx]; cnt++; } }
+          o[y * nw + x] = sum / cnt;
+        }
+      }
       out[c] = o;
     }
     return { ch: out, w: nw, h: nh };
