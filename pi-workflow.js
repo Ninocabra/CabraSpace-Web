@@ -9,7 +9,7 @@
   "use strict";
 
   // --- CONFIGURACIÓN Y ESTADO GLOBAL ---
-  let MAX_PREVIEW_DIM = 2000; // Resolución máx. de trabajo (default 2000; ajustable por el selector "Resolución de trabajo", máx 4000). Se aplica al cargar.
+  let MAX_PREVIEW_DIM = 4000; // Resolución máx. de trabajo (default 4000 = máxima calidad; ajustable por el selector "Resolución de trabajo"). Se aplica al cargar.
   const wl = [0.2126, 0.7152, 0.0722]; // Pesos de luminancia Rec.709
 
   const state = {
