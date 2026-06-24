@@ -894,22 +894,31 @@ def apply_spcc(img, catalog_stars, wcs_meta):
     cB = _fit_best(meas_BG[keep], exp_BG[keep])
 
     # Aplicar Fase 2 por pixel, escalando R y B alrededor de su mediana (pivot scale, como SSSC/SFCC).
-    def _pivot(ch, gain, pv):
-        return pv + (ch - pv) * gain
+    # Aplicacion en MEMORIA REDUCIDA: a 4000px (~10.9M px) crear varios arrays full-res agotaba el heap
+    # de Pyodide (MemoryError). Modificamos img IN-PLACE (sin array 'calibrated') y liberamos los
+    # temporales entre canales con del -> el pico de memoria baja mucho.
+    def _apply_chan(chan, Gc, c):
+        rg = chan / Gc                       # ratio canal/G
+        gain = rg * rg                       # cuadratica con ops in-place (minimiza temporales)
+        gain *= c[0]
+        gain += c[1] * rg
+        gain += c[2]
+        np.clip(gain, 0.25, 4.0, out=gain)
+        np.maximum(rg, 1e-8, out=rg)
+        gain /= rg                           # gain = mC/ratio
+        del rg
+        pv = float(np.median(chan))
+        chan -= pv; chan *= gain; chan += pv  # pivot scale IN-PLACE
+        np.clip(chan, 0.0, 1.0, out=chan)
+        del gain
 
     Gc = np.maximum(img[1], 1e-8)
-    RG_px = img[0] / Gc
-    BG_px = img[2] / Gc
-    mR = np.clip(cR[0] * RG_px ** 2 + cR[1] * RG_px + cR[2], 0.25, 4.0)
-    mB = np.clip(cB[0] * BG_px ** 2 + cB[1] * BG_px + cB[2], 0.25, 4.0)
-
-    calibrated = np.zeros_like(img)
-    calibrated[1] = img[1]
-    calibrated[0] = np.clip(_pivot(img[0], mR / np.maximum(RG_px, 1e-8), float(np.median(img[0]))), 0.0, 1.0)
-    calibrated[2] = np.clip(_pivot(img[2], mB / np.maximum(BG_px, 1e-8), float(np.median(img[2]))), 0.0, 1.0)
+    _apply_chan(img[0], Gc, cR)              # R (vista in-place sobre img)
+    _apply_chan(img[2], Gc, cB)              # B
+    del Gc
 
     factors = [float(k_R), 1.0, float(k_B)]
-    return calibrated, factors
+    return img, factors
 `;
 
     const deconPy = `
