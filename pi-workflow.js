@@ -6321,8 +6321,10 @@
         btnText = lang === "es" ? "Recortar" : "Crop";
       }
     } else if (id === "sectionSolve" || titleText.includes("solve")) {
-      action = () => el("btnSolveImage")?.click();
-      btnText = lang === "es" ? "Resolver" : "Solve";
+      // El botón grande "Resolver" del visor era redundante (el menú ya tiene "Resolver Imagen" y solo
+      // reenviaba a él). No mostramos botón contextual en Plate Solving.
+      btn.style.display = "none";
+      return;
     } else if (id === "sectionGradient" || titleText.includes("gradient") || titleText.includes("gradiente")) {
       action = () => {
         commitPreview();
