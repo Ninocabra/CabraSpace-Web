@@ -2580,7 +2580,7 @@
     const lang = document.documentElement.lang || "es";
     const iters = el("sldRlIters") ? parseInt(el("sldRlIters").value, 10) : 5;
     const amount = el("sldRlAmount") ? parseFloat(el("sldRlAmount").value) : 0.8;
-    const dering = el("sldRlDering") ? parseFloat(el("sldRlDering").value) : 1.0;
+    const starProt = el("sldRlStarProt") ? parseFloat(el("sldRlStarProt").value) : 1.0;
     // Luminancia (deconvolvemos L y reaplicamos preservando el color)
     const L = new Float32Array(n);
     if (isColor) { const r = srcImg.ch[0], g = srcImg.ch[1], b = srcImg.ch[2]; for (let i = 0; i < n; i++) L[i] = 0.2126 * r[i] + 0.7152 * g[i] + 0.0722 * b[i]; }
@@ -2595,12 +2595,25 @@
       _gaussConv(corr, corr, w, h, sigma);
       for (let i = 0; i < n; i++) est[i] *= corr[i];
     }
-    // Deringing: impide que el resultado baje por debajo del original (mata halos negros).
-    // Mezcla de realce (amount) sobre el original.
+    // Protección de estrellas: RL aprieta las estrellas creando sobre-disparo, que ES el anillo
+    // (ringing). Por eso se protegen las estrellas brillantes (como la deconvolución de PixInsight):
+    // máscara smoothstep sobre la luminancia, DILATADA con una gaussiana para cubrir núcleo + anillo.
+    // Donde la máscara es alta se conserva el original -> cero anillos; la decon actúa en la
+    // nebulosa y las estrellas débiles.
+    let med2 = fastSampledMedian(L), nmad = 0;
+    { const st = Math.max(1, (n / 80000) | 0), tt = []; for (let i = 0; i < n; i += st) tt.push(Math.abs(L[i] - med2)); tt.sort((a, b) => a - b); nmad = (tt[tt.length >> 1] || 1e-4) * 1.4826; }
+    const t0 = med2 + 120 * nmad, t1d = (300 * nmad) || 1e-6;
+    const raw = new Float32Array(n);
+    for (let i = 0; i < n; i++) { let v = (L[i] - t0) / t1d; v = v < 0 ? 0 : v > 1 ? 1 : v; raw[i] = v * v * (3 - 2 * v); }
+    const prot = new Float32Array(n);
+    _gaussConv(raw, prot, w, h, sigma * 2.5);
+    // Clamp anti-oscurecimiento + realce (amount) + protección de estrellas (starProt).
     for (let i = 0; i < n; i++) {
       let e = est[i];
-      if (e < L[i]) e = L[i] - (L[i] - e) * (1 - dering);
-      est[i] = L[i] + amount * (e - L[i]);
+      if (e < L[i]) e = L[i]; // ningún píxel baja del original (sin halos oscuros)
+      e = L[i] + amount * (e - L[i]);
+      let p = prot[i] * starProt; if (p > 1) p = 1;
+      est[i] = e * (1 - p) + L[i] * p;
     }
     // Reaplicar conservando el color por ratio de luminancia.
     const out = [];
@@ -2617,7 +2630,7 @@
     } else {
       const o = new Float32Array(n); for (let i = 0; i < n; i++) o[i] = Math.min(1, Math.max(0, est[i])); out.push(o);
     }
-    logConsole(lang === "es" ? `Deconvolución RL (clásica): σ PSF=${sigma.toFixed(2)}px, ${iters} iter, deringing ${dering}` : `RL deconvolution: PSF σ=${sigma.toFixed(2)}px, ${iters} iters, deringing ${dering}`, "info");
+    logConsole(lang === "es" ? `Deconvolución RL (clásica): σ PSF=${sigma.toFixed(2)}px, ${iters} iter, protección estrellas ${starProt}` : `RL deconvolution: PSF σ=${sigma.toFixed(2)}px, ${iters} iters, star protection ${starProt}`, "info");
     return { ch: out, w, h, nc, isColor };
   }
   // RL-DECONV-END
@@ -5231,7 +5244,7 @@
     { s: "sldCcNsAmount", v: "valCcNsAmount", p: 2 },
     { s: "sldRlIters", v: "valRlIters", p: 0 },
     { s: "sldRlAmount", v: "valRlAmount", p: 2 },
-    { s: "sldRlDering", v: "valRlDering", p: 2 },
+    { s: "sldRlStarProt", v: "valRlStarProt", p: 2 },
     { s: "sldStfBg", v: "valStfBg", p: 2 },
     { s: "sldStfClip", v: "valStfClip", p: 2 },
     { s: "sldGhsSig", v: "valGhsSig", p: 2 },
