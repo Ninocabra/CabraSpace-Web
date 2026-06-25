@@ -2505,13 +2505,15 @@
   // Modelos servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
   // En localhost, resolveCosmicModelUrl tira de scratch/.
   const RELEASE_BASE = "https://astronomy-proxy.vercel.app/m/";
-  const STELLAR_MODEL_URL = RELEASE_BASE + "deep_sharp_stellar_cnn_AI3_5s.onnx";
+  // fp16 (11.8->5.9MB cada uno, paridad imperceptible): ~2x mas rapido en WebGPU + mitad de descarga.
+  // Requiere subir los .fp16.onnx a la Release. En localhost resolveCosmicModelUrl usa scratch/.
+  const STELLAR_MODEL_URL = RELEASE_BASE + "deep_sharp_stellar_cnn_AI3_5s.fp16.onnx";
   // En la Release solo está el nonstellar radius_2; todas las opciones de radio usan ese modelo.
   const NONSTELLAR_MODEL_URLS = {
-    radius_1: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
-    radius_2: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
-    radius_4: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx",
-    radius_8: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.onnx"
+    radius_1: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.fp16.onnx",
+    radius_2: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.fp16.onnx",
+    radius_4: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.fp16.onnx",
+    radius_8: RELEASE_BASE + "deep_nonstellar_sharp_cnn_radius_2AI3_5s.fp16.onnx"
   };
 
   // COSMIC-MODEL-ROUTING-BEGIN
