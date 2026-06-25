@@ -277,6 +277,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: Astro Camera**
   - [Sv535 Sc571cc, una nueva cámara astrofotográfica de Svbony](https://www.youtube.com/watch?v=LvS19OipaJc) (2026-06-24)
+- **Modelo: Av503 70**
+  - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
 - **Modelo: COOLCAM SC571CC**
   - [COOLCAM SC571CC: Cámara enfriada económica para astrofotografía - Revisión de Pros y Contras](https://www.youtube.com/watch?v=_LEwLFKDZIE) (2026-06-01)
 - **Modelo: SC571CC**
@@ -372,6 +374,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Benoit de Mulder**
   - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
+- **Modelo: S30 Pro**
+  - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: Willie Stickley**
   - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
 - **Modelo: star tracker**
