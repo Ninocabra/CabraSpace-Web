@@ -353,14 +353,15 @@
     const rect = cv.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
-    // Reverse the scale & translation of the canvas style transform
-    // The CSS transform: translate(panX, panY) scale(zoom)
-    // The canvas's intrinsic size is cv.width x cv.height, but it's rendered at clientWidth x clientHeight.
-    // However, coordinate-wise inside the canvas, the mouse position on the canvas coordinate space (0 to cv.width/height):
-    const imgX = (mouseX / rect.width) * cv.width;
-    const imgY = (mouseY / rect.height) * cv.height;
-    
+
+    // El canvas llena el recuadro con object-fit:contain: el bitmap (cv.width × cv.height) se escala a
+    // 'fit' y se CENTRA (letterbox). Mapeamos ratón→imagen con esa escala y desplazamiento.
+    const s = Math.min(rect.width / cv.width, rect.height / cv.height) || 1;
+    const ox = (rect.width - cv.width * s) / 2;
+    const oy = (rect.height - cv.height * s) / 2;
+    const imgX = (mouseX - ox) / s;
+    const imgY = (mouseY - oy) / s;
+
     return {
       x: Math.max(0, Math.min(state.activeImage.w - 1, Math.floor(imgX))),
       y: Math.max(0, Math.min(state.activeImage.h - 1, Math.floor(imgY)))
