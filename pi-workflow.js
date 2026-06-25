@@ -2539,33 +2539,17 @@
   // Deconvolución Richardson-Lucy CLÁSICA en JS puro (sin IA, sin Pyodide, sin tiling): rápida,
   // específica para cielo profundo, con PSF gaussiana AUTO-estimada de las estrellas y DERINGING
   // (evita halos negros). El blur se aproxima con 3 cajas (O(n) por sigma) -> rápido a 4000px.
-  function _boxBlur(src, dst, w, h, r) {
-    if (r < 1) { dst.set(src); return; }
-    const tmp = new Float32Array(w * h), inv = 1 / (2 * r + 1);
-    // horizontal (running sum, bordes reflect-clamp)
-    for (let y = 0; y < h; y++) {
-      const o = y * w; let sum = 0;
-      for (let k = -r; k <= r; k++) sum += src[o + Math.min(w - 1, Math.max(0, k))];
-      for (let x = 0; x < w; x++) {
-        tmp[o + x] = sum * inv;
-        const add = Math.min(w - 1, x + r + 1), sub = Math.max(0, x - r);
-        sum += src[o + add] - src[o + sub];
-      }
-    }
-    // vertical
-    for (let x = 0; x < w; x++) {
-      let sum = 0;
-      for (let k = -r; k <= r; k++) sum += tmp[Math.min(h - 1, Math.max(0, k)) * w + x];
-      for (let y = 0; y < h; y++) {
-        dst[y * w + x] = sum * inv;
-        const add = Math.min(h - 1, y + r + 1), sub = Math.max(0, y - r);
-        sum += tmp[add * w + x] - tmp[sub * w + x];
-      }
-    }
-  }
-  function _gaussApprox(src, dst, w, h, sigma) {
-    const r = Math.max(1, Math.round(sigma)); // 3 cajas ≈ gaussiana
-    _boxBlur(src, dst, w, h, r); _boxBlur(dst, dst, w, h, r); _boxBlur(dst, dst, w, h, r);
+  // Convolución gaussiana separable EXACTA (kernel acotado a ±3σ). Es CRÍTICO para la
+  // deconvolución: aproximar la gaussiana por cajas la ensancha (~1.6×) y provoca anillos
+  // (ringing/donuts) alrededor de las estrellas. El kernel exacto los elimina.
+  function _gaussConv(src, dst, w, h, sigma) {
+    const r = Math.max(1, Math.ceil(3 * sigma));
+    const k = new Float32Array(2 * r + 1); let s = 0;
+    for (let i = -r; i <= r; i++) { const v = Math.exp(-(i * i) / (2 * sigma * sigma)); k[i + r] = v; s += v; }
+    for (let i = 0; i < k.length; i++) k[i] /= s;
+    const w1 = w - 1, h1 = h - 1, tmp = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) { const o = y * w; for (let x = 0; x < w; x++) { let acc = 0; for (let j = -r; j <= r; j++) acc += src[o + Math.min(w1, Math.max(0, x + j))] * k[j + r]; tmp[o + x] = acc; } }
+    for (let x = 0; x < w; x++) { for (let y = 0; y < h; y++) { let acc = 0; for (let j = -r; j <= r; j++) acc += tmp[Math.min(h1, Math.max(0, y + j)) * w + x] * k[j + r]; dst[y * w + x] = acc; } }
   }
   // Estima la sigma de la PSF a partir del segundo momento de las estrellas brillantes no saturadas.
   function _estimatePSFSigma(L, w, h) {
@@ -2594,7 +2578,7 @@
     const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
     const isColor = srcImg.isColor || nc >= 3;
     const lang = document.documentElement.lang || "es";
-    const iters = el("sldRlIters") ? parseInt(el("sldRlIters").value, 10) : 10;
+    const iters = el("sldRlIters") ? parseInt(el("sldRlIters").value, 10) : 5;
     const amount = el("sldRlAmount") ? parseFloat(el("sldRlAmount").value) : 0.8;
     const dering = el("sldRlDering") ? parseFloat(el("sldRlDering").value) : 1.0;
     // Luminancia (deconvolvemos L y reaplicamos preservando el color)
@@ -2606,9 +2590,9 @@
     // Richardson-Lucy
     const est = Float32Array.from(L), conv = new Float32Array(n), corr = new Float32Array(n);
     for (let it = 0; it < iters; it++) {
-      _gaussApprox(est, conv, w, h, sigma);
+      _gaussConv(est, conv, w, h, sigma);
       for (let i = 0; i < n; i++) { const c = conv[i]; corr[i] = c > 1e-6 ? L[i] / c : 1; }
-      _gaussApprox(corr, corr, w, h, sigma);
+      _gaussConv(corr, corr, w, h, sigma);
       for (let i = 0; i < n; i++) est[i] *= corr[i];
     }
     // Deringing: impide que el resultado baje por debajo del original (mata halos negros).
