@@ -2067,6 +2067,7 @@
     { const b = el("btnComparePostSharp"); if (b) b.disabled = false; }
     el("btnApplyPostCurves").disabled = false;
     el("btnApplyPostColor").disabled = false;
+    enablePostProcessControls();
 
     el("piwHint").style.display = "none";
     el("piwToolbar").style.display = "flex";
@@ -5245,6 +5246,11 @@
     { s: "sldRlIters", v: "valRlIters", p: 0 },
     { s: "sldRlAmount", v: "valRlAmount", p: 2 },
     { s: "sldRlStarProt", v: "valRlStarProt", p: 2 },
+    { s: "sldPostBalanceR", v: "valPostBalanceR", p: 3 },
+    { s: "sldPostBalanceG", v: "valPostBalanceG", p: 3 },
+    { s: "sldPostBalanceB", v: "valPostBalanceB", p: 3 },
+    { s: "sldPostBalanceSat", v: "valPostBalanceSat", p: 2 },
+    { s: "sldPostBalanceSCNR", v: "valPostBalanceSCNR", p: 2 },
     { s: "sldStfBg", v: "valStfBg", p: 2 },
     { s: "sldStfClip", v: "valStfClip", p: 2 },
     { s: "sldGhsSig", v: "valGhsSig", p: 2 },
@@ -6179,6 +6185,58 @@
       drawCurvesWidget();
     });
   }
+
+  // POST-CONTROLS-ENABLE-BEGIN
+  // Color Balance y Curves tenían sus controles funcionales en estado `disabled`/`piw-disabled-control`
+  // (los handlers ya eran reales). Se habilitan al cargar imagen y se cablean los sliders de Curves
+  // al editor de curva (antes no estaban conectados a nada).
+  function enablePostProcessControls() {
+    [
+      "sldPostBalanceR", "sldPostBalanceG", "sldPostBalanceB", "sldPostBalanceSat",
+      "chkPostBalanceSCNR", "sldPostBalanceSCNR", "btnPostColorBalanceReset",
+      "sldPostCurvesContrast", "sldPostCurvesBright", "sldPostCurvesShadows",
+      "sldPostCurvesHighlights", "sldPostCurvesSaturation"
+    ].forEach((id) => {
+      const e = el(id);
+      if (!e) return;
+      e.disabled = false;
+      const grp = e.closest(".piw-disabled-control");
+      if (grp) grp.classList.remove("piw-disabled-control");
+    });
+  }
+
+  // Reconstruye las curvas K (luminancia) y S (saturación) a partir de los 5 sliders de Curves.
+  function rebuildCurvesFromSliders() {
+    const cl = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+    const c = parseFloat(el("sldPostCurvesContrast").value) || 0;
+    const b = parseFloat(el("sldPostCurvesBright").value) || 0;
+    const sh = parseFloat(el("sldPostCurvesShadows").value) || 0;
+    const hi = parseFloat(el("sldPostCurvesHighlights").value) || 0;
+    const sat = parseFloat(el("sldPostCurvesSaturation").value);
+    el("valPostCurvesContrast").textContent = c.toFixed(2);
+    el("valPostCurvesBright").textContent = b.toFixed(3);
+    el("valPostCurvesShadows").textContent = sh.toFixed(3);
+    el("valPostCurvesHighlights").textContent = hi.toFixed(3);
+    el("valPostCurvesSaturation").textContent = sat.toFixed(2);
+    state.curves.K = [
+      { x: 0, y: 0 },
+      { x: 0.25, y: cl(0.25 + sh - c * 0.12 + b * 0.6) },
+      { x: 0.5, y: cl(0.5 + b) },
+      { x: 0.75, y: cl(0.75 + hi + c * 0.12 + b * 0.4) },
+      { x: 1, y: 1 }
+    ];
+    if (Math.abs(sat - 1) < 1e-3) {
+      state.curves.S = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+    } else {
+      state.curves.S = [{ x: 0, y: 0 }, { x: 0.5, y: cl(0.5 * sat) }, { x: 1, y: 1 }];
+    }
+    drawCurvesWidget();
+  }
+  ["sldPostCurvesContrast", "sldPostCurvesBright", "sldPostCurvesShadows", "sldPostCurvesHighlights", "sldPostCurvesSaturation"].forEach((id) => {
+    const s = el(id);
+    if (s) s.addEventListener("input", rebuildCurvesFromSliders);
+  });
+  // POST-CONTROLS-ENABLE-END
 
 
   // 3. Rueda de Balance de Color Cromático (Mockup)
