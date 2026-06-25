@@ -1499,9 +1499,39 @@
           <div class="piw-section collapsed">
             <h3 class="piw-section-title">Deconvolución</h3>
             <select class="piw-select" id="selDeconAlgo">
+              <option value="rl_auto" selected>Richardson-Lucy (auto-PSF, rápida)</option>
               <option value="cosmic_std">Standard Deconvolution (opción A)</option>
               <option value="cosmic_ia">Cosmic Clarity IA (opción B)</option>
             </select>
+
+            <!-- Richardson-Lucy clásica (auto-PSF + deringing) -->
+            <div id="decon-rl-controls">
+              <div class="piw-subcard">
+                <div class="piw-subcard-header">Richardson-Lucy (clásica)</div>
+                <div class="piw-value" id="lblRlPsf" style="margin-bottom:8px;color:var(--piw-gold,#d4af37);">PSF estimada: — px (σ)</div>
+                <div class="piw-control-group">
+                  <div class="piw-label-row">
+                    <span class="piw-label">Iteraciones</span>
+                    <span class="piw-value" id="valRlIters">10</span>
+                  </div>
+                  <input type="range" class="piw-slider" id="sldRlIters" min="3" max="30" step="1" value="10">
+                </div>
+                <div class="piw-control-group">
+                  <div class="piw-label-row">
+                    <span class="piw-label">Realce</span>
+                    <span class="piw-value" id="valRlAmount">0.80</span>
+                  </div>
+                  <input type="range" class="piw-slider" id="sldRlAmount" min="0" max="1" step="0.05" value="0.80">
+                </div>
+                <div class="piw-control-group">
+                  <div class="piw-label-row">
+                    <span class="piw-label">Deringing</span>
+                    <span class="piw-value" id="valRlDering">1.00</span>
+                  </div>
+                  <input type="range" class="piw-slider" id="sldRlDering" min="0" max="1" step="0.05" value="1.0">
+                </div>
+              </div>
+            </div>
 
             <!-- Cosmic Clarity - Activo -->
             <div id="decon-cosmic-controls">

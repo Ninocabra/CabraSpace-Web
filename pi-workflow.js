@@ -2535,9 +2535,113 @@
 
   // Event Listener para Deconvolución
   // DECON-COMPUTE-BEGIN
-  // Calcula la deconvolución para un algoritmo EXPLÍCITO (cosmic_std | cosmic_ia) sobre srcImg,
+  // RL-DECONV-BEGIN
+  // Deconvolución Richardson-Lucy CLÁSICA en JS puro (sin IA, sin Pyodide, sin tiling): rápida,
+  // específica para cielo profundo, con PSF gaussiana AUTO-estimada de las estrellas y DERINGING
+  // (evita halos negros). El blur se aproxima con 3 cajas (O(n) por sigma) -> rápido a 4000px.
+  function _boxBlur(src, dst, w, h, r) {
+    if (r < 1) { dst.set(src); return; }
+    const tmp = new Float32Array(w * h), inv = 1 / (2 * r + 1);
+    // horizontal (running sum, bordes reflect-clamp)
+    for (let y = 0; y < h; y++) {
+      const o = y * w; let sum = 0;
+      for (let k = -r; k <= r; k++) sum += src[o + Math.min(w - 1, Math.max(0, k))];
+      for (let x = 0; x < w; x++) {
+        tmp[o + x] = sum * inv;
+        const add = Math.min(w - 1, x + r + 1), sub = Math.max(0, x - r);
+        sum += src[o + add] - src[o + sub];
+      }
+    }
+    // vertical
+    for (let x = 0; x < w; x++) {
+      let sum = 0;
+      for (let k = -r; k <= r; k++) sum += tmp[Math.min(h - 1, Math.max(0, k)) * w + x];
+      for (let y = 0; y < h; y++) {
+        dst[y * w + x] = sum * inv;
+        const add = Math.min(h - 1, y + r + 1), sub = Math.max(0, y - r);
+        sum += tmp[add * w + x] - tmp[sub * w + x];
+      }
+    }
+  }
+  function _gaussApprox(src, dst, w, h, sigma) {
+    const r = Math.max(1, Math.round(sigma)); // 3 cajas ≈ gaussiana
+    _boxBlur(src, dst, w, h, r); _boxBlur(dst, dst, w, h, r); _boxBlur(dst, dst, w, h, r);
+  }
+  // Estima la sigma de la PSF a partir del segundo momento de las estrellas brillantes no saturadas.
+  function _estimatePSFSigma(L, w, h) {
+    const med = fastSampledMedian(L);
+    let mad = 0; const ns = Math.min(L.length, 100000), st = Math.max(1, (L.length / ns) | 0);
+    const tmp = []; for (let i = 0; i < L.length; i += st) tmp.push(Math.abs(L[i] - med));
+    tmp.sort((a, b) => a - b); mad = (tmp[tmp.length >> 1] || 0.001) * 1.4826;
+    const thr = med + 6 * mad; const sigmas = [];
+    for (let y = 4; y < h - 4 && sigmas.length < 400; y++) {
+      for (let x = 4; x < w - 4; x++) {
+        const v = L[y * w + x];
+        if (v < thr || v > 0.95) continue;
+        if (v < L[y * w + x - 1] || v < L[y * w + x + 1] || v < L[(y - 1) * w + x] || v < L[(y + 1) * w + x]) continue;
+        let sxx = 0, sw = 0;
+        for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
+          const p = L[(y + dy) * w + x + dx] - med; if (p <= 0) continue;
+          sxx += p * (dx * dx + dy * dy); sw += p;
+        }
+        if (sw > 0) { const s = Math.sqrt(sxx / sw / 2); if (s > 0.6 && s < 5) sigmas.push(s); }
+      }
+    }
+    if (!sigmas.length) return 1.5;
+    sigmas.sort((a, b) => a - b); return sigmas[sigmas.length >> 1];
+  }
+  function computeRLDeconv(srcImg) {
+    const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
+    const isColor = srcImg.isColor || nc >= 3;
+    const lang = document.documentElement.lang || "es";
+    const iters = el("sldRlIters") ? parseInt(el("sldRlIters").value, 10) : 10;
+    const amount = el("sldRlAmount") ? parseFloat(el("sldRlAmount").value) : 0.8;
+    const dering = el("sldRlDering") ? parseFloat(el("sldRlDering").value) : 1.0;
+    // Luminancia (deconvolvemos L y reaplicamos preservando el color)
+    const L = new Float32Array(n);
+    if (isColor) { const r = srcImg.ch[0], g = srcImg.ch[1], b = srcImg.ch[2]; for (let i = 0; i < n; i++) L[i] = 0.2126 * r[i] + 0.7152 * g[i] + 0.0722 * b[i]; }
+    else L.set(srcImg.ch[0]);
+    const sigma = _estimatePSFSigma(L, w, h);
+    if (el("lblRlPsf")) el("lblRlPsf").textContent = (lang === "es" ? "PSF estimada: " : "Estimated PSF: ") + sigma.toFixed(2) + " px (σ)";
+    // Richardson-Lucy
+    const est = Float32Array.from(L), conv = new Float32Array(n), corr = new Float32Array(n);
+    for (let it = 0; it < iters; it++) {
+      _gaussApprox(est, conv, w, h, sigma);
+      for (let i = 0; i < n; i++) { const c = conv[i]; corr[i] = c > 1e-6 ? L[i] / c : 1; }
+      _gaussApprox(corr, corr, w, h, sigma);
+      for (let i = 0; i < n; i++) est[i] *= corr[i];
+    }
+    // Deringing: impide que el resultado baje por debajo del original (mata halos negros).
+    // Mezcla de realce (amount) sobre el original.
+    for (let i = 0; i < n; i++) {
+      let e = est[i];
+      if (e < L[i]) e = L[i] - (L[i] - e) * (1 - dering);
+      est[i] = L[i] + amount * (e - L[i]);
+    }
+    // Reaplicar conservando el color por ratio de luminancia.
+    const out = [];
+    if (isColor) {
+      const ro = new Float32Array(n), go = new Float32Array(n), bo = new Float32Array(n);
+      const r = srcImg.ch[0], g = srcImg.ch[1], b = srcImg.ch[2];
+      for (let i = 0; i < n; i++) {
+        const ratio = L[i] > 1e-6 ? Math.min(5, est[i] / L[i]) : 1;
+        ro[i] = Math.min(1, Math.max(0, r[i] * ratio));
+        go[i] = Math.min(1, Math.max(0, g[i] * ratio));
+        bo[i] = Math.min(1, Math.max(0, b[i] * ratio));
+      }
+      out.push(ro, go, bo);
+    } else {
+      const o = new Float32Array(n); for (let i = 0; i < n; i++) o[i] = Math.min(1, Math.max(0, est[i])); out.push(o);
+    }
+    logConsole(lang === "es" ? `Deconvolución RL (clásica): σ PSF=${sigma.toFixed(2)}px, ${iters} iter, deringing ${dering}` : `RL deconvolution: PSF σ=${sigma.toFixed(2)}px, ${iters} iters, deringing ${dering}`, "info");
+    return { ch: out, w, h, nc, isColor };
+  }
+  // RL-DECONV-END
+
+  // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cosmic_std | cosmic_ia) sobre srcImg,
   // leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
   async function computeDeconv(algo, srcImg) {
+    if (algo === "rl_auto") return computeRLDeconv(srcImg);
     const lang = document.documentElement.lang || "es";
     const mode = el("selCcSharpenMode").value;
     const stellarAmt = parseFloat(el("sldCcStellarAmt").value);
@@ -2605,9 +2709,9 @@
         try {
           res = await computeDeconv(algo, srcImg);
         } catch (err) {
-          if (algo === "cosmic_ia") {
-            logConsole(lang === "es" ? "Fallo en Cosmic Clarity IA. Reintentando con Deconvolución Estándar automáticamente..." : "Cosmic Clarity AI failed. Retrying with Standard Deconvolution automatically...", "warn");
-            res = await computeDeconv("cosmic_std", srcImg);
+          if (algo !== "rl_auto") {
+            logConsole(lang === "es" ? `Fallo en ${algo}. Reintentando con Richardson-Lucy (clásica, rápida) automáticamente...` : `${algo} failed. Retrying with Richardson-Lucy (classic, fast) automatically...`, "warn");
+            res = await computeDeconv("rl_auto", srcImg);
           } else {
             throw err;
           }
@@ -2637,7 +2741,7 @@
         try {
           const srcImg = state.stepInputImage || state.activeImage;
           const variants = [
-            { name: "Standard", algo: "cosmic_std" },
+            { name: "Richardson-Lucy", algo: "rl_auto" },
             { name: "Cosmic Clarity IA", algo: "cosmic_ia" }
           ];
           const results = [];
@@ -5141,6 +5245,9 @@
     { s: "sldCcStellarAmt", v: "valCcStellarAmt", p: 2 },
     { s: "sldCcNsStrength", v: "valCcNsStrength", p: 2 },
     { s: "sldCcNsAmount", v: "valCcNsAmount", p: 2 },
+    { s: "sldRlIters", v: "valRlIters", p: 0 },
+    { s: "sldRlAmount", v: "valRlAmount", p: 2 },
+    { s: "sldRlDering", v: "valRlDering", p: 2 },
     { s: "sldStfBg", v: "valStfBg", p: 2 },
     { s: "sldStfClip", v: "valStfClip", p: 2 },
     { s: "sldGhsSig", v: "valGhsSig", p: 2 },
@@ -5330,6 +5437,7 @@
   });
 
   setupDropdownToggle("selDeconAlgo", {
+    rl_auto: "decon-rl-controls",
     cosmic_std: "decon-cosmic-controls",
     cosmic_ia: "decon-cosmic-controls"
   });
