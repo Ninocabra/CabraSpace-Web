@@ -370,6 +370,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## ZWO
 
 ### ACCESSORIES
+- **Modelo: Benoit de Mulder**
+  - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
 - **Modelo: Willie Stickley**
   - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
 - **Modelo: star tracker**
