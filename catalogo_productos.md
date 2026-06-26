@@ -113,6 +113,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: harmonic drive mount**
   - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
 
+### MOUNTS,CAMERAS
+- **Modelo: Askar N160**
+  - [Noticias Astronómicas de Julio 2026](https://www.youtube.com/watch?v=VaxOMIFMq8U) (2026-06-24)
+
 ### SOFTWARE
 - **Modelo: AI Denoise**
   - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
@@ -174,6 +178,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Eagle**
   - [Filippo y Zoltan discuten astrofotografía moderna y control remoto en AstroFest Europeo 2026](https://www.youtube.com/watch?v=0gWm3hn2HkU) (2026-02-09)
 - **Modelo: OUTPOST 3M**
+  - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
   - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
 - **Modelo: PL GSS**
   - [PL GSS debuta en SATShow 2026, Washington DC](https://www.youtube.com/watch?v=T4mLiczmSJg) (2026-03-27)
