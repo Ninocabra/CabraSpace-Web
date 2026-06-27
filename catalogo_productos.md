@@ -361,6 +361,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: StellaVita**
+  - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
   - [Tutorial de StellaVita App 2.0: Configuración de Plan de Captura](https://www.youtube.com/watch?v=2b8Obk4QVUw) (2026-05-12)
 
 ### TELESCOPES
