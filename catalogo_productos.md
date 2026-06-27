@@ -112,6 +112,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nueva montura Saturn: la próxima gran innovación](https://www.youtube.com/shorts/VxK2DBVOdCM) (2026-05-25)
 - **Modelo: harmonic drive mount**
   - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
+- **Modelo: montura armónica**
+  - [La Nueva Generación de Monturas Armónicas Ha Llegado](https://www.youtube.com/watch?v=y9Ktz3GHPAg) (2026-06-26)
 
 ### MOUNTS,CAMERAS
 - **Modelo: Askar N160**
