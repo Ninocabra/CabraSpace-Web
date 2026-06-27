@@ -120,6 +120,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: AI Denoise**
   - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
+- **Modelo: BlurXTerminator**
+  - [BlurXTerminator sin PixInsight: Llegó el Momento](https://www.youtube.com/watch?v=Vrw90sNdOyE) (2026-06-26)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: NightVis**
@@ -306,6 +308,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
 - **Modelo: Mak 127**
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
+- **Modelo: SV503**
+  - [Telescopio Refractor SV503 70mm de Svbony: Explorando el Cosmos sin gastar una fortuna](https://www.youtube.com/shorts/bK21vw9ipaY) (2026-06-26)
 - **Modelo: SV535**
   - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
 - **Modelo: SV555**
