@@ -1587,16 +1587,13 @@
               <button class="piw-btn" id="btnLoadStarless" style="flex: 1; font-size: 0.65rem;">Cargar Starless</button>
               <button class="piw-btn" id="btnLoadStars" style="flex: 1; font-size: 0.65rem;">Cargar Estrellas</button>
             </div>
-            <select class="piw-select" id="selStarAlgo" style="margin-bottom:8px;">
-              <option value="starnet2" selected>StarNet2</option>
-            </select>
-            <button class="piw-btn primary" id="btnRunNox" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Quitar estrellas</button>
+            <button class="piw-btn primary" id="btnRemoveStars" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Quitar estrellas</button>
             <div class="piw-control-group">
               <div class="piw-label-row">
                 <span class="piw-label" title="Conserva textura de nebulosa que el modelo suaviza. 0 = starless crudo (máximo quitado de estrellas).">Recuperar nebulosa</span>
-                <span class="piw-value" id="valNoxRecover">0.40</span>
+                <span class="piw-value" id="valStarRecover">0.40</span>
               </div>
-              <input type="range" class="piw-slider" id="sldNoxRecover" min="0" max="1" step="0.05" value="0.40">
+              <input type="range" class="piw-slider" id="sldStarRecover" min="0" max="1" step="0.05" value="0.40">
             </div>
             <input type="file" id="fileInputStarless" accept="image/*,.fit,.fits,.fts,.xisf,.tif,.tiff" style="display:none;" />
             <input type="file" id="fileInputStars" accept="image/*,.fit,.fits,.fts,.xisf,.tif,.tiff" style="display:none;" />
@@ -2635,9 +2632,9 @@
   <!-- Librerías de soporte -->
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
   <script src="onnx-engine.js"></script>
-  <script src="nox.js"></script>
+  <script src="star-removal.js"></script>
   <script src="autoghs.js"></script>
   <script src="saspro-pyodide.js"></script>
   <script src="lut.js"></script>

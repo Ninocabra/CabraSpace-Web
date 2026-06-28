@@ -1,33 +1,21 @@
 /* =========================================================================
- * nox.js — Módulo de integración para eliminación de estrellas (nox)
+ * star-removal.js — Módulo de integración para eliminación de estrellas (StarNet2)
  *
- * Carga el modelo nox_color o nox_gray en formato ONNX, ejecuta inferencia
- * por tiles con solapamiento, y separa la imagen en capas Starless y Stars.
+ * Carga el modelo starnet2 en formato ONNX, ejecuta inferencia por tiles con
+ * solapamiento, y separa la imagen en capas Starless y Stars.
  * ========================================================================= */
 
-window.NoxStarRemoval = (function () {
+window.StarRemoval = (function () {
   "use strict";
 
-  // Servidos vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
-  let MODEL_URL_COLOR = "https://astronomy-proxy.vercel.app/m/nox_color.fp16.onnx";
-  let MODEL_URL_GRAY = "https://astronomy-proxy.vercel.app/m/nox_gray.fp16.onnx";
+  // Servido vía proxy Vercel (añade CORS sobre la Release models-v1; GitHub Releases no da CORS).
   let MODEL_URL_STARNET2 = "https://astronomy-proxy.vercel.app/m/starnet2.onnx";
 
-  // Usar modelos locales al probar en entorno de desarrollo local
+  // Usar modelo local al probar en entorno de desarrollo local
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    MODEL_URL_COLOR = "scratch/nox_color.fp16.onnx";
-    MODEL_URL_GRAY = "scratch/nox_gray.fp16.onnx";
     MODEL_URL_STARNET2 = "scratch/starnet2.onnx";
   }
 
-  /**
-   * Ejecuta el proceso de eliminación de estrellas.
-   *
-   * @param {Object} imgData Imagen de entrada { ch: [Float32Array, ...], w, h, nc, isColor }
-   * @param {Function} onDownloadProgress Progreso de descarga del modelo (p) => {}
-   * @param {Function} onTileProgress Progreso de inferencia por tiles (completed, total) => {}
-   * @returns {Promise<Object>} Capas resultantes: { starless, stars }
-   */
   // Recuperación de detalle de nebulosa: el modelo quita estrellas pero suaviza un poco la textura
   // de la nebulosa. Usamos el starless del modelo SOLO donde se quitó algo significativo (estrellas:
   // diff alto/localizado) y mantenemos el original donde no (preserva la textura). `recover` (0..1)
@@ -70,40 +58,6 @@ window.NoxStarRemoval = (function () {
     return out;
   }
 
-  async function runNox(imgData, onDownloadProgress, onTileProgress, recover) {
-    if (!imgData || !imgData.ch || imgData.ch.length === 0) {
-      throw new Error("No hay datos de imagen de entrada válidos.");
-    }
-
-    const isColor = imgData.isColor || imgData.nc === 3;
-    const modelUrl = isColor ? MODEL_URL_COLOR : MODEL_URL_GRAY;
-
-    // 1+2. Modelo (descarga/caché) + sesión ONNX REUTILIZABLE (cacheada por URL; no recompila por clic)
-    const session = await window.OnnxEngine.loadSession(modelUrl, {}, onDownloadProgress);
-
-    // 3. Ejecución por tiles con normalización
-    // Entrada: [0, 1] -> [-1, 1] (scaleIn: 2.0, offsetIn: -1.0)
-    // Salida: [-1, 1] -> [0, 1] (scaleOut: 0.5, offsetOut: 0.5)
-    // El modelo espera NHWC [1, None, None, 3]
-    const options = {
-      tileSize: 512,
-      overlap: 64, // Solapamiento para evitar costuras
-      padMode: "reflect",
-      layout: "NHWC",
-      scaleIn: 2.0,
-      offsetIn: -1.0,
-      scaleOut: 0.5,
-      offsetOut: 0.5,
-      onProgress: onTileProgress,
-      channels: isColor ? 3 : 1,
-      fixedTile: 512 // nox requiere tamaño de tile múltiplo de 256 por su profundidad U-Net (reducción de 256x)
-    };
-
-    let starlessCh = await window.OnnxEngine.runOnnxModelTiled(session, imgData, options);
-
-    return finishStarRemoval(imgData, starlessCh, recover, isColor);
-  }
-
   // StarNet2: starless directo. NHWC 512x512 fijo, normalización [0,1] (sin escalado).
   async function runStarNet2(imgData, onDownloadProgress, onTileProgress, recover) {
     if (!imgData || !imgData.ch || imgData.ch.length === 0) {
@@ -138,7 +92,6 @@ window.NoxStarRemoval = (function () {
   }
 
   return {
-    runNox,
     runStarNet2
   };
 })();

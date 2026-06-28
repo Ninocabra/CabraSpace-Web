@@ -18,7 +18,7 @@ window.OnnxEngine = (function () {
   (function initOrtEnv() {
     try {
       if (typeof ort === "undefined" || !ort.env) return;
-      // Los .wasm/.mjs deben venir de la MISMA versión pineada que ort.min.js (evita mismatch/404).
+      // Los .wasm/.mjs deben venir de la MISMA versión pineada que ort.webgpu.min.js (evita mismatch/404).
       ort.env.wasm.wasmPaths = ORT_DIST;
       ort.env.wasm.simd = true;
       // El multihilo WASM SOLO funciona con cross-origin isolation (SharedArrayBuffer disponible).

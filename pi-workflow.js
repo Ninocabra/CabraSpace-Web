@@ -2531,7 +2531,7 @@
 
   // ONNX-ENGINE-REF-BEGIN
   // Las funciones openModelDB, getCachedModel, cacheModel, fetchModelWithCache y runOnnxModelTiled
-  // han sido movidas al módulo independiente 'onnx-engine.js' para modularidad y reutilización en nox/GraXpert.
+  // han sido movidas al módulo independiente 'onnx-engine.js' para modularidad y reutilización en star removal/GraXpert.
   // ONNX-ENGINE-REF-END
 
   // Event Listener para Deconvolución
@@ -2909,18 +2909,18 @@
     drawHistogram();
   });
 
-  // NOX-INTEGRATION-BEGIN
-  el("btnRunNox").addEventListener("click", () => {
+  // STAR-REMOVAL-INTEGRATION-BEGIN
+  el("btnRemoveStars").addEventListener("click", () => {
     if (!state.activeImage) {
       logConsole(window.location.pathname.includes("-en.html")
-        ? "Please load an image before running nox."
-        : "Carga una imagen antes de ejecutar nox.", "err");
+        ? "Please load an image before removing stars."
+        : "Carga una imagen antes de quitar estrellas.", "err");
       return;
     }
 
     const runExecution = () => {
       const lang = window.location.pathname.includes("-en.html") ? "en" : "es";
-      showLoader(lang === "es" ? "Cargando modelo nox..." : "Loading nox model...");
+      showLoader(lang === "es" ? "Cargando modelo StarNet2..." : "Loading StarNet2 model...");
 
       setTimeout(async () => {
         try {
@@ -2974,15 +2974,14 @@
             };
           }
 
-          const starAlgo = el("selStarAlgo") ? el("selStarAlgo").value : "starnet2";
-          const runFn = (starAlgo === "nox") ? window.NoxStarRemoval.runNox : window.NoxStarRemoval.runStarNet2;
+          const runFn = window.StarRemoval.runStarNet2;
           const result = await runFn(
             inputImg,
             // Callback para progreso de descarga
             (p) => {
               showLoader(lang === "es"
-                ? `Descargando modelo nox: ${(p * 100).toFixed(0)}%`
-                : `Downloading nox model: ${(p * 100).toFixed(0)}%`
+                ? `Descargando modelo StarNet2: ${(p * 100).toFixed(0)}%`
+                : `Downloading StarNet2 model: ${(p * 100).toFixed(0)}%`
               );
             },
             // Callback para progreso de tiles
@@ -2993,7 +2992,7 @@
               );
             },
             // Recuperación de detalle de nebulosa (slider; 0 = starless crudo del modelo)
-            (el("sldNoxRecover") ? parseFloat(el("sldNoxRecover").value) : 0)
+            (el("sldStarRecover") ? parseFloat(el("sldStarRecover").value) : 0)
           );
 
           let starlessOut = result.starless;
@@ -3065,15 +3064,15 @@
           state.workflowImages[starsKey] = starsOut;
 
           logConsole(lang === "es"
-            ? `Eliminación de estrellas (nox) completada: creados "${starlessKey}" y "${starsKey}".`
-            : `Star removal (nox) completed: created "${starlessKey}" and "${starsKey}".`,
+            ? `Eliminación de estrellas completada: creados "${starlessKey}" y "${starsKey}".`
+            : `Star removal completed: created "${starlessKey}" and "${starsKey}".`,
             "info"
           );
 
           updateMixSourceOptions();
           selectWorkflowKey(starlessKey); // ver el starless de esa fuente
         } catch (err) {
-          logConsole(`Error en nox: ${err.message}`, "err");
+          logConsole(`Error en eliminación de estrellas: ${err.message}`, "err");
           console.error(err);
         } finally {
           hideLoader();
@@ -3083,7 +3082,7 @@
 
     runExecution();
   });
-  // NOX-INTEGRATION-END
+  // STAR-REMOVAL-INTEGRATION-END
 
   // Mostrar u ocultar controles dinámicos de estirado según algoritmo seleccionado
   el("selStretchAlgo").addEventListener("change", (e) => {
@@ -3112,11 +3111,11 @@
     });
   });
 
-  // Slider "Recuperar nebulosa" del star split (nox)
+  // Slider "Recuperar nebulosa" del star split
   {
-    const sldRec = el("sldNoxRecover");
+    const sldRec = el("sldStarRecover");
     if (sldRec) sldRec.addEventListener("input", () => {
-      const v = el("valNoxRecover");
+      const v = el("valStarRecover");
       if (v) v.textContent = parseFloat(sldRec.value).toFixed(2);
     });
   }
