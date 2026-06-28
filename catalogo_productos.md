@@ -144,6 +144,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Mi primer telescopio](https://www.reddit.com/r/telescopes/comments/1tvo6ah/my_first_telescope/) (2026-06-03)
 - **Modelo: Marketing**
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
+- **Modelo: Sightron**
+  - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
 - **Modelo: StellaLyra**
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
   - [Nuevo telescopio Newtoniano StellaLyra 8" f/5 M-LRN con enfocador de doble velocidad de 2"](https://stargazerslounge.com/topic/445765-stellalyra-8-f5-m-lrn-newt-2-dual-speed-focuser/) (2026-06-05)
@@ -246,8 +248,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Consejos para el primer telescopio: modelos recomendados](https://www.reddit.com/r/telescopes/comments/1tvj51m/first_telescope_model_tips/) (2026-06-03)
 - **Modelo: NEAF**
   - [Resumen de NEAIC/NEAF 2026: Novedades de Equipos de Astrofotografía](https://www.youtube.com/watch?v=LcyOOeVvOg4) (2026-04-18)
-- **Modelo: ST80**
-  - [Reducir la apertura del refractor ST80](https://stargazerslounge.com/topic/445698-stopping-down-st80/) (2026-06-03)
 
 ## Stellarium
 
@@ -404,6 +404,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Resumen de ATT 2026 de ZWO](https://www.youtube.com/shorts/g91t3DjdgzM) (2026-05-12)
 - **Modelo: Pillars of Creation**
   - [ZWO: Capturando los Pilares de la Creación con equipos terrestres](https://www.youtube.com/shorts/8NW33-CdiHg) (2026-04-28)
+- **Modelo: S50**
+  - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 
 ### SOFTWARE
 - **Modelo: ASIAir**
