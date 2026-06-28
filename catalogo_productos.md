@@ -234,8 +234,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sky-Watcher Esprit EDX: Nuevo telescopio apocromático de triple lente](https://www.youtube.com/watch?v=qzheZZFEYnA) (2026-05-16)
 - **Modelo: Evostar EDX**
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
-- **Actualizaciones Generales / Revisiones:**
-  - [Guía para elegir un telescopio de astrofotografía por unos 2000€](https://www.youtube.com/watch?v=cltaXN8rkQY) (2026-05-27)
 - **Modelo: Heliostar 100Ha**
   - [Vista general del Heliostar 100Ha de Sky-Watcher](https://www.youtube.com/watch?v=wKLNY2Rk9bQ) (2026-05-09)
 - **Modelo: Heritage 130p**
@@ -311,6 +309,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV535**
   - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
 - **Modelo: SV555**
+  - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
   - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
 
 ## Takahashi
