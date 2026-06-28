@@ -44,12 +44,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Nexstar C11**
   - [Nexstar C11: ¿Sigue siendo una buena opción en 2026?](https://www.reddit.com/r/telescopes/comments/1tvprmw/nexstar_c11_still_worth_it_in_2026/) (2026-06-03)
 
-## Ekos
-
-### SOFTWARE
-- **Modelo: CachyOS**
-  - [Problemas con EKOS/INDI en CachyOS](https://stargazerslounge.com/topic/445713-issues-with-ekosindi-on-cachyos/) (2026-06-03)
-
 ## Explore Scientific
 
 ### ACCESSORIES
@@ -388,6 +382,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Benoit de Mulder**
   - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
+- **Modelo: Rueda Portafiltros**
+  - [Nuevas Ruedas Portafiltros ZWO P25 para Astrofotografía](https://www.youtube.com/watch?v=T1N8SeCWgO4) (2026-06-28)
 - **Modelo: S30 Pro**
   - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: Willie Stickley**
