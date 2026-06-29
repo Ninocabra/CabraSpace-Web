@@ -2188,9 +2188,15 @@
       }
     }
     if (stars.length === 0) throw new Error("No se encontraron estrellas Gaia DR3 en la zona");
-    return await window.SASProPyodide.processImageRaw(srcImg, "spcc", {
-      catalogStars: stars,
-      wcsMeta: { ra: wcsData.ra, dec: wcsData.dec, pixscale: wcsData.pixscale, orientation: wcsData.orientation, parity: wcsData.parity }
+    // SPCC-PYODIDE->JS: calibración en JS puro (window.SPCC, spcc.js). Replica apply_spcc/astropy
+    // (proyección TAN reconstruida desde ra/dec/pixscale/orientation/parity, sin SIP). Validado vs
+    // astropy a precisión de máquina (factores y píxeles, |Δ|<6e-8). calibrate() es síncrono; cedemos
+    // el hilo para que el loader repinte antes del cómputo (mediana exacta de canales a 4K ~ s).
+    const lang2 = document.documentElement.lang || "es";
+    showLoader(lang2 === "es" ? "Calibrando color (SPCC, JS)..." : "Calibrating color (SPCC, JS)...");
+    await new Promise(r => setTimeout(r, 20));
+    return window.SPCC.calibrate(srcImg, stars, {
+      ra: wcsData.ra, dec: wcsData.dec, pixscale: wcsData.pixscale, orientation: wcsData.orientation, parity: wcsData.parity
     });
   }
   // CALIB-COMPUTE-END
@@ -5804,7 +5810,8 @@
       btnInitSaspro.disabled = true;
       lblSasproStatus.textContent = lang === "es" ? "● Cargando..." : "● Loading...";
       try {
-        await SASProPyodide.init();
+        // SAS Pro y SPCC ahora son 100% JS: ya NO se carga Pyodide (antes esta era la última descarga
+        // del runtime WASM ~10MB). El botón solo revela los controles, instantáneo.
         lblSasproStatus.textContent = lang === "es" ? "● Listo" : "● Ready";
         lblSasproStatus.style.color = "var(--gold-primary)";
         btnInitSaspro.style.display = "none";
