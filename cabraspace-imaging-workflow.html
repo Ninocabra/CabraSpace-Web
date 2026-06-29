@@ -120,7 +120,7 @@
       padding-left: 22px;
       padding-right: 22px;
       max-width: 1760px;
-      min-height: calc(100vh - 100px);
+      min-height: calc(100vh - 128px);
       /* REDISEÑO-FASE1B: paleta cálida scoped al cockpit (NO toca el :root global del sitio) */
       --piw-panel: #1a1815;
       --piw-panel-border: #2a2723;
@@ -142,6 +142,16 @@
       font-family: var(--piw-mono, 'JetBrains Mono', monospace);
     }
 
+    /* AI-CREDITS: línea de crédito a los creadores de los modelos de IA */
+    .piw-credits {
+      font-size: 0.7rem;
+      line-height: 1.4;
+      color: var(--text-secondary, #9a948a);
+      padding: 5px 0 9px;
+    }
+    .piw-credits a { color: var(--gold-primary); text-decoration: none; font-weight: 600; }
+    .piw-credits a:hover { text-decoration: underline; }
+
     .piw-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -153,7 +163,7 @@
       /* REDISEÑO-FASE1-BEGIN: imagen protagonista a alto completo */
       .piw-grid {
         grid-template-columns: 230px 1fr;
-        height: calc(100vh - 100px);
+        height: calc(100vh - 128px);
         align-items: stretch;
       }
       /* Sidebar y panel derecho llenan la altura; el cockpit no hace scroll de página */
@@ -1196,6 +1206,15 @@
   <main class="container piw-container">
     <!-- REDISEÑO: grano vintage del cockpit (no cubre la imagen, ver z-index) -->
     <div class="piw-grain" aria-hidden="true"></div>
+    <!-- AI-CREDITS-BEGIN -->
+    <div class="piw-credits">
+      Modelos de IA por sus creadores:
+      <a href="https://www.starnetastro.com/" target="_blank" rel="noopener">StarNet2</a> &amp;
+      <a href="https://www.starnetastro.com/cli-tools/deepsnr/" target="_blank" rel="noopener">DeepSNR</a> - Nikita Misiura ·
+      <a href="https://www.setiastro.com/cosmic-clarity" target="_blank" rel="noopener">Cosmic Clarity</a> - Seti Astro ·
+      <a href="https://graxpert.com/" target="_blank" rel="noopener">GraXpert</a> - GraXpert Team
+    </div>
+    <!-- AI-CREDITS-END -->
     <div class="piw-grid">
       <!-- Barra lateral izquierda (Workflow Panel) -->
       <aside class="piw-card" style="padding: 16px;">
@@ -1348,7 +1367,7 @@
           <div class="piw-section collapsed" id="sectionGradient">
             <h3 class="piw-section-title">Gradient Correction</h3>
             <select class="piw-select" id="selGradientAlgo">
-              <option value="graxpert_ia" selected>GraXpert (Extracción de fondo IA)</option>
+              <option value="graxpert_ia" selected>GraXpert - GraXpert Team (Extracción de fondo IA)</option>
               <option value="graxpert">GraXpert (Simulado)</option>
               <option value="abe">ABE (Automatic Background Extractor)</option>
               <option value="dbe">AutoDBE (SetiAstro)</option>
@@ -1501,7 +1520,7 @@
             <select class="piw-select" id="selDeconAlgo">
               <option value="rl_auto" selected>Richardson-Lucy (auto-PSF, rápida)</option>
               <option value="cosmic_std">Standard Deconvolution (opción A)</option>
-              <option value="cosmic_ia">Cosmic Clarity IA (opción B)</option>
+              <option value="cosmic_ia">Cosmic Clarity IA - Seti Astro (opción B)</option>
               <option value="cs_ia_beta">CS IA Deconvolution (Beta)</option>
             </select>
 
@@ -1604,6 +1623,7 @@
               <button class="piw-btn" id="btnLoadStars" style="flex: 1; font-size: 0.65rem;">Cargar Estrellas</button>
             </div>
             <button class="piw-btn primary" id="btnRemoveStars" style="width: 100%; font-size: 0.75rem; margin-bottom: 8px;">Quitar estrellas</button>
+            <div style="font-size:0.62rem; color:var(--text-secondary,#9a948a); text-align:center; margin:-4px 0 8px;">StarNet2 - <a href="https://www.starnetastro.com/" target="_blank" rel="noopener" style="color:var(--gold-primary);text-decoration:none;">Nikita Misiura</a></div>
             <div class="piw-control-group">
               <div class="piw-label-row">
                 <span class="piw-label" title="Conserva textura de nebulosa que el modelo suaviza. 0 = starless crudo (máximo quitado de estrellas).">Recuperar nebulosa</span>
@@ -1770,9 +1790,9 @@
             <h3 class="piw-section-title">Reducción de Ruido</h3>
             <select class="piw-select" id="selPostNoiseAlgo">
               <option value="tgv">TGV Denoise</option>
-              <option value="cosmic">Cosmic Clarity (SetiAstro)</option>
-              <option value="deepsnr">DeepSNR</option>
-              <option value="graxpert">GraXpert Denoise (lento)</option>
+              <option value="cosmic">Cosmic Clarity - Seti Astro</option>
+              <option value="deepsnr">DeepSNR - Nikita Misiura</option>
+              <option value="graxpert">GraXpert Denoise - GraXpert Team (lento)</option>
             </select>
 
             <!-- NoiseXTerminator Controls -->
@@ -2003,7 +2023,7 @@
             <h3 class="piw-section-title">Enfoque / Detalles</h3>
             <select class="piw-select" id="selPostSharpAlgo">
               <option value="usm">Unsharp Mask</option>
-              <option value="cosmic">Cosmic Clarity</option>
+              <option value="cosmic">Cosmic Clarity - Seti Astro</option>
               <option value="hdr">HDR Multiscale Transform</option>
               <option value="lhe">Local Histogram Equalization</option>
               <option value="dse">Dark Structure Enhance</option>
