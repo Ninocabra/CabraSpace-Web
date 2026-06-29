@@ -2784,6 +2784,55 @@
   }
   // COSMIC-DECON-BLEND-JS-END
 
+  // STAT-STRETCH-JS-BEGIN
+  // Port a JS del Statistical Stretch de Seti Astro (antes en Pyodide/stretch.py). Mismo algoritmo:
+  // por canal -> MAD robusto, punto de negro a sigma*MAD, normaliza [0,1], y MTF para llevar la
+  // mediana al objetivo. Sin Pyodide (sin descargar el runtime ni OOM), como las demás operaciones JS.
+  function _ssSample(ch) {
+    const n = ch.length, MAX = 500000;
+    if (n <= MAX) return Float32Array.from(ch);
+    const arr = new Float32Array(MAX), step = Math.floor(n / MAX);
+    for (let i = 0; i < MAX; i++) arr[i] = ch[i * step];
+    return arr;
+  }
+  function _ssMAD(ch, med) {
+    const s = _ssSample(ch);
+    for (let i = 0; i < s.length; i++) s[i] = Math.abs(s[i] - med);
+    s.sort();
+    const m = s.length >> 1;
+    return s.length % 2 === 0 ? (s[m - 1] + s[m]) * 0.5 : s[m];
+  }
+  function _ssStd(ch) {
+    const s = _ssSample(ch);
+    let mean = 0; for (let i = 0; i < s.length; i++) mean += s[i]; mean /= s.length;
+    let v = 0; for (let i = 0; i < s.length; i++) { const d = s[i] - mean; v += d * d; }
+    return Math.sqrt(v / s.length);
+  }
+  function computeStatisticalStretchJS(srcImg, target, sigma) {
+    const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
+    const out = [];
+    for (let c = 0; c < nc; c++) {
+      const ch = srcImg.ch[c];
+      const med = fastSampledMedian(ch);
+      let dev = _ssMAD(ch, med);
+      if (dev < 1e-6) dev = _ssStd(ch);
+      if (dev < 1e-6) dev = 0.001;
+      const bp = Math.max(0, med - sigma * dev);
+      let denom = 1 - bp; if (denom < 1e-6) denom = 1;
+      const o = new Float32Array(n);
+      for (let i = 0; i < n; i++) { let v = (ch[i] - bp) / denom; o[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
+      let x = fastSampledMedian(o); if (x <= 0.0001) x = 0.002;
+      let m = (target - 1) * x / (x * (2 * target - 1) - target);
+      if (!isFinite(m)) m = 0.5;
+      m = m < 0.0001 ? 0.0001 : (m > 0.9999 ? 0.9999 : m);
+      const m2 = 2 * m - 1;
+      for (let i = 0; i < n; i++) { const v = o[i]; let dm = m2 * v - m; if (Math.abs(dm) < 1e-12) dm = 1e-12; let r = (m - 1) * v / dm; o[i] = r < 0 ? 0 : (r > 1 ? 1 : r); }
+      out.push(o);
+    }
+    return { ch: out, w, h, nc, isColor: srcImg.isColor };
+  }
+  // STAT-STRETCH-JS-END
+
   // sobre srcImg, leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
   async function computeDeconv(algo, srcImg) {
     if (algo === "rl_auto") return computeRLDeconv(srcImg);
@@ -3305,8 +3354,8 @@
     } else if (algo === "statistical_stretch") {
       const tgt = parseFloat(el("sldStretchStatTgt").value);
       const sig = parseFloat(el("sldStretchStatSigma").value);
-      const res = await window.SASProPyodide.processImageRaw(img, "statistical_stretch", { target_median: tgt, sigma_clip: sig });
-      img = { ch: res.ch, w: res.w, h: res.h, nc: res.nc, isColor: res.isColor };
+      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), mismo algoritmo (MAD + MTF por canal).
+      img = computeStatisticalStretchJS(img, tgt, sig);
     } else if (algo === "curves") {
       const lut = window.LUT.buildLUT((x) => curveEval(x), 65536);
       for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
