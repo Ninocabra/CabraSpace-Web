@@ -546,7 +546,7 @@
       render();
       const lang = document.documentElement.lang || "es";
       logConsole(lang === "es" ? `Crop aplicado a imagen actual (${cropped.w}×${cropped.h} px)` : `Crop applied to current image (${cropped.w}×${cropped.h} px)`, "info");
-      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de SPCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before SPCC.", "warn");
+      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de PCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before PCC.", "warn");
     });
   }
 
@@ -570,7 +570,7 @@
       render();
       const lang = document.documentElement.lang || "es";
       logConsole(lang === "es" ? `Crop aplicado a todo el flujo (${state.activeImage.w}×${state.activeImage.h} px)` : `Crop applied to all workflow images (${state.activeImage.w}×${state.activeImage.h} px)`, "info");
-      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de SPCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before SPCC.", "warn");
+      if (hadWcs) logConsole(lang === "es" ? "El recorte invalidó la solución astrométrica: vuelve a ejecutar Plate Solving antes de PCC." : "Crop invalidated the astrometric solution: re-run Plate Solving before PCC.", "warn");
     });
   }
 
@@ -2193,7 +2193,7 @@
     // astropy a precisión de máquina (factores y píxeles, |Δ|<6e-8). calibrate() es síncrono; cedemos
     // el hilo para que el loader repinte antes del cómputo (mediana exacta de canales a 4K ~ s).
     const lang2 = document.documentElement.lang || "es";
-    showLoader(lang2 === "es" ? "Calibrando color (SPCC, JS)..." : "Calibrating color (SPCC, JS)...");
+    showLoader(lang2 === "es" ? "Calibrando color (PCC, JS)..." : "Calibrating color (PCC, JS)...");
     await new Promise(r => setTimeout(r, 20));
     return window.SPCC.calibrate(srcImg, stars, {
       ra: wcsData.ra, dec: wcsData.dec, pixscale: wcsData.pixscale, orientation: wcsData.orientation, parity: wcsData.parity
@@ -2302,18 +2302,18 @@
     }
   }
 
-  // Web-SPCC helper function
+  // PCC helper function
   async function runSPCC() {
     if (!state.activeImage) return;
     const lang = document.documentElement.lang || "es";
     const wcsData = state.wcs || state.activeImage.wcs;
     if (!wcsData) {
       logConsole(lang === "es" 
-        ? "Error: Web-SPCC requiere que la imagen esté resuelta (Plate Solving) previamente." 
-        : "Error: Web-SPCC requires the image to be solved (Plate Solving) first.", "err");
+        ? "Error: PCC requiere que la imagen esté resuelta (Plate Solving) previamente." 
+        : "Error: PCC requires the image to be solved (Plate Solving) first.", "err");
       alert(lang === "es" 
-        ? "Por favor, ejecute Plate Solving en la pestaña correspondiente antes de usar SPCC." 
-        : "Please run Plate Solving in the corresponding tab before using SPCC.");
+        ? "Por favor, ejecute Plate Solving en la pestaña correspondiente antes de usar PCC."
+        : "Please run Plate Solving in the corresponding tab before using PCC.");
       return;
     }
     
@@ -2324,7 +2324,7 @@
       const res = await computeSPCCNeutralized(srcImg, wcsData);
 
       // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
-      previewActiveImage(res, srcImg, "SPCC");
+      previewActiveImage(res, srcImg, "PCC");
 
       render();
       drawHistogram();
@@ -2337,10 +2337,10 @@
           "ok"
         );
       } else {
-        logConsole(lang === "es" ? "Web-SPCC completado sin cambios de factores." : "Web-SPCC completed without factor changes.", "info");
+        logConsole(lang === "es" ? "PCC completado sin cambios de factores." : "PCC completed without factor changes.", "info");
       }
     } catch (err) {
-      logConsole(`Error en Web-SPCC: ${err.message}`, "err");
+      logConsole(`Error en PCC: ${err.message}`, "err");
     } finally {
       hideLoader();
     }
@@ -2442,10 +2442,10 @@
             try {
               results.push({ name: "PCC", img: await computeSPCCNeutralized(srcImg, wcsData) });
             } catch (e) {
-              logConsole((lang === "es" ? "SPCC omitido: " : "SPCC skipped: ") + e.message, "warn");
+              logConsole((lang === "es" ? "PCC omitido: " : "PCC skipped: ") + e.message, "warn");
             }
           } else {
-            logConsole(lang === "es" ? "SPCC omitido: la imagen no está resuelta (Plate Solving)." : "SPCC skipped: image is not plate-solved.", "warn");
+            logConsole(lang === "es" ? "PCC omitido: la imagen no está resuelta (Plate Solving)." : "PCC skipped: image is not plate-solved.", "warn");
           }
 
           for (let i = 0; i < results.length; i++) {
