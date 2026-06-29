@@ -2636,10 +2636,24 @@
   }
   // RL-DECONV-END
 
-  // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cosmic_std | cosmic_ia) sobre srcImg,
-  // leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
+  // CS IA Deconvolution (Beta): modelo de deconvolución propio de CabraSpace (deconv.js),
+  // mono/NCHW sobre luminancia en dominio lineal. Devuelve imgData deconvolucionado.
+  async function computeDeconvAI(srcImg) {
+    const lang = document.documentElement.lang || "es";
+    const strength = el("sldDeconAiStrength") ? parseFloat(el("sldDeconAiStrength").value) : 0.8;
+    showLoader(lang === "es" ? "Cargando CS IA Deconvolution (Beta)..." : "Loading CS IA Deconvolution (Beta)...");
+    return await window.DeconvAI.run(
+      srcImg, { strength },
+      (p) => showLoader(lang === "es" ? `Descargando modelo IA: ${(p * 100).toFixed(0)}%` : `Downloading AI model: ${(p * 100).toFixed(0)}%`),
+      (idx, total) => showLoader(lang === "es" ? `Deconvolución IA: tile ${idx}/${total}` : `AI deconvolution: tile ${idx}/${total}`)
+    );
+  }
+
+  // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cs_ia_beta | cosmic_std | cosmic_ia)
+  // sobre srcImg, leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
   async function computeDeconv(algo, srcImg) {
     if (algo === "rl_auto") return computeRLDeconv(srcImg);
+    if (algo === "cs_ia_beta") return await computeDeconvAI(srcImg);
     const lang = document.documentElement.lang || "es";
     const mode = el("selCcSharpenMode").value;
     const stellarAmt = parseFloat(el("sldCcStellarAmt").value);
@@ -5267,7 +5281,8 @@
     { s: "sldMixOpacity1", v: "valMixOpacity1", p: 2 },
     { s: "sldMixOpacity2", v: "valMixOpacity2", p: 2 },
     { s: "sldMixOpacity3", v: "valMixOpacity3", p: 2 },
-    { s: "sldPostGraXpertStrength", v: "valPostGraXpertStrength", p: 2 }
+    { s: "sldPostGraXpertStrength", v: "valPostGraXpertStrength", p: 2 },
+    { s: "sldDeconAiStrength", v: "valDeconAiStrength", p: 2 }
   ];
 
   dynamicSliders.forEach(({ s, v, p }) => {
@@ -5441,7 +5456,8 @@
   setupDropdownToggle("selDeconAlgo", {
     rl_auto: "decon-rl-controls",
     cosmic_std: "decon-cosmic-controls",
-    cosmic_ia: "decon-cosmic-controls"
+    cosmic_ia: "decon-cosmic-controls",
+    cs_ia_beta: "decon-csia-controls"
   });
 
   setupDropdownToggle("selPostNoiseAlgo", {
