@@ -181,6 +181,15 @@ header.scrolled {
   transition: var(--transition-smooth);
 }
 
+/* El item del tool web ("CabraSpace Imaging Workflow (Beta)") es mucho mas largo que
+   el resto; en el nav horizontal lo compactamos para que quepa en una sola linea y no
+   descuadre el menu. En <=1024px (nav vertical de bloques) se resetea mas abajo. */
+.nav-link[href*="cabraspace-imaging-workflow"] {
+  font-size: 0.66rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
 .nav-link:hover,
 .nav-link.active {
   color: var(--gold-primary);
@@ -1126,6 +1135,14 @@ body.menu-open {
     padding: 16px 28px;
     font-size: 0.82rem;
     width: 100%;
+  }
+
+  /* En el nav vertical (bloques a ancho completo) el item del tool va como el resto
+     y puede ocupar dos lineas sin problema; deshacemos la compactacion de escritorio. */
+  .nav-link[href*="cabraspace-imaging-workflow"] {
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    white-space: normal;
   }
 
   .nav-link:hover,
