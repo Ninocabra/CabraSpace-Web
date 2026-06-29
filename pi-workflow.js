@@ -2722,13 +2722,28 @@
     if (mb > 0) for (let i = 0; i < n; i++) { let v = base[i] / mb; base[i] = v > 1 ? 1 : (v < 0 ? 0 : v); }
     return { base, dil };
   }
-  // Sustituye a apply_cosmic_clarity_decon (Pyodide). nsStrength/removeAb no se usan en el path de IA.
-  function computeCosmicDeconBlend(srcImg, stellarAi, nonstellarAi, mode, stellarAmt, nsAmount) {
+  // Lucy-Richardson en JS (PSF gaussiana sigma 1.2, 5 iter; fftconvolve(x,gauss) == blur gaussiano).
+  // Genera el canal deconvolucionado para cosmic_std (deconv estandar, SIN IA).
+  function _ccLucyRichardson(src, w, h) {
+    const n = w * h, decon = Float32Array.from(src);
+    for (let it = 0; it < 5; it++) {
+      const conv = _ccGaussBlur1(decon, w, h, 1.2);
+      const rel = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const c = conv[i] < 1e-10 ? 1e-10 : conv[i]; rel[i] = src[i] / c; }
+      const corr = _ccGaussBlur1(rel, w, h, 1.2);
+      for (let i = 0; i < n; i++) { let v = decon[i] * corr[i]; decon[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
+    }
+    return decon;
+  }
+  // Sustituye a apply_cosmic_clarity_decon (Pyodide). Maneja IA (cosmic_ia: stellar/nonstellar_ai) y
+  // SIN IA (cosmic_std: decon via Lucy-Richardson, detalle via img - blur(img)).
+  function computeCosmicDeconBlend(srcImg, stellarAi, nonstellarAi, mode, stellarAmt, nsStrength, nsAmount) {
     const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
     const isColor = srcImg.isColor && nc >= 3;
     const cl = (v) => v < 0 ? 0 : (v > 1 ? 1 : v);
-    const doStellar = (mode === "both" || mode === "stellar") && stellarAmt > 0.01 && stellarAi;
-    const doNS = (mode === "both" || mode === "nonstellar") && nsAmount > 0.01 && nonstellarAi;
+    const doStellar = (mode === "both" || mode === "stellar") && stellarAmt > 0.01;
+    const doNS = (mode === "both" || mode === "nonstellar") && nsAmount > 0.01;
+    const nsSigma = Math.max(0.5, Math.min(5.0, nsStrength / 2.0));
     if (isColor) {
       const ch = srcImg.ch;
       const L = new Float32Array(n);
@@ -2736,10 +2751,12 @@
       const { base, dil } = _ccStarMasks(L, w, h);
       const ratio = new Float32Array(n);
       if (doStellar) {
+        let deconL;
+        if (stellarAi) { deconL = new Float32Array(n); for (let i = 0; i < n; i++) deconL[i] = (stellarAi[0][i] + stellarAi[1][i] + stellarAi[2][i]) / 3; }
+        else { deconL = _ccLucyRichardson(L, w, h); }
         for (let i = 0; i < n; i++) {
-          const decL = (stellarAi[0][i] + stellarAi[1][i] + stellarAi[2][i]) / 3;
           const a = base[i] * stellarAmt;
-          const sL = L[i] * (1 - a) + decL * a;
+          const sL = L[i] * (1 - a) + deconL[i] * a;
           let r = L[i] > 1e-6 ? sL / (L[i] + 1e-10) : 1.0; ratio[i] = r > 5 ? 5 : (r < 0 ? 0 : r);
         }
       } else { ratio.fill(1.0); }
@@ -2750,9 +2767,11 @@
           const neb = _ccGaussReduced(ch[c], w, h, 6.0, 4);
           let mxn = 0; for (let i = 0; i < n; i++) if (neb[i] > mxn) mxn = neb[i];
           const inv = 2.0 / (mxn + 1e-6);
+          const blurC = nonstellarAi ? null : _ccGaussBlur1(ch[c], w, h, nsSigma);
           for (let i = 0; i < n; i++) {
-            let d = cl(nonstellarAi[c][i]) - ch[c][i];
-            if (dil[i] > 0.01 && d < 0) d = 0;
+            let d;
+            if (nonstellarAi) { d = cl(nonstellarAi[c][i]) - ch[c][i]; if (dil[i] > 0.01 && d < 0) d = 0; }
+            else { d = ch[c][i] - blurC[i]; }
             let nm = neb[i] * inv; nm = nm > 1 ? 1 : (nm < 0 ? 0 : nm);
             out[c][i] = cl(out[c][i] + nsAmount * d * (1 - base[i]) * nm);
           }
@@ -2764,15 +2783,18 @@
       const { base, dil } = _ccStarMasks(cv, w, h);
       const out = new Float32Array(n);
       if (doStellar) {
-        for (let i = 0; i < n; i++) { const a = base[i] * stellarAmt; out[i] = cv[i] * (1 - a) + cl(stellarAi[0][i]) * a; }
+        const deconCh = stellarAi ? null : _ccLucyRichardson(cv, w, h);
+        for (let i = 0; i < n; i++) { const a = base[i] * stellarAmt; const dec = stellarAi ? cl(stellarAi[0][i]) : deconCh[i]; out[i] = cv[i] * (1 - a) + dec * a; }
       } else { out.set(cv); }
       if (doNS) {
         const neb = _ccGaussReduced(cv, w, h, 6.0, 4);
         let mxn = 0; for (let i = 0; i < n; i++) if (neb[i] > mxn) mxn = neb[i];
         const inv = 2.0 / (mxn + 1e-6);
+        const blurC = nonstellarAi ? null : _ccGaussBlur1(cv, w, h, nsSigma);
         for (let i = 0; i < n; i++) {
-          let d = cl(nonstellarAi[0][i]) - cv[i];
-          if (dil[i] > 0.01 && d < 0) d = 0;
+          let d;
+          if (nonstellarAi) { d = cl(nonstellarAi[0][i]) - cv[i]; if (dil[i] > 0.01 && d < 0) d = 0; }
+          else { d = cv[i] - blurC[i]; }
           let nm = neb[i] * inv; nm = nm > 1 ? 1 : (nm < 0 ? 0 : nm);
           out[i] = cl(out[i] + nsAmount * d * (1 - base[i]) * nm);
         }
@@ -2842,7 +2864,6 @@
     const stellarAmt = parseFloat(el("sldCcStellarAmt").value);
     const nsStrength = parseFloat(el("sldCcNsStrength").value);
     const nsAmount = parseFloat(el("sldCcNsAmount").value);
-    const removeAb = el("chkCcRemoveAb").checked;
     let stellarAiCh = null;
     let nonstellarAiCh = null;
 
@@ -2885,15 +2906,13 @@
       // ONNX-ENGINE-REF-END
     }
 
-    if (algo === "cosmic_ia") {
-      // COSMIC-DECON-PYODIDE->JS: blend en JS (sin Pyodide/WASM, sin OOM a 4K), igual que las otras IA.
+    // COSMIC-DECON en JS (sin Pyodide). cosmic_ia usa stellar/nonstellar_ai (IA); cosmic_std (AI=null)
+    // genera el decon via Lucy-Richardson y el detalle via img-blur dentro de computeCosmicDeconBlend.
+    if (algo === "cosmic_ia" || algo === "cosmic_std") {
       showLoader(lang === "es" ? "Mezcla final (JS)..." : "Final blending (JS)...");
-      return computeCosmicDeconBlend(srcImg, stellarAiCh, nonstellarAiCh, mode, stellarAmt, nsAmount);
+      return computeCosmicDeconBlend(srcImg, stellarAiCh, nonstellarAiCh, mode, stellarAmt, nsStrength, nsAmount);
     }
-    // cosmic_std (deconv estándar, SIN IA): sigue en Pyodide (Lucy-Richardson, no portado). A 4K aún puede dar OOM.
-    showLoader(lang === "es" ? "Realizando mezcla final en Pyodide..." : "Performing final blending in Pyodide...");
-    const params = { mode, stellar_amt: stellarAmt, ns_strength: nsStrength, ns_amount: nsAmount, remove_aberration: removeAb, stellar_ai: stellarAiCh, nonstellar_ai: nonstellarAiCh };
-    return await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
+    throw new Error("Algoritmo de deconvolución desconocido: " + algo);
   }
   // DECON-COMPUTE-END
 
