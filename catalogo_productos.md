@@ -50,6 +50,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: eyepieces**
   - [Cómo limpiar y almacenar tus oculares: consejos de Explore Scientific](https://www.youtube.com/shorts/3d9hTWm_gl0) (2025-12-22)
 
+### SOFTWARE
+- **Modelo: Scott Roberts**
+  - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
+
 ### TELESCOPES
 - **Modelo: ED102**
   - [Opciones de telescopios de gama media](https://www.youtube.com/watch?v=GZyuFnfiYqU) (2025-12-22)
@@ -94,8 +98,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Observatorio retráctil de Alan Midkiff (Tours de Observatorios #7)](https://www.youtube.com/watch?v=S8y0CbtjlRA) (2026-05-27)
 
 ### CAMERAS
-- **Modelo: Canon**
-  - [Inicio en Astrofotografía: Cámara Canon EOS 2000D con Kit 18-55mm](https://stargazerslounge.com/topic/445721-dslr-canon-eos-2000d-kit-18-55mm-dc-for-astrophotography-a-beginners-search/) (2026-06-03)
 - **Modelo: DSLR**
   - [Cámara réflex para astrofotografía de cielo profundo](https://www.reddit.com/r/telescopes/comments/1tuudke/camara_reflex_para_astrofotografia_de_cielo/) (2026-06-02)
 
@@ -216,8 +218,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Heritage 150p**
   - [Asesoramiento sobre accesorios para Skywatcher Heritage 150p](https://www.reddit.com/r/telescopes/comments/1tuwvsi/are_these_good_for_skywatcher_heritage_150p/) (2026-06-02)
-- **Modelo: Skymax 90**
-  - [Mejoras para el Skywatcher Skymax 90](https://stargazerslounge.com/topic/445726-skywatcher-skymax-90-upgrades/) (2026-06-03)
 
 ### MOUNTS
 - **Modelo: HEQ5-R**
@@ -303,6 +303,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Mak 127**
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
 - **Modelo: SV503**
+  - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
   - [Telescopio Refractor SV503 70mm de Svbony: Explorando el Cosmos sin gastar una fortuna](https://www.youtube.com/shorts/bK21vw9ipaY) (2026-06-26)
 - **Modelo: SV503 70**
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
@@ -319,6 +320,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Anuncio de nuevos oculares Takahashi](https://stargazerslounge.com/topic/411644-new-takahashi-eyepieces-announced/) (2026-06-24)
 
 ### TELESCOPES
+- **Modelo: FC100DZ**
+  - [Reseña del Takahashi FC100DZ: la grandeza de fluorita de 4 pulgadas de Tak continúa](https://www.youtube.com/watch?v=lzJ0anAw7D8) (2026-06-28)
 - **Actualizaciones Generales / Revisiones:**
   - [Nuevo telescopio Takahashi anunciado](https://stargazerslounge.com/topic/444195-new-takahashi-scope/) (2026-06-04)
 
@@ -393,8 +396,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: ASI2600MC Air**
   - [Astrofotografía de campo amplio con ASI2600MC Air](https://www.youtube.com/shorts/NrdtWWIAR_c) (2026-05-13)
-- **Modelo: ASI676MM**
-  - [ZWO ASI676MM: Nueva cámara de astrofotografía](https://stargazerslounge.com/topic/441691-new-camera-zwo-asi676mm/) (2026-06-03)
 - **Modelo: ATT 2026**
   - [Resumen de ATT 2026 de ZWO](https://www.youtube.com/shorts/g91t3DjdgzM) (2026-05-12)
 - **Modelo: Pillars of Creation**
