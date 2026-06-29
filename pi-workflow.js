@@ -2853,6 +2853,26 @@
     }
     return { ch: out, w, h, nc, isColor: srcImg.isColor };
   }
+  // Star Stretch = Statistical Stretch + correccion gamma por canal para preservar el color estelar.
+  function computeStarStretchJS(srcImg, target, sigma, colorPreservation) {
+    const res = computeStatisticalStretchJS(srcImg, target, sigma);
+    if (res.isColor && res.nc >= 3) {
+      const n = res.w * res.h;
+      for (let c = 0; c < res.nc; c++) {
+        const ch = res.ch[c];
+        for (let i = 0; i < n; i++) { let v = Math.pow(ch[i], colorPreservation); ch[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
+      }
+    }
+    return res;
+  }
+  // SCNR Green (Subtractive Chrominance Noise Reduction): el verde no supera al max(R,B) (con amount).
+  function computeScnrGreenJS(srcImg, amount) {
+    if (!srcImg.isColor || srcImg.nc < 3) return srcImg;
+    const n = srcImg.w * srcImg.h, r = srcImg.ch[0], g = srcImg.ch[1], b = srcImg.ch[2];
+    const ng = new Float32Array(n);
+    for (let i = 0; i < n; i++) { const maxRB = r[i] > b[i] ? r[i] : b[i]; ng[i] = g[i] > maxRB ? g[i] - amount * (g[i] - maxRB) : g[i]; }
+    return { ch: [Float32Array.from(r), ng, Float32Array.from(b)], w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: true };
+  }
   // STAT-STRETCH-JS-END
 
   // sobre srcImg, leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
@@ -5864,7 +5884,15 @@
         }
 
         try {
-          const result = await SASProPyodide.processImageFile(file, algo, params);
+          // SAS-PRO-PYODIDE->JS: carga con autoghs.js (JS) + algo en JS (sin Pyodide).
+          showLoader(lang === "es" ? "Procesando archivo (JS)..." : "Processing file (JS)...");
+          const loaded = await AutoGHS.loadFromFile(file);
+          let result;
+          if (algo === "statistical_stretch") result = computeStatisticalStretchJS(loaded, params.target_median, params.sigma_clip);
+          else if (algo === "star_stretch") result = computeStarStretchJS(loaded, params.target_median, params.sigma_clip, params.color_preservation);
+          else if (algo === "scnr") result = computeScnrGreenJS(loaded, params.amount);
+          else result = loaded;
+          hideLoader();
           
           // Establecer como imagen activa y actualizar la previsualización
           state.activeImage = result;
@@ -5889,6 +5917,7 @@
           setActiveImage(result);
           logConsole(lang === "es" ? `Proceso SASPro ${algo} aplicado con éxito` : `SASPro ${algo} process applied successfully`, "ok");
         } catch (err) {
+          hideLoader();
           logConsole(`Error: ${err.message}`, "err");
         }
       }
