@@ -145,8 +145,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: StellaLyra**
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
   - [Nuevo telescopio Newtoniano StellaLyra 8" f/5 M-LRN con enfocador de doble velocidad de 2"](https://stargazerslounge.com/topic/445765-stellalyra-8-f5-m-lrn-newt-2-dual-speed-focuser/) (2026-06-05)
-- **Modelo: imaging**
-  - [Comparación de dos refractores de imagen](https://stargazerslounge.com/topic/445727-comparing-two-imaging-refractors/) (2026-06-03)
 - **Modelo: sampling**
   - [¿Son los telescopios grandes peores para la astrofotografía?](https://www.youtube.com/watch?v=bOyjWlGmKoc) (2026-06-05)
 
@@ -261,6 +259,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
 - **Modelo: Prime Day**
+  - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
   - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
   - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
 - **Modelo: Rumak**
