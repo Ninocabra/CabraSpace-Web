@@ -2643,13 +2643,147 @@
     const strength = el("sldDeconAiStrength") ? parseFloat(el("sldDeconAiStrength").value) : 0.8;
     showLoader(lang === "es" ? "Cargando CS IA Deconvolution (Beta)..." : "Loading CS IA Deconvolution (Beta)...");
     return await window.DeconvAI.run(
-      srcImg, { strength },
+      srcImg, { strength, onLog: (m) => logConsole(m, "info") },
       (p) => showLoader(lang === "es" ? `Descargando modelo IA: ${(p * 100).toFixed(0)}%` : `Downloading AI model: ${(p * 100).toFixed(0)}%`),
       (idx, total) => showLoader(lang === "es" ? `Deconvolución IA: tile ${idx}/${total}` : `AI deconvolution: tile ${idx}/${total}`)
     );
   }
 
   // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cs_ia_beta | cosmic_std | cosmic_ia)
+  // COSMIC-DECON-BLEND-JS-BEGIN
+  // Port a JS del blend de Cosmic Clarity deconv (antes en Pyodide/decon.py de Seti Astro).
+  // A 4K, el blend en Pyodide (WASM) alocaba varias copias de 124 MiB -> OOM. Como img/stellar_ai/
+  // nonstellar_ai ya están en JS tras la inferencia WebGPU, blendeamos aquí (sin límite WASM, más
+  // rápido), igual que StarNet2/GraXpert/DeepSNR. No se porta la rama Lucy-Richardson (stellar_ai=None):
+  // el path de IA siempre provee stellar/nonstellar.
+  function _ccGaussBlur1(src, w, h, sigma) {
+    if (sigma <= 0.01) return Float32Array.from(src);
+    const r = Math.max(1, Math.ceil(3 * sigma));
+    const k = new Float32Array(2 * r + 1); let s = 0;
+    for (let i = -r; i <= r; i++) { const v = Math.exp(-(i * i) / (2 * sigma * sigma)); k[i + r] = v; s += v; }
+    for (let i = 0; i < k.length; i++) k[i] /= s;
+    const tmp = new Float32Array(w * h), out = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) { const row = y * w; for (let x = 0; x < w; x++) { let a = 0; for (let j = -r; j <= r; j++) { let xx = x + j; if (xx < 0) xx = 0; else if (xx >= w) xx = w - 1; a += src[row + xx] * k[j + r]; } tmp[row + x] = a; } }
+    for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) { let a = 0; for (let j = -r; j <= r; j++) { let yy = y + j; if (yy < 0) yy = 0; else if (yy >= h) yy = h - 1; a += tmp[yy * w + x] * k[j + r]; } out[y * w + x] = a; } }
+    return out;
+  }
+  function _ccGaussReduced(src, w, h, sigma, factor) {
+    const dw = Math.max(1, Math.round(w / factor)), dh = Math.max(1, Math.round(h / factor));
+    const ds = window.Resample.resizeBilinear(src, w, h, dw, dh);
+    const bds = _ccGaussBlur1(ds, dw, dh, sigma / factor);
+    return window.Resample.resizeBilinear(bds, dw, dh, w, h);
+  }
+  function _ccMaxFilter(src, w, h, size) {
+    const r = Math.floor(size / 2);
+    const tmp = new Float32Array(w * h), out = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) { const row = y * w; for (let x = 0; x < w; x++) { let m = -Infinity; for (let dx = -r; dx <= r; dx++) { let xx = x + dx; if (xx < 0) xx = 0; else if (xx >= w) xx = w - 1; const v = src[row + xx]; if (v > m) m = v; } tmp[row + x] = m; } }
+    for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) { let m = -Infinity; for (let dy = -r; dy <= r; dy++) { let yy = y + dy; if (yy < 0) yy = 0; else if (yy >= h) yy = h - 1; const v = tmp[yy * w + x]; if (v > m) m = v; } out[y * w + x] = m; } }
+    return out;
+  }
+  function _ccMedianFilter(src, w, h, size) {
+    const r = Math.floor(size / 2), out = new Float32Array(w * h), buf = new Float32Array(size * size);
+    for (let y = 0; y < h; y++) { for (let x = 0; x < w; x++) { let kk = 0; for (let dy = -r; dy <= r; dy++) { let yy = y + dy; if (yy < 0) yy = 0; else if (yy >= h) yy = h - 1; const row = yy * w; for (let dx = -r; dx <= r; dx++) { let xx = x + dx; if (xx < 0) xx = 0; else if (xx >= w) xx = w - 1; buf[kk++] = src[row + xx]; } } const a = buf.slice(0, kk).sort(); out[y * w + x] = a[kk >> 1]; } }
+    return out;
+  }
+  function _ccMedian(arr) { const a = Float32Array.from(arr).sort(); const n = a.length; return n % 2 ? a[(n - 1) >> 1] : 0.5 * (a[n / 2 - 1] + a[n / 2]); }
+  function _ccStarMasks(L, w, h) {
+    const n = w * h;
+    const dds = Math.min(h, w) >= 256 ? 4 : 1;
+    let bg;
+    if (dds > 1) {
+      const dw = Math.max(1, Math.round(w / dds)), dh = Math.max(1, Math.round(h / dds));
+      const Lds = window.Resample.resizeBilinear(L, w, h, dw, dh);
+      const bgds = _ccMedianFilter(Lds, dw, dh, Math.max(3, Math.floor(11 / dds)));
+      bg = window.Resample.resizeBilinear(bgds, dw, dh, w, h);
+    } else {
+      bg = _ccMedianFilter(L, w, h, 11);
+    }
+    const stars = new Float32Array(n);
+    let mean = 0;
+    for (let i = 0; i < n; i++) { const d = L[i] - bg[i]; stars[i] = d > 0 ? d : 0; mean += L[i]; }
+    mean /= n;
+    let sd = 0; for (let i = 0; i < n; i++) { const d = L[i] - mean; sd += d * d; } sd = Math.sqrt(sd / n);
+    const thr = _ccMedian(L) + 1.2 * sd;
+    const sm = new Float32Array(n);
+    for (let i = 0; i < n; i++) sm[i] = stars[i] > thr ? stars[i] : 0;
+    let dil;
+    if (dds > 1) {
+      const dw = Math.max(1, Math.round(w / dds)), dh = Math.max(1, Math.round(h / dds));
+      const smds = window.Resample.resizeBilinear(sm, w, h, dw, dh);
+      const smdd = _ccGaussBlur1(_ccMaxFilter(smds, dw, dh, Math.max(3, Math.floor(15 / dds))), dw, dh, 2.0 / dds);
+      dil = window.Resample.resizeBilinear(smdd, dw, dh, w, h);
+    } else {
+      dil = _ccGaussBlur1(_ccMaxFilter(sm, w, h, 15), w, h, 2.0);
+    }
+    let mx = 0; for (let i = 0; i < n; i++) if (dil[i] > mx) mx = dil[i];
+    if (mx > 0) for (let i = 0; i < n; i++) { let v = dil[i] / mx; dil[i] = v > 1 ? 1 : (v < 0 ? 0 : v); }
+    const base = _ccGaussBlur1(sm, w, h, 1.5);
+    let mb = 0; for (let i = 0; i < n; i++) if (base[i] > mb) mb = base[i];
+    if (mb > 0) for (let i = 0; i < n; i++) { let v = base[i] / mb; base[i] = v > 1 ? 1 : (v < 0 ? 0 : v); }
+    return { base, dil };
+  }
+  // Sustituye a apply_cosmic_clarity_decon (Pyodide). nsStrength/removeAb no se usan en el path de IA.
+  function computeCosmicDeconBlend(srcImg, stellarAi, nonstellarAi, mode, stellarAmt, nsAmount) {
+    const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
+    const isColor = srcImg.isColor && nc >= 3;
+    const cl = (v) => v < 0 ? 0 : (v > 1 ? 1 : v);
+    const doStellar = (mode === "both" || mode === "stellar") && stellarAmt > 0.01 && stellarAi;
+    const doNS = (mode === "both" || mode === "nonstellar") && nsAmount > 0.01 && nonstellarAi;
+    if (isColor) {
+      const ch = srcImg.ch;
+      const L = new Float32Array(n);
+      for (let i = 0; i < n; i++) L[i] = (ch[0][i] + ch[1][i] + ch[2][i]) / 3;
+      const { base, dil } = _ccStarMasks(L, w, h);
+      const ratio = new Float32Array(n);
+      if (doStellar) {
+        for (let i = 0; i < n; i++) {
+          const decL = (stellarAi[0][i] + stellarAi[1][i] + stellarAi[2][i]) / 3;
+          const a = base[i] * stellarAmt;
+          const sL = L[i] * (1 - a) + decL * a;
+          let r = L[i] > 1e-6 ? sL / (L[i] + 1e-10) : 1.0; ratio[i] = r > 5 ? 5 : (r < 0 ? 0 : r);
+        }
+      } else { ratio.fill(1.0); }
+      const out = [new Float32Array(n), new Float32Array(n), new Float32Array(n)];
+      for (let c = 0; c < 3; c++) for (let i = 0; i < n; i++) out[c][i] = cl(ch[c][i] * ratio[i]);
+      if (doNS) {
+        for (let c = 0; c < 3; c++) {
+          const neb = _ccGaussReduced(ch[c], w, h, 6.0, 4);
+          let mxn = 0; for (let i = 0; i < n; i++) if (neb[i] > mxn) mxn = neb[i];
+          const inv = 2.0 / (mxn + 1e-6);
+          for (let i = 0; i < n; i++) {
+            let d = cl(nonstellarAi[c][i]) - ch[c][i];
+            if (dil[i] > 0.01 && d < 0) d = 0;
+            let nm = neb[i] * inv; nm = nm > 1 ? 1 : (nm < 0 ? 0 : nm);
+            out[c][i] = cl(out[c][i] + nsAmount * d * (1 - base[i]) * nm);
+          }
+        }
+      }
+      return { ch: out, w, h, nc, isColor: true };
+    } else {
+      const cv = srcImg.ch[0];
+      const { base, dil } = _ccStarMasks(cv, w, h);
+      const out = new Float32Array(n);
+      if (doStellar) {
+        for (let i = 0; i < n; i++) { const a = base[i] * stellarAmt; out[i] = cv[i] * (1 - a) + cl(stellarAi[0][i]) * a; }
+      } else { out.set(cv); }
+      if (doNS) {
+        const neb = _ccGaussReduced(cv, w, h, 6.0, 4);
+        let mxn = 0; for (let i = 0; i < n; i++) if (neb[i] > mxn) mxn = neb[i];
+        const inv = 2.0 / (mxn + 1e-6);
+        for (let i = 0; i < n; i++) {
+          let d = cl(nonstellarAi[0][i]) - cv[i];
+          if (dil[i] > 0.01 && d < 0) d = 0;
+          let nm = neb[i] * inv; nm = nm > 1 ? 1 : (nm < 0 ? 0 : nm);
+          out[i] = cl(out[i] + nsAmount * d * (1 - base[i]) * nm);
+        }
+      } else {
+        for (let i = 0; i < n; i++) out[i] = cl(out[i]);
+      }
+      return { ch: [out], w, h, nc, isColor: false };
+    }
+  }
+  // COSMIC-DECON-BLEND-JS-END
+
   // sobre srcImg, leyendo los parámetros actuales de la UI. Reutilizado por "Probar" y "Comparar".
   async function computeDeconv(algo, srcImg) {
     if (algo === "rl_auto") return computeRLDeconv(srcImg);
@@ -2702,6 +2836,12 @@
       // ONNX-ENGINE-REF-END
     }
 
+    if (algo === "cosmic_ia") {
+      // COSMIC-DECON-PYODIDE->JS: blend en JS (sin Pyodide/WASM, sin OOM a 4K), igual que las otras IA.
+      showLoader(lang === "es" ? "Mezcla final (JS)..." : "Final blending (JS)...");
+      return computeCosmicDeconBlend(srcImg, stellarAiCh, nonstellarAiCh, mode, stellarAmt, nsAmount);
+    }
+    // cosmic_std (deconv estándar, SIN IA): sigue en Pyodide (Lucy-Richardson, no portado). A 4K aún puede dar OOM.
     showLoader(lang === "es" ? "Realizando mezcla final en Pyodide..." : "Performing final blending in Pyodide...");
     const params = { mode, stellar_amt: stellarAmt, ns_strength: nsStrength, ns_amount: nsAmount, remove_aberration: removeAb, stellar_ai: stellarAiCh, nonstellar_ai: nonstellarAiCh };
     return await window.SASProPyodide.processImageRaw(srcImg, "cosmic", params);
@@ -2730,6 +2870,13 @@
         }
         // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Deconvolución")
         previewActiveImage(res, srcImg, "Deconvolution");
+        // CS IA Deconvolution devuelve imagen LINEAL -> activar AutoSTF para que el
+        // resultado no se vea negro (igual que Background/Gradiente).
+        if (algo === "cs_ia_beta") {
+          state.screenStretchMode = true;
+          const stfBtn = el("btnToolAutoSTF");
+          if (stfBtn) stfBtn.classList.add("active");
+        }
         render();
         drawHistogram();
         logConsole(lang === "es" ? "Vista previa de deconvolución (Probar). Pulsa 'Aplicar Deconvolución' para confirmar." : "Deconvolution preview (Test). Press 'Apply Deconvolve' to commit.", "info");
@@ -2927,8 +3074,8 @@
   el("btnRemoveStars").addEventListener("click", () => {
     if (!state.activeImage) {
       logConsole(window.location.pathname.includes("-en.html")
-        ? "Please load an image before removing stars."
-        : "Carga una imagen antes de quitar estrellas.", "err");
+        ? "Please load an image before separating stars."
+        : "Carga una imagen antes de separar estrellas.", "err");
       return;
     }
 
