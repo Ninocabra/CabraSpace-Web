@@ -4899,13 +4899,9 @@
 
   function zoomFit() {
     if (!state.activeImage) return;
-    const parentWidth = container.clientWidth;
-    const parentHeight = container.clientHeight;
-    
-    const scaleX = parentWidth / state.activeImage.w;
-    const scaleY = parentHeight / state.activeImage.h;
-    
-    state.zoom = Math.min(scaleX, scaleY) * 0.95;
+    // El canvas se muestra con object-fit:contain llenando el panel, asi que a escala 1
+    // la imagen ya queda ajustada (toda visible). "Fit/Ajustar" = volver a escala 1.
+    state.zoom = 1;
     state.panX = 0;
     state.panY = 0;
     updateTransform();
@@ -5042,7 +5038,11 @@
   // Toolbar events
   el("btnToolZoomFit").addEventListener("click", zoomFit);
   el("btnToolZoomReset").addEventListener("click", () => {
-    state.zoom = 1;
+    if (!state.activeImage) return;
+    // "1:1" = 100% de pixeles reales (1 px de imagen = 1 px de pantalla). A escala 1 la imagen se
+    // muestra ajustada (object-fit:contain con factor 'fit'); el zoom para 100% es el inverso de 'fit'.
+    const fit = Math.min(container.clientWidth / cv.width, container.clientHeight / cv.height) || 1;
+    state.zoom = fit > 0 ? 1 / fit : 1;
     state.panX = 0;
     state.panY = 0;
     updateTransform();
