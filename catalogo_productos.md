@@ -20,6 +20,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: filtros**
   - [Baader lanza nuevos filtros SLOAN/SDSS de 36mm (ugriz)](https://stargazerslounge.com/topic/445793-baader-new-gen-sloansdss-filter-sets-36mm-ugriz/) (2026-06-06)
 
+## Baader Planetarium
+
+### ACCESSORIES
+- **Modelo: Observable Space**
+  - [Lo más destacado de ASTRO Friedrichshafen 2026 de Baader, Celestron y otros](https://www.youtube.com/watch?v=7lrgVyyXj2k) (2026-06-29)
+
 ## Celestron
 
 ### ACCESSORIES
@@ -80,8 +86,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Otros / No especificado
 
 ### ACCESSORIES
-- **Modelo: 28mm**
-  - [¿Ocular de 28 mm 82° o 30 mm 70° para un SCT de 8 pulgadas?](https://stargazerslounge.com/topic/445716-advice-please-28mm-82-deg-eyepiece-or-30mm-70-deg-for-a-8sct/) (2026-06-03)
 - **Modelo: EQ platform**
   - [Equilibrado de una plataforma ecuacional Dobsoniana con bolsa de aire](https://www.reddit.com/r/telescopes/comments/1tvwjig/unweighting_an_dobsonian_eq_platformtable_air_bag/) (2026-06-03)
 - **Actualizaciones Generales / Revisiones:**
