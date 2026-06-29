@@ -2649,7 +2649,7 @@
     const strength = el("sldDeconAiStrength") ? parseFloat(el("sldDeconAiStrength").value) : 0.8;
     showLoader(lang === "es" ? "Cargando CS IA Deconvolution (Beta)..." : "Loading CS IA Deconvolution (Beta)...");
     return await window.DeconvAI.run(
-      srcImg, { strength, onLog: (m) => logConsole(m, "info") },
+      srcImg, { strength },
       (p) => showLoader(lang === "es" ? `Descargando modelo IA: ${(p * 100).toFixed(0)}%` : `Downloading AI model: ${(p * 100).toFixed(0)}%`),
       (idx, total) => showLoader(lang === "es" ? `Deconvolución IA: tile ${idx}/${total}` : `AI deconvolution: tile ${idx}/${total}`)
     );

@@ -15,12 +15,11 @@ window.DeconvAI = (function () {
   "use strict";
 
   // fp16 (~4 MB). Prod via proxy Vercel (CORS sobre la Release); local desde scratch/.
-  let MODEL_URL = "https://astronomy-proxy.vercel.app/m/deconv_beta.fp16.onnx";
+  // Modelo desplegado: deconv_v3 (Fase 2 con datos reales de Hubble + saturación +
+  // elongación; aprobado a ojo por Nino). Subir deconv_v3.fp16.onnx al Release del proxy.
+  let MODEL_URL = "https://astronomy-proxy.vercel.app/m/deconv_v3.fp16.onnx";
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    // STAGING (revisión a ojo de Nino): en local servimos el modelo de Fase 2.
-    // Producción sigue con el Beta hasta su visto bueno. Al desplegar, actualizar
-    // tambien la MODEL_URL de produccion (Release + proxy) a deconv_phase2.fp16.onnx.
-    MODEL_URL = "scratch/deconv_phase2.fp16.onnx";
+    MODEL_URL = "scratch/deconv_v3.fp16.onnx";
   }
 
   const LUMA = [0.2126, 0.7152, 0.0722]; // Rec.709
