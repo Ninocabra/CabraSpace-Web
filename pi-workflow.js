@@ -3542,7 +3542,9 @@
   // DeepSNR simplificado a tile fijo 512 (control-flow plegado): numéricamente IDÉNTICO al
   // deepsnr_v2.onnx original (diff < 2e-7), pero 946 vs 2193 nodos → más rápido, y sin el bug de
   // forma 512/256 que hacía fallar a onnxruntime-web. Subir este .onnx a la Release (GATE humano).
-  const DEEPSNR_PROD = RELEASE_BASE + "deepsnr_v2_512.onnx";
+  // ?v=1: esquiva un 404 que quedó cacheado como immutable en el CDN de Vercel para la URL sin
+  // query (model.js cachea también las respuestas de error). Distinta clave de caché -> MISS -> 200.
+  const DEEPSNR_PROD = RELEASE_BASE + "deepsnr_v2_512.onnx?v=1";
   function resolveDenoiseModel(prodUrl, scratchFile) {
     const host = window.location.hostname;
     return (host === "localhost" || host === "127.0.0.1") ? ("scratch/" + scratchFile) : prodUrl;
