@@ -3539,10 +3539,43 @@
   // en producción habría que re-hospedarlos con CORS — GATE humano).
   const COSMIC_DENOISE_COLOR_PROD = RELEASE_BASE + "cosmic_denoise_color.onnx";
   const COSMIC_DENOISE_MONO_PROD = RELEASE_BASE + "cosmic_denoise_mono.onnx";
-  const DEEPSNR_PROD = RELEASE_BASE + "deepsnr_v2.onnx";
+  // DeepSNR simplificado a tile fijo 512 (control-flow plegado): numéricamente IDÉNTICO al
+  // deepsnr_v2.onnx original (diff < 2e-7), pero 946 vs 2193 nodos → más rápido, y sin el bug de
+  // forma 512/256 que hacía fallar a onnxruntime-web. Subir este .onnx a la Release (GATE humano).
+  const DEEPSNR_PROD = RELEASE_BASE + "deepsnr_v2_512.onnx";
   function resolveDenoiseModel(prodUrl, scratchFile) {
     const host = window.location.hostname;
     return (host === "localhost" || host === "127.0.0.1") ? ("scratch/" + scratchFile) : prodUrl;
+  }
+
+  // Opción 2 — worker aislado para DeepSNR (ort-web 1.27 / WebGPU). La página principal sigue en
+  // ort 1.19.2: el worker tiene su PROPIO scope global, así que el bump de versión no afecta al
+  // resto de la pila IA. Devuelve el array de canales (mismo formato que runOnnxModelTiled). Si el
+  // worker o WebGPU fallan, el caller cae a la ruta WASM clásica del hilo principal.
+  let __deepsnrWorker = null;
+  function runDeepSNRWorker(srcImg, modelUrl, opts, onProgress) {
+    return new Promise((resolve, reject) => {
+      let worker;
+      try {
+        if (!__deepsnrWorker) __deepsnrWorker = new Worker("deepsnr-worker.js");
+        worker = __deepsnrWorker;
+      } catch (e) { reject(e); return; }
+      const cleanup = () => {
+        worker.removeEventListener("message", onMsg);
+        worker.removeEventListener("error", onErr);
+      };
+      const onMsg = (ev) => {
+        const m = ev.data;
+        if (m.type === "progress") { if (onProgress) onProgress(m.idx, m.total); }
+        else if (m.type === "result") { cleanup(); resolve(m.ch); }
+        else if (m.type === "error") { cleanup(); __deepsnrWorker = null; reject(new Error(m.message || "worker error")); }
+      };
+      const onErr = (e) => { cleanup(); __deepsnrWorker = null; reject(new Error(e.message || "worker crash")); };
+      worker.addEventListener("message", onMsg);
+      worker.addEventListener("error", onErr);
+      // Sin lista de transferencia: srcImg.ch se clona (debe sobrevivir para blendDenoise).
+      worker.postMessage({ ch: srcImg.ch, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, modelUrl, opts });
+    });
   }
   // Estirado MTF a mediana objetivo 0.25 + su inverso (m -> 1-m). Hace robustos a la luminancia
   // de entrada los modelos SetiAstro (entrenados con datos estirados).
@@ -3666,13 +3699,26 @@
     }
     if (algo === "deepsnr") {
       showLoader(lang === "es" ? "Cargando DeepSNR..." : "Loading DeepSNR...");
-      const url = resolveDenoiseModel(DEEPSNR_PROD, "deepsnr_v2.onnx");
-      // DeepSNR tiene ops que WebGPU no ejecuta (Mul broadcast) -> forzar WASM (CPU).
-      const session = await window.OnnxEngine.loadSession(url, { executionProviders: ["wasm"] }, (p) => {
-        showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
-      });
-      showLoader(lang === "es" ? "Procesando DeepSNR..." : "Processing DeepSNR...");
-      const ai = await window.OnnxEngine.runOnnxModelTiled(session, srcImg, { tileSize: 512, fixedTile: 512, overlap: 32, layout: "NHWC" });
+      const url = resolveDenoiseModel(DEEPSNR_PROD, "deepsnr_v2_512.onnx");
+      const dsnrOpts = { tileSize: 512, fixedTile: 512, overlap: 32, layout: "NHWC" };
+      const onTile = (idx, total) => {
+        const lt = el("piwLoaderText");
+        if (lt) lt.textContent = (lang === "es" ? `Procesando mosaico ${idx}/${total}...` : `Processing tile ${idx}/${total}...`);
+      };
+      let ai;
+      try {
+        // Worker aislado con ort-web 1.27 → WebGPU (~33ms/tile @256). La página sigue en 1.19.2.
+        showLoader(lang === "es" ? "Procesando DeepSNR (WebGPU)..." : "Processing DeepSNR (WebGPU)...");
+        ai = await runDeepSNRWorker(srcImg, url, dsnrOpts, onTile);
+      } catch (e) {
+        // Fallback robusto: ruta clásica en el hilo principal (ort 1.19.2, WASM) si el worker o WebGPU fallan.
+        logConsole(lang === "es" ? `DeepSNR: worker no disponible (${e.message}); usando WASM.` : `DeepSNR: worker unavailable (${e.message}); falling back to WASM.`, "warn");
+        showLoader(lang === "es" ? "Procesando DeepSNR (WASM)..." : "Processing DeepSNR (WASM)...");
+        const session = await window.OnnxEngine.loadSession(url, { executionProviders: ["wasm"] }, (p) => {
+          showLoader(lang === "es" ? `Descargando modelo: ${(p * 100).toFixed(0)}%` : `Downloading model: ${(p * 100).toFixed(0)}%`);
+        });
+        ai = await window.OnnxEngine.runOnnxModelTiled(session, srcImg, dsnrOpts);
+      }
       return blendDenoise(srcImg, ai, parseFloat(el("sldPostDeepSNRAmount").value));
     }
     throw new Error(`Algoritmo de denoise desconocido: ${algo}`);
