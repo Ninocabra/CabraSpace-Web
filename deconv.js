@@ -15,11 +15,12 @@ window.DeconvAI = (function () {
   "use strict";
 
   // fp16 (~4 MB). Prod via proxy Vercel (CORS sobre la Release); local desde scratch/.
-  // Modelo desplegado: deconv_v3 (Fase 2 con datos reales de Hubble + saturación +
-  // elongación; aprobado a ojo por Nino). Subir deconv_v3.fp16.onnx al Release del proxy.
-  let MODEL_URL = "https://astronomy-proxy.vercel.app/m/deconv_v3.fp16.onnx";
+  // Modelo desplegado: deconv_v5f (mono; corrige elongación moderada + más limpio que v3,
+  // validado en 12 imágenes reales con src/judge.py). El coma cromático fuerte queda para
+  // el modelo color 3ch (ver Modelos IA/.../MODELO-COLOR-3ch.md). v3 sigue en la Release.
+  let MODEL_URL = "https://astronomy-proxy.vercel.app/m/deconv_v5f.fp16.onnx";
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    MODEL_URL = "scratch/deconv_v3.fp16.onnx";
+    MODEL_URL = "scratch/deconv_v5f.fp16.onnx";
   }
 
   const LUMA = [0.2126, 0.7152, 0.0722]; // Rec.709
