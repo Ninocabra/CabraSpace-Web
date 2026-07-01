@@ -40,6 +40,10 @@
     imageSlots: new Array(8).fill(null),
     maskSlots: new Array(8).fill(null),
     activeSlotIdx: -1,
+    // Historial global Undo/Redo: pilas de { key, img } (referencias a imágenes committeadas;
+    // las operaciones crean objetos nuevos, así que guardar referencias es correcto y sin copias).
+    undoStack: [],
+    redoStack: [],
     // Tras "Comparar Métodos" de Color Calibration: permite que "Aplicar Calibración"
     // esté activo aunque no haya card seleccionada, para confirmar el slot elegido.
     calibCompareReady: false,
@@ -134,6 +138,7 @@
   // `result` debe traer al menos { ch, w, h, nc, isColor }. `sourceImg` es el origen del que
   // heredar wcs e historial (por defecto, la entrada del paso actual).
   function commitActiveImage(result, stageLabel, sourceImg) {
+    recordUndo(); // guarda el estado committeado anterior para poder deshacer
     const src = sourceImg || state.stepInputImage || state.activeImage;
     const img = {
       ch: result.ch,
@@ -188,6 +193,59 @@
     return img;
   }
   // IMAGE-MODEL-END
+
+  // UNDO-REDO-BEGIN — Historial global de pasos aplicados al flujo.
+  // Se registra la imagen committeada ANTERIOR (referencia) antes de sobrescribirla; deshacer/rehacer
+  // restaura workflowImages[key] + activeImage + stepInputImage.
+  function recordUndo() {
+    const key = state.activeWorkflowKey;
+    const cur = key ? state.workflowImages[key] : null;
+    if (!cur) return;
+    const top = state.undoStack[state.undoStack.length - 1];
+    if (top && top.key === key && top.img === cur) return; // ya registrado (evita duplicados)
+    state.undoStack.push({ key, img: cur });
+    if (state.undoStack.length > 30) state.undoStack.shift();
+    state.redoStack.length = 0; // una acción nueva invalida el redo
+    updateUndoButtons();
+  }
+  function _restoreSnapshot(snap) {
+    state.workflowImages[snap.key] = snap.img;
+    state.activeWorkflowKey = snap.key;
+    state.activeImage = snap.img;
+    state.stepInputImage = cloneImage(snap.img);
+    state.pendingPreview = false;
+    state.viewingPrevious = false;
+    state.splitViewMode = false;
+    state.previewMaskMode = false;
+    state.previewGradientMode = false;
+    render(); drawHistogram(); refreshPathBar(); updateUndoButtons();
+  }
+  function doUndo() {
+    if (!state.undoStack.length) return;
+    const key = state.activeWorkflowKey || state.undoStack[state.undoStack.length - 1].key;
+    const cur = state.workflowImages[key];
+    const snap = state.undoStack.pop();
+    if (cur) state.redoStack.push({ key, img: cur });
+    _restoreSnapshot(snap);
+    const lang = document.documentElement.lang || "es";
+    logConsole(lang === "es" ? "Deshacer" : "Undo", "info");
+  }
+  function doRedo() {
+    if (!state.redoStack.length) return;
+    const key = state.activeWorkflowKey;
+    const cur = key ? state.workflowImages[key] : null;
+    const snap = state.redoStack.pop();
+    if (cur) state.undoStack.push({ key, img: cur });
+    _restoreSnapshot(snap);
+    const lang = document.documentElement.lang || "es";
+    logConsole(lang === "es" ? "Rehacer" : "Redo", "info");
+  }
+  function updateUndoButtons() {
+    const u = el("btnToolUndo"), r = el("btnToolRedo");
+    if (u) { u.disabled = state.undoStack.length === 0; u.classList.toggle("piw-tool-disabled", state.undoStack.length === 0); }
+    if (r) { r.disabled = state.redoStack.length === 0; r.classList.toggle("piw-tool-disabled", state.redoStack.length === 0); }
+  }
+  // UNDO-REDO-END
 
   // -------------------------------------------------------------------------
   // Auto STF MAD — Port exacto de PI Workflow (optMadMidtone + optApplyMadAutoStretch)
@@ -1943,6 +2001,7 @@
     state.stepInputImage = cloneImage(img);
     state.pendingPreview = false;
     state.calibCompareReady = false;
+    state.undoStack.length = 0; state.redoStack.length = 0; updateUndoButtons();
 
     // Reset A/B comparison
     state.previousImage = null;
@@ -3536,7 +3595,7 @@
     return new Promise((resolve, reject) => {
       let worker;
       try {
-        if (!__deepsnrWorker) __deepsnrWorker = new Worker("deepsnr-worker.js");
+        if (!__deepsnrWorker) __deepsnrWorker = new Worker("deepsnr-worker.js?v=" + (window.PIW_BUILD || "0"));
         worker = __deepsnrWorker;
       } catch (e) { reject(e); return; }
       const cleanup = () => {
@@ -4561,7 +4620,23 @@
     return list;
   }
 
-  // Reconstruye la paleta de etiquetas arrastrables (compat: se sigue llamando updateMixSourceOptions).
+  // Añade una capa nueva desde una fuente (arriba de la pila). Usado por drag (ratón) y tap (táctil).
+  function addMixLayer(key) {
+    if (!key) return;
+    const isBase = state.mixLayers.length === 0;
+    state.mixLayers.unshift({ key: key, blend: isBase ? "normal" : "screen", opacity: 1.0, visible: true });
+    renderMixStack(); mixRefreshPreview();
+  }
+  // Mueve una capa arriba/abajo en la pila (reordenar sin arrastrar → táctil).
+  function moveMixLayer(idx, dir) {
+    const to = idx + dir;
+    if (to < 0 || to >= state.mixLayers.length) return;
+    const m = state.mixLayers.splice(idx, 1)[0];
+    state.mixLayers.splice(to, 0, m);
+    renderMixStack(); mixRefreshPreview();
+  }
+
+  // Reconstruye la paleta de etiquetas (arrastrables con ratón, y con TAP para añadir en táctil).
   function updateMixSourceOptions() {
     const pal = el("mixPalette");
     if (!pal) return;
@@ -4575,10 +4650,12 @@
       const chip = document.createElement("div");
       chip.className = "piw-mix-chip";
       chip.textContent = mixLabelForKey(key);
+      chip.title = isEn ? "Tap or drag to add as a layer" : "Toca o arrastra para añadir como capa";
       chip.setAttribute("draggable", "true");
       chip.dataset.key = key;
       chip.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/mixkey", key); e.dataTransfer.effectAllowed = "copy"; chip.classList.add("dragging"); });
       chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      chip.addEventListener("click", () => addMixLayer(key)); // tap para añadir (táctil + ratón)
       pal.appendChild(chip);
     });
     renderMixStack();
@@ -4604,29 +4681,40 @@
       const isBase = (idx === layers.length - 1);
       const row = document.createElement("div");
       row.className = "piw-mix-layer-row";
-      row.setAttribute("draggable", "true");
+      row.setAttribute("draggable", "true"); // arrastre para reordenar (ratón)
       row.dataset.idx = String(idx);
+
+      // --- Línea 1: grip · ojo · nombre · ▲ ▼ · ✕ ---
+      const top = document.createElement("div"); top.className = "mix-row-top";
+      const grip = document.createElement("span"); grip.className = "mix-grip"; grip.textContent = "⠿";
       const eye = document.createElement("button");
       eye.className = "mix-eye" + (L.visible ? "" : " off"); eye.textContent = L.visible ? "👁" : "▫"; eye.title = isEn ? "Show/Hide" : "Ver/Ocultar";
       eye.addEventListener("click", (e) => { e.stopPropagation(); L.visible = !L.visible; renderMixStack(); mixRefreshPreview(); });
-      const grip = document.createElement("span"); grip.className = "mix-grip"; grip.textContent = "⠿";
-      const name = document.createElement("span"); name.className = "mix-name"; name.textContent = mixLabelForKey(L.key) + (isBase ? (isEn ? " · base" : " · base") : "");
-      const blend = document.createElement("select"); blend.className = "mix-blend";
-      MIX_BLENDS.forEach(b => { const o = document.createElement("option"); o.value = b.v; o.textContent = isEn ? b.en : b.es; if (b.v === L.blend) o.selected = true; blend.appendChild(o); });
-      blend.disabled = isBase; // la capa base no tiene modo de fusión (es el fondo)
-      blend.addEventListener("click", (e) => e.stopPropagation());
-      blend.addEventListener("change", (e) => { L.blend = e.target.value; mixRefreshPreview(); });
-      const op = document.createElement("span"); op.className = "mix-op"; op.textContent = Math.round(L.opacity * 100) + "%";
+      const name = document.createElement("span"); name.className = "mix-name"; name.textContent = mixLabelForKey(L.key) + (isBase ? " · base" : "");
+      const up = document.createElement("button"); up.className = "mix-move"; up.textContent = "▲"; up.title = isEn ? "Move up" : "Subir"; up.disabled = idx === 0;
+      up.addEventListener("click", (e) => { e.stopPropagation(); moveMixLayer(idx, -1); });
+      const down = document.createElement("button"); down.className = "mix-move"; down.textContent = "▼"; down.title = isEn ? "Move down" : "Bajar"; down.disabled = idx === layers.length - 1;
+      down.addEventListener("click", (e) => { e.stopPropagation(); moveMixLayer(idx, 1); });
       const del = document.createElement("button"); del.className = "mix-del"; del.textContent = "✕"; del.title = isEn ? "Remove" : "Quitar";
       del.addEventListener("click", (e) => { e.stopPropagation(); state.mixLayers.splice(idx, 1); renderMixStack(); mixRefreshPreview(); });
-      // Clic derecho: opacidad
-      row.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        const cur = Math.round(L.opacity * 100);
-        const val = prompt(isEn ? "Layer opacity (0-100%)" : "Opacidad de la capa (0-100%)", String(cur));
-        if (val !== null) { let v = parseFloat(val); if (isFinite(v)) { v = Math.max(0, Math.min(100, v)) / 100; L.opacity = v; renderMixStack(); mixRefreshPreview(); } }
-      });
-      // Reordenar por arrastre dentro de la pila
+      top.appendChild(grip); top.appendChild(eye); top.appendChild(name); top.appendChild(up); top.appendChild(down); top.appendChild(del);
+
+      // --- Línea 2: modo de fusión + slider de opacidad ---
+      const bottom = document.createElement("div"); bottom.className = "mix-row-bottom";
+      const blend = document.createElement("select"); blend.className = "mix-blend";
+      MIX_BLENDS.forEach(b => { const o = document.createElement("option"); o.value = b.v; o.textContent = isEn ? b.en : b.es; if (b.v === L.blend) o.selected = true; blend.appendChild(o); });
+      blend.disabled = isBase; // la capa base es el fondo (sin modo de fusión)
+      blend.addEventListener("click", (e) => e.stopPropagation());
+      blend.addEventListener("change", (e) => { L.blend = e.target.value; mixRefreshPreview(); });
+      const opWrap = document.createElement("label"); opWrap.className = "mix-op-wrap"; opWrap.title = isEn ? "Opacity" : "Opacidad";
+      const opVal = document.createElement("span"); opVal.className = "mix-op"; opVal.textContent = Math.round(L.opacity * 100) + "%";
+      const opSld = document.createElement("input"); opSld.type = "range"; opSld.className = "mix-op-slider"; opSld.min = "0"; opSld.max = "1"; opSld.step = "0.05"; opSld.value = String(L.opacity);
+      opSld.addEventListener("click", (e) => e.stopPropagation());
+      opSld.addEventListener("input", (e) => { L.opacity = parseFloat(e.target.value); opVal.textContent = Math.round(L.opacity * 100) + "%"; mixRefreshPreview(); });
+      opWrap.appendChild(opSld); opWrap.appendChild(opVal);
+      bottom.appendChild(blend); bottom.appendChild(opWrap);
+
+      // Reordenar por arrastre dentro de la pila (ratón; en táctil se usan ▲▼)
       row.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/mixlayeridx", String(idx)); e.dataTransfer.effectAllowed = "move"; row.classList.add("dragging"); });
       row.addEventListener("dragend", () => { row.classList.remove("dragging"); Array.from(stack.children).forEach(c => c.classList.remove("drop-before", "drop-after")); });
       row.addEventListener("dragover", (e) => {
@@ -4647,7 +4735,7 @@
         state.mixLayers.splice(to, 0, moved);
         renderMixStack(); mixRefreshPreview();
       });
-      row.appendChild(grip); row.appendChild(eye); row.appendChild(name); row.appendChild(blend); row.appendChild(op); row.appendChild(del);
+      row.appendChild(top); row.appendChild(bottom);
       stack.appendChild(row);
     });
     const btn = el("btnGenerateBlend");
@@ -4668,9 +4756,7 @@
         const key = e.dataTransfer.getData("text/mixkey");
         if (!key) return;
         e.preventDefault();
-        const isBase = state.mixLayers.length === 0;
-        state.mixLayers.unshift({ key: key, blend: isBase ? "normal" : "screen", opacity: 1.0, visible: true });
-        renderMixStack(); mixRefreshPreview();
+        addMixLayer(key);
       });
     }
   }
@@ -4783,37 +4869,50 @@
     R[p] = cmClamp01(y2 + cr); G[p] = cmClamp01(y2 + cg); B[p] = cmClamp01(y2 + cb);
   }
   function cmHasWork(st) { return st.bands.some(b => Math.abs(b.hueShift) > 1e-6 || Math.abs(b.saturation) > 1e-6 || Math.abs(b.luminance) > 1e-6); }
-  function computeColorMixer(srcImg, st) {
-    if (!srcImg.isColor || srcImg.nc < 3) throw new Error(document.documentElement.lang === "es" ? "Color Mixer requiere imagen RGB." : "Color Mixer requires an RGB image.");
-    if (!cmHasWork(st)) return cloneImage(srcImg);
-    const w = srcImg.w, h = srcImg.h, count = w * h;
-    const R = Float32Array.from(srcImg.ch[0]), G = Float32Array.from(srcImg.ch[1]), B = Float32Array.from(srcImg.ch[2]);
-    const srcH = new Float32Array(count), srcS = new Float32Array(count), srcL = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      const r = R[i], g = G[i], b = B[i]; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, li = (mx + mn) * 0.5; let hue = 0, sat = 0;
-      if (d > 1e-7) { sat = li > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); if (mx === r) hue = ((g - b) / d) % 6; else if (mx === g) hue = (b - r) / d + 2; else hue = (r - g) / d + 4; hue *= 60; if (hue < 0) hue += 360; }
-      srcH[i] = hue; srcS[i] = sat; srcL[i] = li;
-    }
-    const gs = st.globalStrength != null ? st.globalStrength : 1;
-    for (let bi = 0; bi < st.bands.length; bi++) {
-      const band = st.bands[bi];
-      const satBase = band.saturation / 100, lumBase = band.luminance / 100, hueRad = band.hueShift * Math.PI / 180, hasHue = Math.abs(band.hueShift) > 1e-6;
-      if (Math.abs(satBase) < 1e-6 && Math.abs(lumBase) < 1e-6 && !hasHue) continue;
-      const outerW = band.width, innerW = band.feather <= 1e-6 ? outerW : outerW * (1 - band.feather), featherDen = outerW - innerW, center = band.center;
-      for (let p = 0; p < count; p++) {
-        const delta = Math.abs((srcH[p] % 360) - center); const dist = delta < (360 - delta) ? delta : (360 - delta);
-        let hueMask; if (dist <= innerW + 1e-6) hueMask = 1; else if (dist <= outerW + 1e-6 && featherDen > 1e-6) { let t = (dist - innerW) / featherDen; t = t < 0 ? 0 : (t > 1 ? 1 : t); hueMask = 1 - (t * t * (3 - 2 * t)); } else continue;
-        if (hueMask <= 0) continue;
-        const s = srcS[p], l = srcL[p];
-        const satMask = st.protectLowSat ? cmSmooth(st.satFloor, st.satFull, s) : 1;
-        const darkMask = cmSmooth(st.darkFloor, st.darkFull, l);
-        const hiMask = st.protectStars ? (1 - cmSmooth(st.highlightStart, st.highlightFull, l)) : 1;
-        const m = hueMask * satMask * darkMask * hiMask * gs;
-        if (m > 0) cmApplyPixel(R, G, B, p, m, satBase, lumBase, hasHue, hueRad);
-      }
-    }
-    return { ch: [R, G, B], w, h, nc: 3, isColor: true, wcs: srcImg.wcs };
+  // IMG-WORKER: ejecuta operaciones pesadas (Color Mixer / Detail) en un Web Worker para NO congelar
+  // la UI al "Aplicar" a resolución completa. Clona los canales del origen y los TRANSFIERE (sin copia
+  // extra) al worker; el worker devuelve el resultado también transferido. Si el worker falla, el
+  // llamador hace fallback al hilo principal.
+  let _imgWorker = null, _imgWorkerId = 0;
+  const _imgWorkerCbs = {};
+  function ensureImgWorker() {
+    if (_imgWorker) return _imgWorker;
+    _imgWorker = new Worker("imgworker.js?v=" + (window.PIW_BUILD || "0"));
+    _imgWorker.onmessage = (e) => {
+      const d = e.data || {}; const cb = _imgWorkerCbs[d.id]; if (!cb) return; delete _imgWorkerCbs[d.id];
+      if (d.error) cb.reject(new Error(d.error));
+      else cb.resolve({ ch: d.ch, w: d.w, h: d.h, nc: d.nc, isColor: d.isColor });
+    };
+    _imgWorker.onerror = (ev) => { Object.keys(_imgWorkerCbs).forEach(k => { _imgWorkerCbs[k].reject(new Error("Worker: " + (ev.message || "error"))); delete _imgWorkerCbs[k]; }); };
+    return _imgWorker;
   }
+  function runImgWorker(op, srcImg, params) {
+    return new Promise((resolve, reject) => {
+      const wrk = ensureImgWorker();
+      const id = ++_imgWorkerId;
+      _imgWorkerCbs[id] = { resolve, reject };
+      const chCopy = srcImg.ch.map(c => Float32Array.from(c)); // copia (no toca el original) para transferir
+      wrk.postMessage({ id, op, img: { ch: chCopy, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor }, params }, chCopy.map(c => c.buffer));
+    });
+  }
+  // Aplica una operación de ImgOps en el worker; si algo falla, cae al hilo principal (mainFn).
+  function applyImgOp(op, srcImg, params, stageLabel, mainFn) {
+    const lang = document.documentElement.lang || "es";
+    let done = false;
+    const finish = (res) => { if (done) return; done = true; res.wcs = srcImg.wcs; commitActiveImage(res, stageLabel, srcImg); render(); drawHistogram(); refreshPathBar(); hideLoader(); logConsole((lang === "es" ? "Aplicado: " : "Applied: ") + stageLabel, "ok"); };
+    const fallback = (why) => {
+      if (done) return; done = true;
+      try { const res = mainFn(); res.wcs = srcImg.wcs; commitActiveImage(res, stageLabel, srcImg); render(); drawHistogram(); refreshPathBar(); logConsole((lang === "es" ? "Aplicado (CPU): " : "Applied (CPU): ") + stageLabel, "ok"); }
+      catch (e) { logConsole(stageLabel + ": " + e.message, "err"); }
+      finally { hideLoader(); }
+    };
+    try {
+      runImgWorker(op, srcImg, params).then(finish).catch((e) => fallback(e && e.message));
+    } catch (e) { fallback(e && e.message); }
+  }
+
+  // Delegado al módulo común ImgOps (misma matemática, unificada; también la usa el Web Worker).
+  function computeColorMixer(srcImg, st) { return window.ImgOps.computeColorMixer(srcImg, st); }
 
   // --- Color Mixer: cableado de UI ---
   function cmCurrentBand() { return state.colorMixer.bands[el("selCmBand") ? el("selCmBand").selectedIndex : 0] || state.colorMixer.bands[0]; }
@@ -4846,23 +4945,17 @@
     if (btnCM) btnCM.addEventListener("click", () => {
       const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
       const lang = document.documentElement.lang || "es";
+      const st = state.colorMixer;
       showLoader(lang === "es" ? "Aplicando Color Mixer..." : "Applying Color Mixer...");
-      setTimeout(() => { try { commitActiveImage(computeColorMixer(srcImg, state.colorMixer), "Color Mixer", srcImg); render(); drawHistogram(); refreshPathBar(); logConsole(lang === "es" ? "Color Mixer aplicado." : "Color Mixer applied.", "ok"); } catch (e) { logConsole((lang === "es" ? "Color Mixer: " : "Color Mixer: ") + e.message, "err"); } finally { hideLoader(); } }, 50);
+      applyImgOp("colorMixer", srcImg, st, "Color Mixer", () => computeColorMixer(srcImg, st));
     });
     const btnCMR = el("btnResetColorMixer");
     if (btnCMR) btnCMR.addEventListener("click", () => { state.colorMixer = cmDefaultState(); cmSyncSlidersFromBand(); if (el("sldCmStrength")) { el("sldCmStrength").value = "1.00"; el("valCmStrength").textContent = "1.00"; } if (el("chkCmProtectStars")) el("chkCmProtectStars").checked = true; if (el("chkCmProtectLowSat")) el("chkCmProtectLowSat").checked = true; livePreviewColorMixer(); logConsole(document.documentElement.lang === "es" ? "Color Mixer restablecido." : "Color Mixer reset.", "info"); });
   }
 
   // --- Detail & Contrast (luminancia; preserva color reaplicando el DELTA de luma) ---
-  function detailBoxBlur(src, w, h, radius) {
-    const r = Math.round(radius); if (r < 1) return src;
-    const win = 2 * r + 1, tmp = new Float32Array(w * h), out = new Float32Array(w * h);
-    for (let y = 0; y < h; y++) { const base = y * w; let sum = 0; for (let k = -r; k <= r; k++) { const xx = k < 0 ? 0 : (k >= w ? w - 1 : k); sum += src[base + xx]; }
-      for (let x = 0; x < w; x++) { tmp[base + x] = sum / win; const xo = x - r, xi = x + r + 1; const xoC = xo < 0 ? 0 : (xo >= w ? w - 1 : xo), xiC = xi < 0 ? 0 : (xi >= w ? w - 1 : xi); sum += src[base + xiC] - src[base + xoC]; } }
-    for (let x = 0; x < w; x++) { let sum2 = 0; for (let j = -r; j <= r; j++) { const yy = j < 0 ? 0 : (j >= h ? h - 1 : j); sum2 += tmp[yy * w + x]; }
-      for (let y = 0; y < h; y++) { out[y * w + x] = sum2 / win; const yo = y - r, yi = y + r + 1; const yoC = yo < 0 ? 0 : (yo >= h ? h - 1 : yo), yiC = yi < 0 ? 0 : (yi >= h ? h - 1 : yi); sum2 += tmp[yiC * w + x] - tmp[yoC * w + x]; } }
-    return out;
-  }
+  // Box blur separable → delegado al módulo común ImgProc (misma implementación, unificada).
+  const detailBoxBlur = (src, w, h, radius) => window.ImgProc.boxBlur(src, w, h, radius);
   function detailAtrous(Y, w, h, gains) { const count = w * h, out = new Float32Array(count); let cur = Y; for (let i = 0; i < count; i++) out[i] = Y[i]; for (let k = 0; k < gains.length; k++) { const g = gains[k], blur = detailBoxBlur(cur, w, h, 1 << k); if (g !== 0) for (let p = 0; p < count; p++) out[p] += g * (cur[p] - blur[p]); cur = blur; } return out; }
   function detailApplyLuma(srcImg, lumaFn) {
     const w = srcImg.w, h = srcImg.h, count = w * h;
@@ -4883,12 +4976,8 @@
       hpAmount: parseFloat((el("sldDetailHpAmount") || {}).value || 0.5), hpRadius: parseFloat((el("sldDetailHpRadius") || {}).value || 3)
     };
   }
-  function computeDetail(srcImg, algo, pr) {
-    if (algo === "localContrast") return detailApplyLuma(srcImg, (Y, w, h) => { const bl = detailBoxBlur(Y, w, h, Math.max(2, Math.round(pr.lcRadius))); const o = new Float32Array(w * h); for (let i = 0; i < o.length; i++) o[i] = Y[i] + pr.lcAmount * (Y[i] - bl[i]); return o; });
-    if (algo === "highPass") return detailApplyLuma(srcImg, (Y, w, h) => { const bl = detailBoxBlur(Y, w, h, Math.max(1, Math.round(pr.hpRadius))); const o = new Float32Array(w * h); for (let i = 0; i < o.length; i++) o[i] = Y[i] + pr.hpAmount * (Y[i] - bl[i]); return o; });
-    if (algo === "multiscale") return detailApplyLuma(srcImg, (Y, w, h) => detailAtrous(Y, w, h, [pr.mdFine, pr.mdMedium, pr.mdMedium * 0.5]));
-    return cloneImage(srcImg);
-  }
+  // Delegado al módulo común ImgOps (misma matemática, unificada; también la usa el Web Worker).
+  function computeDetail(srcImg, algo, pr) { const p = Object.assign({ algo: algo }, pr); return window.ImgOps.computeDetail(srcImg, algo, p); }
   function livePreviewDetail() { const algo = el("selDetailAlgo") ? el("selDetailAlgo").value : "localContrast"; _runLive("chkDetailLive", (img) => computeDetail(img, algo, detailParams()), "Detail"); }
   {
     const selD = el("selDetailAlgo");
@@ -4908,8 +4997,9 @@
     if (btnD) btnD.addEventListener("click", () => {
       const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
       const lang = document.documentElement.lang || "es"; const algo = el("selDetailAlgo").value;
+      const pr = Object.assign({ algo }, detailParams());
       showLoader(lang === "es" ? "Aplicando detalle..." : "Applying detail...");
-      setTimeout(() => { try { commitActiveImage(computeDetail(srcImg, algo, detailParams()), "Detail", srcImg); render(); drawHistogram(); refreshPathBar(); logConsole(lang === "es" ? "Mejora de detalle aplicada." : "Detail enhancement applied.", "ok"); } catch (e) { logConsole("Detail: " + e.message, "err"); } finally { hideLoader(); } }, 50);
+      applyImgOp("detail", srcImg, pr, "Detail", () => computeDetail(srcImg, algo, detailParams()));
     });
   }
   // IMG-ENH-END
@@ -5401,7 +5491,7 @@
       return -1;
     };
     svg.style.cursor = "crosshair";
-    svg.addEventListener("mousedown", (ev) => {
+    svg.addEventListener("pointerdown", (ev) => {
       const [x, y] = toNorm(ev);
       let idx = findNear(x, y);
       if (idx < 0) {
@@ -5413,7 +5503,7 @@
       drawStretchCurve();
       ev.preventDefault();
     });
-    window.addEventListener("mousemove", (ev) => {
+    window.addEventListener("pointermove", (ev) => {
       if (dragIdx < 0) return;
       const [x, y] = toNorm(ev);
       const isEnd = dragIdx === 0 || dragIdx === stretchPoints.length - 1;
@@ -5422,7 +5512,7 @@
       stretchPoints[dragIdx] = [px, y];
       drawStretchCurve();
     });
-    window.addEventListener("mouseup", () => { dragIdx = -1; });
+    window.addEventListener("pointerup", () => { dragIdx = -1; });
     svg.addEventListener("dblclick", (ev) => {
       const [x, y] = toNorm(ev);
       const idx = findNear(x, y);
@@ -5466,7 +5556,7 @@
   }, { passive: false });
 
   // Paneo y Crop con arrastre del ratón
-  cv.addEventListener("mousedown", (e) => {
+  cv.addEventListener("pointerdown", (e) => {
     if (!state.activeImage) return;
     
     // Check if Crop section is expanded/visible to allow crop mode
@@ -5513,7 +5603,7 @@
     cv.style.cursor = "grabbing";
   });
 
-  window.addEventListener("mousemove", (e) => {
+  window.addEventListener("pointermove", (e) => {
     if (cropState.drawing && state.activeImage) {
       const { x: ix, y: iy } = getImageCoordsFromEvent(e);
       const imgW = state.activeImage.w;
@@ -5560,7 +5650,7 @@
     }
   });
 
-  window.addEventListener("mouseup", () => {
+  window.addEventListener("pointerup", () => {
     if (cropState.drawing) {
       cropState.drawing = false;
       cropState.dragMode = "";
@@ -5697,6 +5787,19 @@
   });
 
   // RESET-BTN-BEGIN
+  // UNDO/REDO: botones de la toolbar + atajos de teclado (Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z).
+  if (el("btnToolUndo")) el("btnToolUndo").addEventListener("click", doUndo);
+  if (el("btnToolRedo")) el("btnToolRedo").addEventListener("click", doRedo);
+  window.addEventListener("keydown", (e) => {
+    const mod = e.ctrlKey || e.metaKey;
+    if (!mod) return;
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || (e.target && e.target.isContentEditable)) return; // no interferir al escribir
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); doUndo(); }
+    else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); doRedo(); }
+  });
+
   el("btnToolReset").addEventListener("click", () => {
     const lang = document.documentElement.lang || "es";
     const confirmed = confirm(lang === "es" ? "¿Seguro que deseas reiniciar el espacio de trabajo actual?" : "Are you sure you want to reset the current workspace?");
@@ -5714,6 +5817,7 @@
     state._lastImgRef = null;
     state.workflowImages = {};
     state.activeWorkflowKey = "";
+    state.undoStack.length = 0; state.redoStack.length = 0; updateUndoButtons();
 
     // Limpiar canvas
     ctx.clearRect(0, 0, cv.width, cv.height);
@@ -5745,13 +5849,13 @@
   // llegue al canvas (que iniciaría el paneo de la imagen) y que el navegador arranque una
   // selección/arrastre nativo mientras se mueve la línea.
   const splitSlider = el("piwSplitSlider");
-  splitSlider.addEventListener("mousedown", (e) => {
+  splitSlider.addEventListener("pointerdown", (e) => {
     e.stopPropagation();
     e.preventDefault();
     state.isDraggingSplit = true;
   });
 
-  window.addEventListener("mousemove", (e) => {
+  window.addEventListener("pointermove", (e) => {
     if (state.isDraggingSplit) {
       const rect = container.getBoundingClientRect();
       const posX = e.clientX - rect.left;
@@ -5761,7 +5865,7 @@
     }
   });
 
-  window.addEventListener("mouseup", () => {
+  window.addEventListener("pointerup", () => {
     state.isDraggingSplit = false;
   });
 
@@ -6686,7 +6790,7 @@
       return -1;
     }
 
-    curvesCv.addEventListener("mousedown", (e) => {
+    curvesCv.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       const coords = getMouseNormCoords(e);
       const pts = state.curves[activeCurveChan];
@@ -6720,7 +6824,7 @@
 
     curvesCv.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    curvesCv.addEventListener("mousemove", (e) => {
+    curvesCv.addEventListener("pointermove", (e) => {
       const coords = getMouseNormCoords(e);
       const pts = state.curves[activeCurveChan];
       
@@ -6757,7 +6861,7 @@
       }
     });
 
-    window.addEventListener("mouseup", () => {
+    window.addEventListener("pointerup", () => {
       if (draggedCurvePtIdx !== -1) {
         draggedCurvePtIdx = -1;
         drawCurvesWidget();
@@ -7004,19 +7108,19 @@
       drawColorBalanceWidget();
     }
     
-    cbCv.addEventListener("mousedown", (e) => {
+    cbCv.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       isDraggingCb = true;
       updateCbAnchor(e.clientX, e.clientY);
     });
     
-    window.addEventListener("mousemove", (e) => {
+    window.addEventListener("pointermove", (e) => {
       if (isDraggingCb) {
         updateCbAnchor(e.clientX, e.clientY);
       }
     });
     
-    window.addEventListener("mouseup", () => {
+    window.addEventListener("pointerup", () => {
       isDraggingCb = false;
     });
   }
@@ -7056,16 +7160,15 @@
       return;
     }
     
-    const titleEl = activeSection.querySelector(".piw-section-title");
-    const titleText = titleEl ? titleEl.textContent.trim().toLowerCase() : "";
-    const id = activeSection.id;
-    
-    let action = null;
-    let btnText = "Aplicar";
+    // APPLY-DATA-BEGIN: el botón grande se resuelve por el atributo data-apply de la sección
+    // (declarado en el HTML), NO por el texto del título. Antes se hacía matching de strings del
+    // título en ambos idiomas → renombrar un título rompía silenciosamente el Aplicar (frágil).
+    const applyKey = activeSection.dataset ? (activeSection.dataset.apply || "") : "";
     const lang = document.documentElement.lang || "es";
 
     const commitPreview = () => {
       if (state.activeImage) {
+        recordUndo(); // registra el estado committeado anterior para poder deshacer
         state.stepInputImage = cloneImage(state.activeImage);
         if (state.activeWorkflowKey) {
           state.workflowImages[state.activeWorkflowKey] = state.activeImage;
@@ -7075,99 +7178,47 @@
         updateBigApply();
       }
     };
-    
-    if (id === "sectionCrop" || titleText.includes("crop") || titleText.includes("recorte")) {
+
+    // Mapa declarativo: etiqueta ES/EN + gating. noGate = secciones con flujo propio (aplican desde
+    // selección/slot, no desde un preview pendiente).
+    const APPLY_DEFS = {
+      crop:        { es: "Recortar",             en: "Crop",              noGate: true },
+      gradient:    { es: "Aplicar Gradiente",    en: "Apply Gradient" },
+      calibration: { es: "Aplicar Calibración",  en: "Apply Calibration", noGate: true },
+      deconv:      { es: "Aplicar Deconvolución",en: "Apply Deconvolve" },
+      stretch:     { es: "Aplicar Estirado",     en: "Apply Stretch" },
+      noise:       { es: "Aplicar Reducción",    en: "Apply Denoise" },
+      sharpen:     { es: "Aplicar Enfoque",      en: "Apply Sharpen" },
+      balance:     { es: "Aplicar Balance",      en: "Apply Balance" },
+      curves:      { es: "Aplicar Curvas",       en: "Apply Curves" },
+      scnr:        { es: "Aplicar SCNR",         en: "Apply SCNR" },
+      mask:        { es: "Guardar Máscara",      en: "Save Mask",         noGate: true },
+      saturation:  { es: "Aplicar Saturación",   en: "Apply Saturation" },
+      saspro:      { es: "Aplicar SASPro",       en: "Apply SASPro" }
+    };
+
+    const def = APPLY_DEFS[applyKey];
+    if (!def) { btn.style.display = "none"; return; } // sección sin data-apply → sin botón contextual
+
+    let action = null;
+    if (applyKey === "crop") {
+      // Crop delega en su propio botón de sección y commitea tras el recorte.
       const applyCropBtn = el("btnCropApplyCurrent");
       if (applyCropBtn && !applyCropBtn.disabled) {
-        action = () => {
-          applyCropBtn.click();
-          setTimeout(commitPreview, 100);
-        };
-        btnText = lang === "es" ? "Recortar" : "Crop";
+        action = () => { applyCropBtn.click(); setTimeout(commitPreview, 100); };
       }
-    } else if (id === "sectionSolve" || titleText.includes("solve")) {
-      // El botón grande "Resolver" del visor era redundante (el menú ya tiene "Resolver Imagen" y solo
-      // reenviaba a él). No mostramos botón contextual en Plate Solving.
-      btn.style.display = "none";
-      return;
-    } else if (id === "sectionGradient" || titleText.includes("gradient") || titleText.includes("gradiente")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Gradiente" : "Apply Gradient";
-    } else if (titleText.includes("calibration") || titleText.includes("calibración")) {
+    } else if (applyKey === "calibration") {
+      // Activo solo si hay un método previsualizado (card) o tras "Comparar Métodos".
       const activeCard = activeSection.querySelector(".piw-action-card.active-cc");
-      // Botón activo si hay un método previsualizado (card) o si se hizo "Comparar Métodos"
-      // (para poder cargar un slot y aplicarlo).
-      if (activeCard || state.calibCompareReady) {
-        action = () => {
-          commitPreview();
-        };
-        btnText = lang === "es" ? "Aplicar Calibración" : "Apply Calibration";
-      }
-    } else if (titleText.includes("deconvolución") || titleText.includes("deconvolution")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Deconvolución" : "Apply Deconvolve";
-    } else if (titleText.includes("estirado") || titleText.includes("stretching")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Estirado" : "Apply Stretch";
-    } else if (titleText.includes("ruido") || titleText.includes("noise")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Reducción" : "Apply Denoise";
-    } else if (titleText.includes("enfoque") || titleText.includes("sharp")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Enfoque" : "Apply Sharpen";
-    } else if (titleText.includes("balance") || titleText.includes("color balance")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Balance" : "Apply Balance";
-    } else if (titleText.includes("curves") || titleText.includes("curvas")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Curvas" : "Apply Curves";
-    } else if (titleText.includes("scnr") || titleText.includes("verde")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar SCNR" : "Apply SCNR";
-    } else if (titleText.includes("máscaras") || titleText.includes("mask")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Guardar Máscara" : "Save Mask";
-    } else if (titleText.includes("saturación") || titleText.includes("saturation")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar Saturación" : "Apply Saturation";
-    } else if (id === "sectionSaspro" || titleText.includes("sas pro")) {
-      action = () => {
-        commitPreview();
-      };
-      btnText = lang === "es" ? "Aplicar SASPro" : "Apply SASPro";
+      if (activeCard || state.calibCompareReady) action = commitPreview;
+    } else {
+      action = commitPreview;
     }
 
     if (action) {
       btn.style.display = "block";
-      btn.textContent = btnText;
-
-      // El botón "Aplicar" solo se habilita si hay un preview SIN aplicar (state.pendingPreview).
-      // Excepciones que tienen su propio flujo (aplican desde slot/selección, no desde un preview):
-      // Crop, Máscaras y Calibración de Color.
-      const noGate = (id === "sectionCrop") || titleText.includes("crop") || titleText.includes("recorte")
-        || titleText.includes("máscaras") || titleText.includes("mask")
-        || titleText.includes("calibration") || titleText.includes("calibración");
-      const enabled = noGate ? true : !!state.pendingPreview;
+      btn.textContent = lang === "es" ? def.es : def.en;
+      const enabled = def.noGate ? true : !!state.pendingPreview;
 
       const newBtn = btn.cloneNode(true);
       newBtn.disabled = !enabled;
@@ -7179,6 +7230,7 @@
     } else {
       btn.style.display = "none";
     }
+    // APPLY-DATA-END
   }
   
   // Exponer a ámbito global/del módulo para que las tarjetas de calibración puedan actualizar el botón
