@@ -686,6 +686,15 @@
     .piw-toast.show { opacity: 1; transform: none; }
     .piw-toast.err { border-color: #a04040; color: #ff8a8a; }
 
+    /* U3: history of applied steps (stages) under the channel bar */
+    .piw-stages-bar {
+      font-family: var(--piw-mono, 'JetBrains Mono', monospace);
+      font-size: 0.6rem; color: var(--text-secondary, #9a948a);
+      background: #0d0d10; border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 5px 10px; margin: 6px 0 8px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
     .piw-loader {
       position: absolute;
       inset: 0;
@@ -2678,6 +2687,7 @@
         <div class="piw-slots-container">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="piw-slots-label">Image Memory Slots (A/B Comparison Cockpit)</span>
+            <span class="piw-slots-label" id="lblMemUse" title="Estimated RAM used by images (workflow + slots + history)"></span>
             <button class="btn-reset-inputs" id="btnClearSlots" style="font-size:0.6rem; padding:2px 6px;">Clear all</button>
           </div>
           <div class="piw-slots-grid" id="slotsGrid">
@@ -2708,6 +2718,8 @@
 
         <!-- Workflow channel path buttons -->
         <div class="piw-path-bar" id="piwPathBar" style="display:none;"></div>
+        <!-- U3: history of applied steps (stages) for the displayed image -->
+        <div class="piw-stages-bar" id="piwStagesBar" style="display:none;"></div>
 
         <div class="piw-card piw-viewport-card" style="padding: 10px; width: 100%;">
           <div class="piw-canvas-container" id="canvasContainer">

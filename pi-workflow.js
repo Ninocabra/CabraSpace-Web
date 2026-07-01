@@ -190,6 +190,7 @@
       state.workflowImages[state.activeWorkflowKey] = img;
     }
     state.pendingPreview = false; // ya confirmado
+    scheduleSessionSave();        // U2: autoguardado (debounced) del flujo committeado
     return img;
   }
 
@@ -223,6 +224,11 @@
   // UNDO-REDO-BEGIN — Historial global de pasos aplicados al flujo.
   // Se registra la imagen committeada ANTERIOR (referencia) antes de sobrescribirla; deshacer/rehacer
   // restaura workflowImages[key] + activeImage + stepInputImage.
+  // V3: presupuesto del historial en BYTES, no en nº de pasos (30 imágenes de 144 MB matarían la
+  // pestaña de un iPad). Las entradas son referencias — a menudo compartidas con workflowImages —
+  // así que esta cuenta es una cota superior conservadora. deviceMemory<=4GB → presupuesto menor.
+  const UNDO_BUDGET_BYTES = ((navigator.deviceMemory && navigator.deviceMemory <= 4) ? 250 : 600) * 1e6;
+  function imgBytes(img) { let b = 0; if (img && img.ch) for (const c of img.ch) b += (c && c.byteLength) || 0; return b; }
   function recordUndo() {
     const key = state.activeWorkflowKey;
     const cur = key ? state.workflowImages[key] : null;
@@ -230,6 +236,9 @@
     const top = state.undoStack[state.undoStack.length - 1];
     if (top && top.key === key && top.img === cur) return; // ya registrado (evita duplicados)
     state.undoStack.push({ key, img: cur });
+    let total = 0;
+    for (const s of state.undoStack) total += imgBytes(s.img);
+    while (state.undoStack.length > 1 && total > UNDO_BUDGET_BYTES) total -= imgBytes(state.undoStack.shift().img);
     if (state.undoStack.length > 30) state.undoStack.shift();
     state.redoStack.length = 0; // una acción nueva invalida el redo
     updateUndoButtons();
@@ -270,8 +279,156 @@
     const u = el("btnToolUndo"), r = el("btnToolRedo");
     if (u) { u.disabled = state.undoStack.length === 0; u.classList.toggle("piw-tool-disabled", state.undoStack.length === 0); }
     if (r) { r.disabled = state.redoStack.length === 0; r.classList.toggle("piw-tool-disabled", state.redoStack.length === 0); }
+    updateMemIndicator();
   }
   // UNDO-REDO-END
+
+  // MEM-INDICATOR-BEGIN (V3): estimación de la RAM ocupada por imágenes, contando cada buffer
+  // UNA sola vez aunque esté referenciado desde varios sitios (workflow/slots/undo comparten refs).
+  function updateMemIndicator() {
+    const lbl = el("lblMemUse");
+    if (!lbl) return;
+    const seen = new Set();
+    let bytes = 0;
+    const add = (img) => {
+      if (!img || !img.ch) return;
+      for (const c of img.ch) { if (c && c.buffer && !seen.has(c.buffer)) { seen.add(c.buffer); bytes += c.byteLength; } }
+    };
+    Object.values(state.workflowImages || {}).forEach(add);
+    (state.imageSlots || []).forEach(add);
+    (state.undoStack || []).forEach(s => add(s.img));
+    (state.redoStack || []).forEach(s => add(s.img));
+    add(state.activeImage); add(state.stepInputImage); add(state.originalImage);
+    add(state.starlessImage); add(state.starsImage);
+    lbl.textContent = bytes > 0 ? "RAM img: " + (bytes / 1e6).toFixed(0) + " MB" : "";
+  }
+  setInterval(updateMemIndicator, 4000);
+  // MEM-INDICATOR-END
+
+  // STAGES-BAR-BEGIN (U3): historial visible de pasos aplicados (stages) bajo la barra de canales.
+  function updateStagesBar() {
+    const bar = el("piwStagesBar");
+    if (!bar) return;
+    const st = (state.activeImage && state.activeImage.stages) || [];
+    if (!st.length) { bar.style.display = "none"; return; }
+    bar.style.display = "block";
+    const shown = st.length > 7 ? st.slice(-7) : st;
+    bar.textContent = (st.length > 7 ? "… → " : "") + shown.join(" → ");
+    bar.title = st.join(" → ");
+  }
+  // STAGES-BAR-END
+
+  // SESSION-BEGIN (U2): autoguardado de la sesión en IndexedDB. Se guarda el flujo COMMITTEADO
+  // (workflowImages) tras cada Aplicar, con debounce; al cargar la página se ofrece recuperarla.
+  const SESSION_DB = "piw-session";
+  function sessionDB() {
+    return new Promise((res, rej) => {
+      const rq = indexedDB.open(SESSION_DB, 1);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        if (!db.objectStoreNames.contains("images")) db.createObjectStore("images");
+        if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta");
+      };
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => rej(rq.error);
+    });
+  }
+  let _sessTimer = 0;
+  function scheduleSessionSave() {
+    if (_sessTimer) clearTimeout(_sessTimer);
+    _sessTimer = setTimeout(saveSessionNow, 2500);
+  }
+  async function saveSessionNow() {
+    _sessTimer = 0;
+    try {
+      const keys = Object.keys(state.workflowImages || {});
+      if (!keys.length) return;
+      const db = await sessionDB();
+      const tx = db.transaction(["images", "meta"], "readwrite");
+      const st = tx.objectStore("images");
+      st.clear();
+      keys.forEach((k) => {
+        const im = state.workflowImages[k];
+        st.put({ ch: im.ch, w: im.w, h: im.h, nc: im.nc, isColor: im.isColor, wcs: im.wcs || null, stages: im.stages || [] }, k);
+      });
+      tx.objectStore("meta").put({ keys, activeKey: state.activeWorkflowKey, savedAt: Date.now() }, "session");
+      await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+    } catch (e) { console.warn("Session save:", e); }
+  }
+  async function loadSessionMeta() {
+    try {
+      const db = await sessionDB();
+      return await new Promise((res) => {
+        const rq = db.transaction("meta").objectStore("meta").get("session");
+        rq.onsuccess = () => res(rq.result || null);
+        rq.onerror = () => res(null);
+      });
+    } catch (e) { return null; }
+  }
+  async function restoreSession() {
+    const meta = await loadSessionMeta();
+    if (!meta || !meta.keys || !meta.keys.length) return false;
+    const db = await sessionDB();
+    const imgs = {};
+    await Promise.all(meta.keys.map((k) => new Promise((res) => {
+      const rq = db.transaction("images").objectStore("images").get(k);
+      rq.onsuccess = () => { if (rq.result && rq.result.ch) imgs[k] = rq.result; res(); };
+      rq.onerror = () => res();
+    })));
+    const keys = Object.keys(imgs);
+    if (!keys.length) return false;
+    state.workflowImages = imgs;
+    const ak = imgs[meta.activeKey] ? meta.activeKey : keys[0];
+    state.activeWorkflowKey = ak;
+    setActiveImage(imgs[ak]);   // habilita toda la UI (misma ruta que una carga normal)
+    refreshPathBar();
+    return true;
+  }
+  async function clearSession() {
+    try {
+      const db = await sessionDB();
+      const tx = db.transaction(["images", "meta"], "readwrite");
+      tx.objectStore("images").clear();
+      tx.objectStore("meta").clear();
+    } catch (e) { /* borrar la sesión nunca debe romper el flujo */ }
+  }
+  // Banner persistente (no auto-expira) con Recuperar / Descartar.
+  function showRestoreBanner(meta) {
+    const lang = document.documentElement.lang || "es";
+    const wrap = document.createElement("div");
+    wrap.className = "piw-toast-wrap";
+    wrap.style.pointerEvents = "auto";
+    const t = document.createElement("div");
+    t.className = "piw-toast show";
+    t.style.pointerEvents = "auto";
+    const span = document.createElement("div");
+    const mins = Math.max(1, Math.round((Date.now() - (meta.savedAt || Date.now())) / 60000));
+    span.textContent = (lang === "es"
+      ? `Sesión guardada hace ${mins} min (${meta.keys.join(", ")})`
+      : `Session saved ${mins} min ago (${meta.keys.join(", ")})`);
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:8px;margin-top:8px;";
+    const bR = document.createElement("button");
+    bR.className = "piw-btn primary"; bR.style.cssText = "padding:5px 10px;font-size:0.62rem;width:auto;";
+    bR.textContent = lang === "es" ? "Recuperar" : "Restore";
+    const bD = document.createElement("button");
+    bD.className = "piw-btn"; bD.style.cssText = "padding:5px 10px;font-size:0.62rem;width:auto;";
+    bD.textContent = lang === "es" ? "Descartar" : "Discard";
+    bR.onclick = async () => {
+      wrap.remove();
+      showLoader(lang === "es" ? "Recuperando sesión..." : "Restoring session...");
+      try {
+        const ok = await restoreSession();
+        logConsole(ok ? (lang === "es" ? "Sesión recuperada" : "Session restored")
+                      : (lang === "es" ? "No se pudo recuperar la sesión" : "Could not restore session"), ok ? "ok" : "err");
+      } finally { hideLoader(); }
+    };
+    bD.onclick = () => { wrap.remove(); clearSession(); };
+    row.appendChild(bR); row.appendChild(bD);
+    t.appendChild(span); t.appendChild(row); wrap.appendChild(t);
+    document.body.appendChild(wrap);
+  }
+  // SESSION-END
 
   // -------------------------------------------------------------------------
   // Auto STF MAD — Port exacto de PI Workflow (optMadMidtone + optApplyMadAutoStretch)
@@ -5274,6 +5431,7 @@
       return;
     }
     updateBigApply();
+    updateStagesBar(); // U3: refleja el historial de pasos de la imagen mostrada
     // La persistencia en workflowImages ya NO ocurre aquí (era un efecto secundario frágil):
     // ahora se hace explícitamente en commitActiveImage() al confirmar cada operación.
 
@@ -5844,6 +6002,7 @@
     state.workflowImages = {};
     state.activeWorkflowKey = "";
     state.undoStack.length = 0; state.redoStack.length = 0; updateUndoButtons();
+    clearSession(); // U2: un Reset explícito también descarta la sesión autoguardada
 
     // Limpiar canvas
     ctx.clearRect(0, 0, cv.width, cv.height);
@@ -7222,6 +7381,7 @@
           state.workflowImages[state.activeWorkflowKey] = state.activeImage;
         }
         state.pendingPreview = false; // ya aplicado → deshabilita "Aplicar" hasta el próximo preview
+        scheduleSessionSave();        // U2: autoguardado (debounced) del flujo committeado
         logConsole(lang === "es" ? "Cambios aplicados y guardados en el flujo" : "Changes saved and committed to workflow", "ok");
         updateBigApply();
       }
@@ -7285,6 +7445,13 @@
   window.updateBigApply = updateBigApply;
 
   updateBigApply();
+
+  // SESSION-RESTORE-PROMPT (U2): si hay una sesión autoguardada y aún no se ha cargado nada,
+  // ofrecer recuperarla (banner persistente con Recuperar/Descartar).
+  loadSessionMeta().then((meta) => {
+    if (!meta || !meta.keys || !meta.keys.length || state.activeImage) return;
+    showRestoreBanner(meta);
+  }).catch(() => {});
 
   // E2E-HOOK-BEGIN
   if (typeof window !== "undefined" && window.location.search.includes("e2ehook=1")) {
