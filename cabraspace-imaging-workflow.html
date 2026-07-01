@@ -159,11 +159,19 @@
       align-items: start;
     }
 
-    @media (min-width: 1100px) {
+    /* iPad y tablets: reduce la fuente global para que la barra lateral ocupe menos y la imagen
+       gane sitio (casi todo el UI está en rem, así que esto escala toda la interfaz). */
+    @media (min-width: 768px) and (max-width: 1099px) {
+      html { font-size: 12px; }
+    }
+
+    /* Layout imagen-protagonista a alto completo desde iPad (768px). Antes empezaba en 1100px, por
+       eso en iPad todo se apilaba y la imagen quedaba minúscula. La barra lateral es proporcional. */
+    @media (min-width: 768px) {
       /* REDISEÑO-FASE1-BEGIN: imagen protagonista a alto completo */
       .piw-grid {
-        grid-template-columns: 230px 1fr;
-        height: calc(100vh - 128px);
+        grid-template-columns: clamp(202px, 22vw, 240px) 1fr;
+        height: calc(100vh - 118px);
         align-items: stretch;
       }
       /* Sidebar y panel derecho llenan la altura; el cockpit no hace scroll de página */
@@ -174,6 +182,7 @@
       }
       aside.piw-card {
         overflow-y: auto;
+        overflow-x: hidden;   /* nada del sidebar puede invadir/quedar bajo la imagen */
         scrollbar-width: thin;
         scrollbar-color: var(--gold-border) transparent;
       }
@@ -216,42 +225,67 @@
     }
 
     /* Pestañas de Navegación del Flujo */
+    /* Pestañas como flechas/chevrones solapados (breadcrumb), todas en una fila */
     .piw-tabs-nav {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
+      display: flex;
+      gap: 0;
       margin-bottom: 20px;
       background: var(--bg-color, #100f0d);
       border: 1px solid var(--piw-panel-border, #2a2723);
       border-radius: 11px;
       padding: 4px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
     }
+    .piw-tabs-nav::-webkit-scrollbar { height: 0; display: none; }
 
     .piw-tab-btn {
-      background: transparent;
+      flex: 1 1 auto;
+      min-width: max-content;   /* nunca recorta el texto de la pestaña */
+      background: rgba(255, 255, 255, 0.035);
       border: none;
       color: var(--text-secondary);
-      font-size: 0.72rem;
+      font-size: 0.57rem;
       font-family: var(--font-sans);
-      font-weight: 500;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 9px 4px;
+      letter-spacing: 0;
+      padding: 8px 4px 8px 12px;
       cursor: pointer;
-      border-radius: 8px;
       transition: var(--transition-smooth);
       text-align: center;
+      white-space: nowrap;
+      position: relative;
+      /* Flecha con punta y muesca ROMAS (achaflanadas) para suavizar los picos; se encajan solapadas */
+      clip-path: polygon(0 0, calc(100% - 8px) 0, calc(100% - 1px) 42%, calc(100% - 1px) 58%, calc(100% - 8px) 100%, 0 100%, 7px 58%, 7px 42%);
+      margin-left: -8px;
+    }
+    .piw-tab-btn:first-child {
+      margin-left: 0;
+      padding-left: 11px;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, calc(100% - 1px) 42%, calc(100% - 1px) 58%, calc(100% - 8px) 100%, 0 100%);
+      border-top-left-radius: 7px;
+      border-bottom-left-radius: 7px;
+    }
+    .piw-tab-btn:last-child {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 7px 58%, 7px 42%);
+      padding-right: 8px;
+      border-top-right-radius: 7px;
+      border-bottom-right-radius: 7px;
     }
 
-    .piw-tab-btn:hover {
+    .piw-tab-btn:hover:not(.active) {
       color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 2;
     }
 
     .piw-tab-btn.active {
       color: #1c1709;
       background: var(--gold-primary);
       font-weight: 700;
+      z-index: 3;
     }
 
     .piw-tab-content {
@@ -454,7 +488,11 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      min-width: 0;   /* permite encoger dentro de filas flex estrechas (iPad) */
     }
+    /* Las filas de botones del sidebar envuelven cuando no caben (iPad) en vez de desbordar sobre la
+       imagen. En escritorio (barra ancha) siguen en una sola línea. */
+    .piw-section div[style*="display: flex"] { flex-wrap: wrap; }
 
     .piw-btn:hover:not(:disabled) {
       border-color: var(--text-primary);
@@ -514,9 +552,20 @@
       bottom: 0;
       width: 2px;
       background: var(--gold-primary);
-      z-index: 10;
+      z-index: 20;
       cursor: ew-resize;
       box-shadow: 0 0 10px rgba(207, 171, 74, 0.5);
+    }
+    /* Zona de agarre transparente y ancha alrededor de la fina línea de 2px, para poder
+       arrastrar la cortinilla con facilidad (antes solo eran agarrables 2px). */
+    .piw-split-slider::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -12px;
+      right: -12px;
+      cursor: ew-resize;
     }
 
     .piw-split-handle {
@@ -535,7 +584,10 @@
       justify-content: center;
       font-size: 0.65rem;
       font-weight: bold;
-      pointer-events: none;
+      /* Grabable: antes era pointer-events:none, así que agarrar el círculo dejaba pasar el
+         evento al canvas y paneaba la imagen en vez de mover la cortinilla. */
+      pointer-events: auto;
+      cursor: ew-resize;
       box-shadow: 0 4px 10px rgba(0,0,0,0.8);
     }
 
@@ -877,6 +929,36 @@
       color: var(--gold-primary);
       letter-spacing: 0.05em;
     }
+
+    /* Mezcla drag & drop (estilo Photoshop) */
+    .piw-mix-help { font-size: 0.62rem; color: var(--text-secondary, #9a948a); line-height: 1.4; margin-bottom: 10px; }
+    .piw-mix-sublabel { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold-primary); margin: 8px 0 4px; }
+    .piw-mix-palette { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; padding: 6px; border: 1px dashed var(--border-color); border-radius: 8px; background: #020202; }
+    .piw-mix-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.66rem; font-weight: 600; padding: 4px 9px; border-radius: 999px;
+      border: 1px solid var(--gold-border, #cfab4a); color: var(--gold-primary);
+      background: rgba(207,171,74,0.08); cursor: grab; user-select: none; white-space: nowrap;
+    }
+    .piw-mix-chip:active { cursor: grabbing; }
+    .piw-mix-chip.dragging { opacity: 0.4; }
+    .piw-mix-stack { display: flex; flex-direction: column; gap: 6px; min-height: 54px; padding: 6px; border: 1px dashed var(--border-color); border-radius: 8px; background: #020202; }
+    .piw-mix-stack.drop-hover { border-color: var(--gold-primary); background: rgba(207,171,74,0.04); }
+    .piw-mix-empty { font-size: 0.62rem; color: var(--text-secondary, #9a948a); text-align: center; padding: 12px 4px; }
+    .piw-mix-layer-row {
+      display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+      border: 1px solid var(--border-color); border-radius: 8px; background: #0d0d10; cursor: grab;
+    }
+    .piw-mix-layer-row.dragging { opacity: 0.4; }
+    .piw-mix-layer-row.drop-before { box-shadow: 0 -2px 0 0 var(--gold-primary); }
+    .piw-mix-layer-row.drop-after { box-shadow: 0 2px 0 0 var(--gold-primary); }
+    .piw-mix-layer-row .mix-grip { color: var(--text-secondary, #9a948a); font-size: 0.8rem; cursor: grab; }
+    .piw-mix-layer-row .mix-name { flex: 1; font-size: 0.66rem; font-weight: 600; color: #e8e2d8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .piw-mix-layer-row .mix-op { font-size: 0.6rem; color: var(--gold-primary); min-width: 30px; text-align: right; }
+    .piw-mix-layer-row select.mix-blend { font-size: 0.6rem; padding: 2px 4px; background: #020202; color: #e8e2d8; border: 1px solid var(--border-color); border-radius: 5px; }
+    .piw-mix-layer-row .mix-eye, .piw-mix-layer-row .mix-del { cursor: pointer; background: none; border: none; color: var(--text-secondary, #9a948a); font-size: 0.8rem; padding: 0 2px; }
+    .piw-mix-layer-row .mix-eye.off { opacity: 0.35; }
+    .piw-mix-layer-row .mix-del:hover { color: #ff6b6b; }
 
     /* Histograma de vista previa */
     .piw-histogram-svg {
@@ -1224,6 +1306,7 @@
           <button class="piw-tab-btn" data-tab="tab-stretch">Stretch</button>
           <button class="piw-tab-btn" data-tab="tab-post">Post</button>
           <button class="piw-tab-btn" data-tab="tab-combine">Mezcla</button>
+          <button class="piw-tab-btn" data-tab="tab-enhance">Mejora</button>
         </nav>
 
         <!-- Contenido Tab 0: Pre-Procesado -->
@@ -1290,12 +1373,6 @@
             <!-- Subzona NB (Banda Estrecha) -->
             <div id="loading-nb-split" class="piw-loading-subzone" style="display: none;">
               <div class="piw-channel-slots">
-                <div class="piw-channel-row piw-drop-target" data-channel="4" draggable="false">
-                  <span class="piw-channel-dot s2"></span>
-                  <span class="piw-channel-name">Canal SII (Azufre II)</span>
-                  <span class="piw-channel-file" id="file-name-4">vacío</span>
-                  <span class="piw-drop-icon" title="Arrastra un archivo aquí">↓</span>
-                </div>
                 <div class="piw-channel-row piw-drop-target" data-channel="5" draggable="false">
                   <span class="piw-channel-dot ha"></span>
                   <span class="piw-channel-name">Canal Ha (Hidrógeno Alfa)</span>
@@ -1306,6 +1383,12 @@
                   <span class="piw-channel-dot o3"></span>
                   <span class="piw-channel-name">Canal OIII (Oxígeno III)</span>
                   <span class="piw-channel-file" id="file-name-6">vacío</span>
+                  <span class="piw-drop-icon" title="Arrastra un archivo aquí">↓</span>
+                </div>
+                <div class="piw-channel-row piw-drop-target" data-channel="4" draggable="false">
+                  <span class="piw-channel-dot s2"></span>
+                  <span class="piw-channel-name">Canal SII (Azufre II)</span>
+                  <span class="piw-channel-file" id="file-name-4">vacío</span>
                   <span class="piw-drop-icon" title="Arrastra un archivo aquí">↓</span>
                 </div>
               </div>
@@ -1368,7 +1451,6 @@
             <h3 class="piw-section-title">Gradient Correction</h3>
             <select class="piw-select" id="selGradientAlgo">
               <option value="graxpert_ia" selected>GraXpert - GraXpert Team (Extracción de fondo IA)</option>
-              <option value="graxpert">GraXpert (Simulado)</option>
               <option value="abe">ABE (Automatic Background Extractor)</option>
               <option value="dbe">AutoDBE (SetiAstro)</option>
             </select>
@@ -1521,7 +1603,6 @@
               <option value="rl_auto" selected>Richardson-Lucy (auto-PSF, rápida)</option>
               <option value="cosmic_ia">Cosmic Clarity IA - Seti Astro</option>
               <option value="cs_ia_beta">CS IA Deconvolution (Beta)</option>
-              <option value="cosmic_std">Standard Deconvolution</option>
             </select>
 
             <!-- Richardson-Lucy clásica (auto-PSF + deringing) -->
@@ -1641,7 +1722,7 @@
               <option value="stf">Auto STF (PixInsight Screen Transfer)</option>
               <option value="ghs">AutoGHS (Generalised Hyperbolic)</option>
               <option value="statistical_stretch">Statistical Stretch (SetiAstro)</option>
-              <option value="stars">Stars Stretch (Hyperbolic)</option>
+              <option value="stars">Star Stretch - Seti Astro</option>
               <option value="curves">Curva Manual / Sigmoide</option>
             </select>
 
@@ -1670,7 +1751,7 @@
                   <span class="piw-label">Sigmas from Center</span>
                   <span class="piw-value" id="valGhsSig">1.00</span>
                 </div>
-                <input type="range" class="piw-slider" id="sldGhsSig" min="-3" max="6" step="0.1" value="1.00">
+                <input type="range" class="piw-slider" id="sldGhsSig" min="-3" max="3" step="0.1" value="1.00">
               </div>
               <div class="piw-control-group">
                 <div class="piw-label-row">
@@ -1678,6 +1759,13 @@
                   <span class="piw-value" id="valGhsInt">0.70</span>
                 </div>
                 <input type="range" class="piw-slider" id="sldGhsInt" min="0" max="3" step="0.05" value="0.70">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label" title="Menos iteraciones = estirado más suave (protege el color de las estrellas)">Iteraciones</span>
+                  <span class="piw-value" id="valGhsIters">10</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldGhsIters" min="1" max="10" step="1" value="10">
               </div>
             </div>
 
@@ -1701,12 +1789,20 @@
 
             <!-- Controles dinámicos Stars Stretch -->
             <div id="stretch-stars-controls" style="display:none;">
+              <div class="piw-subcard-header" style="margin-bottom:6px;">Star Stretch — Seti Astro</div>
               <div class="piw-control-group">
                 <div class="piw-label-row">
-                  <span class="piw-label">Stretch Amount</span>
-                  <span class="piw-value" id="valStarsStretch">4.00</span>
+                  <span class="piw-label" title="Estirado hiperbólico de estrellas (3^amount). Más = más brillo de estrellas.">Stretch Amount</span>
+                  <span class="piw-value" id="valStarsStretch">5.00</span>
                 </div>
-                <input type="range" class="piw-slider" id="sldStarsStretch" min="1.0" max="8.0" step="0.1" value="4.00">
+                <input type="range" class="piw-slider" id="sldStarsStretch" min="0" max="10" step="0.1" value="5.00">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row">
+                  <span class="piw-label" title="Realza el color de las estrellas alrededor de su luminancia (1 = sin cambio)">Color Boost</span>
+                  <span class="piw-value" id="valStarsBoost">1.20</span>
+                </div>
+                <input type="range" class="piw-slider" id="sldStarsBoost" min="0" max="2" step="0.05" value="1.20">
               </div>
             </div>
 
@@ -2023,7 +2119,6 @@
             <h3 class="piw-section-title">Enfoque / Detalles</h3>
             <select class="piw-select" id="selPostSharpAlgo">
               <option value="usm">Unsharp Mask</option>
-              <option value="cosmic">Cosmic Clarity - Seti Astro</option>
               <option value="hdr">HDR Multiscale Transform</option>
               <option value="lhe">Local Histogram Equalization</option>
               <option value="dse">Dark Structure Enhance</option>
@@ -2109,7 +2204,7 @@
                     <span class="piw-label">Layers</span>
                     <span class="piw-value" id="valPostHdrLayers">5</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldPostHdrLayers" min="2" max="8" step="1" value="5" disabled>
+                  <input type="range" class="piw-slider" id="sldPostHdrLayers" min="1" max="15" step="1" value="5" disabled>
                 </div>
                 <div class="piw-control-group">
                   <div class="piw-label-row">
@@ -2162,42 +2257,6 @@
                   </div>
                   <input type="range" class="piw-slider" id="sldPostDseAmount" min="0" max="1" step="0.01" value="0.30" disabled>
                 </div>
-              </div>
-            </div>
-
-            <!-- Cosmic Clarity controls -->
-            <div id="post-sharp-cosmic-controls" class="piw-disabled-control" style="display:none;">
-              <div class="piw-subcard">
-                <div class="piw-subcard-header">Cosmic Clarity Settings</div>
-                <select class="piw-select" id="selPostCcSharpenMode" disabled style="margin-bottom:8px;">
-                  <option value="both">Both (Estrellas y Fondo)</option>
-                  <option value="stellar">Stellar Only</option>
-                  <option value="nonstellar">Non-Stellar Only</option>
-                </select>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Stellar Amt</span>
-                    <span class="piw-value" id="valPostCcStellarAmt">0.90</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostCcStellarAmt" min="0" max="1" step="0.05" value="0.90" disabled>
-                </div>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Ns. Size</span>
-                    <span class="piw-value" id="valPostCcNsStrength">3.0</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostCcNsStrength" min="1" max="8" step="0.1" value="3.0" disabled>
-                </div>
-                <div class="piw-control-group">
-                  <div class="piw-label-row">
-                    <span class="piw-label">Ns. Amt</span>
-                    <span class="piw-value" id="valPostCcNsAmount">0.50</span>
-                  </div>
-                  <input type="range" class="piw-slider" id="sldPostCcNsAmount" min="0" max="1" step="0.05" value="0.50" disabled>
-                </div>
-                <label class="piw-checkbox-row" style="margin-bottom:0;">
-                  <input type="checkbox" id="chkPostCcRemoveAb" disabled> Remove Aberration First
-                </label>
               </div>
             </div>
 
@@ -2490,75 +2549,99 @@
           </div>
         </div>
 
-        <!-- Contenido Tab 3: Mezcla de Canales -->
+        <!-- Contenido Tab 3: Mezcla de Canales (estilo Photoshop, drag & drop) -->
         <div class="piw-tab-content" id="tab-combine">
-          <div class="piw-section collapsed" style="max-height:360px; overflow-y:auto; padding-right:4px;">
-            <h3 class="piw-section-title">Capas de Mezcla</h3>
-            
-            <!-- Capa 1: Base (Nebulosa/Starless) -->
-            <div class="piw-mix-layer">
-              <div class="piw-mix-layer-header">
-                <span class="piw-mix-layer-title">Capa 1: Starless / Canal R</span>
-                <input type="checkbox" id="chkMixLayer1" checked>
-              </div>
-              <div class="piw-control-group" style="margin-bottom:6px;">
-                <select class="piw-select" id="selMixSource1" style="font-size:0.7rem; padding:4px; margin-bottom:4px;"></select>
-                <div class="piw-label-row" style="font-size:0.65rem;">
-                  <span>Opacidad</span>
-                  <span id="valMixOpacity1">1.00</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldMixOpacity1" min="0" max="1" step="0.05" value="1.00" style="margin:2px 0;">
-              </div>
+          <div class="piw-section">
+            <h3 class="piw-section-title">Mezcla de Capas</h3>
+            <div class="piw-mix-help">Arrastra las etiquetas a la <b>pila de capas</b>. La de <b>arriba se funde sobre</b> las de abajo (como Photoshop). Reordena arrastrando. <b>Clic derecho</b> en una capa: opacidad.</div>
+
+            <div class="piw-mix-sublabel">Imágenes disponibles</div>
+            <div class="piw-mix-palette" id="mixPalette"></div>
+
+            <div class="piw-mix-sublabel">Pila de capas <span style="opacity:.6">(arriba = encima)</span></div>
+            <div class="piw-mix-stack" id="mixStack">
+              <div class="piw-mix-empty" id="mixStackEmpty">Arrastra aquí una imagen para empezar</div>
             </div>
 
-            <!-- Capa 2: Mezcla (OIII/Canal G) -->
-            <div class="piw-mix-layer">
-              <div class="piw-mix-layer-header">
-                <span class="piw-mix-layer-title">Capa 2: Canal G</span>
-                <input type="checkbox" id="chkMixLayer2" checked>
-              </div>
-              <div class="piw-control-group" style="margin-bottom:6px;">
-                <select class="piw-select" id="selMixSource2" style="font-size:0.7rem; padding:4px; margin-bottom:4px;"></select>
-                <div class="piw-label-row" style="font-size:0.65rem;">
-                  <span>Opacidad</span>
-                  <span id="valMixOpacity2">1.00</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldMixOpacity2" min="0" max="1" step="0.05" value="1.00" style="margin:2px 0;">
-                <select class="piw-select" id="selMixBlend2" style="font-size:0.7rem; padding:4px; margin:4px 0 0 0;">
-                  <option value="screen">Fusión: Pantalla (Screen)</option>
-                  <option value="lighten">Fusión: Aclarar (Lighten)</option>
-                  <option value="add">Fusión: Aditiva (Add)</option>
-                  <option value="normal">Fusión: Normal</option>
-                </select>
-              </div>
-            </div>
+            <label class="piw-checkbox-row" style="margin-top:8px;">
+              <input type="checkbox" id="chkMixPreview"> Ver mezcla (preview en vivo)
+            </label>
+            <button class="piw-btn primary" id="btnGenerateBlend" disabled style="width:100%;">Componer y Renderizar Mezcla</button>
+          </div>
+        </div>
 
-            <!-- Capa 3: Estrellas (Stars) -->
-            <div class="piw-mix-layer">
-              <div class="piw-mix-layer-header">
-                <span class="piw-mix-layer-title">Capa 3: Estrellas (Stars)</span>
-                <input type="checkbox" id="chkMixLayer3" checked>
-              </div>
-              <div class="piw-control-group" style="margin-bottom:6px;">
-                <select class="piw-select" id="selMixSource3" style="font-size:0.7rem; padding:4px; margin-bottom:4px;"></select>
-                <div class="piw-label-row" style="font-size:0.65rem;">
-                  <span>Opacidad</span>
-                  <span id="valMixOpacity3">1.00</span>
-                </div>
-                <input type="range" class="piw-slider" id="sldMixOpacity3" min="0" max="1" step="0.05" value="1.00" style="margin:2px 0;">
-                <select class="piw-select" id="selMixBlend3" style="font-size:0.7rem; padding:4px; margin:4px 0 0 0;">
-                  <option value="screen">Fusión: Pantalla (Screen)</option>
-                  <option value="add">Fusión: Aditiva (Add)</option>
-                  <option value="lighten">Fusión: Aclarar (Lighten)</option>
-                  <option value="normal">Fusión: Normal</option>
-                </select>
-              </div>
+        <!-- Contenido Tab 4: Mejora (Image Enhancement — port de PI Workflow) -->
+        <div class="piw-tab-content" id="tab-enhance">
+          <!-- COLOR MIXER -->
+          <div class="piw-section">
+            <h3 class="piw-section-title">Color Mixer</h3>
+            <span class="piw-eyebrow">COLOR SELECTIVO POR BANDAS DE TONO</span>
+            <select class="piw-select" id="selCmBand"></select>
+            <div class="piw-control-group">
+              <div class="piw-label-row"><span class="piw-label">Tono (Hue)</span><span class="piw-value" id="valCmHue">0</span></div>
+              <input type="range" class="piw-slider" id="sldCmHue" min="-45" max="45" step="1" value="0">
+            </div>
+            <div class="piw-control-group">
+              <div class="piw-label-row"><span class="piw-label">Saturación</span><span class="piw-value" id="valCmSat">0</span></div>
+              <input type="range" class="piw-slider" id="sldCmSat" min="-100" max="100" step="1" value="0">
+            </div>
+            <div class="piw-control-group">
+              <div class="piw-label-row"><span class="piw-label">Luminancia</span><span class="piw-value" id="valCmLum">0</span></div>
+              <input type="range" class="piw-slider" id="sldCmLum" min="-100" max="100" step="1" value="0">
+            </div>
+            <div class="piw-control-group">
+              <div class="piw-label-row"><span class="piw-label">Fuerza global</span><span class="piw-value" id="valCmStrength">1.00</span></div>
+              <input type="range" class="piw-slider" id="sldCmStrength" min="0" max="1" step="0.05" value="1.00">
+            </div>
+            <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectStars" checked> Proteger estrellas (altas luces)</label>
+            <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectLowSat" checked> Proteger fondo (baja saturación)</label>
+            <label class="piw-checkbox-row" style="margin-bottom:8px;"><input type="checkbox" id="chkCmLive"> Live</label>
+            <div style="display:flex; gap:8px;">
+              <button class="piw-btn primary" id="btnApplyColorMixer" disabled style="flex:2;">Aplicar Color Mixer</button>
+              <button class="piw-btn" id="btnResetColorMixer" style="flex:1;">Reset</button>
             </div>
           </div>
 
-
-          <div class="piw-section">
-            <button class="piw-btn primary" id="btnGenerateBlend" disabled>Componer y Renderizar Mezcla</button>
+          <!-- DETAIL & CONTRAST -->
+          <div class="piw-section collapsed">
+            <h3 class="piw-section-title">Detail &amp; Contrast</h3>
+            <select class="piw-select" id="selDetailAlgo">
+              <option value="localContrast">Local Contrast (Clarity)</option>
+              <option value="multiscale">Multiscale Detail Boost</option>
+              <option value="highPass">High-Pass Sharpen</option>
+            </select>
+            <div id="detail-lc-controls">
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Amount</span><span class="piw-value" id="valDetailLcAmount">0.20</span></div>
+                <input type="range" class="piw-slider" id="sldDetailLcAmount" min="0" max="1" step="0.02" value="0.20">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Radio (px)</span><span class="piw-value" id="valDetailLcRadius">80</span></div>
+                <input type="range" class="piw-slider" id="sldDetailLcRadius" min="10" max="200" step="5" value="80">
+              </div>
+            </div>
+            <div id="detail-md-controls" style="display:none;">
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Detalle fino</span><span class="piw-value" id="valDetailMdFine">0.40</span></div>
+                <input type="range" class="piw-slider" id="sldDetailMdFine" min="0" max="1" step="0.02" value="0.40">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Detalle medio</span><span class="piw-value" id="valDetailMdMedium">0.20</span></div>
+                <input type="range" class="piw-slider" id="sldDetailMdMedium" min="0" max="1" step="0.02" value="0.20">
+              </div>
+            </div>
+            <div id="detail-hp-controls" style="display:none;">
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Amount</span><span class="piw-value" id="valDetailHpAmount">0.50</span></div>
+                <input type="range" class="piw-slider" id="sldDetailHpAmount" min="0" max="1" step="0.02" value="0.50">
+              </div>
+              <div class="piw-control-group">
+                <div class="piw-label-row"><span class="piw-label">Radio (px)</span><span class="piw-value" id="valDetailHpRadius">3</span></div>
+                <input type="range" class="piw-slider" id="sldDetailHpRadius" min="1" max="12" step="1" value="3">
+              </div>
+            </div>
+            <label class="piw-checkbox-row" style="margin:6px 0 8px;"><input type="checkbox" id="chkDetailLive"> Live</label>
+            <button class="piw-btn primary" id="btnApplyDetail" disabled style="width:100%;">Aplicar Detalle</button>
           </div>
         </div>
       </aside>

@@ -60,6 +60,7 @@
     previousImage: null,
     viewingPrevious: false,
     _lastImgRef: null,
+    pendingPreview: false, // Hay un preview sin aplicar en el menú actual → habilita "Aplicar"
 
     // Hue Rueda de color
     selectedHue: 180,
@@ -157,6 +158,7 @@
     if (state.activeWorkflowKey) {
       state.workflowImages[state.activeWorkflowKey] = img;
     }
+    state.pendingPreview = false; // ya confirmado
     return img;
   }
 
@@ -182,6 +184,7 @@
     }
     img.stages = stages;
     state.activeImage = img;
+    state.pendingPreview = true; // hay un preview sin aplicar → habilita "Aplicar"
     return img;
   }
   // IMAGE-MODEL-END
@@ -1187,52 +1190,6 @@
     return result;
   }
 
-  // --- Lógica del modelo GraXpert ---
-  function applyGraXpert(img, correction, smoothness) {
-    // GraXpert web simula una interpolación bicúbica multiescala de muy baja frecuencia
-    const w = img.w;
-    const h = img.h;
-    const result = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
-    const grad = { w, h, nc: img.nc, isColor: img.isColor, ch: [] };
-    
-    // Estimación bicúbica del fondo
-    const coeffs = fitPolynomial2D(img, 2, true);
-    
-    for (let c = 0; c < img.nc; c++) {
-      const src = img.ch[c];
-      const dst = new Float32Array(w * h);
-      const bgCh = new Float32Array(w * h);
-      const coeff = coeffs[c];
-      
-      // Calcular la media para normalización
-      let sum = 0;
-      for (let i = 0; i < src.length; i++) sum += src[i];
-      const mean = sum / src.length;
-      
-      for (let y = 0; y < h; y++) {
-        const ny = y / h;
-        for (let x = 0; x < w; x++) {
-          const nx = x / w;
-          const idx = y * w + x;
-          
-          const background = evaluatePolynomial(nx, ny, coeff, 2) * (1 - smoothness * 0.15);
-          bgCh[idx] = background;
-          
-          if (correction === "subtraction") {
-            dst[idx] = Math.max(0, src[idx] - background);
-          } else {
-            const denom = Math.max(0.001, background);
-            dst[idx] = Math.max(0, Math.min(1.0, src[idx] / denom)) * mean;
-          }
-        }
-      }
-      result.ch.push(dst);
-      grad.ch.push(bgCh);
-    }
-    state.subtractedGradient = grad;
-    return result;
-  }
-
   // --- PROCESAMIENTO GENERAL DE GRADIENTE ---
   function applyGradientCorrection(img) {
     if (!img) return null;
@@ -1250,10 +1207,6 @@
       // Mapear grados impares a 1 y pares a 2 en la aproximación analítica
       const fitDegree = degree <= 2 ? 1 : 2;
       return applyABE(img, fitDegree, corr, norm);
-    } else if (algo === "graxpert") {
-      const corr = el("selGraXpertCorrection").value;
-      const smooth = parseFloat(el("sldGraXpertSmooth").value);
-      return applyGraXpert(img, corr, smooth);
     }
     return img;
   }
@@ -1278,9 +1231,6 @@
       const degree = parseInt(el("sldAbeDegree").value, 10);
       const fitDegree = degree <= 2 ? 1 : 2;
       return { corrected: applyABE(srcImg, fitDegree, el("selAbeCorrection").value, el("chkAbeNormalize").checked), bgCh: null };
-    }
-    if (algo === "graxpert") {
-      return { corrected: applyGraXpert(srcImg, el("selGraXpertCorrection").value, parseFloat(el("sldGraXpertSmooth").value)), bgCh: null };
     }
     return { corrected: srcImg, bgCh: null };
   }
@@ -1358,7 +1308,6 @@
           const srcImg = state.stepInputImage || state.activeImage;
           const algos = [
             { id: "graxpert_ia", name: "GraXpert IA" },
-            { id: "graxpert",    name: "GraXpert (Sim)" },
             { id: "abe",         name: "ABE" },
             { id: "dbe",         name: "AutoDBE" }
           ];
@@ -1384,8 +1333,8 @@
 
           hideLoader();
           logConsole(lang === "es"
-            ? "Comparación lista: 4 algoritmos guardados en Slots 1-4. Pulsa un slot para verlo."
-            : "Comparison ready: 4 algorithms saved to Slots 1-4. Click a slot to view it.", "ok");
+            ? "Comparación lista: 3 algoritmos guardados en Slots 1-3. Pulsa un slot para verlo."
+            : "Comparison ready: 3 algorithms saved to Slots 1-3. Click a slot to view it.", "ok");
         } catch (e) {
           hideLoader();
           logConsole(`Error: ${e.message}`, "err");
@@ -1551,7 +1500,9 @@
     const hasL = state.loadedChannels[3] !== null;
     const rgbValid = (hasR && hasG) || (hasR && hasG && hasB) || hasL;
     el("btnCombineRGB").disabled = !rgbValid;
-    if (el("btnSeparateRGB")) el("btnSeparateRGB").disabled = !rgbValid;
+    // "Por Separado" carga cada canal cargado como imagen independiente → basta con tener ≥1 canal
+    // (no exige la receta completa como "Combinar").
+    if (el("btnSeparateRGB")) el("btnSeparateRGB").disabled = !(hasR || hasG || hasB || hasL);
     
     // 2. NB (Narrowband)
     const hasSII = state.loadedChannels[4] !== null;
@@ -1577,7 +1528,8 @@
       }
     }
     el("btnCombineNB").disabled = !nbValid;
-    if (el("btnSeparateNB")) el("btnSeparateNB").disabled = !nbValid;
+    // "Por Separado" carga cada canal NB cargado como imagen independiente → basta con tener ≥1 canal.
+    if (el("btnSeparateNB")) el("btnSeparateNB").disabled = !(hasSII || hasHa || hasOIII);
 
     // 3. RGB Color (Direct)
     const hasColorImg = state.loadedChannels[7] !== null;
@@ -1926,6 +1878,7 @@
     // La imagen seleccionada pasa a ser la Imagen Inicial de las operaciones (estirado, etc.),
     // para que se apliquen sobre lo que el usuario tiene seleccionado (RGB/Starless/Stars/…).
     state.stepInputImage = cloneImage(state.activeImage);
+    state.pendingPreview = false;
 
     // MONO-RGB-VIS-BEGIN
     el("piwHint").style.display = "none";
@@ -1988,6 +1941,7 @@
     state.activeImage = img;
     state.originalImage = cloneImage(img);
     state.stepInputImage = cloneImage(img);
+    state.pendingPreview = false;
     state.calibCompareReady = false;
 
     // Reset A/B comparison
@@ -2060,7 +2014,8 @@
     el("btnApplyMask").disabled = false;
     el("btnApplySat").disabled = !img.isColor;
     el("btnDownloadPNG").disabled = false;
-    el("btnGenerateBlend").disabled = false;
+    { const b = el("btnApplyColorMixer"); if (b) b.disabled = false; }
+    { const b = el("btnApplyDetail"); if (b) b.disabled = false; }
     el("btnApplyPostNR").disabled = false;
     { const b = el("btnComparePostNR"); if (b) b.disabled = false; }
     el("btnApplyPostSharp").disabled = false;
@@ -2248,7 +2203,7 @@
   async function runBackgroundNeutralization() {
     if (!state.activeImage) return;
     const lang = document.documentElement.lang || "es";
-    showLoader(lang === "es" ? "Neutralizando fondo (SetiAstro)..." : "Neutralizing background (SetiAstro)...");
+    showLoader(lang === "es" ? "Neutralizando fondo..." : "Neutralizing background...");
     
     setTimeout(() => {
       try {
@@ -2263,7 +2218,7 @@
 
         const bgStr = Array.from(bgVals).map(v => v.toFixed(4)).join(", ");
         logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
-        logConsole(lang === "es" ? "Neutralización de fondo (SetiAstro) completada" : "Background Neutralization (SetiAstro) completed", "info");
+        logConsole(lang === "es" ? "Neutralización de fondo completada" : "Background Neutralization completed", "info");
       } catch (err) {
         logConsole(`Error en Neutralización: ${err.message}`, "err");
       } finally {
@@ -2655,7 +2610,7 @@
     );
   }
 
-  // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cs_ia_beta | cosmic_std | cosmic_ia)
+  // Calcula la deconvolución para un algoritmo EXPLÍCITO (rl_auto | cs_ia_beta | cosmic_ia)
   // COSMIC-DECON-BLEND-JS-BEGIN
   // Port a JS del blend de Cosmic Clarity deconv (antes en Pyodide/decon.py de Seti Astro).
   // A 4K, el blend en Pyodide (WASM) alocaba varias copias de 124 MiB -> OOM. Como img/stellar_ai/
@@ -2729,7 +2684,8 @@
     return { base, dil };
   }
   // Lucy-Richardson en JS (PSF gaussiana sigma 1.2, 5 iter; fftconvolve(x,gauss) == blur gaussiano).
-  // Genera el canal deconvolucionado para cosmic_std (deconv estandar, SIN IA).
+  // Fallback defensivo SIN IA dentro de computeCosmicDeconBlend (se usaba en el retirado
+  // "Standard Deconvolution"; cosmic_ia siempre aporta el canal estelar por IA).
   function _ccLucyRichardson(src, w, h) {
     const n = w * h, decon = Float32Array.from(src);
     for (let it = 0; it < 5; it++) {
@@ -2741,8 +2697,8 @@
     }
     return decon;
   }
-  // Sustituye a apply_cosmic_clarity_decon (Pyodide). Maneja IA (cosmic_ia: stellar/nonstellar_ai) y
-  // SIN IA (cosmic_std: decon via Lucy-Richardson, detalle via img - blur(img)).
+  // Sustituye a apply_cosmic_clarity_decon (Pyodide). Maneja la mezcla IA de cosmic_ia
+  // (stellar/nonstellar_ai). Las ramas sin IA quedan como fallback defensivo.
   function computeCosmicDeconBlend(srcImg, stellarAi, nonstellarAi, mode, stellarAmt, nsStrength, nsAmount) {
     const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
     const isColor = srcImg.isColor && nc >= 3;
@@ -2913,7 +2869,8 @@
           showLoader(lang === "es" ? `Descargando modelo de estrellas: ${(p * 100).toFixed(0)}%` : `Downloading stellar model: ${(p * 100).toFixed(0)}%`);
         });
         showLoader(lang === "es" ? "Procesando estrellas por IA..." : "Processing stars via AI...");
-        stellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
+        stellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32,
+          onProgress: (done, total) => showLoader((lang === "es" ? "Procesando estrellas por IA: " : "Processing stars via AI: ") + Math.round(done / Math.max(1, total) * 100) + "%") }));
       }
       if ((mode === "both" || mode === "nonstellar") && nsAmount > 0.01) {
         let modelKey = "radius_2";
@@ -2927,14 +2884,14 @@
           showLoader(lang === "es" ? `Descargando modelo de nebulosa: ${(p * 100).toFixed(0)}%` : `Downloading nebula model: ${(p * 100).toFixed(0)}%`);
         });
         showLoader(lang === "es" ? "Procesando nebulosa por IA..." : "Processing nebula via AI...");
-        nonstellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32 }));
+        nonstellarAiCh = _unstretch(await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32,
+          onProgress: (done, total) => showLoader((lang === "es" ? "Procesando nebulosa por IA: " : "Processing nebula via AI: ") + Math.round(done / Math.max(1, total) * 100) + "%") }));
       }
       // ONNX-ENGINE-REF-END
     }
 
-    // COSMIC-DECON en JS (sin Pyodide). cosmic_ia usa stellar/nonstellar_ai (IA); cosmic_std (AI=null)
-    // genera el decon via Lucy-Richardson y el detalle via img-blur dentro de computeCosmicDeconBlend.
-    if (algo === "cosmic_ia" || algo === "cosmic_std") {
+    // COSMIC-DECON en JS (sin Pyodide). cosmic_ia usa stellar/nonstellar_ai (IA).
+    if (algo === "cosmic_ia") {
       showLoader(lang === "es" ? "Mezcla final (JS)..." : "Final blending (JS)...");
       return computeCosmicDeconBlend(srcImg, stellarAiCh, nonstellarAiCh, mode, stellarAmt, nsStrength, nsAmount);
     }
@@ -3389,13 +3346,33 @@
       const cfg = AutoGHS.defaultConfig();
       cfg.sigmasFromCenter = parseFloat(el("sldGhsSig").value);
       cfg.stretchIntensity = parseFloat(el("sldGhsInt").value);
+      const _ghsIters = el("sldGhsIters");
+      if (_ghsIters) cfg.maxIterations = parseInt(_ghsIters.value, 10);
       cfg.colorMode = img.isColor ? "luminance" : "rgb";
       const res = AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, cfg);
       img.ch = res.channels;
     } else if (algo === "stars") {
+      // STAR-STRETCH-SETIASTRO: estirado hiperbólico de estrellas de Seti Astro (numba_utils.applyPixelMath):
+      //   f = 3^amount ; out = (f·x)/((f-1)·x + 1)  por canal  (mapea [0,1]→[0,1], levanta mucho las sombras).
+      // Luego Color Boost alrededor de la media RGB por píxel:  out = media + (out-media)·boost.
       const amt = parseFloat(el("sldStarsStretch").value);
-      const asinhLut = window.LUT.buildLUT(x => Math.asinh(amt * x) / Math.asinh(amt), 65536);
-      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], asinhLut);
+      const boostEl = el("sldStarsBoost");
+      const boost = boostEl ? parseFloat(boostEl.value) : 1.0;
+      const f = Math.pow(3, amt);
+      const denom = f - 1;
+      const starLut = window.LUT.buildLUT((x) => { const v = (f * x) / (denom * x + 1); return v < 0 ? 0 : (v > 1 ? 1 : v); }, 65536);
+      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], starLut);
+      // Color Boost (solo tiene sentido en color; realza la saturación de las estrellas).
+      if (img.isColor && img.nc >= 3 && Math.abs(boost - 1) > 1e-6) {
+        const r = img.ch[0], g = img.ch[1], b = img.ch[2], nn = img.w * img.h;
+        for (let i = 0; i < nn; ++i) {
+          const m = (r[i] + g[i] + b[i]) / 3;
+          let rr = m + (r[i] - m) * boost; let gg = m + (g[i] - m) * boost; let bb = m + (b[i] - m) * boost;
+          r[i] = rr < 0 ? 0 : (rr > 1 ? 1 : rr);
+          g[i] = gg < 0 ? 0 : (gg > 1 ? 1 : gg);
+          b[i] = bb < 0 ? 0 : (bb > 1 ? 1 : bb);
+        }
+      }
     } else if (algo === "statistical_stretch") {
       const tgt = parseFloat(el("sldStretchStatTgt").value);
       const sig = parseFloat(el("sldStretchStatSigma").value);
@@ -3695,7 +3672,8 @@
       // Estirar -> inferir -> des-estirar (modelo entrenado con datos estirados; robustez a luminancia).
       const m = piwStretchMidtone(srcImg);
       const stretchedSrc = { w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, ch: piwMtfStretchChans(srcImg.ch, m) };
-      const aiS = await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32, layout: "NCHW" });
+      const aiS = await window.OnnxEngine.runOnnxModelTiled(session, stretchedSrc, { tileSize: 256, fixedTile: 256, overlap: 32, layout: "NCHW",
+        onProgress: (done, total) => showLoader((lang === "es" ? "Procesando Cosmic Clarity Denoise: " : "Processing Cosmic Clarity Denoise: ") + Math.round(done / Math.max(1, total) * 100) + "%") });
       const ai = piwMtfStretchChans(aiS, 1 - m);
       return blendDenoise(srcImg, ai, parseFloat(el("sldPostCcnrLuma").value));
     }
@@ -3907,10 +3885,6 @@
       };
       return window.Sharpening.computeUSM(srcImg, opts);
     }
-    if (algo === "cosmic") {
-      // Cosmic Clarity = el mismo sharpen IA de la deconvolución (modelos stellar/nonstellar + estirado).
-      return await computeDeconv("cosmic_ia", srcImg);
-    }
     if (algo === "hdr") {
       showLoader(lang === "es" ? "Aplicando HDR Multiscale..." : "Applying HDR Multiscale...");
       return computeSharpHDR(srcImg);
@@ -3958,7 +3932,6 @@
         try {
           const variants = [
             { name: "USM", algo: "usm" },
-            { name: "Cosmic Clarity", algo: "cosmic" },
             { name: "HDR Multiscale", algo: "hdr" },
             { name: "Local Hist. Eq.", algo: "lhe" },
             { name: "Dark Struct.", algo: "dse" }
@@ -3991,6 +3964,63 @@
   // WEB-WORKER-END
 
   // CURVES-BEGIN
+  // Aplica las curvas actuales (state.curves) a srcImg y devuelve la imagen resultante SIN mutar
+  // la entrada. Reutilizado por "Aplicar Curvas" (commit) y por el preview Live.
+  function computeCurvesImage(srcImg) {
+    const lutK = window.LUT.buildLUT(getCubicSpline(state.curves.K));
+    const lutR = window.LUT.buildLUT(getCubicSpline(state.curves.R));
+    const lutG = window.LUT.buildLUT(getCubicSpline(state.curves.G));
+    const lutB = window.LUT.buildLUT(getCubicSpline(state.curves.B));
+    const lutS = window.LUT.buildLUT(getCubicSpline(state.curves.S));
+
+    const w = srcImg.w, h = srcImg.h, nc = srcImg.nc;
+    const isColor = srcImg.isColor || nc === 3;
+    const size = w * h;
+    const dstCh = [];
+    for (let c = 0; c < nc; c++) dstCh.push(new Float32Array(size));
+    const clampIdx = (val) => { let idx = Math.round(val * 65535); return idx < 0 ? 0 : (idx > 65535 ? 65535 : idx); };
+
+    if (isColor && nc === 3) {
+      const rSrc = srcImg.ch[0], gSrc = srcImg.ch[1], bSrc = srcImg.ch[2];
+      const rDst = dstCh[0], gDst = dstCh[1], bDst = dstCh[2];
+      const isSatModified = state.curves.S.some(p => Math.abs(p.x - p.y) > 1e-4);
+      for (let i = 0; i < size; i++) {
+        let r = rSrc[i], g = gSrc[i], b = bSrc[i];
+        r = lutK[clampIdx(r)]; g = lutK[clampIdx(g)]; b = lutK[clampIdx(b)];
+        r = lutR[clampIdx(r)]; g = lutG[clampIdx(g)]; b = lutB[clampIdx(b)];
+        if (isSatModified) {
+          let max = r, min = r;
+          if (g > max) max = g; if (b > max) max = b;
+          if (g < min) min = g; if (b < min) min = b;
+          let hh = 0, s = 0, l = (max + min) / 2;
+          if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) hh = (g - b) / d + (g < b ? 6 : 0);
+            else if (max === g) hh = (b - r) / d + 2;
+            else hh = (r - g) / d + 4;
+            hh /= 6;
+          }
+          s = lutS[clampIdx(s)];
+          if (s === 0) { r = g = b = l; }
+          else {
+            const hue2rgb = (p, q, t) => { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1/6) return p + (q - p) * 6 * t; if (t < 1/2) return q; if (t < 2/3) return p + (q - p) * (2/3 - t) * 6; return p; };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            r = hue2rgb(p, q, hh + 1/3); g = hue2rgb(p, q, hh); b = hue2rgb(p, q, hh - 1/3);
+          }
+        }
+        rDst[i] = r < 0 ? 0 : (r > 1 ? 1 : r);
+        gDst[i] = g < 0 ? 0 : (g > 1 ? 1 : g);
+        bDst[i] = b < 0 ? 0 : (b > 1 ? 1 : b);
+      }
+    } else {
+      const srcCh = srcImg.ch[0], dstCh0 = dstCh[0];
+      for (let i = 0; i < size; i++) { const v = lutK[clampIdx(srcCh[i])]; dstCh0[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
+    }
+    return { ch: dstCh, w, h, nc, isColor };
+  }
+
   el("btnApplyPostCurves").addEventListener("click", () => {
     const srcImg = state.stepInputImage || state.activeImage;
     if (!srcImg) return;
@@ -4000,119 +4030,7 @@
 
     setTimeout(() => {
       try {
-        // Build LUTs for each channel
-        const lutK = window.LUT.buildLUT(getCubicSpline(state.curves.K));
-        const lutR = window.LUT.buildLUT(getCubicSpline(state.curves.R));
-        const lutG = window.LUT.buildLUT(getCubicSpline(state.curves.G));
-        const lutB = window.LUT.buildLUT(getCubicSpline(state.curves.B));
-        const lutS = window.LUT.buildLUT(getCubicSpline(state.curves.S));
-
-        const w = srcImg.w;
-        const h = srcImg.h;
-        const nc = srcImg.nc;
-        const isColor = srcImg.isColor || nc === 3;
-        const size = w * h;
-
-        const dstCh = [];
-        for (let c = 0; c < nc; c++) {
-          dstCh.push(new Float32Array(size));
-        }
-
-        // Helper: clamp and index
-        const clampIdx = (val) => {
-          let idx = Math.round(val * 65535);
-          return idx < 0 ? 0 : (idx > 65535 ? 65535 : idx);
-        };
-
-        if (isColor && nc === 3) {
-          const rSrc = srcImg.ch[0];
-          const gSrc = srcImg.ch[1];
-          const bSrc = srcImg.ch[2];
-
-          const rDst = dstCh[0];
-          const gDst = dstCh[1];
-          const bDst = dstCh[2];
-
-          // Check if saturation spline is modified
-          const isSatModified = state.curves.S.some(p => Math.abs(p.x - p.y) > 1e-4);
-
-          for (let i = 0; i < size; i++) {
-            let r = rSrc[i];
-            let g = gSrc[i];
-            let b = bSrc[i];
-
-            // 1. Master/Luminance curve
-            r = lutK[clampIdx(r)];
-            g = lutK[clampIdx(g)];
-            b = lutK[clampIdx(b)];
-
-            // 2. Individual channel curves
-            r = lutR[clampIdx(r)];
-            g = lutG[clampIdx(g)];
-            b = lutB[clampIdx(b)];
-
-            // 3. Saturation curve
-            if (isSatModified) {
-              // RGB to HSL
-              let max = r, min = r;
-              if (g > max) max = g;
-              if (b > max) max = b;
-              if (g < min) min = g;
-              if (b < min) min = b;
-
-              let h = 0, s = 0, l = (max + min) / 2;
-              if (max !== min) {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                if (max === r) {
-                  h = (g - b) / d + (g < b ? 6 : 0);
-                } else if (max === g) {
-                  h = (b - r) / d + 2;
-                } else {
-                  h = (r - g) / d + 4;
-                }
-                h /= 6;
-              }
-
-              // Apply Saturation curve
-              s = lutS[clampIdx(s)];
-
-              // HSL to RGB
-              if (s === 0) {
-                r = g = b = l;
-              } else {
-                const hue2rgb = (p, q, t) => {
-                  if (t < 0) t += 1;
-                  if (t > 1) t -= 1;
-                  if (t < 1/6) return p + (q - p) * 6 * t;
-                  if (t < 1/2) return q;
-                  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                  return p;
-                };
-                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                const p = 2 * l - q;
-                r = hue2rgb(p, q, h + 1/3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1/3);
-              }
-            }
-
-            // Clamp results to [0, 1]
-            rDst[i] = r < 0 ? 0 : (r > 1 ? 1 : r);
-            gDst[i] = g < 0 ? 0 : (g > 1 ? 1 : g);
-            bDst[i] = b < 0 ? 0 : (b > 1 ? 1 : b);
-          }
-        } else {
-          // Grayscale or single channel image
-          const srcCh = srcImg.ch[0];
-          const dstCh0 = dstCh[0];
-          for (let i = 0; i < size; i++) {
-            const v = lutK[clampIdx(srcCh[i])];
-            dstCh0[i] = v < 0 ? 0 : (v > 1 ? 1 : v);
-          }
-        }
-
-        commitActiveImage({ ch: dstCh, w, h, nc, isColor }, "Curves", srcImg);
+        commitActiveImage(computeCurvesImage(srcImg), "Curves", srcImg);
 
         render();
         refreshPathBar();
@@ -4132,8 +4050,81 @@
   // CURVES-END
 
   // COLOR-WHEEL-BEGIN
+  // Aplica el balance de color actual (multiplicadores RGB + saturación + SCNR de los controles)
+  // a srcImg y devuelve la imagen resultante SIN mutar la entrada. Reutilizado por "Aplicar
+  // Balance" (commit) y por el preview Live.
+  function computeColorBalanceImage(srcImg) {
+    const rMult   = parseFloat(el("sldPostBalanceR").value);
+    const gMult   = parseFloat(el("sldPostBalanceG").value);
+    const bMult   = parseFloat(el("sldPostBalanceB").value);
+    const satMult = parseFloat(el("sldPostBalanceSat").value);
+    const doScnr  = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
+    const scnrAmt = doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0;
+
+    const img = cloneImage(srcImg);
+    const n = img.w * img.h;
+    const isColor = img.isColor;
+
+    // 1. Multiplicadores RGB por canal
+    const rCh = img.ch[0];
+    if (rMult !== 1) {
+      for (let i = 0; i < n; ++i) { rCh[i] = rCh[i] * rMult; if (rCh[i] > 1) rCh[i] = 1; else if (rCh[i] < 0) rCh[i] = 0; }
+    }
+    if (isColor) {
+      const gCh = img.ch[1];
+      if (gMult !== 1) {
+        for (let i = 0; i < n; ++i) { gCh[i] = gCh[i] * gMult; if (gCh[i] > 1) gCh[i] = 1; else if (gCh[i] < 0) gCh[i] = 0; }
+      }
+      const bCh = img.ch[2];
+      if (bMult !== 1) {
+        for (let i = 0; i < n; ++i) { bCh[i] = bCh[i] * bMult; if (bCh[i] > 1) bCh[i] = 1; else if (bCh[i] < 0) bCh[i] = 0; }
+      }
+    }
+
+    // 2. Ajuste de saturación vía HSL
+    if (satMult !== 1 && isColor) {
+      const rCh2 = img.ch[0], gCh2 = img.ch[1], bCh2 = img.ch[2];
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1; if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      for (let i = 0; i < n; ++i) {
+        const rv = rCh2[i], gv = gCh2[i], bv = bCh2[i];
+        const mx = Math.max(rv, gv, bv);
+        const mn = Math.min(rv, gv, bv);
+        const d = mx - mn;
+        if (d === 0) continue;
+        const l = (mx + mn) / 2;
+        const s = d / (l < 0.5 ? mx + mn : 2 - mx - mn);
+        const sNew = s * satMult > 1 ? 1 : s * satMult < 0 ? 0 : s * satMult;
+        const hh = rv === mx ? ((gv - bv) / d + (gv < bv ? 6 : 0)) / 6
+                : gv === mx ? ((bv - rv) / d + 2) / 6
+                :             ((rv - gv) / d + 4) / 6;
+        const q2 = l < 0.5 ? l * (1 + sNew) : l + sNew - l * sNew;
+        const p2 = 2 * l - q2;
+        rCh2[i] = hue2rgb(p2, q2, hh + 1/3);
+        gCh2[i] = hue2rgb(p2, q2, hh);
+        bCh2[i] = hue2rgb(p2, q2, hh - 1/3);
+      }
+    }
+
+    // 3. SCNR Green (opcional)
+    if (doScnr && isColor) {
+      const rCh3 = img.ch[0], gCh3 = img.ch[1], bCh3 = img.ch[2];
+      for (let i = 0; i < n; ++i) {
+        const limit = (rCh3[i] + bCh3[i]) / 2;
+        if (gCh3[i] > limit) gCh3[i] = (1 - scnrAmt) * gCh3[i] + scnrAmt * limit;
+      }
+    }
+    return img;
+  }
+
   el("btnApplyPostColor").addEventListener("click", () => {
     if (!state.activeImage) return;
+    const lang = document.documentElement.lang || "es";
 
     const rMult   = parseFloat(el("sldPostBalanceR").value);
     const gMult   = parseFloat(el("sldPostBalanceG").value);
@@ -4142,80 +4133,16 @@
     const doScnr  = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
     const scnrAmt = doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0;
 
-    const noRGB = (rMult === 1 && gMult === 1 && bMult === 1);
-    const noSat = (satMult === 1);
-    if (noRGB && noSat && !doScnr) {
-      const lang = document.documentElement.lang || "es";
+    if (rMult === 1 && gMult === 1 && bMult === 1 && satMult === 1 && !doScnr) {
       logConsole(lang === "es" ? "Balance de color: ajuste neutro, sin cambios." : "Color balance: neutral adjustment, no changes.", "info");
       return;
     }
 
-    const lang = document.documentElement.lang || "es";
     showLoader(lang === "es" ? "Aplicando balance de color..." : "Applying color balance...");
-
     setTimeout(() => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        const img = cloneImage(srcImg);
-        const n = img.w * img.h;
-        const isColor = img.isColor;
-
-        // 1. Multiplicadores RGB por canal
-        const rCh = img.ch[0];
-        if (rMult !== 1) {
-          for (let i = 0; i < n; ++i) { rCh[i] = rCh[i] * rMult; if (rCh[i] > 1) rCh[i] = 1; else if (rCh[i] < 0) rCh[i] = 0; }
-        }
-        if (isColor) {
-          const gCh = img.ch[1];
-          if (gMult !== 1) {
-            for (let i = 0; i < n; ++i) { gCh[i] = gCh[i] * gMult; if (gCh[i] > 1) gCh[i] = 1; else if (gCh[i] < 0) gCh[i] = 0; }
-          }
-          const bCh = img.ch[2];
-          if (bMult !== 1) {
-            for (let i = 0; i < n; ++i) { bCh[i] = bCh[i] * bMult; if (bCh[i] > 1) bCh[i] = 1; else if (bCh[i] < 0) bCh[i] = 0; }
-          }
-        }
-
-        // 2. Ajuste de saturación vía HSL
-        if (satMult !== 1 && isColor) {
-          const rCh = img.ch[0], gCh = img.ch[1], bCh = img.ch[2];
-          const hue2rgb = (p, q, t) => {
-            if (t < 0) t += 1; if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-            return p;
-          };
-          for (let i = 0; i < n; ++i) {
-            const rv = rCh[i], gv = gCh[i], bv = bCh[i];
-            const mx = Math.max(rv, gv, bv);
-            const mn = Math.min(rv, gv, bv);
-            const d = mx - mn;
-            if (d === 0) continue;
-            const l = (mx + mn) / 2;
-            const s = d / (l < 0.5 ? mx + mn : 2 - mx - mn);
-            const sNew = s * satMult > 1 ? 1 : s * satMult < 0 ? 0 : s * satMult;
-            const h = rv === mx ? ((gv - bv) / d + (gv < bv ? 6 : 0)) / 6
-                    : gv === mx ? ((bv - rv) / d + 2) / 6
-                    :             ((rv - gv) / d + 4) / 6;
-            const q2 = l < 0.5 ? l * (1 + sNew) : l + sNew - l * sNew;
-            const p2 = 2 * l - q2;
-            rCh[i] = hue2rgb(p2, q2, h + 1/3);
-            gCh[i] = hue2rgb(p2, q2, h);
-            bCh[i] = hue2rgb(p2, q2, h - 1/3);
-          }
-        }
-
-        // 3. SCNR Green (opcional)
-        if (doScnr && isColor) {
-          const rCh = img.ch[0], gCh = img.ch[1], bCh = img.ch[2];
-          for (let i = 0; i < n; ++i) {
-            const limit = (rCh[i] + bCh[i]) / 2;
-            if (gCh[i] > limit) gCh[i] = (1 - scnrAmt) * gCh[i] + scnrAmt * limit;
-          }
-        }
-
-        commitActiveImage(img, "Color Balance", srcImg);
+        commitActiveImage(computeColorBalanceImage(srcImg), "Color Balance", srcImg);
         render(); refreshPathBar();
         logConsole(`Balance de color: R×${rMult.toFixed(3)} G×${gMult.toFixed(3)} B×${bMult.toFixed(3)} Sat×${satMult.toFixed(2)}${doScnr ? ` + SCNR(${(scnrAmt*100).toFixed(0)}%)` : ""}`, "info");
       } catch (err) {
@@ -4226,6 +4153,72 @@
     }, 50);
   });
   // COLOR-WHEEL-END
+
+  // LIVE-PREVIEW-BEGIN
+  // Preview Live de Color Balance y Curvas: con el checkbox "Live" marcado, cada cambio en los
+  // controles muestra el efecto sobre la imagen en tiempo real (preview NO destructivo desde la
+  // Imagen Inicial del menú). El commit real lo sigue haciendo "Aplicar". Se limita a un cálculo
+  // por frame (requestAnimationFrame) para coalescer arrastres rápidos de sliders/rueda.
+  let _livePreviewFn = null, _livePreviewRAF = 0;
+  function scheduleLivePreview(fn) {
+    _livePreviewFn = fn;
+    if (_livePreviewRAF) return;
+    _livePreviewRAF = requestAnimationFrame(() => {
+      _livePreviewRAF = 0;
+      const f = _livePreviewFn; _livePreviewFn = null;
+      if (f) { try { f(); } catch (e) { console.warn("Live preview:", e); } }
+    });
+  }
+  // Fuente REDUCIDA de la Imagen Inicial (lado largo ≤ 1000 px, promediado por área) cacheada por
+  // objeto: computar curvas/balance sobre ~1 MP en vez de 16-36 MP hace el Live realmente instantáneo.
+  let _liveSmallSrc = null, _liveSmallSrcOf = null;
+  function _getLiveSmallSrc() {
+    const base = state.stepInputImage;
+    if (!base) return null;
+    if (_liveSmallSrc && _liveSmallSrcOf === base) return _liveSmallSrc;
+    const capped = window.AutoGHS.capChannels(base.ch, base.w, base.h, base.nc, 1000);
+    _liveSmallSrc = { ch: capped.ch, w: capped.w, h: capped.h, nc: base.nc, isColor: base.isColor };
+    _liveSmallSrcOf = base;
+    return _liveSmallSrc;
+  }
+  // Motor Live común: 1) preview instantáneo en baja resolución (coalescido a 1/frame);
+  //                   2) al quedar quieto ~220 ms, recalcula a resolución COMPLETA para una vista nítida.
+  let _liveSettleTimer = 0;
+  function _runLive(chkId, computeFn, label) {
+    const chk = el(chkId);
+    if (!chk || !chk.checked) return;
+    const full = state.stepInputImage;
+    if (!full) return;
+    const small = _getLiveSmallSrc() || full;
+    scheduleLivePreview(() => {
+      previewActiveImage(computeFn(small), full, label);
+      render();
+    });
+    if (_liveSettleTimer) clearTimeout(_liveSettleTimer);
+    _liveSettleTimer = setTimeout(() => {
+      _liveSettleTimer = 0;
+      if (!chk.checked || state.stepInputImage !== full) return;
+      previewActiveImage(computeFn(full), full, label);
+      render();
+    }, 220);
+  }
+  function livePreviewCurves() { _runLive("chkPostCurvesLive", computeCurvesImage, "Curves"); }
+  function livePreviewColorBalance() { _runLive("chkPostColorBalanceLive", computeColorBalanceImage, "Color Balance"); }
+  // Al (des)marcar Live: si se activa, muestra el preview ya; si se desactiva, descarta el preview
+  // no aplicado y vuelve a la Imagen Inicial del menú (para no dejar un preview "pegado").
+  {
+    const chkCurvesLive = el("chkPostCurvesLive");
+    if (chkCurvesLive) chkCurvesLive.addEventListener("change", () => {
+      if (chkCurvesLive.checked) livePreviewCurves();
+      else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); }
+    });
+    const chkColorLive = el("chkPostColorBalanceLive");
+    if (chkColorLive) chkColorLive.addEventListener("change", () => {
+      if (chkColorLive.checked) livePreviewColorBalance();
+      else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); }
+    });
+  }
+  // LIVE-PREVIEW-END
 
   // Rueda de color en Color Mask
   const wheel = el("maskColorWheel");
@@ -4537,172 +4530,389 @@
     }, 50);
   });
 
-  // --- OPERACIONES DE MEZCLA DE CANALES (TAB 3) ---
+  // --- MEZCLA DE CAPAS ESTILO PHOTOSHOP (TAB 3, drag & drop) ---
+  // MIX-DND-BEGIN
+  // Pila de capas: índice 0 = ARRIBA (se funde encima). Cada capa: { key, blend, opacity, visible }.
+  if (!state.mixLayers) state.mixLayers = [];
 
-  // Actualiza los selectores de las capas de mezcla según las imágenes disponibles
-  function updateMixSourceOptions() {
-    const isEn = window.location.pathname.includes("-en.html");
-    const options = [];
-    options.push(isEn ? '<option value="none">-- No image --</option>' : '<option value="none">-- Sin imagen --</option>');
-    if (state.activeImage) {
-      options.push(isEn ? '<option value="active">Active Working Image</option>' : '<option value="active">Imagen de Trabajo Activa</option>');
-    }
-    if (state.starlessImage) {
-      options.push(isEn ? '<option value="starless">Starless Layer (Starless)</option>' : '<option value="starless">Capa Sin Estrellas (Starless)</option>');
-    }
-    if (state.starsImage) {
-      options.push(isEn ? '<option value="stars">Stars Layer (Stars)</option>' : '<option value="stars">Capa de Estrellas (Stars)</option>');
-    }
-
-    // Añadir ranuras rellenas
-    for (let i = 0; i < 8; ++i) {
-      if (state.imageSlots[i]) {
-        options.push(isEn ? `<option value="slot-${i}">Memory Slot ${i + 1}</option>` : `<option value="slot-${i}">Slot de Memoria ${i + 1}</option>`);
-      }
-    }
-
-    const html = options.join("");
-    el("selMixSource1").innerHTML = html;
-    el("selMixSource2").innerHTML = html;
-    el("selMixSource3").innerHTML = html;
-
-    // Valores por defecto inteligentes
-    if (state.starlessImage) el("selMixSource1").value = "starless";
-    else if (state.activeImage) el("selMixSource1").value = "active";
-
-    if (state.activeImage && !state.starlessImage) el("selMixSource2").value = "active";
-    
-    if (state.starsImage) el("selMixSource3").value = "stars";
+  function mixSourceImage(key) {
+    if (!key) return null;
+    if (key.indexOf("wf-") === 0) return state.workflowImages[key.slice(3)];
+    if (key === "starless") return state.starlessImage;
+    if (key === "stars") return state.starsImage;
+    if (key === "active") return state.activeImage;
+    if (key.indexOf("slot-") === 0) return state.imageSlots[parseInt(key.slice(5), 10)];
+    return null;
+  }
+  function mixLabelForKey(key) {
+    if (key.indexOf("wf-") === 0) return key.slice(3);
+    if (key === "starless") return "Starless";
+    if (key === "stars") return "Stars";
+    if (key === "active") return (document.documentElement.lang === "es" ? "Activa" : "Active");
+    if (key.indexOf("slot-") === 0) return "Slot " + (parseInt(key.slice(5), 10) + 1);
+    return key;
+  }
+  function mixAvailableSources() {
+    const list = [];
+    Object.keys(state.workflowImages || {}).forEach(k => list.push("wf-" + k));
+    if (state.starlessImage) list.push("starless");
+    if (state.starsImage) list.push("stars");
+    for (let i = 0; i < 8; ++i) if (state.imageSlots[i]) list.push("slot-" + i);
+    return list;
   }
 
-  // Componer y Renderizar Mezcla (Tab 3)
-  el("btnGenerateBlend").addEventListener("click", () => {
-    showLoader("Componiendo mezcla de canales...");
-    setTimeout(() => {
-      try {
-        const useLayer1 = el("chkMixLayer1").checked;
-        const useLayer2 = el("chkMixLayer2").checked;
-        const useLayer3 = el("chkMixLayer3").checked;
+  // Reconstruye la paleta de etiquetas arrastrables (compat: se sigue llamando updateMixSourceOptions).
+  function updateMixSourceOptions() {
+    const pal = el("mixPalette");
+    if (!pal) return;
+    const isEn = document.documentElement.lang !== "es";
+    pal.innerHTML = "";
+    const sources = mixAvailableSources();
+    if (sources.length === 0) {
+      pal.innerHTML = '<span class="piw-mix-empty">' + (isEn ? "Load images or separate stars first…" : "Carga imágenes o separa estrellas…") + '</span>';
+    }
+    sources.forEach((key) => {
+      const chip = document.createElement("div");
+      chip.className = "piw-mix-chip";
+      chip.textContent = mixLabelForKey(key);
+      chip.setAttribute("draggable", "true");
+      chip.dataset.key = key;
+      chip.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/mixkey", key); e.dataTransfer.effectAllowed = "copy"; chip.classList.add("dragging"); });
+      chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      pal.appendChild(chip);
+    });
+    renderMixStack();
+  }
 
-        const src1Key = el("selMixSource1").value;
-        const src2Key = el("selMixSource2").value;
-        const src3Key = el("selMixSource3").value;
+  const MIX_BLENDS = [
+    { v: "normal", es: "Normal", en: "Normal" },
+    { v: "screen", es: "Pantalla (Screen)", en: "Screen" },
+    { v: "add", es: "Aditiva (Add)", en: "Add" },
+    { v: "lighten", es: "Aclarar (Lighten)", en: "Lighten" }
+  ];
 
-        const getSourceImage = (key) => {
-          if (key === "active") return state.activeImage;
-          if (key === "starless") return state.starlessImage;
-          if (key === "stars") return state.starsImage;
-          if (key.startsWith("slot-")) {
-            const idx = parseInt(key.split("-")[1], 10);
-            return state.imageSlots[idx];
-          }
-          return null;
-        };
+  function renderMixStack() {
+    const stack = el("mixStack");
+    if (!stack) return;
+    const isEn = document.documentElement.lang !== "es";
+    const layers = state.mixLayers;
+    stack.innerHTML = "";
+    if (!layers.length) {
+      stack.innerHTML = '<div class="piw-mix-empty">' + (isEn ? "Drag an image here to start" : "Arrastra aquí una imagen para empezar") + '</div>';
+    }
+    layers.forEach((L, idx) => {
+      const isBase = (idx === layers.length - 1);
+      const row = document.createElement("div");
+      row.className = "piw-mix-layer-row";
+      row.setAttribute("draggable", "true");
+      row.dataset.idx = String(idx);
+      const eye = document.createElement("button");
+      eye.className = "mix-eye" + (L.visible ? "" : " off"); eye.textContent = L.visible ? "👁" : "▫"; eye.title = isEn ? "Show/Hide" : "Ver/Ocultar";
+      eye.addEventListener("click", (e) => { e.stopPropagation(); L.visible = !L.visible; renderMixStack(); mixRefreshPreview(); });
+      const grip = document.createElement("span"); grip.className = "mix-grip"; grip.textContent = "⠿";
+      const name = document.createElement("span"); name.className = "mix-name"; name.textContent = mixLabelForKey(L.key) + (isBase ? (isEn ? " · base" : " · base") : "");
+      const blend = document.createElement("select"); blend.className = "mix-blend";
+      MIX_BLENDS.forEach(b => { const o = document.createElement("option"); o.value = b.v; o.textContent = isEn ? b.en : b.es; if (b.v === L.blend) o.selected = true; blend.appendChild(o); });
+      blend.disabled = isBase; // la capa base no tiene modo de fusión (es el fondo)
+      blend.addEventListener("click", (e) => e.stopPropagation());
+      blend.addEventListener("change", (e) => { L.blend = e.target.value; mixRefreshPreview(); });
+      const op = document.createElement("span"); op.className = "mix-op"; op.textContent = Math.round(L.opacity * 100) + "%";
+      const del = document.createElement("button"); del.className = "mix-del"; del.textContent = "✕"; del.title = isEn ? "Remove" : "Quitar";
+      del.addEventListener("click", (e) => { e.stopPropagation(); state.mixLayers.splice(idx, 1); renderMixStack(); mixRefreshPreview(); });
+      // Clic derecho: opacidad
+      row.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        const cur = Math.round(L.opacity * 100);
+        const val = prompt(isEn ? "Layer opacity (0-100%)" : "Opacidad de la capa (0-100%)", String(cur));
+        if (val !== null) { let v = parseFloat(val); if (isFinite(v)) { v = Math.max(0, Math.min(100, v)) / 100; L.opacity = v; renderMixStack(); mixRefreshPreview(); } }
+      });
+      // Reordenar por arrastre dentro de la pila
+      row.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/mixlayeridx", String(idx)); e.dataTransfer.effectAllowed = "move"; row.classList.add("dragging"); });
+      row.addEventListener("dragend", () => { row.classList.remove("dragging"); Array.from(stack.children).forEach(c => c.classList.remove("drop-before", "drop-after")); });
+      row.addEventListener("dragover", (e) => {
+        if (Array.from(e.dataTransfer.types).indexOf("text/mixlayeridx") === -1) return;
+        e.preventDefault();
+        const rect = row.getBoundingClientRect(); const after = (e.clientY - rect.top) > rect.height / 2;
+        row.classList.toggle("drop-after", after); row.classList.toggle("drop-before", !after);
+      });
+      row.addEventListener("dragleave", () => row.classList.remove("drop-before", "drop-after"));
+      row.addEventListener("drop", (e) => {
+        const from = parseInt(e.dataTransfer.getData("text/mixlayeridx"), 10);
+        if (isNaN(from)) return;
+        e.preventDefault(); e.stopPropagation();
+        const rect = row.getBoundingClientRect(); const after = (e.clientY - rect.top) > rect.height / 2;
+        let to = idx + (after ? 1 : 0);
+        const moved = state.mixLayers.splice(from, 1)[0];
+        if (from < to) to--;
+        state.mixLayers.splice(to, 0, moved);
+        renderMixStack(); mixRefreshPreview();
+      });
+      row.appendChild(grip); row.appendChild(eye); row.appendChild(name); row.appendChild(blend); row.appendChild(op); row.appendChild(del);
+      stack.appendChild(row);
+    });
+    const btn = el("btnGenerateBlend");
+    if (btn) btn.disabled = state.mixLayers.filter(L => L.visible).length === 0;
+  }
 
-        const img1 = useLayer1 ? getSourceImage(src1Key) : null;
-        const img2 = useLayer2 ? getSourceImage(src2Key) : null;
-        const img3 = useLayer3 ? getSourceImage(src3Key) : null;
+  // Zona de soltado de la pila: añadir una capa nueva desde la paleta (arriba del todo).
+  {
+    const stack = el("mixStack");
+    if (stack) {
+      stack.addEventListener("dragover", (e) => {
+        if (Array.from(e.dataTransfer.types).indexOf("text/mixkey") === -1) return;
+        e.preventDefault(); stack.classList.add("drop-hover");
+      });
+      stack.addEventListener("dragleave", () => stack.classList.remove("drop-hover"));
+      stack.addEventListener("drop", (e) => {
+        stack.classList.remove("drop-hover");
+        const key = e.dataTransfer.getData("text/mixkey");
+        if (!key) return;
+        e.preventDefault();
+        const isBase = state.mixLayers.length === 0;
+        state.mixLayers.unshift({ key: key, blend: isBase ? "normal" : "screen", opacity: 1.0, visible: true });
+        renderMixStack(); mixRefreshPreview();
+      });
+    }
+  }
 
-        if (!img1) throw new Error("La Capa 1 es obligatoria y debe tener una imagen seleccionada.");
-
-        const w = img1.w;
-        const h = img1.h;
-        const n = w * h;
-
-        // Reservar memoria para salida RGB
-        const outR = new Float32Array(n);
-        const outG = new Float32Array(n);
-        const outB = new Float32Array(n);
-
-        // Inicializar con la Capa 1
-        const op1 = parseFloat(el("sldMixOpacity1").value);
-        for (let i = 0; i < n; ++i) {
-          outR[i] = (img1.ch[0][i] || 0) * op1;
-          outG[i] = (img1.nc > 1 ? img1.ch[1][i] : img1.ch[0][i]) * op1;
-          outB[i] = (img1.nc > 2 ? img1.ch[2][i] : (img1.nc > 1 ? img1.ch[1][i] : img1.ch[0][i])) * op1;
-        }
-
-        // Fusión de la Capa 2
-        if (img2) {
-          const op2 = parseFloat(el("sldMixOpacity2").value);
-          const blend2 = el("selMixBlend2").value;
-          const r2 = img2.ch[0];
-          const g2 = img2.nc > 1 ? img2.ch[1] : img2.ch[0];
-          const b2 = img2.nc > 2 ? img2.ch[2] : (img2.nc > 1 ? img2.ch[1] : img2.ch[0]);
-
-          for (let i = 0; i < n; ++i) {
-            const vR = (r2[i] || 0) * op2;
-            const vG = (g2[i] || 0) * op2;
-            const vB = (b2[i] || 0) * op2;
-
-            if (blend2 === "add") {
-              outR[i] = Math.min(1, outR[i] + vR);
-              outG[i] = Math.min(1, outG[i] + vG);
-              outB[i] = Math.min(1, outB[i] + vB);
-            } else if (blend2 === "screen") {
-              outR[i] = 1 - (1 - outR[i]) * (1 - vR);
-              outG[i] = 1 - (1 - outG[i]) * (1 - vG);
-              outB[i] = 1 - (1 - outB[i]) * (1 - vB);
-            } else if (blend2 === "lighten") {
-              outR[i] = Math.max(outR[i], vR);
-              outG[i] = Math.max(outG[i], vG);
-              outB[i] = Math.max(outB[i], vB);
-            } else {
-              // Normal (interpolación)
-              outR[i] = outR[i] * (1 - op2) + vR;
-              outG[i] = outG[i] * (1 - op2) + vG;
-              outB[i] = outB[i] * (1 - op2) + vB;
-            }
-          }
-        }
-
-        // Fusión de la Capa 3 (Estrellas)
-        if (img3) {
-          const op3 = parseFloat(el("sldMixOpacity3").value);
-          const blend3 = el("selMixBlend3").value;
-          const r3 = img3.ch[0];
-          const g3 = img3.nc > 1 ? img3.ch[1] : img3.ch[0];
-          const b3 = img3.nc > 2 ? img3.ch[2] : (img3.nc > 1 ? img3.ch[1] : img3.ch[0]);
-
-          for (let i = 0; i < n; ++i) {
-            const vR = (r3[i] || 0) * op3;
-            const vG = (g3[i] || 0) * op3;
-            const vB = (b3[i] || 0) * op3;
-
-            if (blend3 === "add") {
-              outR[i] = Math.min(1, outR[i] + vR);
-              outG[i] = Math.min(1, outG[i] + vG);
-              outB[i] = Math.min(1, outB[i] + vB);
-            } else if (blend3 === "screen") {
-              outR[i] = 1 - (1 - outR[i]) * (1 - vR);
-              outG[i] = 1 - (1 - outG[i]) * (1 - vG);
-              outB[i] = 1 - (1 - outB[i]) * (1 - vB);
-            } else if (blend3 === "lighten") {
-              outR[i] = Math.max(outR[i], vR);
-              outG[i] = Math.max(outG[i], vG);
-              outB[i] = Math.max(outB[i], vB);
-            } else {
-              outR[i] = outR[i] * (1 - op3) + vR;
-              outG[i] = outG[i] * (1 - op3) + vG;
-              outB[i] = outB[i] * (1 - op3) + vB;
-            }
-          }
-        }
-
-        // Reemplazar la imagen activa con la composición (hereda wcs/historial de la capa base).
-        commitActiveImage({ ch: [outR, outG, outB], w: w, h: h, nc: 3, isColor: true }, "Blend", img1);
-
-        render();
-        drawHistogram();
-        refreshPathBar();
-        logConsole(`Composición multi-capa generada con éxito`, "info");
-      } catch (err) {
-        logConsole(`Error al generar mezcla: ${err.message}`, "err");
-      } finally {
-        hideLoader();
+  function mixBlendPix(base, top, mode) {
+    if (mode === "screen") return 1 - (1 - base) * (1 - top);
+    if (mode === "add") { const v = base + top; return v > 1 ? 1 : v; }
+    if (mode === "lighten") return base > top ? base : top;
+    return top; // normal
+  }
+  // Compone la pila (fondo→arriba). La opacidad interpola entre lo de debajo y el resultado fundido.
+  function composeMixImage() {
+    const visible = state.mixLayers.filter(L => L.visible);
+    if (!visible.length) return null;
+    const ordered = visible.slice().reverse(); // [fondo … arriba]
+    const baseImg = mixSourceImage(ordered[0].key);
+    if (!baseImg) return null;
+    const w = baseImg.w, h = baseImg.h, n = w * h;
+    const chans = (img) => [img.ch[0], img.nc > 1 ? img.ch[1] : img.ch[0], img.nc > 2 ? img.ch[2] : (img.nc > 1 ? img.ch[1] : img.ch[0])];
+    const outR = new Float32Array(n), outG = new Float32Array(n), outB = new Float32Array(n);
+    { const [r, g, b] = chans(baseImg); const op = ordered[0].opacity; for (let i = 0; i < n; i++) { outR[i] = r[i] * op; outG[i] = g[i] * op; outB[i] = b[i] * op; } }
+    for (let li = 1; li < ordered.length; li++) {
+      const L = ordered[li]; const img = mixSourceImage(L.key);
+      if (!img || img.w !== w || img.h !== h) { logConsole((document.documentElement.lang === "es" ? "Capa omitida (tamaño distinto): " : "Layer skipped (size mismatch): ") + mixLabelForKey(L.key), "warn"); continue; }
+      const [r, g, b] = chans(img); const op = L.opacity, mode = L.blend;
+      for (let i = 0; i < n; i++) {
+        const br = outR[i], bg = outG[i], bb = outB[i];
+        outR[i] = br * (1 - op) + mixBlendPix(br, r[i], mode) * op;
+        outG[i] = bg * (1 - op) + mixBlendPix(bg, g[i], mode) * op;
+        outB[i] = bb * (1 - op) + mixBlendPix(bb, b[i], mode) * op;
       }
-    }, 50);
-  });
+    }
+    for (let i = 0; i < n; i++) { outR[i] = outR[i] < 0 ? 0 : (outR[i] > 1 ? 1 : outR[i]); outG[i] = outG[i] < 0 ? 0 : (outG[i] > 1 ? 1 : outG[i]); outB[i] = outB[i] < 0 ? 0 : (outB[i] > 1 ? 1 : outB[i]); }
+    return { ch: [outR, outG, outB], w, h, nc: 3, isColor: true, wcs: baseImg.wcs };
+  }
+
+  // Preview en vivo de la mezcla (si el checkbox está marcado). No destructivo.
+  function mixRefreshPreview() {
+    const chk = el("chkMixPreview");
+    if (!chk || !chk.checked) return;
+    const img = composeMixImage();
+    if (img) { previewActiveImage(img, state.stepInputImage || state.activeImage, "Blend"); state.screenStretchMode = false; render(); drawHistogram(); }
+  }
+
+  if (el("chkMixPreview")) {
+    el("chkMixPreview").addEventListener("change", () => {
+      if (el("chkMixPreview").checked) mixRefreshPreview();
+      else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); }
+    });
+  }
+
+  if (el("btnGenerateBlend")) {
+    el("btnGenerateBlend").addEventListener("click", () => {
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Componiendo mezcla de capas..." : "Composing layer blend...");
+      setTimeout(() => {
+        try {
+          const img = composeMixImage();
+          if (!img) throw new Error(lang === "es" ? "No hay capas visibles en la pila." : "No visible layers in the stack.");
+          commitActiveImage(img, "Blend", state.stepInputImage || state.activeImage);
+          state.screenStretchMode = false;
+          render(); drawHistogram(); refreshPathBar();
+          logConsole(lang === "es" ? "Mezcla compuesta y aplicada al flujo." : "Blend composed and committed.", "ok");
+        } catch (err) {
+          logConsole((lang === "es" ? "Error al componer mezcla: " : "Blend error: ") + err.message, "err");
+        } finally { hideLoader(); }
+      }, 50);
+    });
+  }
+  // MIX-DND-END
+
+  // IMG-ENH-BEGIN — Pestaña "Mejora": Color Mixer + Detail & Contrast (port de PI Workflow Dev_194).
+  const CM_BANDS = [
+    { id: "red", center: 0, label: "Rojo / H-alpha", labelEn: "Red / H-alpha" },
+    { id: "orange", center: 30, label: "Naranja / Núcleos", labelEn: "Orange / Galaxy Cores" },
+    { id: "yellow", center: 60, label: "Amarillo / Estrellas cálidas", labelEn: "Yellow / Warm Stars" },
+    { id: "green", center: 120, label: "Verde / Control de tinte", labelEn: "Green / Cast Control" },
+    { id: "cyan", center: 180, label: "Cian / OIII", labelEn: "Cyan / OIII" },
+    { id: "blue", center: 240, label: "Azul / Nebulosa reflexión", labelEn: "Blue / Reflection Nebula" },
+    { id: "purple", center: 275, label: "Púrpura / Violetas", labelEn: "Purple / Violet Cleanup" },
+    { id: "magenta", center: 315, label: "Magenta / Halos", labelEn: "Magenta / Halo Cleanup" }
+  ];
+  const CM_AXIS = 1 / Math.sqrt(3);
+  const CM_POS_LUM_GAIN = 0.5;
+  const cmClamp01 = (x) => x < 0 ? 0 : (x > 1 ? 1 : x);
+  const cmSmooth = (a, b, x) => { if (a >= b) return x < a ? 0 : 1; let t = (x - a) / (b - a); t = t < 0 ? 0 : (t > 1 ? 1 : t); return t * t * (3 - 2 * t); };
+  function cmDefaultState() {
+    return {
+      bands: CM_BANDS.map(d => ({ id: d.id, center: d.center, hueShift: 0, saturation: 0, luminance: 0, width: 45, feather: 0.75 })),
+      globalStrength: 1.0, protectStars: true, protectLowSat: true,
+      satFloor: 0.015, satFull: 0.07, darkFloor: 0.0, darkFull: 0.06, highlightStart: 0.92, highlightFull: 1.0
+    };
+  }
+  if (!state.colorMixer) state.colorMixer = cmDefaultState();
+
+  // Aplica el ajuste de una banda al píxel p (sat + rotación de tono en el plano de croma + luminancia).
+  function cmApplyPixel(R, G, B, p, mask, satBase, lumBase, hasHue, hueRad) {
+    const rr = R[p], gg = G[p], bb = B[p];
+    const y = 0.2126 * rr + 0.7152 * gg + 0.0722 * bb;
+    let cr = rr - y, cg = gg - y, cb = bb - y;
+    let satScale = 1 + satBase * mask; if (satScale < 0) satScale = 0;
+    cr *= satScale; cg *= satScale; cb *= satScale;
+    if (hasHue) {
+      const ang = hueRad * mask, cosA = Math.cos(ang), sinA = Math.sin(ang), invc = 1 - cosA, ax = CM_AXIS, ay = CM_AXIS, az = CM_AXIS;
+      const dot = cr * ax + cg * ay + cb * az;
+      const xr = ay * cb - az * cg, xg = az * cr - ax * cb, xb = ax * cg - ay * cr;
+      cr = cr * cosA + xr * sinA + ax * dot * invc; cg = cg * cosA + xg * sinA + ay * dot * invc; cb = cb * cosA + xb * sinA + az * dot * invc;
+    }
+    const y2 = lumBase >= 0 ? y + (lumBase * CM_POS_LUM_GAIN) * mask * (1 - y) : y + lumBase * mask * y;
+    R[p] = cmClamp01(y2 + cr); G[p] = cmClamp01(y2 + cg); B[p] = cmClamp01(y2 + cb);
+  }
+  function cmHasWork(st) { return st.bands.some(b => Math.abs(b.hueShift) > 1e-6 || Math.abs(b.saturation) > 1e-6 || Math.abs(b.luminance) > 1e-6); }
+  function computeColorMixer(srcImg, st) {
+    if (!srcImg.isColor || srcImg.nc < 3) throw new Error(document.documentElement.lang === "es" ? "Color Mixer requiere imagen RGB." : "Color Mixer requires an RGB image.");
+    if (!cmHasWork(st)) return cloneImage(srcImg);
+    const w = srcImg.w, h = srcImg.h, count = w * h;
+    const R = Float32Array.from(srcImg.ch[0]), G = Float32Array.from(srcImg.ch[1]), B = Float32Array.from(srcImg.ch[2]);
+    const srcH = new Float32Array(count), srcS = new Float32Array(count), srcL = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      const r = R[i], g = G[i], b = B[i]; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, li = (mx + mn) * 0.5; let hue = 0, sat = 0;
+      if (d > 1e-7) { sat = li > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); if (mx === r) hue = ((g - b) / d) % 6; else if (mx === g) hue = (b - r) / d + 2; else hue = (r - g) / d + 4; hue *= 60; if (hue < 0) hue += 360; }
+      srcH[i] = hue; srcS[i] = sat; srcL[i] = li;
+    }
+    const gs = st.globalStrength != null ? st.globalStrength : 1;
+    for (let bi = 0; bi < st.bands.length; bi++) {
+      const band = st.bands[bi];
+      const satBase = band.saturation / 100, lumBase = band.luminance / 100, hueRad = band.hueShift * Math.PI / 180, hasHue = Math.abs(band.hueShift) > 1e-6;
+      if (Math.abs(satBase) < 1e-6 && Math.abs(lumBase) < 1e-6 && !hasHue) continue;
+      const outerW = band.width, innerW = band.feather <= 1e-6 ? outerW : outerW * (1 - band.feather), featherDen = outerW - innerW, center = band.center;
+      for (let p = 0; p < count; p++) {
+        const delta = Math.abs((srcH[p] % 360) - center); const dist = delta < (360 - delta) ? delta : (360 - delta);
+        let hueMask; if (dist <= innerW + 1e-6) hueMask = 1; else if (dist <= outerW + 1e-6 && featherDen > 1e-6) { let t = (dist - innerW) / featherDen; t = t < 0 ? 0 : (t > 1 ? 1 : t); hueMask = 1 - (t * t * (3 - 2 * t)); } else continue;
+        if (hueMask <= 0) continue;
+        const s = srcS[p], l = srcL[p];
+        const satMask = st.protectLowSat ? cmSmooth(st.satFloor, st.satFull, s) : 1;
+        const darkMask = cmSmooth(st.darkFloor, st.darkFull, l);
+        const hiMask = st.protectStars ? (1 - cmSmooth(st.highlightStart, st.highlightFull, l)) : 1;
+        const m = hueMask * satMask * darkMask * hiMask * gs;
+        if (m > 0) cmApplyPixel(R, G, B, p, m, satBase, lumBase, hasHue, hueRad);
+      }
+    }
+    return { ch: [R, G, B], w, h, nc: 3, isColor: true, wcs: srcImg.wcs };
+  }
+
+  // --- Color Mixer: cableado de UI ---
+  function cmCurrentBand() { return state.colorMixer.bands[el("selCmBand") ? el("selCmBand").selectedIndex : 0] || state.colorMixer.bands[0]; }
+  function cmSyncSlidersFromBand() {
+    const b = cmCurrentBand();
+    if (el("sldCmHue")) { el("sldCmHue").value = b.hueShift; el("valCmHue").textContent = String(b.hueShift); }
+    if (el("sldCmSat")) { el("sldCmSat").value = b.saturation; el("valCmSat").textContent = String(b.saturation); }
+    if (el("sldCmLum")) { el("sldCmLum").value = b.luminance; el("valCmLum").textContent = String(b.luminance); }
+  }
+  function livePreviewColorMixer() { _runLive("chkCmLive", (img) => computeColorMixer(img, state.colorMixer), "Color Mixer"); }
+  {
+    const selBand = el("selCmBand");
+    if (selBand) {
+      const _isEnCm = document.documentElement.lang !== "es";
+      CM_BANDS.forEach((d, i) => { const o = document.createElement("option"); o.value = d.id; o.textContent = _isEnCm ? d.labelEn : d.label; selBand.appendChild(o); });
+      selBand.addEventListener("change", cmSyncSlidersFromBand);
+      cmSyncSlidersFromBand();
+    }
+    const wire = (sldId, valId, prop) => { const s = el(sldId); if (!s) return; s.addEventListener("input", () => { const v = parseFloat(s.value); el(valId).textContent = String(v); cmCurrentBand()[prop] = v; livePreviewColorMixer(); }); };
+    wire("sldCmHue", "valCmHue", "hueShift");
+    wire("sldCmSat", "valCmSat", "saturation");
+    wire("sldCmLum", "valCmLum", "luminance");
+    const sldGS = el("sldCmStrength");
+    if (sldGS) sldGS.addEventListener("input", () => { const v = parseFloat(sldGS.value); el("valCmStrength").textContent = v.toFixed(2); state.colorMixer.globalStrength = v; livePreviewColorMixer(); });
+    const cps = el("chkCmProtectStars"); if (cps) cps.addEventListener("change", () => { state.colorMixer.protectStars = cps.checked; livePreviewColorMixer(); });
+    const cpl = el("chkCmProtectLowSat"); if (cpl) cpl.addEventListener("change", () => { state.colorMixer.protectLowSat = cpl.checked; livePreviewColorMixer(); });
+    const cmLive = el("chkCmLive");
+    if (cmLive) cmLive.addEventListener("change", () => { if (cmLive.checked) livePreviewColorMixer(); else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); } });
+    const btnCM = el("btnApplyColorMixer");
+    if (btnCM) btnCM.addEventListener("click", () => {
+      const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
+      const lang = document.documentElement.lang || "es";
+      showLoader(lang === "es" ? "Aplicando Color Mixer..." : "Applying Color Mixer...");
+      setTimeout(() => { try { commitActiveImage(computeColorMixer(srcImg, state.colorMixer), "Color Mixer", srcImg); render(); drawHistogram(); refreshPathBar(); logConsole(lang === "es" ? "Color Mixer aplicado." : "Color Mixer applied.", "ok"); } catch (e) { logConsole((lang === "es" ? "Color Mixer: " : "Color Mixer: ") + e.message, "err"); } finally { hideLoader(); } }, 50);
+    });
+    const btnCMR = el("btnResetColorMixer");
+    if (btnCMR) btnCMR.addEventListener("click", () => { state.colorMixer = cmDefaultState(); cmSyncSlidersFromBand(); if (el("sldCmStrength")) { el("sldCmStrength").value = "1.00"; el("valCmStrength").textContent = "1.00"; } if (el("chkCmProtectStars")) el("chkCmProtectStars").checked = true; if (el("chkCmProtectLowSat")) el("chkCmProtectLowSat").checked = true; livePreviewColorMixer(); logConsole(document.documentElement.lang === "es" ? "Color Mixer restablecido." : "Color Mixer reset.", "info"); });
+  }
+
+  // --- Detail & Contrast (luminancia; preserva color reaplicando el DELTA de luma) ---
+  function detailBoxBlur(src, w, h, radius) {
+    const r = Math.round(radius); if (r < 1) return src;
+    const win = 2 * r + 1, tmp = new Float32Array(w * h), out = new Float32Array(w * h);
+    for (let y = 0; y < h; y++) { const base = y * w; let sum = 0; for (let k = -r; k <= r; k++) { const xx = k < 0 ? 0 : (k >= w ? w - 1 : k); sum += src[base + xx]; }
+      for (let x = 0; x < w; x++) { tmp[base + x] = sum / win; const xo = x - r, xi = x + r + 1; const xoC = xo < 0 ? 0 : (xo >= w ? w - 1 : xo), xiC = xi < 0 ? 0 : (xi >= w ? w - 1 : xi); sum += src[base + xiC] - src[base + xoC]; } }
+    for (let x = 0; x < w; x++) { let sum2 = 0; for (let j = -r; j <= r; j++) { const yy = j < 0 ? 0 : (j >= h ? h - 1 : j); sum2 += tmp[yy * w + x]; }
+      for (let y = 0; y < h; y++) { out[y * w + x] = sum2 / win; const yo = y - r, yi = y + r + 1; const yoC = yo < 0 ? 0 : (yo >= h ? h - 1 : yo), yiC = yi < 0 ? 0 : (yi >= h ? h - 1 : yi); sum2 += tmp[yiC * w + x] - tmp[yoC * w + x]; } }
+    return out;
+  }
+  function detailAtrous(Y, w, h, gains) { const count = w * h, out = new Float32Array(count); let cur = Y; for (let i = 0; i < count; i++) out[i] = Y[i]; for (let k = 0; k < gains.length; k++) { const g = gains[k], blur = detailBoxBlur(cur, w, h, 1 << k); if (g !== 0) for (let p = 0; p < count; p++) out[p] += g * (cur[p] - blur[p]); cur = blur; } return out; }
+  function detailApplyLuma(srcImg, lumaFn) {
+    const w = srcImg.w, h = srcImg.h, count = w * h;
+    if (srcImg.isColor && srcImg.nc >= 3) {
+      const R = Float32Array.from(srcImg.ch[0]), G = Float32Array.from(srcImg.ch[1]), B = Float32Array.from(srcImg.ch[2]);
+      const Y = new Float32Array(count); for (let i = 0; i < count; i++) Y[i] = 0.2126 * R[i] + 0.7152 * G[i] + 0.0722 * B[i];
+      const nY = lumaFn(Y, w, h);
+      for (let j = 0; j < count; j++) { const dlt = nY[j] - Y[j]; R[j] = cmClamp01(R[j] + dlt); G[j] = cmClamp01(G[j] + dlt); B[j] = cmClamp01(B[j] + dlt); }
+      return { ch: [R, G, B], w, h, nc: 3, isColor: true, wcs: srcImg.wcs };
+    }
+    const C = Float32Array.from(srcImg.ch[0]); const nC = lumaFn(C, w, h); for (let p = 0; p < count; p++) C[p] = cmClamp01(nC[p]);
+    return { ch: [C], w, h, nc: 1, isColor: false, wcs: srcImg.wcs };
+  }
+  function detailParams() {
+    return {
+      lcAmount: parseFloat((el("sldDetailLcAmount") || {}).value || 0.2), lcRadius: parseFloat((el("sldDetailLcRadius") || {}).value || 80),
+      mdFine: parseFloat((el("sldDetailMdFine") || {}).value || 0.4), mdMedium: parseFloat((el("sldDetailMdMedium") || {}).value || 0.2),
+      hpAmount: parseFloat((el("sldDetailHpAmount") || {}).value || 0.5), hpRadius: parseFloat((el("sldDetailHpRadius") || {}).value || 3)
+    };
+  }
+  function computeDetail(srcImg, algo, pr) {
+    if (algo === "localContrast") return detailApplyLuma(srcImg, (Y, w, h) => { const bl = detailBoxBlur(Y, w, h, Math.max(2, Math.round(pr.lcRadius))); const o = new Float32Array(w * h); for (let i = 0; i < o.length; i++) o[i] = Y[i] + pr.lcAmount * (Y[i] - bl[i]); return o; });
+    if (algo === "highPass") return detailApplyLuma(srcImg, (Y, w, h) => { const bl = detailBoxBlur(Y, w, h, Math.max(1, Math.round(pr.hpRadius))); const o = new Float32Array(w * h); for (let i = 0; i < o.length; i++) o[i] = Y[i] + pr.hpAmount * (Y[i] - bl[i]); return o; });
+    if (algo === "multiscale") return detailApplyLuma(srcImg, (Y, w, h) => detailAtrous(Y, w, h, [pr.mdFine, pr.mdMedium, pr.mdMedium * 0.5]));
+    return cloneImage(srcImg);
+  }
+  function livePreviewDetail() { const algo = el("selDetailAlgo") ? el("selDetailAlgo").value : "localContrast"; _runLive("chkDetailLive", (img) => computeDetail(img, algo, detailParams()), "Detail"); }
+  {
+    const selD = el("selDetailAlgo");
+    if (selD) selD.addEventListener("change", () => {
+      const v = selD.value;
+      if (el("detail-lc-controls")) el("detail-lc-controls").style.display = v === "localContrast" ? "block" : "none";
+      if (el("detail-md-controls")) el("detail-md-controls").style.display = v === "multiscale" ? "block" : "none";
+      if (el("detail-hp-controls")) el("detail-hp-controls").style.display = v === "highPass" ? "block" : "none";
+      livePreviewDetail();
+    });
+    [["sldDetailLcAmount", "valDetailLcAmount", 2], ["sldDetailLcRadius", "valDetailLcRadius", 0], ["sldDetailMdFine", "valDetailMdFine", 2], ["sldDetailMdMedium", "valDetailMdMedium", 2], ["sldDetailHpAmount", "valDetailHpAmount", 2], ["sldDetailHpRadius", "valDetailHpRadius", 0]].forEach(([sId, vId, dp]) => {
+      const s = el(sId); if (s) s.addEventListener("input", () => { el(vId).textContent = parseFloat(s.value).toFixed(dp); livePreviewDetail(); });
+    });
+    const dLive = el("chkDetailLive");
+    if (dLive) dLive.addEventListener("change", () => { if (dLive.checked) livePreviewDetail(); else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); } });
+    const btnD = el("btnApplyDetail");
+    if (btnD) btnD.addEventListener("click", () => {
+      const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
+      const lang = document.documentElement.lang || "es"; const algo = el("selDetailAlgo").value;
+      showLoader(lang === "es" ? "Aplicando detalle..." : "Applying detail...");
+      setTimeout(() => { try { commitActiveImage(computeDetail(srcImg, algo, detailParams()), "Detail", srcImg); render(); drawHistogram(); refreshPathBar(); logConsole(lang === "es" ? "Mejora de detalle aplicada." : "Detail enhancement applied.", "ok"); } catch (e) { logConsole("Detail: " + e.message, "err"); } finally { hideLoader(); } }, 50);
+    });
+  }
+  // IMG-ENH-END
 
 
   // --- SLOTS DE MEMORIA DE IMAGEN Y MÁSCARA ---
@@ -4760,14 +4970,20 @@
   }
 
   function loadSlot(idx) {
-    if (!state.imageSlots[idx]) return;
-    
+    const slot = state.imageSlots[idx];
+    if (!slot) return;
+
     // Desmarcar anterior activo
     document.querySelectorAll(".piw-slot-btn").forEach(btn => btn.classList.remove("active-slot"));
-    
-    state.activeImage = cloneImage(state.imageSlots[idx]);
+
+    // Copia de trabajo ESTABLE por slot: reutilizarla al reciclar entre slots permite que el render
+    // cacheado (displayImageDataFor) acierte y el cambio entre slots sea instantáneo (antes clonaba
+    // un objeto NUEVO en cada clic → siempre fallaba el cache → AutoSTF completo por clic).
+    if (!slot.__working) slot.__working = cloneImage(slot);
+    state.activeImage = slot.__working;
     state.subtractedGradient = null;
     state.previewGradientMode = false;
+    state.pendingPreview = true; // el slot cargado es un cambio pendiente de aplicar
     if (state.activeWorkflowKey) {
       state.workflowImages[state.activeWorkflowKey] = state.activeImage;
     }
@@ -4855,6 +5071,60 @@
   }
   // DISPLAY-AA-END
 
+  // RENDER-CACHE-BEGIN
+  // Cache del ImageData final (estirado de pantalla AutoSTF + channelsToImageData + antialias) por
+  // objeto-imagen. Recalcular esto en cada render (varias pasadas O(n) sobre millones de píxeles) era
+  // el cuello de botella que hacía lentos el Split y el cambio de slots. Como cada preview/commit crea
+  // un objeto-imagen NUEVO, cachear en el propio objeto es seguro; un LRU acotado limita la memoria.
+  const _dispCacheLRU = [];
+  function _dispCacheTouch(imgObj) {
+    const i = _dispCacheLRU.indexOf(imgObj);
+    if (i !== -1) _dispCacheLRU.splice(i, 1);
+    _dispCacheLRU.push(imgObj);
+    while (_dispCacheLRU.length > 4) {
+      const old = _dispCacheLRU.shift();
+      if (old) { old.__disp = null; old.__dispKey = null; }
+    }
+  }
+  function displayImageDataFor(imgObj, aaR) {
+    const key = (state.screenStretchMode ? "s" : "n") + "|" + aaR;
+    if (imgObj.__disp && imgObj.__dispKey === key) return imgObj.__disp;
+    let channelsToDraw = imgObj.ch;
+    if (state.screenStretchMode) {
+      try { channelsToDraw = applyAutoSTF(imgObj.ch, imgObj.nc, imgObj.isColor, false); }
+      catch (e) { console.warn("AutoSTF:", e); }
+    }
+    const id = AutoGHS.channelsToImageData(channelsToDraw, imgObj.w, imgObj.h, imgObj.nc);
+    if (aaR) displayAntiAlias(id, aaR);
+    imgObj.__disp = id;
+    imgObj.__dispKey = key;
+    _dispCacheTouch(imgObj);
+    return id;
+  }
+  // Radio de antialias de la vista según cuánto reduce el CSS el canvas (mismo criterio de siempre).
+  function _displayAAR() {
+    const dispW = cv.getBoundingClientRect().width || cv.width;
+    const ratio = dispW > 0 ? cv.width / dispW : 1;
+    return (ratio >= 1.8 && !famePainting) ? Math.min(2, Math.max(1, Math.round((ratio - 1) / 2.5))) : 0;
+  }
+
+  // Composición rápida del Split: reutiliza dos canvas offscreen ya renderizados (_splitCanvasA/B) y
+  // solo redibuja las dos porciones en la posición actual. Se llama en cada mousemove del arrastre en
+  // vez de render() completo, por eso la cortinilla ahora es fluida.
+  let _splitCanvasA = null, _splitCanvasB = null;
+  function compositeSplitFast() {
+    if (!_splitCanvasA || !_splitCanvasB || _splitCanvasA.width !== cv.width) { render(); return; }
+    const splitX = Math.round(cv.width * state.splitPercent);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(_splitCanvasA, 0, 0, splitX, cv.height, 0, 0, splitX, cv.height);
+    ctx.drawImage(_splitCanvasB, splitX, 0, cv.width - splitX, cv.height, splitX, 0, cv.width - splitX, cv.height);
+    const containerRect = container.getBoundingClientRect();
+    const splitSlider = el("piwSplitSlider");
+    splitSlider.style.display = "block";
+    splitSlider.style.left = (state.splitPercent * containerRect.width) + "px";
+  }
+  // RENDER-CACHE-END
+
   function render() {
     // Detect change of activeImage reference
     if (state.activeImage && state.activeImage !== state._lastImgRef) {
@@ -4862,25 +5132,24 @@
         state.previousImage = state._lastImgRef;
       }
       state._lastImgRef = state.activeImage;
-      
-      // Reset A/B viewing toggle and split when a new image operation runs
+
+      // COMPARE-BASELINE: al ejecutar una nueva operación (preview/commit) se descarta el
+      // Toggle A/B momentáneo para mostrar el nuevo resultado (B). La cortinilla Split, en
+      // cambio, PERSISTE: sigue comparando contra la Imagen Inicial del menú actual
+      // (state.stepInputImage = "antes de aplicar"), no contra la última imagen mostrada.
       state.viewingPrevious = false;
       const btnToggle = el("btnToolToggleAB");
       if (btnToggle) {
         btnToggle.classList.remove("active");
         btnToggle.textContent = "Toggle A/B";
       }
-      
-      state.splitViewMode = false;
-      const btnSplit = el("btnToolSplitView");
-      if (btnSplit) {
-        btnSplit.classList.remove("active");
-      }
-      el("piwSplitSlider").style.display = "none";
+      // La comparación (Toggle y Split) usa siempre la Imagen Inicial del menú como referencia.
+      state.splitCompareImage = state.stepInputImage;
     }
 
-    // Determine which image is active source
-    const imgSource = (state.viewingPrevious && state.previousImage) ? state.previousImage : state.activeImage;
+    // Determine which image is active source. La "A" del Toggle es la Imagen Inicial del menú
+    // (state.stepInputImage), es decir, la imagen antes de aplicar cambios en este menú.
+    const imgSource = (state.viewingPrevious && state.stepInputImage) ? state.stepInputImage : state.activeImage;
     const img = (el("chkStarlessView").checked && state.starlessImage) ? state.starlessImage : imgSource;
 
     if (!img) {
@@ -4915,7 +5184,10 @@
 
     const n = img.w * img.h;
 
-    // Generar imagen final a dibujar
+    // DISPLAY-AA: antialias de la vista si el canvas se reduce mucho por CSS (p.ej. 4000px → ~1075px).
+    const _aaR = _displayAAR();
+
+    // Generar imagen final a dibujar (la ruta normal usa el cache por objeto-imagen).
     let id;
     if (state.previewMaskMode && state.activeMask) {
       // Dibujar máscara en escala de grises
@@ -4925,6 +5197,7 @@
         const val = Math.round(state.activeMask[i] * 255);
         d[p] = val; d[p+1] = val; d[p+2] = val; d[p+3] = 255;
       }
+      if (_aaR) displayAntiAlias(id, _aaR);
     } else if (state.previewGradientMode && state.subtractedGradient) {
       // Dibujar modelo de gradiente sustraído
       let channelsToDraw = state.subtractedGradient.ch;
@@ -4936,61 +5209,40 @@
         }
       }
       id = AutoGHS.channelsToImageData(channelsToDraw, state.subtractedGradient.w, state.subtractedGradient.h, state.subtractedGradient.nc);
+      if (_aaR) displayAntiAlias(id, _aaR);
     } else {
-      // Dibujar imagen (color o monocromo)
-      let channelsToDraw = img.ch;
-      if (state.screenStretchMode) {
-        try {
-          // Estirado de pantalla AutoSTF en modo UNLINKED
-          channelsToDraw = applyAutoSTF(img.ch, img.nc, img.isColor, false);
-        } catch (e) {
-          console.warn("Failed to apply AutoSTF screen stretch:", e);
-        }
-      }
-      id = AutoGHS.channelsToImageData(channelsToDraw, img.w, img.h, img.nc);
+      // Dibujar imagen (color o monocromo) — cacheado por objeto (AutoSTF + AA incluidos).
+      id = displayImageDataFor(img, _aaR);
     }
 
-    // DISPLAY-AA: antialias de la vista si el canvas se reduce mucho por CSS (p.ej. 4000px → ~1075px).
-    // No se aplica durante la pintura interactiva de FAME (para no ralentizar el pincel).
-    const _dispW = cv.getBoundingClientRect().width || cv.width;
-    const _dispRatio = _dispW > 0 ? cv.width / _dispW : 1;
-    // Radio SUAVE y acotado (máx 2): antialias el downscale sin emborronar; evita sobre-suavizar
-    // cuando el visor es pequeño (ratios muy altos).
-    const _aaR = (_dispRatio >= 1.8 && !famePainting) ? Math.min(2, Math.max(1, Math.round((_dispRatio - 1) / 2.5))) : 0;
-    if (_aaR) displayAntiAlias(id, _aaR);
-
-    if (state.splitViewMode && state.splitCompareImage) {
-      // Renderizar vista dividida A/B
-      let compChannelsToDraw = state.splitCompareImage.ch;
-      if (state.screenStretchMode) {
-        try {
-          compChannelsToDraw = applyAutoSTF(state.splitCompareImage.ch, state.splitCompareImage.nc, state.splitCompareImage.isColor, false);
-        } catch (e) {
-          console.warn("Failed to apply AutoSTF screen stretch to split image:", e);
-        }
-      }
-      const compId = AutoGHS.channelsToImageData(compChannelsToDraw, img.w, img.h, img.nc);
-      if (_aaR) displayAntiAlias(compId, _aaR);
+    // Referencia "antes de aplicar" del menú actual. Solo dividimos si coincide en geometría con
+    // la imagen activa (evita basura cuando un menú cambia el tamaño, p.ej. Crop/Resample).
+    const splitComp = state.splitCompareImage || state.stepInputImage;
+    if (state.splitViewMode && splitComp && splitComp.w === img.w && splitComp.h === img.h && splitComp.nc === img.nc) {
+      // Renderizar vista dividida A/B (ambos lados cacheados). Guardamos los canvas compuestos en
+      // _splitCanvasA/B para que el arrastre de la cortinilla solo recomponga (compositeSplitFast).
+      const compId = displayImageDataFor(splitComp, _aaR);
       const splitX = Math.round(img.w * state.splitPercent);
-      
-      const tempCanvasA = document.createElement("canvas");
-      tempCanvasA.width = img.w; tempCanvasA.height = img.h;
-      tempCanvasA.getContext("2d").putImageData(id, 0, 0);
 
-      const tempCanvasB = document.createElement("canvas");
-      tempCanvasB.width = img.w; tempCanvasB.height = img.h;
-      tempCanvasB.getContext("2d").putImageData(compId, 0, 0);
+      if (!_splitCanvasA) _splitCanvasA = document.createElement("canvas");
+      _splitCanvasA.width = img.w; _splitCanvasA.height = img.h;
+      _splitCanvasA.getContext("2d").putImageData(id, 0, 0);
+
+      if (!_splitCanvasB) _splitCanvasB = document.createElement("canvas");
+      _splitCanvasB.width = img.w; _splitCanvasB.height = img.h;
+      _splitCanvasB.getContext("2d").putImageData(compId, 0, 0);
 
       // Dibujar porciones
-      ctx.drawImage(tempCanvasA, 0, 0, splitX, img.h, 0, 0, splitX, img.h);
-      ctx.drawImage(tempCanvasB, splitX, 0, img.w - splitX, img.h, splitX, 0, img.w - splitX, img.h);
-      
+      ctx.drawImage(_splitCanvasA, 0, 0, splitX, img.h, 0, 0, splitX, img.h);
+      ctx.drawImage(_splitCanvasB, splitX, 0, img.w - splitX, img.h, splitX, 0, img.w - splitX, img.h);
+
       // Mostrar y posicionar el slider de cortinilla
       const containerRect = container.getBoundingClientRect();
       const splitSlider = el("piwSplitSlider");
       splitSlider.style.display = "block";
       splitSlider.style.left = (state.splitPercent * containerRect.width) + "px";
     } else {
+      _splitCanvasA = null; _splitCanvasB = null;
       ctx.putImageData(id, 0, 0);
       el("piwSplitSlider").style.display = "none";
     }
@@ -5387,25 +5639,25 @@
     });
   }
 
-  // Toggle A/B (Vista Alternada)
+  // Toggle A/B (Vista Alternada). A = Imagen Inicial del menú (antes de aplicar); B = imagen activa.
   el("btnToolToggleAB").addEventListener("click", () => {
     const lang = document.documentElement.lang || "es";
-    if (!state.previousImage) {
-      logConsole(lang === "es" ? "No hay imagen anterior para comparar" : "No previous image to compare", "err");
+    if (!state.stepInputImage) {
+      logConsole(lang === "es" ? "No hay imagen inicial para comparar" : "No baseline image to compare", "err");
       return;
     }
     state.viewingPrevious = !state.viewingPrevious;
     if (state.viewingPrevious) {
       el("btnToolToggleAB").classList.add("active");
       el("btnToolToggleAB").textContent = "Toggle A/B (A)";
-      
+
       // Desactivar splitViewMode si estaba activo
       if (state.splitViewMode) {
         state.splitViewMode = false;
         el("btnToolSplitView").classList.remove("active");
         el("piwSplitSlider").style.display = "none";
       }
-      logConsole(lang === "es" ? "Mostrando imagen anterior (A)" : "Showing previous image (A)", "info");
+      logConsole(lang === "es" ? "Mostrando imagen inicial del menú (A)" : "Showing menu baseline image (A)", "info");
     } else {
       el("btnToolToggleAB").classList.remove("active");
       el("btnToolToggleAB").textContent = "Toggle A/B (B)";
@@ -5414,18 +5666,18 @@
     render();
   });
 
-  // Toggle Cortinilla A/B (Split A/B)
+  // Toggle Cortinilla A/B (Split A/B). Compara la imagen activa contra la Imagen Inicial del menú.
   el("btnToolSplitView").addEventListener("click", () => {
     const lang = document.documentElement.lang || "es";
-    if (!state.previousImage) {
-      logConsole(lang === "es" ? "No hay imagen anterior para comparar" : "No previous image to compare", "err");
+    if (!state.stepInputImage) {
+      logConsole(lang === "es" ? "No hay imagen inicial para comparar" : "No baseline image to compare", "err");
       return;
     }
     state.splitViewMode = !state.splitViewMode;
-    
+
     if (state.splitViewMode) {
       el("btnToolSplitView").classList.add("active");
-      state.splitCompareImage = state.previousImage;
+      state.splitCompareImage = state.stepInputImage;
       
       // Desactivar toggle A/B si estaba activo para no crear confusión
       if (state.viewingPrevious) {
@@ -5489,10 +5741,13 @@
   });
   // RESET-BTN-END
 
-  // Arrastrar Cortinilla Split View
+  // Arrastrar Cortinilla Split View. stopPropagation + preventDefault evitan que el mousedown
+  // llegue al canvas (que iniciaría el paneo de la imagen) y que el navegador arranque una
+  // selección/arrastre nativo mientras se mueve la línea.
   const splitSlider = el("piwSplitSlider");
   splitSlider.addEventListener("mousedown", (e) => {
     e.stopPropagation();
+    e.preventDefault();
     state.isDraggingSplit = true;
   });
 
@@ -5501,7 +5756,8 @@
       const rect = container.getBoundingClientRect();
       const posX = e.clientX - rect.left;
       state.splitPercent = Math.max(0.01, Math.min(0.99, posX / rect.width));
-      render();
+      // Recomposición ligera (sin recalcular AutoSTF/antialias): cortinilla fluida.
+      compositeSplitFast();
     }
   });
 
@@ -5517,7 +5773,13 @@
       document.querySelectorAll(".piw-tab-content").forEach(c => c.classList.remove("active"));
 
       btn.classList.add("active");
-      el(btn.getAttribute("data-tab")).classList.add("active");
+      const _tabId = btn.getAttribute("data-tab");
+      el(_tabId).classList.add("active");
+      // La pestaña Mezcla muestra SIEMPRE todas sus capas desplegadas (no participa del acordeón).
+      if (_tabId === "tab-combine") {
+        document.querySelectorAll("#tab-combine .piw-section").forEach(s => s.classList.remove("collapsed"));
+        updateMixSourceOptions();
+      }
       updateBigApply();
     });
   });
@@ -5557,7 +5819,9 @@
     { s: "sldStfClip", v: "valStfClip", p: 2 },
     { s: "sldGhsSig", v: "valGhsSig", p: 2 },
     { s: "sldGhsInt", v: "valGhsInt", p: 2 },
+    { s: "sldGhsIters", v: "valGhsIters", p: 0 },
     { s: "sldStarsStretch", v: "valStarsStretch", p: 2 },
+    { s: "sldStarsBoost", v: "valStarsBoost", p: 2 },
     { s: "sldScnrInt", v: "valScnrInt", p: 2 },
     // SCNR-PRE-BEGIN
     { s: "sldScnrIntPre", v: "valScnrIntPre", p: 2 },
@@ -5574,15 +5838,20 @@
     { s: "sldDeconAiStrength", v: "valDeconAiStrength", p: 2 }
   ];
 
+  const _colorBalanceSliders = ["sldPostBalanceR", "sldPostBalanceG", "sldPostBalanceB", "sldPostBalanceSat", "sldPostBalanceSCNR"];
   dynamicSliders.forEach(({ s, v, p }) => {
     const sld = el(s);
     const val = el(v);
     if (sld && val) {
       sld.addEventListener("input", () => {
         val.textContent = parseFloat(sld.value).toFixed(p);
+        // Preview Live: si el usuario mueve directamente un slider de balance de color.
+        if (_colorBalanceSliders.indexOf(s) !== -1) livePreviewColorBalance();
       });
     }
   });
+  // SCNR (casilla) también dispara el preview Live de balance de color.
+  { const scnrChk = el("chkPostBalanceSCNR"); if (scnrChk) scnrChk.addEventListener("change", livePreviewColorBalance); }
 
   // --- REGISTRO DRAG & DROP GLOBAL DE ARCHIVOS ---
   window.addEventListener("dragover", (e) => e.preventDefault());
@@ -5738,13 +6007,11 @@
   setupDropdownToggle("selGradientAlgo", {
     dbe: "gradient-dbe-controls",
     abe: "gradient-abe-controls",
-    graxpert: "gradient-graxpert-controls",
     graxpert_ia: "gradient-graxpert-controls"
   });
 
   setupDropdownToggle("selDeconAlgo", {
     rl_auto: "decon-rl-controls",
-    cosmic_std: "decon-cosmic-controls",
     cosmic_ia: "decon-cosmic-controls",
     cs_ia_beta: "decon-csia-controls"
   });
@@ -5763,8 +6030,7 @@
     usm: "post-sharp-usm-controls",
     hdr: "post-sharp-hdr-controls",
     lhe: "post-sharp-lhe-controls",
-    dse: "post-sharp-dse-controls",
-    cosmic: "post-sharp-cosmic-controls"
+    dse: "post-sharp-dse-controls"
   });
 
   setupDropdownToggle("selMaskType", {
@@ -5810,10 +6076,12 @@
     title.addEventListener("click", () => {
       const section = title.closest(".piw-section");
       if (section) {
+        // La pestaña Mezcla no participa del acordeón: sus capas quedan siempre desplegadas.
+        if (section.closest("#tab-combine")) return;
         const isCollapsed = section.classList.contains("collapsed");
         if (isCollapsed) {
-          // Descolapsar esta sección y colapsar todas las demás
-          document.querySelectorAll(".piw-section").forEach(s => s.classList.add("collapsed"));
+          // Descolapsar esta sección y colapsar todas las demás (excepto las de la pestaña Mezcla).
+          document.querySelectorAll(".piw-section").forEach(s => { if (!s.closest("#tab-combine")) s.classList.add("collapsed"); });
           section.classList.remove("collapsed");
           // PREVIEW-DISCARD: al cambiar de sección, descartar cualquier preview NO aplicado.
           // La Imagen Inicial de la nueva sección es la imagen COMMITTED del flujo (no un preview
@@ -5827,6 +6095,15 @@
           if (state.activeImage) {
             state.stepInputImage = cloneImage(state.activeImage);
           }
+          state.pendingPreview = false; // menú nuevo: aún no hay nada que aplicar
+          // Cada menú arranca con la comparación limpia: Toggle/Split se referirán a la Imagen
+          // Inicial recién capturada (antes de aplicar cambios en este menú).
+          state.viewingPrevious = false;
+          state.splitViewMode = false;
+          state.splitCompareImage = state.stepInputImage;
+          { const bT = el("btnToolToggleAB"); if (bT) { bT.classList.remove("active"); bT.textContent = "Toggle A/B"; } }
+          { const bS = el("btnToolSplitView"); if (bS) bS.classList.remove("active"); }
+          { const sl = el("piwSplitSlider"); if (sl) sl.style.display = "none"; }
         } else {
           // Si ya está abierta y se pulsa, simplemente colapsarla
           section.classList.add("collapsed");
@@ -6422,6 +6699,7 @@
           hoveredCurvePtIdx = -1;
           draggedCurvePtIdx = -1;
           drawCurvesWidget();
+          livePreviewCurves(); // punto eliminado
         }
       } else {
         // Clic izquierdo
@@ -6434,6 +6712,7 @@
             pts.sort((a, b) => a.x - b.x);
             draggedCurvePtIdx = pts.findIndex(p => p.x === coords.x && p.y === coords.y);
             drawCurvesWidget();
+            livePreviewCurves(); // punto añadido
           }
         }
       }
@@ -6468,11 +6747,12 @@
           }
         }
         drawCurvesWidget();
+        livePreviewCurves(); // curva modificada al arrastrar un punto
       } else {
         const ptIdx = findPointIndex(coords);
         if (ptIdx !== hoveredCurvePtIdx) {
           hoveredCurvePtIdx = ptIdx;
-          drawCurvesWidget();
+          drawCurvesWidget(); // solo hover: no dispara preview Live
         }
       }
     });
@@ -6508,6 +6788,7 @@
     [
       "sldPostBalanceR", "sldPostBalanceG", "sldPostBalanceB", "sldPostBalanceSat",
       "chkPostBalanceSCNR", "sldPostBalanceSCNR", "btnPostColorBalanceReset",
+      "chkPostColorBalanceLive", "chkPostCurvesLive",
       "sldPostCurvesContrast", "sldPostCurvesBright", "sldPostCurvesShadows",
       "sldPostCurvesHighlights", "sldPostCurvesSaturation"
     ].forEach((id) => {
@@ -6545,6 +6826,7 @@
       state.curves.S = [{ x: 0, y: 0 }, { x: 0.5, y: cl(0.5 * sat) }, { x: 1, y: 1 }];
     }
     drawCurvesWidget();
+    livePreviewCurves();
   }
   ["sldPostCurvesContrast", "sldPostCurvesBright", "sldPostCurvesShadows", "sldPostCurvesHighlights", "sldPostCurvesSaturation"].forEach((id) => {
     const s = el(id);
@@ -6692,6 +6974,8 @@
         readout.innerHTML = `<b>Mean:</b> 0.142 | <b>Target:</b> H:${Math.round(angle)}°, S:${(sat*100).toFixed(1)}% | <b>Shift:</b> R:${rShift.toFixed(3)}, G:${gShift.toFixed(3)}, B:${bShift.toFixed(3)}`;
       }
     }
+    // La rueda mueve los sliders programáticamente (sin evento 'input'); dispara aquí el preview Live.
+    livePreviewColorBalance();
   }
 
   const cbCv = el("colorBalanceCanvas");
@@ -6786,6 +7070,7 @@
         if (state.activeWorkflowKey) {
           state.workflowImages[state.activeWorkflowKey] = state.activeImage;
         }
+        state.pendingPreview = false; // ya aplicado → deshabilita "Aplicar" hasta el próximo preview
         logConsole(lang === "es" ? "Cambios aplicados y guardados en el flujo" : "Changes saved and committed to workflow", "ok");
         updateBigApply();
       }
@@ -6875,10 +7160,22 @@
     if (action) {
       btn.style.display = "block";
       btn.textContent = btnText;
-      
+
+      // El botón "Aplicar" solo se habilita si hay un preview SIN aplicar (state.pendingPreview).
+      // Excepciones que tienen su propio flujo (aplican desde slot/selección, no desde un preview):
+      // Crop, Máscaras y Calibración de Color.
+      const noGate = (id === "sectionCrop") || titleText.includes("crop") || titleText.includes("recorte")
+        || titleText.includes("máscaras") || titleText.includes("mask")
+        || titleText.includes("calibration") || titleText.includes("calibración");
+      const enabled = noGate ? true : !!state.pendingPreview;
+
       const newBtn = btn.cloneNode(true);
+      newBtn.disabled = !enabled;
+      newBtn.style.opacity = enabled ? "" : "0.4";
+      newBtn.style.cursor = enabled ? "" : "not-allowed";
+      if (!enabled) newBtn.title = lang === "es" ? "Primero pulsa Probar/Preview para ver el cambio" : "Press Test/Preview first to see the change";
       btn.parentNode.replaceChild(newBtn, btn);
-      newBtn.addEventListener("click", action);
+      newBtn.addEventListener("click", () => { if (!newBtn.disabled) action(); });
     } else {
       btn.style.display = "none";
     }
@@ -6899,8 +7196,10 @@
       getStarsImage: () => state.starsImage,
       getScreenStretchMode: () => state.screenStretchMode,
       getPreviousImage: () => state.previousImage,
+      getStepInputImage: () => state.stepInputImage,
       getViewingPrevious: () => state.viewingPrevious,
       getSplitViewMode: () => state.splitViewMode,
+      getSplitCompareImage: () => state.splitCompareImage,
       getSplitPercent: () => state.splitPercent,
       refreshPathBar: () => { refreshPathBar(); },
       selectWorkflowKey: (key) => { selectWorkflowKey(key); },

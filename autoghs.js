@@ -67,6 +67,21 @@
     return { median: med, sigma: 1.4826 * mad };
   }
 
+  // Ruido de FONDO robusto = 1.4826*MAD de la población oscura (30% más bajo de la submuestra),
+  // como el analizador. A diferencia del MAD de todo el frame, sigue solo el ruido del CIELO, así
+  // que la estructura de una nebulosa que llene el cuadro no lo infla -> válido como techo de ruido.
+  function bgNoise(arr, n, maxSamples) {
+    var step = Math.max(1, Math.floor(n / maxSamples));
+    var s = [];
+    for (var i = 0; i < n; i += step) s.push(arr[i]);
+    s.sort(function (a, b) { return a - b; });
+    var darkN = Math.max(8, Math.floor(s.length * 0.30));
+    var dmed = s[darkN >> 1] || 0, dev = [];
+    for (var j = 0; j < darkN; ++j) dev.push(Math.abs(s[j] - dmed));
+    dev.sort(function (a, b) { return a - b; });
+    return 1.4826 * (dev[dev.length >> 1] || 0);
+  }
+
   function defaultConfig() {
     return {
       sigmasFromCenter: 1.0,
@@ -78,7 +93,20 @@
       localIntensity_b: 1.0,
       colorMode: "luminance",                  // "luminance" | "rgb"
       lumWeights: [0.2126, 0.7152, 0.0722],    // Rec.709
-      maxStatsSamples: 300000
+      maxStatsSamples: 300000,
+      // --- Portados de AutoGHS de PI Workflow (Dev_200) ---
+      // SATURACIÓN: en modo luminancia, cada canal = canal*ghs(L)/L mantiene el ratio RGB lineal,
+      // lo que SOBRE-satura la señal muy realzada y quema el canal dominante de estrellas brillantes.
+      // Con sat<1 mezclamos cada canal hacia la luminancia estirada Ls=ghs(L):
+      //   out = Ls + sat*(canal*ghs(L)/L - Ls).  sat=1 -> color pleno (comportamiento antiguo).
+      saturation: 0.92,
+      // BG-FLOOR: elevación final del punto negro para que el fondo caiga aquí en vez de en 0 (negro
+      // puro). Mapa afín una vez tras las iteraciones: out = floor + in*(1-floor). 0 = desactivado.
+      backgroundFloor: 0.05,
+      // NOISE-CEILING: la parada por mediana objetivo fuerza el estirado necesario para alcanzarla,
+      // lo que en datos débiles/bajo SNR amplifica el ruido del cielo sin límite. Con techo>0 el bucle
+      // TAMBIÉN para cuando el ruido de fondo post-estirado lo alcanza. 0 = desactivado (por defecto).
+      noiseCeiling: 0
     };
   }
 
@@ -96,6 +124,9 @@
     var D = Math.exp(cfg.stretchIntensity) - 1;
     var b = cfg.localIntensity_b;
     var iters = Math.max(1, Math.round(cfg.maxIterations));
+    var sat = isFinite(cfg.saturation) ? cfg.saturation : 1;
+    if (sat < 0) sat = 0;
+    var noiseCeiling = isFinite(cfg.noiseCeiling) ? cfg.noiseCeiling : 0;
     var log = [];
 
     for (var iter = 1; iter <= iters; ++iter) {
@@ -122,28 +153,55 @@
       if (SP > HP - 0.0001) SP = HP - 0.0001;
       var ghs = ghsMake(D, b, SP, 0.0, HP);
 
-      // 4) aplica la transformada
+      // 4) aplica la transformada — en modo luminancia con amortiguación de croma hacia la
+      //    luminancia estirada (saturation) para domar la sobre-saturación y el quemado de núcleos.
       if (cfg.colorMode === "rgb" || !isColor) {
         for (var c3 = 0; c3 < nc; ++c3) { var a3 = ch[c3]; for (var i3 = 0; i3 < n; ++i3) a3[i3] = ghs(a3[i3]); }
       } else {
         for (var i4 = 0; i4 < n; ++i4) {
-          var L = wl[0]*ch[0][i4] + wl[1]*ch[1][i4] + wl[2]*ch[2][i4];
+          var r0 = ch[0][i4], g0 = ch[1][i4], b0 = ch[2][i4];
+          var L = wl[0]*r0 + wl[1]*g0 + wl[2]*b0;
           if (L < 1e-6) continue;
-          var f = ghs(L) / L;
-          var r = ch[0][i4]*f, g = ch[1][i4]*f, bl = ch[2][i4]*f;
+          var Ls = ghs(L);        // luminancia estirada (el objetivo neutro)
+          var f = Ls / L;         // realce por píxel (== ghs(L)/L)
+          var r = Ls + sat*(r0*f - Ls);
+          var g = Ls + sat*(g0*f - Ls);
+          var bl = Ls + sat*(b0*f - Ls);
           ch[0][i4] = r < 0 ? 0 : (r > 1 ? 1 : r);
           ch[1][i4] = g < 0 ? 0 : (g > 1 ? 1 : g);
           ch[2][i4] = bl < 0 ? 0 : (bl > 1 ? 1 : bl);
         }
       }
 
-      // 5) parada de seguridad por mediana objetivo
+      // 5) parada de seguridad por mediana objetivo (y por techo de ruido de fondo si está activo)
       computeLum();
       var st3 = medianMAD(lum, n, cfg.maxStatsSamples);
+      var bgN3 = (noiseCeiling > 0) ? bgNoise(lum, n, cfg.maxStatsSamples) : 0;
       log.push("iter " + iter + ": med " + st.median.toFixed(4) +
                " → bp " + bp.toFixed(4) + ", SP " + SP.toFixed(4) +
-               ", D " + D.toFixed(3) + " ⇒ med " + st3.median.toFixed(4));
+               ", D " + D.toFixed(3) + " ⇒ med " + st3.median.toFixed(4) +
+               (noiseCeiling > 0 ? ", ruidoBg " + bgN3.toFixed(4) : ""));
       if (st3.median >= cfg.targetMedian) { log.push("mediana objetivo alcanzada, stop."); break; }
+      if (noiseCeiling > 0 && bgN3 >= noiseCeiling) {
+        log.push("techo de ruido de fondo alcanzado (" + bgN3.toFixed(4) + " >= " +
+                 noiseCeiling.toFixed(3) + "), stop para no amplificar ruido.");
+        break;
+      }
+    }
+
+    // BG-FLOOR: eleva el fondo desde negro puro hasta el suelo configurado (afín: 0→floor, 1→1).
+    // Una sola pasada por todos los canales tras el bucle.
+    var bgFloor = isFinite(cfg.backgroundFloor) ? cfg.backgroundFloor : 0;
+    if (bgFloor > 0) {
+      var bgScale = 1 - bgFloor;
+      for (var cf = 0; cf < nc; ++cf) {
+        var af = ch[cf];
+        for (var ifx = 0; ifx < n; ++ifx) {
+          var vf = bgFloor + af[ifx] * bgScale;
+          af[ifx] = vf < 0 ? 0 : (vf > 1 ? 1 : vf);
+        }
+      }
+      log.push("fondo elevado al suelo " + bgFloor.toFixed(3) + ".");
     }
     return { channels: ch, log: log };
   }
