@@ -308,11 +308,96 @@
     return createImageBitmap(file).then(function (bmp) { return loadViaCanvas(bmp); });
   }
 
+  /* ----------------------------------------------------------- WRITERS ---- */
+  // TIFF 16-bit SIN comprimir (little-endian 'II', 1 strip, RGB interleaved o gris).
+  // Exporta los DATOS reales de {ch,w,h,nc,isColor} en [0,1] -> uint16. 9 tags minimos.
+  function writeTIFF16(img) {
+    var w = img.w, h = img.h, n = w * h;
+    var spp = (img.isColor && img.nc >= 3) ? 3 : 1;
+    var numTags = 9;
+    var ifdSize = 2 + numTags * 12 + 4;
+    var extOff = 8 + ifdSize;                 // zona externa: BitsPerSample de RGB (3 SHORT > 4 bytes)
+    var extSize = spp === 3 ? 6 : 0;
+    var dataOff = extOff + extSize;
+    if (dataOff % 2) dataOff++;               // Uint16Array requiere offset par
+    var dataSize = n * spp * 2;
+    var buf = new ArrayBuffer(dataOff + dataSize);
+    var dv = new DataView(buf);
+    dv.setUint8(0, 0x49); dv.setUint8(1, 0x49);   // 'II' = little-endian
+    dv.setUint16(2, 42, true);
+    dv.setUint32(4, 8, true);                      // IFD en offset 8
+    var o = 8;
+    dv.setUint16(o, numTags, true); o += 2;
+    function tag(id, type, count, value) {
+      dv.setUint16(o, id, true); dv.setUint16(o + 2, type, true);
+      dv.setUint32(o + 4, count, true); dv.setUint32(o + 8, value, true); o += 12;
+    }
+    tag(256, 4, 1, w);                                              // ImageWidth
+    tag(257, 4, 1, h);                                              // ImageLength
+    if (spp === 3) tag(258, 3, 3, extOff); else tag(258, 3, 1, 16); // BitsPerSample
+    tag(259, 3, 1, 1);                                              // Compression: ninguna
+    tag(262, 3, 1, spp === 3 ? 2 : 1);                              // Photometric: RGB / gris
+    tag(273, 4, 1, dataOff);                                        // StripOffsets
+    tag(277, 3, 1, spp);                                            // SamplesPerPixel
+    tag(278, 4, 1, h);                                              // RowsPerStrip (1 strip)
+    tag(279, 4, 1, dataSize);                                       // StripByteCounts
+    dv.setUint32(o, 0, true);                                       // no hay mas IFDs
+    if (spp === 3) { dv.setUint16(extOff, 16, true); dv.setUint16(extOff + 2, 16, true); dv.setUint16(extOff + 4, 16, true); }
+    // Datos interleaved uint16 (Uint16Array nativo: todos los navegadores reales son little-endian).
+    var out = new Uint16Array(buf, dataOff, n * spp);
+    var r = img.ch[0], g = spp === 3 ? img.ch[1] : null, b = spp === 3 ? img.ch[2] : null;
+    for (var i = 0, p = 0; i < n; ++i) {
+      var v = r[i]; out[p++] = v <= 0 ? 0 : (v >= 1 ? 65535 : (v * 65535 + 0.5) | 0);
+      if (spp === 3) {
+        v = g[i]; out[p++] = v <= 0 ? 0 : (v >= 1 ? 65535 : (v * 65535 + 0.5) | 0);
+        v = b[i]; out[p++] = v <= 0 ? 0 : (v >= 1 ? 65535 : (v * 65535 + 0.5) | 0);
+      }
+    }
+    return buf;
+  }
+
+  // FITS BITPIX=-32 (Float32 big-endian), NAXIS=2 (mono) o 3 (RGB planar). Las filas se escriben
+  // bottom-up (convencion FITS): el inverso exacto del flip que hace parseFITS al leer.
+  function writeFITS(img) {
+    var w = img.w, h = img.h, n = w * h;
+    var planes = (img.isColor && img.nc >= 3) ? 3 : 1;
+    var cards = [];
+    function pad80(s) { while (s.length < 80) s += " "; return s.substring(0, 80); }
+    function card(k, v) {
+      var key = (k + "        ").substring(0, 8);
+      var val = String(v); while (val.length < 20) val = " " + val;   // valor justificado a col 30
+      cards.push(pad80(key + "= " + val));
+    }
+    card("SIMPLE", "T"); card("BITPIX", -32); card("NAXIS", planes === 3 ? 3 : 2);
+    card("NAXIS1", w); card("NAXIS2", h); if (planes === 3) card("NAXIS3", 3);
+    card("BZERO", 0); card("BSCALE", 1);
+    cards.push(pad80("ORIGIN  = 'CabraSpace Imaging Workflow'"));
+    cards.push(pad80("END"));
+    var headerStr = cards.join("");
+    var headerLen = Math.ceil(headerStr.length / 2880) * 2880;
+    var dataLen = Math.ceil(n * planes * 4 / 2880) * 2880;
+    var buf = new ArrayBuffer(headerLen + dataLen);
+    var u8 = new Uint8Array(buf);
+    for (var i = 0; i < headerLen; ++i) u8[i] = i < headerStr.length ? headerStr.charCodeAt(i) : 32;
+    var dvw = new DataView(buf, headerLen);
+    var off = 0;
+    for (var c = 0; c < planes; ++c) {
+      var chd = img.ch[c] || img.ch[0];
+      for (var y = 0; y < h; ++y) {
+        var row = (h - 1 - y) * w;              // top-down -> bottom-up
+        for (var x = 0; x < w; ++x) { dvw.setFloat32(off, chd[row + x], false); off += 4; }
+      }
+    }
+    return buf;
+  }
+
   root.ImgIO = {
     loadFromFile: loadFromFile,
     parseFITS: parseFITS,
     parseXISF: parseXISF,
     loadViaTIFF: loadViaTIFF,
-    loadViaCanvas: loadViaCanvas
+    loadViaCanvas: loadViaCanvas,
+    writeTIFF16: writeTIFF16,
+    writeFITS: writeFITS
   };
 })(typeof window !== "undefined" ? window : this);

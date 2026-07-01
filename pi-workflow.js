@@ -89,6 +89,32 @@
     line.innerHTML = `<span class="time">[${time}]</span><span class="${type}">${msg}</span>`;
     consoleOutput.appendChild(line);
     consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    // TOAST: los ok/err también se muestran como aviso efímero sobre el visor
+    // (la consola queda abajo y no se ve en iPad). Los "info" se quedan solo en consola.
+    if (type === "ok" || type === "err") showToast(msg, type);
+  }
+
+  // Aviso efímero (toast) arriba a la derecha. Dedupe de ráfagas y máximo 3 apilados.
+  let _toastWrap = null, _lastToast = { msg: "", t: 0 };
+  function showToast(msg, type) {
+    try {
+      const now = Date.now();
+      if (msg === _lastToast.msg && now - _lastToast.t < 1500) return;
+      _lastToast = { msg, t: now };
+      if (!_toastWrap) {
+        _toastWrap = document.createElement("div");
+        _toastWrap.className = "piw-toast-wrap";
+        document.body.appendChild(_toastWrap);
+      }
+      while (_toastWrap.children.length >= 3) _toastWrap.removeChild(_toastWrap.firstChild);
+      const t = document.createElement("div");
+      t.className = "piw-toast" + (type === "err" ? " err" : "");
+      t.textContent = (type === "err" ? "✕ " : "✓ ") + msg;
+      _toastWrap.appendChild(t);
+      // setTimeout (no rAF): rAF no dispara con la pestaña en segundo plano y el toast se quedaría invisible.
+      setTimeout(() => t.classList.add("show"), 15);
+      setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 220); }, 2600);
+    } catch (e) { /* el toast nunca debe romper el flujo */ }
   }
 
   function showLoader(text) {
@@ -5888,17 +5914,39 @@
     });
   });
 
-  // --- EXPORTAR PNG ---
+  // --- EXPORTAR (PNG 8-bit de la vista | TIFF 16-bit | FITS 32-bit de los DATOS) ---
+  // PNG conserva el comportamiento clásico: exporta lo que ves en el canvas (incluido el estirado
+  // de pantalla). TIFF/FITS exportan los DATOS reales de state.activeImage vía ImgIO (mejora U1):
+  // sin pérdida a 8 bits, para continuar en PixInsight/Photoshop.
+  function _downloadBlob(blob, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
   el("btnDownloadPNG").addEventListener("click", () => {
     if (!state.activeImage) return;
-    cv.toBlob((blob) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); 
-      a.download = "PI_Workflow_Final.png"; 
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      logConsole("Imagen final exportada y descargada como PNG", "info");
-    }, "image/png");
+    const lang = document.documentElement.lang || "es";
+    const fmt = el("selExportFormat") ? el("selExportFormat").value : "png";
+    try {
+      if (fmt === "tiff16") {
+        const buf = window.ImgIO.writeTIFF16(state.activeImage);
+        _downloadBlob(new Blob([buf], { type: "image/tiff" }), "CabraSpace_Workflow.tif");
+        logConsole(lang === "es" ? "Exportado TIFF 16-bit (datos reales)" : "Exported 16-bit TIFF (real data)", "ok");
+      } else if (fmt === "fits") {
+        const buf = window.ImgIO.writeFITS(state.activeImage);
+        _downloadBlob(new Blob([buf], { type: "application/fits" }), "CabraSpace_Workflow.fits");
+        logConsole(lang === "es" ? "Exportado FITS 32-bit (datos reales)" : "Exported 32-bit FITS (real data)", "ok");
+      } else {
+        cv.toBlob((blob) => {
+          _downloadBlob(blob, "CabraSpace_Workflow.png");
+          logConsole(lang === "es" ? "Exportado PNG 8-bit (vista actual)" : "Exported 8-bit PNG (current view)", "ok");
+        }, "image/png");
+      }
+    } catch (e) {
+      logConsole((lang === "es" ? "Error al exportar: " : "Export error: ") + e.message, "err");
+    }
   });
 
   // --- LIMPIAR CONSOLA ---

@@ -673,6 +673,22 @@
       pointer-events: none;
     }
 
+    /* Toasts de estado: aviso efímero visible sin mirar la consola (clave en iPad) */
+    .piw-toast-wrap {
+      position: fixed; top: 74px; right: 18px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .piw-toast {
+      font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600;
+      padding: 9px 14px; border-radius: 9px; max-width: 320px;
+      border: 1px solid var(--gold-border, #cfab4a); background: rgba(16,15,13,0.94);
+      color: var(--gold-primary); box-shadow: 0 8px 22px rgba(0,0,0,0.6);
+      opacity: 0; transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .piw-toast.show { opacity: 1; transform: none; }
+    .piw-toast.err { border-color: #a04040; color: #ff8a8a; }
+
     .piw-loader {
       position: absolute;
       inset: 0;
@@ -2749,11 +2765,18 @@
           </div>
         </div>
 
-        <!-- Botón de Exportación -->
-        <button class="piw-btn primary" id="btnDownloadPNG" disabled style="padding: 12px 18px; font-size: 0.82rem;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke-width: 2.2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exportar Imagen PNG Final
-        </button>
+        <!-- Exportación: PNG = lo que ves (8-bit); TIFF/FITS = los DATOS reales (16/32-bit) -->
+        <div style="display:flex; gap:8px; align-items:stretch;">
+          <select class="piw-select" id="selExportFormat" style="flex:1.4; margin-bottom:0;" title="PNG exporta la vista actual (8 bits). TIFF y FITS exportan los datos reales para seguir en PixInsight/Photoshop.">
+            <option value="png">PNG 8-bit (vista actual)</option>
+            <option value="tiff16" selected>TIFF 16-bit (datos)</option>
+            <option value="fits">FITS 32-bit (datos)</option>
+          </select>
+          <button class="piw-btn primary" id="btnDownloadPNG" disabled style="flex:1; padding: 12px 12px; font-size: 0.8rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke-width: 2.2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+        </div>
       </section>
     </div>
   </main>
