@@ -19,7 +19,17 @@
 
       btn.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        // Clic derecho: sobreescribir / forzar guardado
+        // Clic derecho: guardar/sobrescribir. Si el slot YA tiene contenido, pedir confirmación:
+        // antes sobrescribía en silencio y destrozaba las comparaciones (el usuario recorría los
+        // slots con clic derecho y los convertía todos en copias de la imagen activa).
+        if (state.imageSlots[slotIdx] !== null) {
+          const lang = document.documentElement.lang || "es";
+          const what = btn.title || (lang === "es" ? `Slot ${slotIdx + 1}` : `Slot ${slotIdx + 1}`);
+          const ok = confirm(lang === "es"
+            ? `El Slot ${slotIdx + 1} ya contiene "${what}". ¿Sobrescribirlo con la imagen activa?\n(Para VER el slot usa clic izquierdo)`
+            : `Slot ${slotIdx + 1} already holds "${what}". Overwrite it with the active image?\n(To VIEW the slot use left click)`);
+          if (!ok) return;
+        }
         saveSlot(slotIdx);
       });
     }
@@ -73,7 +83,11 @@
     const btn = document.querySelector(`.piw-slot-btn[data-slot="${idx + 1}"]`);
     btn.classList.add("active-slot");
 
-    logConsole(`Slot de Imagen ${idx + 1} recuperado al espacio de trabajo`, "info");
+    // Mostrar QUÉ contiene el slot (título puesto por "Comparar": algoritmo/método). Sin esto,
+    // al ciclar slots comparando no se sabía cuál se estaba viendo. "ok" → también sale como toast.
+    const lang = document.documentElement.lang || "es";
+    const what = btn.title ? ` — ${btn.title}` : "";
+    logConsole((lang === "es" ? `Viendo Slot ${idx + 1}` : `Viewing Slot ${idx + 1}`) + what, "ok");
     render();
     drawHistogram();
     refreshPathBar();

@@ -686,6 +686,31 @@
       opacity: 0; transform: translateY(-6px);
       transition: opacity .18s ease, transform .18s ease;
     }
+    /* Interruptor Live: prominente y SIEMPRE arriba del menú (es lo primero que hay que ver) */
+    .piw-live-toggle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+      color: var(--gold-primary);
+      background: rgba(207,171,74,0.10);
+      border: 1px solid var(--gold-border, #cfab4a);
+      border-radius: 9px; padding: 7px 10px; margin: 0 0 10px;
+      cursor: pointer; text-transform: uppercase;
+    }
+    .piw-live-toggle input { accent-color: var(--gold-primary); width: 15px; height: 15px; }
+
+    /* Letrero de proceso en curso sobre el visor (refinado a resolución completa, etc.) */
+    .piw-busy-badge {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 30; display: none;
+      font-family: var(--piw-mono, monospace); font-size: 0.66rem; font-weight: 600;
+      color: var(--gold-primary); background: rgba(16,15,13,0.92);
+      border: 1px solid var(--gold-border, #cfab4a); border-radius: 999px; padding: 6px 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+      animation: piwPulse 1.2s ease-in-out infinite;
+      max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    @keyframes piwPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
     .piw-toast.show { opacity: 1; transform: none; }
     .piw-toast.err { border-color: #a04040; color: #ff8a8a; }
 
@@ -1764,6 +1789,9 @@
               <option value="stars">Star Stretch - Seti Astro</option>
               <option value="curves">Manual Curve / Sigmoidal</option>
             </select>
+            <label class="piw-checkbox-row" style="margin:2px 0 8px;" title="Applies the same transform to all 3 channels (like PixInsight's linked STF). Untick only if you want to re-balance the background channel by channel.">
+              <input type="checkbox" id="chkStretchLinked" checked> Linked channels (preserves color)
+            </label>
 
             <!-- Dynamic STF controls -->
             <div id="stretch-stf-controls">
@@ -1924,10 +1952,10 @@
           <div class="piw-section collapsed" data-apply="noise">
             <h3 class="piw-section-title">Noise Reduction</h3>
             <select class="piw-select" id="selPostNoiseAlgo">
-              <option value="tgv">TGV Denoise</option>
+              <option value="deepsnr" selected>DeepSNR - Nikita Misiura</option>
               <option value="cosmic">Cosmic Clarity - Seti Astro</option>
-              <option value="deepsnr">DeepSNR - Nikita Misiura</option>
               <option value="graxpert">GraXpert Denoise - GraXpert Team (slow)</option>
+              <option value="tgv">TGV Denoise</option>
             </select>
 
             <!-- NoiseXTerminator Controls -->
@@ -2311,6 +2339,7 @@
           <!-- SECTION 3: Color Balance - Disabled -->
           <div class="piw-section collapsed" data-apply="balance">
             <h3 class="piw-section-title">Color Balance</h3>
+            <label class="piw-live-toggle piw-disabled-control"><input type="checkbox" id="chkPostColorBalanceLive" disabled> Live — real-time preview</label>
             <div class="piw-readout-lbl" id="lblPostColorBalanceReadout"><b>Mean:</b> -- | <b>Target:</b> -- | <b>Shift:</b> --</div>
             <div class="piw-colorbalance-wheel-container">
               <canvas id="colorBalanceCanvas" width="150" height="150"></canvas>
@@ -2325,10 +2354,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; align-items:center; margin-bottom: 8px;">
-              <label class="piw-checkbox-row piw-disabled-control" style="margin:0; flex:1;">
-                <input type="checkbox" id="chkPostColorBalanceLive" disabled> Live
-              </label>
-              <button class="piw-btn" id="btnPostColorBalanceReset" disabled style="flex:2; padding: 6px 10px;">Reset Hue Anchor</button>
+              <button class="piw-btn" id="btnPostColorBalanceReset" disabled style="flex:1; padding: 6px 10px;">Reset Hue Anchor</button>
             </div>
 
             <div class="piw-subcard piw-disabled-control">
@@ -2408,6 +2434,7 @@
           <!-- SECTION 4: Curves - Disabled -->
           <div class="piw-section collapsed" data-apply="curves">
             <h3 class="piw-section-title">Curves</h3>
+            <label class="piw-live-toggle piw-disabled-control"><input type="checkbox" id="chkPostCurvesLive" disabled> Live — real-time preview</label>
             <select class="piw-select" id="selPostCurvesChan">
               <option value="K">RGB/K</option>
               <option value="R">Red</option>
@@ -2455,9 +2482,6 @@
             </div>
 
             <div style="display:flex; gap: 8px; align-items:center;">
-              <label class="piw-checkbox-row piw-disabled-control" style="margin:0; flex:1;">
-                <input type="checkbox" id="chkPostCurvesLive" disabled> Live
-              </label>
               <label class="piw-checkbox-row piw-disabled-control" style="margin:0; flex:1;">
                 <input type="checkbox" id="chkPostCurvesUseMask" disabled> Use mask
               </label>
@@ -2615,6 +2639,7 @@
           <div class="piw-section">
             <h3 class="piw-section-title">Color Mixer</h3>
             <span class="piw-eyebrow">SELECTIVE COLOR BY HUE BAND</span>
+            <label class="piw-live-toggle"><input type="checkbox" id="chkCmLive"> Live — real-time preview</label>
             <select class="piw-select" id="selCmBand"></select>
             <div class="piw-control-group">
               <div class="piw-label-row"><span class="piw-label">Hue</span><span class="piw-value" id="valCmHue">0</span></div>
@@ -2634,7 +2659,6 @@
             </div>
             <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectStars" checked> Protect stars (highlights)</label>
             <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectLowSat" checked> Protect background (low saturation)</label>
-            <label class="piw-checkbox-row" style="margin-bottom:8px;"><input type="checkbox" id="chkCmLive"> Live</label>
             <div style="display:flex; gap:8px;">
               <button class="piw-btn primary" id="btnApplyColorMixer" disabled style="flex:2;">Apply Color Mixer</button>
               <button class="piw-btn" id="btnResetColorMixer" style="flex:1;">Reset</button>
@@ -2644,6 +2668,7 @@
           <!-- DETAIL & CONTRAST -->
           <div class="piw-section collapsed">
             <h3 class="piw-section-title">Detail &amp; Contrast</h3>
+            <label class="piw-live-toggle"><input type="checkbox" id="chkDetailLive"> Live — real-time preview</label>
             <select class="piw-select" id="selDetailAlgo">
               <option value="localContrast">Local Contrast (Clarity)</option>
               <option value="multiscale">Multiscale Detail Boost</option>
@@ -2679,7 +2704,6 @@
                 <input type="range" class="piw-slider" id="sldDetailHpRadius" min="1" max="12" step="1" value="3">
               </div>
             </div>
-            <label class="piw-checkbox-row" style="margin:6px 0 8px;"><input type="checkbox" id="chkDetailLive"> Live</label>
             <button class="piw-btn primary" id="btnApplyDetail" disabled style="width:100%;">Apply Detail</button>
           </div>
         </div>
@@ -2801,25 +2825,25 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <!-- pyodide.js (CDN) removed: SAS Pro + SPCC + stretches are 100% JS; loadPyodide is never invoked. -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
-  <script>window.PIW_BUILD="20260702d";</script>
-  <script src="onnx-engine.js?v=20260702d"></script>
-  <script src="star-removal.js?v=20260702d"></script>
-  <script src="deconv.js?v=20260702d"></script>
-  <script src="io.js?v=20260702d"></script>
-  <script src="autoghs.js?v=20260702d"></script>
+  <script>window.PIW_BUILD="20260703a";</script>
+  <script src="onnx-engine.js?v=20260703a"></script>
+  <script src="star-removal.js?v=20260703a"></script>
+  <script src="deconv.js?v=20260703a"></script>
+  <script src="io.js?v=20260703a"></script>
+  <script src="autoghs.js?v=20260703a"></script>
   <!-- saspro-pyodide.js eliminado: SAS Pro + SPCC son 100% JS (spcc.js + AutoGHS), sin Pyodide. -->
-  <script src="lut.js?v=20260702d"></script>
-  <script src="resample.js?v=20260702d"></script>
-  <script src="background.js?v=20260702d"></script>
-  <script src="graxpert.js?v=20260702d"></script>
+  <script src="lut.js?v=20260703a"></script>
+  <script src="resample.js?v=20260703a"></script>
+  <script src="background.js?v=20260703a"></script>
+  <script src="graxpert.js?v=20260703a"></script>
   <!-- USM-SHARP-BEGIN -->
-  <script src="sharpening.js?v=20260702d"></script>
+  <script src="sharpening.js?v=20260703a"></script>
   <!-- USM-SHARP-END -->
-  <script src="spcc.js?v=20260702d"></script>
-  <script src="imgproc.js?v=20260702d"></script>
-  <script src="imgops.js?v=20260702d"></script>
+  <script src="spcc.js?v=20260703a"></script>
+  <script src="imgproc.js?v=20260703a"></script>
+  <script src="imgops.js?v=20260703a"></script>
   <!-- A5: bundle minificado por esbuild (tools/build_piw.py desde src/piw/); sourcemap apunta a pi-workflow.js -->
-  <script src="pi-workflow.min.js?v=20260702d"></script>
-  <script src="mobile-menu.js?v=20260702d"></script>
+  <script src="pi-workflow.min.js?v=20260703a"></script>
+  <script src="mobile-menu.js?v=20260703a"></script>
 </body>
 </html>

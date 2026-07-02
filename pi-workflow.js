@@ -3516,8 +3516,12 @@
   // leídos de los sliders de la UI. Sirven igual para ImgOps.computeStretch en el hilo principal
   // (proxy del Probar, Comparar) y para el Web Worker (resolución completa sin congelar la UI).
   function getStretchParams(algo, srcImg) {
+    // Canales enlazados (por defecto SÍ): misma transformada para R/G/B → conserva el color
+    // calibrado (PCC). Desmarcado = por canal (re-balancea el fondo pero VIRA el color en HSO/SHO).
+    const _lk = el("chkStretchLinked");
+    const linked = !_lk || _lk.checked;
     if (algo === "stf") {
-      return { algo, targetBg: parseFloat(el("sldStfBg").value), clipSigmas: parseFloat(el("sldStfClip").value) };
+      return { algo, linked, targetBg: parseFloat(el("sldStfBg").value), clipSigmas: parseFloat(el("sldStfClip").value) };
     }
     if (algo === "ghs") {
       const cfg = AutoGHS.defaultConfig();
@@ -3533,8 +3537,8 @@
       return { algo, amount: parseFloat(el("sldStarsStretch").value), boost: boostEl ? parseFloat(boostEl.value) : 1.0 };
     }
     if (algo === "statistical_stretch") {
-      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), mismo algoritmo (MAD + MTF por canal).
-      return { algo, target: parseFloat(el("sldStretchStatTgt").value), sigma: parseFloat(el("sldStretchStatSigma").value) };
+      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), MAD + MTF (enlazado o por canal).
+      return { algo, linked, target: parseFloat(el("sldStretchStatTgt").value), sigma: parseFloat(el("sldStretchStatSigma").value) };
     }
     if (algo === "curves") {
       return { algo, points: stretchPoints.map((p) => [p[0], p[1]]) };
@@ -4225,6 +4229,22 @@
   // p. ej. del Web Worker) que reemplaza el preview al terminar. commitPreview (botón grande
   // "Aplicar") espera al full-res pendiente y NUNCA commitea un proxy (véase updateBigApply).
   // computeFn(img) recibe el proxy o srcImg; extraFn (opcional) corre tras cada preview.
+  // BUSY-BADGE: letrero sobre el visor mientras un cómputo sigue en marcha (p. ej. el refinado a
+  // resolución completa tras el proxy, que antes corría en silencio y el usuario no sabía si el
+  // procesado había terminado). Se limpia siempre en finish().
+  let _busyBadge = null;
+  function showBusyBadge(text) {
+    if (!_busyBadge) {
+      _busyBadge = document.createElement("div");
+      _busyBadge.id = "piwBusyBadge";
+      _busyBadge.className = "piw-busy-badge";
+      (el("canvasContainer") || document.body).appendChild(_busyBadge);
+    }
+    _busyBadge.textContent = "⏳ " + text;
+    _busyBadge.style.display = "block";
+  }
+  function hideBusyBadge() { if (_busyBadge) _busyBadge.style.display = "none"; }
+
   let _proxySeq = 0;
   let _proxyPendingFull = null;
   async function previewProxyThenFull(srcImg, stageLabel, computeFn, extraFn) {
@@ -4246,6 +4266,8 @@
           pv._proxy = true;
           if (extraFn) extraFn(true);
           hideLoader(); // el usuario ya ve el resultado; el full-res sigue en segundo plano
+          const langB = document.documentElement.lang || "es";
+          showBusyBadge(langB === "es" ? `Procesando ${stageLabel} a resolución completa…` : `Processing ${stageLabel} at full resolution…`);
           render();
           drawHistogram();
         } catch (e) {
@@ -4261,6 +4283,9 @@
         if (extraFn) extraFn(false);
         render();
         drawHistogram();
+        // Aviso claro de FIN: el usuario sabe que el resultado que ve ya es el definitivo.
+        const langF = document.documentElement.lang || "es";
+        logConsole(langF === "es" ? `${stageLabel}: listo (resolución completa)` : `${stageLabel}: done (full resolution)`, "ok");
       } catch (e) {
         if (job === _proxySeq) {
           const lang = document.documentElement.lang || "es";
@@ -4268,6 +4293,7 @@
         }
       }
     } finally {
+      if (job === _proxySeq) hideBusyBadge();
       finish();
     }
   }
@@ -4663,12 +4689,9 @@
     return key;
   }
   function mixAvailableSources() {
-    const list = [];
-    Object.keys(state.workflowImages || {}).forEach(k => list.push("wf-" + k));
-    if (state.starlessImage) list.push("starless");
-    if (state.starsImage) list.push("stars");
-    for (let i = 0; i < 8; ++i) if (state.imageSlots[i]) list.push("slot-" + i);
-    return list;
+    // SOLO las imágenes del flujo (RGB, Starless RGB, Stars RGB, H/O/S, Final…). La paleta con
+    // starless/stars/activa/slots duplicaba fuentes y hacía el sistema confuso e ininteligible.
+    return Object.keys(state.workflowImages || {}).map(k => "wf-" + k);
   }
 
   // Añade una capa nueva desde una fuente (arriba de la pila). Usado por drag (ratón) y tap (táctil).
@@ -4867,10 +4890,21 @@
         try {
           const img = composeMixImage();
           if (!img) throw new Error(lang === "es" ? "No hay capas visibles en la pila." : "No visible layers in the stack.");
-          commitActiveImage(img, "Blend", state.stepInputImage || state.activeImage);
+          // La mezcla se guarda como imagen NUEVA del flujo: "Final", "Final 1", "Final 2"…
+          // Antes sobrescribía el canal activo (p. ej. Starless RGB) y parecía que "no fusionaba":
+          // el resultado pisaba una fuente y no aparecía como imagen propia en la barra de canales.
+          let name = "Final", nn = 0;
+          while (state.workflowImages[name]) { nn++; name = "Final " + nn; }
+          img.stages = ["Blend"];
+          img.hasTransforms = true;
+          state.workflowImages[name] = img;
+          selectWorkflowKey(name);   // selecciona la nueva imagen (render + path bar + baseline)
+          // Las capas mezcladas ya suelen estar estiradas: sin AutoSTF de pantalla (evita doble estirado).
           state.screenStretchMode = false;
-          render(); drawHistogram(); refreshPathBar();
-          logConsole(lang === "es" ? "Mezcla compuesta y aplicada al flujo." : "Blend composed and committed.", "ok");
+          { const bStf = el("btnToolAutoSTF"); if (bStf) bStf.classList.remove("active"); }
+          render();
+          scheduleSessionSave();
+          logConsole((lang === "es" ? "Mezcla compuesta → " : "Blend composed → ") + name, "ok");
         } catch (err) {
           logConsole((lang === "es" ? "Error al componer mezcla: " : "Blend error: ") + err.message, "err");
         } finally { hideLoader(); }
@@ -5077,7 +5111,17 @@
 
       btn.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        // Clic derecho: sobreescribir / forzar guardado
+        // Clic derecho: guardar/sobrescribir. Si el slot YA tiene contenido, pedir confirmación:
+        // antes sobrescribía en silencio y destrozaba las comparaciones (el usuario recorría los
+        // slots con clic derecho y los convertía todos en copias de la imagen activa).
+        if (state.imageSlots[slotIdx] !== null) {
+          const lang = document.documentElement.lang || "es";
+          const what = btn.title || (lang === "es" ? `Slot ${slotIdx + 1}` : `Slot ${slotIdx + 1}`);
+          const ok = confirm(lang === "es"
+            ? `El Slot ${slotIdx + 1} ya contiene "${what}". ¿Sobrescribirlo con la imagen activa?\n(Para VER el slot usa clic izquierdo)`
+            : `Slot ${slotIdx + 1} already holds "${what}". Overwrite it with the active image?\n(To VIEW the slot use left click)`);
+          if (!ok) return;
+        }
         saveSlot(slotIdx);
       });
     }
@@ -5131,7 +5175,11 @@
     const btn = document.querySelector(`.piw-slot-btn[data-slot="${idx + 1}"]`);
     btn.classList.add("active-slot");
 
-    logConsole(`Slot de Imagen ${idx + 1} recuperado al espacio de trabajo`, "info");
+    // Mostrar QUÉ contiene el slot (título puesto por "Comparar": algoritmo/método). Sin esto,
+    // al ciclar slots comparando no se sabía cuál se estaba viendo. "ok" → también sale como toast.
+    const lang = document.documentElement.lang || "es";
+    const what = btn.title ? ` — ${btn.title}` : "";
+    logConsole((lang === "es" ? `Viendo Slot ${idx + 1}` : `Viewing Slot ${idx + 1}`) + what, "ok");
     render();
     drawHistogram();
     refreshPathBar();
@@ -6075,6 +6123,30 @@
   });
   // SCNR (casilla) también dispara el preview Live de balance de color.
   { const scnrChk = el("chkPostBalanceSCNR"); if (scnrChk) scnrChk.addEventListener("change", livePreviewColorBalance); }
+
+  // SLIDER-LABEL-AUTOSYNC: red de seguridad para TODOS los sliders. La auditoría encontró 39 de 91
+  // sliders sin binding de etiqueta (mueves el slider y el número no cambia: USM, HDR, LHE, DSE,
+  // TGV, NXT, Prism, BXT, DeepSNR, Statistical, FAME…). En vez de mantener a mano una lista de 91
+  // pares, este pase genérico empareja cada .piw-slider `sldX` con su span `valX` y, DESPUÉS de que
+  // corran los handlers específicos (este listener se añade el último), reescribe la etiqueta SOLO
+  // si quedó desincronizada — así no pisa los formatos custom de los sliders que ya funcionaban.
+  // Los decimales se infieren del atributo step (step=1→0, 0.05→2, 0.005→3...).
+  document.querySelectorAll("input.piw-slider[id^='sld']").forEach((sld) => {
+    const span = el("val" + sld.id.slice(3));
+    if (!span) return;
+    const stepStr = sld.getAttribute("step") || "1";
+    const decimals = (stepStr.split(".")[1] || "").length;
+    const sync = () => {
+      const v = parseFloat(sld.value);
+      const shown = parseFloat(span.textContent);
+      // tolerancia = medio step: si el handler específico ya puso el número correcto, no tocar
+      if (!isFinite(shown) || Math.abs(shown - v) > parseFloat(stepStr) / 2 + 1e-9) {
+        span.textContent = v.toFixed(decimals);
+      }
+    };
+    sync(); // al cargar: etiqueta = posición real del slider
+    sld.addEventListener("input", sync);
+  });
 
   // --- REGISTRO DRAG & DROP GLOBAL DE ARCHIVOS ---
   window.addEventListener("dragover", (e) => e.preventDefault());

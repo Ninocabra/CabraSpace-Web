@@ -294,8 +294,12 @@
   // leídos de los sliders de la UI. Sirven igual para ImgOps.computeStretch en el hilo principal
   // (proxy del Probar, Comparar) y para el Web Worker (resolución completa sin congelar la UI).
   function getStretchParams(algo, srcImg) {
+    // Canales enlazados (por defecto SÍ): misma transformada para R/G/B → conserva el color
+    // calibrado (PCC). Desmarcado = por canal (re-balancea el fondo pero VIRA el color en HSO/SHO).
+    const _lk = el("chkStretchLinked");
+    const linked = !_lk || _lk.checked;
     if (algo === "stf") {
-      return { algo, targetBg: parseFloat(el("sldStfBg").value), clipSigmas: parseFloat(el("sldStfClip").value) };
+      return { algo, linked, targetBg: parseFloat(el("sldStfBg").value), clipSigmas: parseFloat(el("sldStfClip").value) };
     }
     if (algo === "ghs") {
       const cfg = AutoGHS.defaultConfig();
@@ -311,8 +315,8 @@
       return { algo, amount: parseFloat(el("sldStarsStretch").value), boost: boostEl ? parseFloat(boostEl.value) : 1.0 };
     }
     if (algo === "statistical_stretch") {
-      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), mismo algoritmo (MAD + MTF por canal).
-      return { algo, target: parseFloat(el("sldStretchStatTgt").value), sigma: parseFloat(el("sldStretchStatSigma").value) };
+      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), MAD + MTF (enlazado o por canal).
+      return { algo, linked, target: parseFloat(el("sldStretchStatTgt").value), sigma: parseFloat(el("sldStretchStatSigma").value) };
     }
     if (algo === "curves") {
       return { algo, points: stretchPoints.map((p) => [p[0], p[1]]) };

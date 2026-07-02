@@ -21,12 +21,9 @@
     return key;
   }
   function mixAvailableSources() {
-    const list = [];
-    Object.keys(state.workflowImages || {}).forEach(k => list.push("wf-" + k));
-    if (state.starlessImage) list.push("starless");
-    if (state.starsImage) list.push("stars");
-    for (let i = 0; i < 8; ++i) if (state.imageSlots[i]) list.push("slot-" + i);
-    return list;
+    // SOLO las imágenes del flujo (RGB, Starless RGB, Stars RGB, H/O/S, Final…). La paleta con
+    // starless/stars/activa/slots duplicaba fuentes y hacía el sistema confuso e ininteligible.
+    return Object.keys(state.workflowImages || {}).map(k => "wf-" + k);
   }
 
   // Añade una capa nueva desde una fuente (arriba de la pila). Usado por drag (ratón) y tap (táctil).
@@ -225,10 +222,21 @@
         try {
           const img = composeMixImage();
           if (!img) throw new Error(lang === "es" ? "No hay capas visibles en la pila." : "No visible layers in the stack.");
-          commitActiveImage(img, "Blend", state.stepInputImage || state.activeImage);
+          // La mezcla se guarda como imagen NUEVA del flujo: "Final", "Final 1", "Final 2"…
+          // Antes sobrescribía el canal activo (p. ej. Starless RGB) y parecía que "no fusionaba":
+          // el resultado pisaba una fuente y no aparecía como imagen propia en la barra de canales.
+          let name = "Final", nn = 0;
+          while (state.workflowImages[name]) { nn++; name = "Final " + nn; }
+          img.stages = ["Blend"];
+          img.hasTransforms = true;
+          state.workflowImages[name] = img;
+          selectWorkflowKey(name);   // selecciona la nueva imagen (render + path bar + baseline)
+          // Las capas mezcladas ya suelen estar estiradas: sin AutoSTF de pantalla (evita doble estirado).
           state.screenStretchMode = false;
-          render(); drawHistogram(); refreshPathBar();
-          logConsole(lang === "es" ? "Mezcla compuesta y aplicada al flujo." : "Blend composed and committed.", "ok");
+          { const bStf = el("btnToolAutoSTF"); if (bStf) bStf.classList.remove("active"); }
+          render();
+          scheduleSessionSave();
+          logConsole((lang === "es" ? "Mezcla compuesta → " : "Blend composed → ") + name, "ok");
         } catch (err) {
           logConsole((lang === "es" ? "Error al componer mezcla: " : "Blend error: ") + err.message, "err");
         } finally { hideLoader(); }

@@ -308,9 +308,44 @@
   // --- ESTIRADOS ---
   // Statistical Stretch de Seti Astro (port exacto de computeStatisticalStretchJS): por canal,
   // MAD robusto, punto de negro a sigma·MAD, normaliza [0,1] y MTF a la mediana objetivo.
-  function computeStatisticalStretch(srcImg, target, sigma) {
+  function computeStatisticalStretch(srcImg, target, sigma, linked) {
     var w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
     var out = [];
+    // LINKED (por defecto): estadistica PROMEDIADA entre canales -> mismo punto negro y misma MTF
+    // para R/G/B (como el STF enlazado de PixInsight). Conserva el color calibrado (PCC) en
+    // imagenes HSO/SHO; el modo por-canal re-balancea el fondo pero VIRA el color.
+    if (linked !== false && nc >= 3 && srcImg.isColor) {
+      var medSum = 0, devSum = 0, c0;
+      for (c0 = 0; c0 < nc; c0++) {
+        var ch0 = srcImg.ch[c0];
+        var med0 = sampledMedian(ch0);
+        var dev0 = sampledMAD(ch0, med0);
+        if (dev0 < 1e-6) dev0 = sampledStd(ch0);
+        medSum += med0; devSum += Math.max(dev0, 0.001);
+      }
+      var medL = medSum / nc, devL = devSum / nc;
+      var bpL = Math.max(0, medL - sigma * devL);
+      var denomL = 1 - bpL; if (denomL < 1e-6) denomL = 1;
+      var rescaled = [];
+      var rsMedSum = 0;
+      for (c0 = 0; c0 < nc; c0++) {
+        var src0 = srcImg.ch[c0], o0 = new Float32Array(n);
+        for (var i0 = 0; i0 < n; i0++) { var v0 = (src0[i0] - bpL) / denomL; o0[i0] = v0 < 0 ? 0 : (v0 > 1 ? 1 : v0); }
+        rescaled.push(o0);
+        rsMedSum += sampledMedian(o0);
+      }
+      var xL = rsMedSum / nc; if (xL <= 0.0001) xL = 0.002;
+      var mL = (target - 1) * xL / (xL * (2 * target - 1) - target);
+      if (!isFinite(mL)) mL = 0.5;
+      mL = mL < 0.0001 ? 0.0001 : (mL > 0.9999 ? 0.9999 : mL);
+      var mL2 = 2 * mL - 1;
+      for (c0 = 0; c0 < nc; c0++) {
+        var oL = rescaled[c0];
+        for (var jL = 0; jL < n; jL++) { var vL = oL[jL]; var dmL = mL2 * vL - mL; if (Math.abs(dmL) < 1e-12) dmL = 1e-12; var rL = (mL - 1) * vL / dmL; oL[jL] = rL < 0 ? 0 : (rL > 1 ? 1 : rL); }
+        out.push(oL);
+      }
+      return { ch: out, w: w, h: h, nc: nc, isColor: srcImg.isColor, wcs: srcImg.wcs };
+    }
     for (var c = 0; c < nc; c++) {
       var ch = srcImg.ch[c];
       var med = sampledMedian(ch);
@@ -334,9 +369,43 @@
 
   // Auto STF por canal (port exacto de runAutoSTF de pi-workflow.js, sin el log por canal).
   // Muta img.ch. Requiere root.AutoGHS (medianMAD) y root.LUT.
-  function autoSTFInPlace(img, targetBg, clipSigmas) {
+  function autoSTFInPlace(img, targetBg, clipSigmas, linked) {
     var LUT = root.LUT, AutoGHS = root.AutoGHS;
     var n = img.w * img.h;
+    // LINKED (por defecto): un UNICO punto negro y una UNICA MTF (de la estadistica promediada)
+    // aplicados a los 3 canales -> conserva el color calibrado. Ver computeStatisticalStretch.
+    if (linked !== false && img.nc >= 3 && img.isColor) {
+      var medSum = 0, sigSum = 0, cL;
+      for (cL = 0; cL < img.nc; ++cL) {
+        var stL = AutoGHS.medianMAD(img.ch[cL], n, 200000);
+        medSum += stL.median; sigSum += stL.sigma;
+      }
+      var medAvg = medSum / img.nc, sigAvg = sigSum / img.nc;
+      var c0L = medAvg + clipSigmas * sigAvg;
+      if (c0L < 0) c0L = 0;
+      if (c0L > medAvg) c0L = medAvg;
+      var c0DenL = (1 - c0L) || 1e-6;
+      var rsMedSum2 = 0, rescaledL = [];
+      for (cL = 0; cL < img.nc; ++cL) {
+        var chL = img.ch[cL], rcL = new Float32Array(n);
+        for (var iL = 0; iL < n; ++iL) { var vaL = (chL[iL] - c0L) / c0DenL; rcL[iL] = vaL < 0 ? 0 : (vaL > 1 ? 1 : vaL); }
+        rescaledL.push(rcL);
+        rsMedSum2 += AutoGHS.medianMAD(rcL, n, 100000).median;
+      }
+      var mPrimeL = Math.max(0.0001, Math.min(0.9999, rsMedSum2 / img.nc));
+      var mLk = ((targetBg - 1) * mPrimeL) / (2 * targetBg * mPrimeL - targetBg - mPrimeL);
+      if (mLk > 0 && mLk < 1) {
+        var m1L = mLk - 1, m2L = 2 * mLk - 1;
+        var lutL = LUT.buildLUT(function (x) {
+          var den = m2L * x - mLk;
+          return Math.abs(den) > 1e-12 ? Math.min(1, Math.max(0, (m1L * x) / den)) : x;
+        }, 65536);
+        for (cL = 0; cL < img.nc; ++cL) img.ch[cL] = LUT.applyLUT(rescaledL[cL], lutL);
+      } else {
+        for (cL = 0; cL < img.nc; ++cL) img.ch[cL] = rescaledL[cL];
+      }
+      return;
+    }
     for (var c = 0; c < img.nc; ++c) {
       var ch = img.ch[c];
       var stats = AutoGHS.medianMAD(ch, n, 200000);
@@ -374,7 +443,7 @@
     var img = { ch: srcImg.ch.map(function (c) { return Float32Array.from(c); }), w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor, wcs: srcImg.wcs };
     var algo = params.algo;
     if (algo === "stf") {
-      autoSTFInPlace(img, params.targetBg, params.clipSigmas);
+      autoSTFInPlace(img, params.targetBg, params.clipSigmas, params.linked);
     } else if (algo === "ghs") {
       var res = root.AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, params.cfg);
       img.ch = res.channels;
@@ -397,7 +466,7 @@
         }
       }
     } else if (algo === "statistical_stretch") {
-      img.ch = computeStatisticalStretch(img, params.target, params.sigma).ch;
+      img.ch = computeStatisticalStretch(img, params.target, params.sigma, params.linked).ch;
     } else if (algo === "curves") {
       var fn = monotoneCurveFn(params.points);
       var lut = LUT.buildLUT(function (x) { return fn(x); }, 65536);

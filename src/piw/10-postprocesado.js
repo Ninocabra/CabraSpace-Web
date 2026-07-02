@@ -595,6 +595,22 @@
   // p. ej. del Web Worker) que reemplaza el preview al terminar. commitPreview (botón grande
   // "Aplicar") espera al full-res pendiente y NUNCA commitea un proxy (véase updateBigApply).
   // computeFn(img) recibe el proxy o srcImg; extraFn (opcional) corre tras cada preview.
+  // BUSY-BADGE: letrero sobre el visor mientras un cómputo sigue en marcha (p. ej. el refinado a
+  // resolución completa tras el proxy, que antes corría en silencio y el usuario no sabía si el
+  // procesado había terminado). Se limpia siempre en finish().
+  let _busyBadge = null;
+  function showBusyBadge(text) {
+    if (!_busyBadge) {
+      _busyBadge = document.createElement("div");
+      _busyBadge.id = "piwBusyBadge";
+      _busyBadge.className = "piw-busy-badge";
+      (el("canvasContainer") || document.body).appendChild(_busyBadge);
+    }
+    _busyBadge.textContent = "⏳ " + text;
+    _busyBadge.style.display = "block";
+  }
+  function hideBusyBadge() { if (_busyBadge) _busyBadge.style.display = "none"; }
+
   let _proxySeq = 0;
   let _proxyPendingFull = null;
   async function previewProxyThenFull(srcImg, stageLabel, computeFn, extraFn) {
@@ -616,6 +632,8 @@
           pv._proxy = true;
           if (extraFn) extraFn(true);
           hideLoader(); // el usuario ya ve el resultado; el full-res sigue en segundo plano
+          const langB = document.documentElement.lang || "es";
+          showBusyBadge(langB === "es" ? `Procesando ${stageLabel} a resolución completa…` : `Processing ${stageLabel} at full resolution…`);
           render();
           drawHistogram();
         } catch (e) {
@@ -631,6 +649,9 @@
         if (extraFn) extraFn(false);
         render();
         drawHistogram();
+        // Aviso claro de FIN: el usuario sabe que el resultado que ve ya es el definitivo.
+        const langF = document.documentElement.lang || "es";
+        logConsole(langF === "es" ? `${stageLabel}: listo (resolución completa)` : `${stageLabel}: done (full resolution)`, "ok");
       } catch (e) {
         if (job === _proxySeq) {
           const lang = document.documentElement.lang || "es";
@@ -638,6 +659,7 @@
         }
       }
     } finally {
+      if (job === _proxySeq) hideBusyBadge();
       finish();
     }
   }

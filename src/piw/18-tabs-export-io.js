@@ -107,6 +107,30 @@
   // SCNR (casilla) también dispara el preview Live de balance de color.
   { const scnrChk = el("chkPostBalanceSCNR"); if (scnrChk) scnrChk.addEventListener("change", livePreviewColorBalance); }
 
+  // SLIDER-LABEL-AUTOSYNC: red de seguridad para TODOS los sliders. La auditoría encontró 39 de 91
+  // sliders sin binding de etiqueta (mueves el slider y el número no cambia: USM, HDR, LHE, DSE,
+  // TGV, NXT, Prism, BXT, DeepSNR, Statistical, FAME…). En vez de mantener a mano una lista de 91
+  // pares, este pase genérico empareja cada .piw-slider `sldX` con su span `valX` y, DESPUÉS de que
+  // corran los handlers específicos (este listener se añade el último), reescribe la etiqueta SOLO
+  // si quedó desincronizada — así no pisa los formatos custom de los sliders que ya funcionaban.
+  // Los decimales se infieren del atributo step (step=1→0, 0.05→2, 0.005→3...).
+  document.querySelectorAll("input.piw-slider[id^='sld']").forEach((sld) => {
+    const span = el("val" + sld.id.slice(3));
+    if (!span) return;
+    const stepStr = sld.getAttribute("step") || "1";
+    const decimals = (stepStr.split(".")[1] || "").length;
+    const sync = () => {
+      const v = parseFloat(sld.value);
+      const shown = parseFloat(span.textContent);
+      // tolerancia = medio step: si el handler específico ya puso el número correcto, no tocar
+      if (!isFinite(shown) || Math.abs(shown - v) > parseFloat(stepStr) / 2 + 1e-9) {
+        span.textContent = v.toFixed(decimals);
+      }
+    };
+    sync(); // al cargar: etiqueta = posición real del slider
+    sld.addEventListener("input", sync);
+  });
+
   // --- REGISTRO DRAG & DROP GLOBAL DE ARCHIVOS ---
   window.addEventListener("dragover", (e) => e.preventDefault());
   window.addEventListener("drop", (e) => e.preventDefault());

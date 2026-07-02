@@ -616,8 +616,8 @@
   "en": "                <span class=\"piw-label\">Hue sat</span>"
  },
  {
-  "es": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:2; padding: 6px 10px;\">Restablecer Ancla</button>",
-  "en": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:2; padding: 6px 10px;\">Reset Hue Anchor</button>"
+  "es": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:1; padding: 6px 10px;\">Restablecer Ancla</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:1; padding: 6px 10px;\">Reset Hue Anchor</button>"
  },
  {
   "es": "                  <span class=\"piw-label\">Saturación</span>",
@@ -890,5 +890,25 @@
  {
   "es": "  <!-- pyodide.js (CDN) eliminado: SAS Pro + SPCC + stretches son 100% JS; loadPyodide ya no se invoca. -->",
   "en": "  <!-- pyodide.js (CDN) removed: SAS Pro + SPCC + stretches are 100% JS; loadPyodide is never invoked. -->"
+ },
+ {
+  "es": "            <label class=\"piw-live-toggle piw-disabled-control\"><input type=\"checkbox\" id=\"chkPostColorBalanceLive\" disabled> Live — preview en tiempo real</label>",
+  "en": "            <label class=\"piw-live-toggle piw-disabled-control\"><input type=\"checkbox\" id=\"chkPostColorBalanceLive\" disabled> Live — real-time preview</label>"
+ },
+ {
+  "es": "            <label class=\"piw-live-toggle piw-disabled-control\"><input type=\"checkbox\" id=\"chkPostCurvesLive\" disabled> Live — preview en tiempo real</label>",
+  "en": "            <label class=\"piw-live-toggle piw-disabled-control\"><input type=\"checkbox\" id=\"chkPostCurvesLive\" disabled> Live — real-time preview</label>"
+ },
+ {
+  "es": "            <label class=\"piw-live-toggle\"><input type=\"checkbox\" id=\"chkCmLive\"> Live — preview en tiempo real</label>",
+  "en": "            <label class=\"piw-live-toggle\"><input type=\"checkbox\" id=\"chkCmLive\"> Live — real-time preview</label>"
+ },
+ {
+  "es": "            <label class=\"piw-live-toggle\"><input type=\"checkbox\" id=\"chkDetailLive\"> Live — preview en tiempo real</label>",
+  "en": "            <label class=\"piw-live-toggle\"><input type=\"checkbox\" id=\"chkDetailLive\"> Live — real-time preview</label>"
+ },
+ {
+  "es": "            <label class=\"piw-checkbox-row\" style=\"margin:2px 0 8px;\" title=\"Aplica la misma transformada a los 3 canales (como el STF enlazado de PixInsight). Desmárcalo solo si quieres re-balancear el fondo canal a canal.\">\n              <input type=\"checkbox\" id=\"chkStretchLinked\" checked> Canales enlazados (conserva el color)\n            </label>",
+  "en": "            <label class=\"piw-checkbox-row\" style=\"margin:2px 0 8px;\" title=\"Applies the same transform to all 3 channels (like PixInsight's linked STF). Untick only if you want to re-balance the background channel by channel.\">\n              <input type=\"checkbox\" id=\"chkStretchLinked\" checked> Linked channels (preserves color)\n            </label>"
  }
 ]
