@@ -111,13 +111,25 @@
     const cpl = el("chkCmProtectLowSat"); if (cpl) cpl.addEventListener("change", () => { state.colorMixer.protectLowSat = cpl.checked; livePreviewColorMixer(); });
     const cmLive = el("chkCmLive");
     if (cmLive) cmLive.addEventListener("change", () => { if (cmLive.checked) livePreviewColorMixer(); else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); } });
+    // "Preview": vista previa NO destructiva (proxy instantáneo + full-res en worker). El commit
+    // lo hace el botón grande "Aplicar Color Mixer" sobre la imagen, como en el resto de menús.
     const btnCM = el("btnApplyColorMixer");
     if (btnCM) btnCM.addEventListener("click", () => {
       const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
       const lang = document.documentElement.lang || "es";
       const st = state.colorMixer;
-      showLoader(lang === "es" ? "Aplicando Color Mixer..." : "Applying Color Mixer...");
-      applyImgOp("colorMixer", srcImg, st, "Color Mixer", () => computeColorMixer(srcImg, st));
+      showLoader(lang === "es" ? "Preview de Color Mixer..." : "Color Mixer preview...");
+      setTimeout(async () => {
+        try {
+          await previewProxyThenFull(srcImg, "Color Mixer", (img) => {
+            if (img === srcImg) return runImgWorker("colorMixer", img, st).catch(() => computeColorMixer(img, st));
+            return computeColorMixer(img, st);
+          });
+          logConsole(lang === "es" ? "Preview de Color Mixer. Pulsa 'Aplicar Color Mixer' para confirmar." : "Color Mixer preview. Press 'Apply Color Mixer' to commit.", "info");
+        } catch (e) {
+          logConsole("Color Mixer: " + (e && e.message ? e.message : e), "err");
+        } finally { hideLoader(); }
+      }, 50);
     });
     const btnCMR = el("btnResetColorMixer");
     if (btnCMR) btnCMR.addEventListener("click", () => { state.colorMixer = cmDefaultState(); cmSyncSlidersFromBand(); if (el("sldCmStrength")) { el("sldCmStrength").value = "1.00"; el("valCmStrength").textContent = "1.00"; } if (el("chkCmProtectStars")) el("chkCmProtectStars").checked = true; if (el("chkCmProtectLowSat")) el("chkCmProtectLowSat").checked = true; livePreviewColorMixer(); logConsole(document.documentElement.lang === "es" ? "Color Mixer restablecido." : "Color Mixer reset.", "info"); });
@@ -163,13 +175,25 @@
     });
     const dLive = el("chkDetailLive");
     if (dLive) dLive.addEventListener("change", () => { if (dLive.checked) livePreviewDetail(); else if (state.stepInputImage) { state.activeImage = state.stepInputImage; render(); } });
+    // "Preview": vista previa NO destructiva SIEMPRE a resolución completa (el enfoque a baja
+    // resolución engaña — misma exclusión de proxy que deconv/denoise/sharpen). Corre en el worker.
+    // El commit lo hace el botón grande "Aplicar Detalle" sobre la imagen.
     const btnD = el("btnApplyDetail");
     if (btnD) btnD.addEventListener("click", () => {
       const srcImg = state.stepInputImage || state.activeImage; if (!srcImg) return;
       const lang = document.documentElement.lang || "es"; const algo = el("selDetailAlgo").value;
       const pr = Object.assign({ algo }, detailParams());
-      showLoader(lang === "es" ? "Aplicando detalle..." : "Applying detail...");
-      applyImgOp("detail", srcImg, pr, "Detail", () => computeDetail(srcImg, algo, detailParams()));
+      showLoader(lang === "es" ? "Preview de detalle..." : "Detail preview...");
+      setTimeout(async () => {
+        try {
+          const res = await runImgWorker("detail", srcImg, pr).catch(() => computeDetail(srcImg, algo, detailParams()));
+          previewActiveImage(res, srcImg, "Detail");
+          render(); drawHistogram();
+          logConsole(lang === "es" ? "Preview de detalle. Pulsa 'Aplicar Detalle' para confirmar." : "Detail preview. Press 'Apply Detail' to commit.", "info");
+        } catch (e) {
+          logConsole("Detail: " + (e && e.message ? e.message : e), "err");
+        } finally { hideLoader(); }
+      }, 50);
     });
   }
   // IMG-ENH-END

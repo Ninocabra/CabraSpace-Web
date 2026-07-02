@@ -80,8 +80,8 @@
   "en": "      content: \"empty\";"
  },
  {
-  "es": "      content: \"Slot \" attr(data-slot) \" (Click: guardar | Click Dcho: cargar)\";",
-  "en": "      content: \"Slot \" attr(data-slot) \" (Click: save | Right-click: load)\";"
+  "es": "      content: \"Slot \" attr(data-slot) \" (Click: ver / guardar si vacío | Dcho: sobrescribir)\";",
+  "en": "      content: \"Slot \" attr(data-slot) \" (Click: view / save if empty | Right-click: overwrite)\";"
  },
  {
   "es": "    /* Mezcla drag & drop (estilo Photoshop) */",
@@ -784,10 +784,6 @@
   "en": "            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectStars\" checked> Protect stars (highlights)</label>\n            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectLowSat\" checked> Protect background (low saturation)</label>"
  },
  {
-  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyColorMixer\" disabled style=\"flex:2;\">Aplicar Color Mixer</button>",
-  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyColorMixer\" disabled style=\"flex:2;\">Apply Color Mixer</button>"
- },
- {
   "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radio (px)</span><span class=\"piw-value\" id=\"valDetailLcRadius\">80</span></div>",
   "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radius (px)</span><span class=\"piw-value\" id=\"valDetailLcRadius\">80</span></div>"
  },
@@ -802,10 +798,6 @@
  {
   "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radio (px)</span><span class=\"piw-value\" id=\"valDetailHpRadius\">3</span></div>",
   "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radius (px)</span><span class=\"piw-value\" id=\"valDetailHpRadius\">3</span></div>"
- },
- {
-  "es": "            <button class=\"piw-btn primary\" id=\"btnApplyDetail\" disabled style=\"width:100%;\">Aplicar Detalle</button>",
-  "en": "            <button class=\"piw-btn primary\" id=\"btnApplyDetail\" disabled style=\"width:100%;\">Apply Detail</button>"
  },
  {
   "es": "\n      <!-- Panel de previsualización central (Shared Preview Pane) -->",

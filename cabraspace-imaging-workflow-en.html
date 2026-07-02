@@ -599,8 +599,8 @@
     /* Botón Aplicar Grande */
     .piw-apply-btn-big {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 56px;      /* bajo la toolbar (que ocupa la esquina superior derecha) */
+      right: 12px;
       z-index: 15;
       background: rgba(207, 171, 74, 0.9);
       color: #020202;
@@ -840,7 +840,7 @@
     }
 
     .piw-slot-btn.filled::after {
-      content: "Slot " attr(data-slot) " (Click: save | Right-click: load)";
+      content: "Slot " attr(data-slot) " (Click: view / save if empty | Right-click: overwrite)";
     }
 
     .piw-slot-btn:hover::after {
@@ -1567,9 +1567,9 @@
                 <div class="piw-control-group">
                   <div class="piw-label-row">
                     <span class="piw-label">Degree</span>
-                    <span class="piw-value" id="valAbeDegree">4</span>
+                    <span class="piw-value" id="valAbeDegree">3</span>
                   </div>
-                  <input type="range" class="piw-slider" id="sldAbeDegree" min="1" max="8" step="1" value="4">
+                  <input type="range" class="piw-slider" id="sldAbeDegree" min="1" max="8" step="1" value="3">
                 </div>
                 <label class="piw-checkbox-row" style="margin-top:0;">
                   <input type="checkbox" id="chkAbeNormalize" checked> Normalize
@@ -1832,7 +1832,7 @@
                   <span class="piw-label" title="Fewer iterations = gentler stretch (protects star color)">Iterations</span>
                   <span class="piw-value" id="valGhsIters">10</span>
                 </div>
-                <input type="range" class="piw-slider" id="sldGhsIters" min="1" max="10" step="1" value="10">
+                <input type="range" class="piw-slider" id="sldGhsIters" min="1" max="15" step="1" value="10">
               </div>
             </div>
 
@@ -2636,7 +2636,7 @@
         <!-- Tab 4: Enhance (Image Enhancement — PI Workflow port) -->
         <div class="piw-tab-content" id="tab-enhance">
           <!-- COLOR MIXER -->
-          <div class="piw-section">
+          <div class="piw-section" data-apply="colormixer">
             <h3 class="piw-section-title">Color Mixer</h3>
             <span class="piw-eyebrow">SELECTIVE COLOR BY HUE BAND</span>
             <label class="piw-live-toggle"><input type="checkbox" id="chkCmLive"> Live — real-time preview</label>
@@ -2660,13 +2660,13 @@
             <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectStars" checked> Protect stars (highlights)</label>
             <label class="piw-checkbox-row" style="margin-bottom:4px;"><input type="checkbox" id="chkCmProtectLowSat" checked> Protect background (low saturation)</label>
             <div style="display:flex; gap:8px;">
-              <button class="piw-btn primary" id="btnApplyColorMixer" disabled style="flex:2;">Apply Color Mixer</button>
+              <button class="piw-btn primary" id="btnApplyColorMixer" disabled style="flex:2;">Preview</button>
               <button class="piw-btn" id="btnResetColorMixer" style="flex:1;">Reset</button>
             </div>
           </div>
 
           <!-- DETAIL & CONTRAST -->
-          <div class="piw-section collapsed">
+          <div class="piw-section collapsed" data-apply="detail">
             <h3 class="piw-section-title">Detail &amp; Contrast</h3>
             <label class="piw-live-toggle"><input type="checkbox" id="chkDetailLive"> Live — real-time preview</label>
             <select class="piw-select" id="selDetailAlgo">
@@ -2704,7 +2704,7 @@
                 <input type="range" class="piw-slider" id="sldDetailHpRadius" min="1" max="12" step="1" value="3">
               </div>
             </div>
-            <button class="piw-btn primary" id="btnApplyDetail" disabled style="width:100%;">Apply Detail</button>
+            <button class="piw-btn primary" id="btnApplyDetail" disabled style="width:100%;">Preview</button>
           </div>
         </div>
       </aside>
@@ -2825,25 +2825,25 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <!-- pyodide.js (CDN) removed: SAS Pro + SPCC + stretches are 100% JS; loadPyodide is never invoked. -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
-  <script>window.PIW_BUILD="20260703a";</script>
-  <script src="onnx-engine.js?v=20260703a"></script>
-  <script src="star-removal.js?v=20260703a"></script>
-  <script src="deconv.js?v=20260703a"></script>
-  <script src="io.js?v=20260703a"></script>
-  <script src="autoghs.js?v=20260703a"></script>
+  <script>window.PIW_BUILD="20260703b";</script>
+  <script src="onnx-engine.js?v=20260703b"></script>
+  <script src="star-removal.js?v=20260703b"></script>
+  <script src="deconv.js?v=20260703b"></script>
+  <script src="io.js?v=20260703b"></script>
+  <script src="autoghs.js?v=20260703b"></script>
   <!-- saspro-pyodide.js eliminado: SAS Pro + SPCC son 100% JS (spcc.js + AutoGHS), sin Pyodide. -->
-  <script src="lut.js?v=20260703a"></script>
-  <script src="resample.js?v=20260703a"></script>
-  <script src="background.js?v=20260703a"></script>
-  <script src="graxpert.js?v=20260703a"></script>
+  <script src="lut.js?v=20260703b"></script>
+  <script src="resample.js?v=20260703b"></script>
+  <script src="background.js?v=20260703b"></script>
+  <script src="graxpert.js?v=20260703b"></script>
   <!-- USM-SHARP-BEGIN -->
-  <script src="sharpening.js?v=20260703a"></script>
+  <script src="sharpening.js?v=20260703b"></script>
   <!-- USM-SHARP-END -->
-  <script src="spcc.js?v=20260703a"></script>
-  <script src="imgproc.js?v=20260703a"></script>
-  <script src="imgops.js?v=20260703a"></script>
+  <script src="spcc.js?v=20260703b"></script>
+  <script src="imgproc.js?v=20260703b"></script>
+  <script src="imgops.js?v=20260703b"></script>
   <!-- A5: bundle minificado por esbuild (tools/build_piw.py desde src/piw/); sourcemap apunta a pi-workflow.js -->
-  <script src="pi-workflow.min.js?v=20260703a"></script>
-  <script src="mobile-menu.js?v=20260703a"></script>
+  <script src="pi-workflow.min.js?v=20260703b"></script>
+  <script src="mobile-menu.js?v=20260703b"></script>
 </body>
 </html>

@@ -268,7 +268,11 @@
       return;
     }
     
-    const activeSection = document.querySelector(".piw-section:not(.collapsed)");
+    // Solo cuentan las secciones del TAB ACTIVO: las de Mezcla están siempre desplegadas y, al ir
+    // antes en el DOM, eclipsaban a las secciones de pestañas posteriores (Mejora) — el botón
+    // grande nunca aparecía para Color Mixer/Detail.
+    const activeSection = document.querySelector(".piw-tab-content.active .piw-section:not(.collapsed)")
+      || document.querySelector(".piw-section:not(.collapsed)");
     if (!activeSection) {
       btn.style.display = "none";
       return;
@@ -331,7 +335,9 @@
       scnr:        { es: "Aplicar SCNR",         en: "Apply SCNR" },
       mask:        { es: "Guardar Máscara",      en: "Save Mask",         noGate: true },
       saturation:  { es: "Aplicar Saturación",   en: "Apply Saturation" },
-      saspro:      { es: "Aplicar SASPro",       en: "Apply SASPro" }
+      saspro:      { es: "Aplicar SASPro",       en: "Apply SASPro" },
+      colormixer:  { es: "Aplicar Color Mixer",  en: "Apply Color Mixer" },
+      detail:      { es: "Aplicar Detalle",      en: "Apply Detail" }
     };
 
     const def = APPLY_DEFS[applyKey];
