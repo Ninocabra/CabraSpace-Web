@@ -74,8 +74,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Hotfix**
   - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
-- **Modelo: Wanderer**
-  - [Liberada la versión 2.2.2 de la biblioteca INDI](https://github.com/indilib/indi/releases/tag/v2.2.2) (2026-06-01)
 
 ## Orion
 
@@ -405,6 +403,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO: Capturando los Pilares de la Creación con equipos terrestres](https://www.youtube.com/shorts/8NW33-CdiHg) (2026-04-28)
 - **Modelo: S50**
   - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
+- **Modelo: Seestar S30 Pro**
+  - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
 
 ### SOFTWARE
 - **Modelo: ASIAir**
