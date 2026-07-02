@@ -2807,24 +2807,25 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <!-- pyodide.js (CDN) eliminado: SAS Pro + SPCC + stretches son 100% JS; loadPyodide ya no se invoca. -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
-  <script>window.PIW_BUILD="20260702b";</script>
-  <script src="onnx-engine.js?v=20260702b"></script>
-  <script src="star-removal.js?v=20260702b"></script>
-  <script src="deconv.js?v=20260702b"></script>
-  <script src="io.js?v=20260702b"></script>
-  <script src="autoghs.js?v=20260702b"></script>
+  <script>window.PIW_BUILD="20260702c";</script>
+  <script src="onnx-engine.js?v=20260702c"></script>
+  <script src="star-removal.js?v=20260702c"></script>
+  <script src="deconv.js?v=20260702c"></script>
+  <script src="io.js?v=20260702c"></script>
+  <script src="autoghs.js?v=20260702c"></script>
   <!-- saspro-pyodide.js eliminado: SAS Pro + SPCC son 100% JS (spcc.js + AutoGHS), sin Pyodide. -->
-  <script src="lut.js?v=20260702b"></script>
-  <script src="resample.js?v=20260702b"></script>
-  <script src="background.js?v=20260702b"></script>
-  <script src="graxpert.js?v=20260702b"></script>
+  <script src="lut.js?v=20260702c"></script>
+  <script src="resample.js?v=20260702c"></script>
+  <script src="background.js?v=20260702c"></script>
+  <script src="graxpert.js?v=20260702c"></script>
   <!-- USM-SHARP-BEGIN -->
-  <script src="sharpening.js?v=20260702b"></script>
+  <script src="sharpening.js?v=20260702c"></script>
   <!-- USM-SHARP-END -->
-  <script src="spcc.js?v=20260702b"></script>
-  <script src="imgproc.js?v=20260702b"></script>
-  <script src="imgops.js?v=20260702b"></script>
-  <script src="pi-workflow.js?v=20260702b"></script>
-  <script src="mobile-menu.js?v=20260702b"></script>
+  <script src="spcc.js?v=20260702c"></script>
+  <script src="imgproc.js?v=20260702c"></script>
+  <script src="imgops.js?v=20260702c"></script>
+  <!-- A5: bundle minificado por esbuild (tools/build_piw.py desde src/piw/); sourcemap apunta a pi-workflow.js -->
+  <script src="pi-workflow.min.js?v=20260702c"></script>
+  <script src="mobile-menu.js?v=20260702c"></script>
 </body>
 </html>

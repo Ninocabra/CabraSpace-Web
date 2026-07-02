@@ -1,6 +1,9 @@
 /* =========================================================================
  * pi-workflow.js — Motor de Procesado y UI de PI Workflow
  *
+ * ARCHIVO GENERADO por tools/build_piw.py desde los fragmentos de src/piw/
+ * (NO editar a mano: edita el fragmento y regenera).
+ *
  * Coordina las operaciones cliente de pre-procesado, estirado, máscaras
  * y mezcla de canales directamente en el navegador.
  * ========================================================================= */

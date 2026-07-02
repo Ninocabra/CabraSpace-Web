@@ -1,0 +1,13 @@
+{
+  "name": "cabraspace-web",
+  "private": true,
+  "description": "Web estática de CabraSpace. Node solo para tooling: esbuild minifica pi-workflow.js (tools/build_piw.py).",
+  "scripts": {
+    "build:piw": "python tools/build_piw.py",
+    "check:piw": "python tools/build_piw.py --check",
+    "check:i18n": "python tools/build_workflow_en.py --check"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}
