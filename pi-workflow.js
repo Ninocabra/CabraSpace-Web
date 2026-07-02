@@ -1512,19 +1512,32 @@
           // (btnBigApply). Cambiar de algoritmo siempre parte de la Imagen Inicial.
           const algo = el("selGradientAlgo").value;
           const srcImg = state.stepInputImage || state.activeImage;
-          const { corrected, bgCh } = await computeGradient(algo, srcImg);
-          if (bgCh) {
-            state.subtractedGradient = { ch: bgCh, w: corrected.w, h: corrected.h, nc: corrected.nc, isColor: corrected.isColor };
+          // PROXY-PROBAR (V1): ABE/AutoDBE (no-IA) previsualizan primero sobre el proxy ≤1000px
+          // (el ajuste de fondo es global: el proxy es representativo) y refinan a resolución
+          // completa en segundo plano. GraXpert IA va directo a resolución completa.
+          const computeFn = async (img) => {
+            const { corrected, bgCh } = await computeGradient(algo, img);
+            // el gradiente restado solo se guarda del pase a resolución completa
+            if (bgCh && img === srcImg) {
+              state.subtractedGradient = { ch: bgCh, w: corrected.w, h: corrected.h, nc: corrected.nc, isColor: corrected.isColor };
+            }
+            return corrected;
+          };
+          const extraFn = () => {
+            // Activar estirado automático de pantalla (AutoSTF) para que el resultado lineal no se vea negro
+            state.screenStretchMode = true;
+            const stfBtn = el("btnToolAutoSTF");
+            if (stfBtn) stfBtn.classList.add("active");
+          };
+          if (algo !== "graxpert_ia") {
+            await previewProxyThenFull(srcImg, "Background Extraction", computeFn, extraFn);
+          } else {
+            previewActiveImage(await computeFn(srcImg), srcImg, "Background Extraction");
+            extraFn();
+            render();
+            drawHistogram();
           }
-          previewActiveImage(corrected, srcImg, "Background Extraction");
-          // Activar estirado automático de pantalla (AutoSTF) para que el resultado lineal no se vea negro
-          state.screenStretchMode = true;
-          const stfBtn = el("btnToolAutoSTF");
-          if (stfBtn) stfBtn.classList.add("active");
-
           hideLoader();
-          render();
-          drawHistogram();
           logConsole(lang === "es" ? "Vista previa de gradiente (Probar). Pulsa 'Aplicar Gradiente' para confirmar." : "Gradient preview (Test). Press 'Apply Gradient' to commit.", "info");
           // PROBAR-GRADIENTE-END
         } catch (e) {
@@ -2402,13 +2415,11 @@
     const srcImg = state.stepInputImage || state.activeImage;
     if (!srcImg || !srcImg.isColor) return;
     showLoader("Alineando canales (Linear Fit)...");
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        const img = computeLinearFit(srcImg);
-        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
-        previewActiveImage(img, srcImg, "Linear Fit");
-        render();
-        drawHistogram();
+        // CALIB-PREVIEW + PROXY-PROBAR (V1): preview no destructivo (commit en "Aplicar
+        // Calibración"); primero instantáneo sobre el proxy y luego a resolución completa.
+        await previewProxyThenFull(srcImg, "Linear Fit", (img) => computeLinearFit(img));
         logConsole("Vista previa Linear Fit (Probar). Pulsa 'Aplicar Calibración' para confirmar.", "info");
       } catch (err) {
         logConsole(`Error en Linear Fit: ${err.message}`, "err");
@@ -2424,13 +2435,11 @@
     if (!srcImg || !srcImg.isColor || srcImg.nc < 3) return;
     const lang = document.documentElement.lang || "es";
     showLoader(lang === "es" ? "Aplicando Optimal Transport (Wasserstein 1D)..." : "Applying Optimal Transport (1D Wasserstein)...");
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        const img = computeOptimalTransport(srcImg);
-        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
-        previewActiveImage(img, srcImg, "Optimal Transport");
-        render();
-        drawHistogram();
+        // CALIB-PREVIEW + PROXY-PROBAR (V1): preview no destructivo (commit en "Aplicar
+        // Calibración"); primero instantáneo sobre el proxy y luego a resolución completa.
+        await previewProxyThenFull(srcImg, "Optimal Transport", (img) => computeOptimalTransport(img));
         logConsole(lang === "es" ? "Vista previa Optimal Transport (Probar). Pulsa 'Aplicar Calibración' para confirmar." : "Optimal Transport preview (Test). Press 'Apply Calibration' to commit.", "info");
       } catch (err) {
         logConsole(`Error en Optimal Transport: ${err.message}`, "err");
@@ -2446,20 +2455,23 @@
     if (!state.activeImage) return;
     const lang = document.documentElement.lang || "es";
     showLoader(lang === "es" ? "Neutralizando fondo..." : "Neutralizing background...");
-    
-    setTimeout(() => {
+
+    setTimeout(async () => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        const { img: res, bgVals } = computeBackgroundNeutralizationCalib(srcImg);
-
-        // CALIB-PREVIEW: preview no destructivo (commit en "Aplicar Calibración")
-        previewActiveImage(res, srcImg, "Background Neutralization");
-
-        render();
-        drawHistogram();
-
-        const bgStr = Array.from(bgVals).map(v => v.toFixed(4)).join(", ");
-        logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
+        // CALIB-PREVIEW + PROXY-PROBAR (V1): preview no destructivo (commit en "Aplicar
+        // Calibración"); primero instantáneo sobre el proxy y luego a resolución completa.
+        // Los valores de fondo del log se toman del pase a resolución completa.
+        let fullBgVals = null;
+        await previewProxyThenFull(srcImg, "Background Neutralization", (img) => {
+          const { img: res, bgVals } = computeBackgroundNeutralizationCalib(img);
+          if (img === srcImg) fullBgVals = bgVals;
+          return res;
+        });
+        if (fullBgVals) {
+          const bgStr = Array.from(fullBgVals).map(v => v.toFixed(4)).join(", ");
+          logConsole(lang === "es" ? `Fondo detectado (R,G,B): [${bgStr}]` : `Detected background (R,G,B): [${bgStr}]`, "info");
+        }
         logConsole(lang === "es" ? "Neutralización de fondo completada" : "Background Neutralization completed", "info");
       } catch (err) {
         logConsole(`Error en Neutralización: ${err.message}`, "err");
@@ -3014,48 +3026,10 @@
   // Port a JS del Statistical Stretch de Seti Astro (antes en Pyodide/stretch.py). Mismo algoritmo:
   // por canal -> MAD robusto, punto de negro a sigma*MAD, normaliza [0,1], y MTF para llevar la
   // mediana al objetivo. Sin Pyodide (sin descargar el runtime ni OOM), como las demás operaciones JS.
-  function _ssSample(ch) {
-    const n = ch.length, MAX = 500000;
-    if (n <= MAX) return Float32Array.from(ch);
-    const arr = new Float32Array(MAX), step = Math.floor(n / MAX);
-    for (let i = 0; i < MAX; i++) arr[i] = ch[i * step];
-    return arr;
-  }
-  function _ssMAD(ch, med) {
-    const s = _ssSample(ch);
-    for (let i = 0; i < s.length; i++) s[i] = Math.abs(s[i] - med);
-    s.sort();
-    const m = s.length >> 1;
-    return s.length % 2 === 0 ? (s[m - 1] + s[m]) * 0.5 : s[m];
-  }
-  function _ssStd(ch) {
-    const s = _ssSample(ch);
-    let mean = 0; for (let i = 0; i < s.length; i++) mean += s[i]; mean /= s.length;
-    let v = 0; for (let i = 0; i < s.length; i++) { const d = s[i] - mean; v += d * d; }
-    return Math.sqrt(v / s.length);
-  }
+  // V2 (Fase 4): la matemática vive en ImgOps.computeStatisticalStretch (imgops.js), compartida
+  // con el Web Worker; aquí queda el delegado para los llamadores existentes.
   function computeStatisticalStretchJS(srcImg, target, sigma) {
-    const w = srcImg.w, h = srcImg.h, n = w * h, nc = srcImg.nc;
-    const out = [];
-    for (let c = 0; c < nc; c++) {
-      const ch = srcImg.ch[c];
-      const med = fastSampledMedian(ch);
-      let dev = _ssMAD(ch, med);
-      if (dev < 1e-6) dev = _ssStd(ch);
-      if (dev < 1e-6) dev = 0.001;
-      const bp = Math.max(0, med - sigma * dev);
-      let denom = 1 - bp; if (denom < 1e-6) denom = 1;
-      const o = new Float32Array(n);
-      for (let i = 0; i < n; i++) { let v = (ch[i] - bp) / denom; o[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
-      let x = fastSampledMedian(o); if (x <= 0.0001) x = 0.002;
-      let m = (target - 1) * x / (x * (2 * target - 1) - target);
-      if (!isFinite(m)) m = 0.5;
-      m = m < 0.0001 ? 0.0001 : (m > 0.9999 ? 0.9999 : m);
-      const m2 = 2 * m - 1;
-      for (let i = 0; i < n; i++) { const v = o[i]; let dm = m2 * v - m; if (Math.abs(dm) < 1e-12) dm = 1e-12; let r = (m - 1) * v / dm; o[i] = r < 0 ? 0 : (r > 1 ? 1 : r); }
-      out.push(o);
-    }
-    return { ch: out, w, h, nc, isColor: srcImg.isColor };
+    return window.ImgOps.computeStatisticalStretch(srcImg, target, sigma);
   }
   // Star Stretch = Statistical Stretch + correccion gamma por canal para preservar el color estelar.
   function computeStarStretchJS(srcImg, target, sigma, colorPreservation) {
@@ -3246,48 +3220,8 @@
   // --- OPERACIONES DE ESTIRADO / STRETCHING (TAB 1) ---
 
   // Auto STF
-  function runAutoSTF(img, targetBg, clipSigmas) {
-    const n = img.w * img.h;
-    
-    for (let c = 0; c < img.nc; ++c) {
-      const ch = img.ch[c];
-      const stats = AutoGHS.medianMAD(ch, n, 200000);
-      
-      // Calcular punto negro (c0)
-      let c0 = stats.median + clipSigmas * stats.sigma;
-      if (c0 < 0) c0 = 0;
-      if (c0 > stats.median) c0 = stats.median;
-
-      // Rescalar
-      const c0Den = (1 - c0) || 1e-6;
-      const rescaledCh = new Float32Array(n);
-      for (let i = 0; i < n; ++i) {
-        const val = (ch[i] - c0) / c0Den;
-        rescaledCh[i] = val < 0 ? 0 : (val > 1 ? 1 : val);
-      }
-
-      // Calcular nueva mediana tras el punto negro
-      const stats2 = AutoGHS.medianMAD(rescaledCh, n, 100000);
-      const mPrime = Math.max(0.0001, Math.min(0.9999, stats2.median));
-
-      // Resolver Midtones Balance (m)
-      const m = ((targetBg - 1) * mPrime) / (2 * targetBg * mPrime - targetBg - mPrime);
-      
-      // Aplicar MTF
-      if (m > 0 && m < 1) {
-        const m1 = m - 1;
-        const m2 = 2 * m - 1;
-        // LUT-MTF-BEGIN
-        const mtfLut = window.LUT.buildLUT(x => {
-          const den = m2 * x - m;
-          return Math.abs(den) > 1e-12 ? Math.min(1, Math.max(0, (m1 * x) / den)) : x;
-        }, 65536);
-        img.ch[c] = window.LUT.applyLUT(rescaledCh, mtfLut);
-        // LUT-MTF-END
-        logConsole(`Canal ${c} estirado con STF: bp = ${c0.toFixed(4)}, m = ${m.toFixed(4)}`, "info");
-      }
-    }
-  }
+  // runAutoSTF (estirado STF del menú Estirar) vive ahora en imgops.js (autoSTFInPlace, misma
+  // matemática) y se invoca vía ImgOps.computeStretch({algo:"stf"}) — también desde el worker.
 
   // Cargar Starless
   el("btnLoadStarless").addEventListener("click", () => {
@@ -3575,56 +3509,40 @@
   }
 
   // STRETCH-COMPARE-BEGIN
-  // Motor de estirado reutilizable (Preview y Comparar). No destructivo: clona srcImg y devuelve img.
-  // Lee los valores actuales de los sliders de cada algoritmo.
-  async function computeStretch(algo, srcImg) {
-    const lang = document.documentElement.lang || "es";
-    let img = cloneImage(srcImg);
+  // STRETCH-PARAMS: params PLANOS (serializables) del estirado según el algoritmo seleccionado,
+  // leídos de los sliders de la UI. Sirven igual para ImgOps.computeStretch en el hilo principal
+  // (proxy del Probar, Comparar) y para el Web Worker (resolución completa sin congelar la UI).
+  function getStretchParams(algo, srcImg) {
     if (algo === "stf") {
-      const bg = parseFloat(el("sldStfBg").value);
-      const clip = parseFloat(el("sldStfClip").value);
-      runAutoSTF(img, bg, clip);
-    } else if (algo === "ghs") {
+      return { algo, targetBg: parseFloat(el("sldStfBg").value), clipSigmas: parseFloat(el("sldStfClip").value) };
+    }
+    if (algo === "ghs") {
       const cfg = AutoGHS.defaultConfig();
       cfg.sigmasFromCenter = parseFloat(el("sldGhsSig").value);
       cfg.stretchIntensity = parseFloat(el("sldGhsInt").value);
       const _ghsIters = el("sldGhsIters");
       if (_ghsIters) cfg.maxIterations = parseInt(_ghsIters.value, 10);
-      cfg.colorMode = img.isColor ? "luminance" : "rgb";
-      const res = AutoGHS.process(img.ch, img.w * img.h, img.nc, img.isColor, cfg);
-      img.ch = res.channels;
-    } else if (algo === "stars") {
-      // STAR-STRETCH-SETIASTRO: estirado hiperbólico de estrellas de Seti Astro (numba_utils.applyPixelMath):
-      //   f = 3^amount ; out = (f·x)/((f-1)·x + 1)  por canal  (mapea [0,1]→[0,1], levanta mucho las sombras).
-      // Luego Color Boost alrededor de la media RGB por píxel:  out = media + (out-media)·boost.
-      const amt = parseFloat(el("sldStarsStretch").value);
-      const boostEl = el("sldStarsBoost");
-      const boost = boostEl ? parseFloat(boostEl.value) : 1.0;
-      const f = Math.pow(3, amt);
-      const denom = f - 1;
-      const starLut = window.LUT.buildLUT((x) => { const v = (f * x) / (denom * x + 1); return v < 0 ? 0 : (v > 1 ? 1 : v); }, 65536);
-      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], starLut);
-      // Color Boost (solo tiene sentido en color; realza la saturación de las estrellas).
-      if (img.isColor && img.nc >= 3 && Math.abs(boost - 1) > 1e-6) {
-        const r = img.ch[0], g = img.ch[1], b = img.ch[2], nn = img.w * img.h;
-        for (let i = 0; i < nn; ++i) {
-          const m = (r[i] + g[i] + b[i]) / 3;
-          let rr = m + (r[i] - m) * boost; let gg = m + (g[i] - m) * boost; let bb = m + (b[i] - m) * boost;
-          r[i] = rr < 0 ? 0 : (rr > 1 ? 1 : rr);
-          g[i] = gg < 0 ? 0 : (gg > 1 ? 1 : gg);
-          b[i] = bb < 0 ? 0 : (bb > 1 ? 1 : bb);
-        }
-      }
-    } else if (algo === "statistical_stretch") {
-      const tgt = parseFloat(el("sldStretchStatTgt").value);
-      const sig = parseFloat(el("sldStretchStatSigma").value);
-      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), mismo algoritmo (MAD + MTF por canal).
-      img = computeStatisticalStretchJS(img, tgt, sig);
-    } else if (algo === "curves") {
-      const lut = window.LUT.buildLUT((x) => curveEval(x), 65536);
-      for (let c = 0; c < img.nc; ++c) img.ch[c] = window.LUT.applyLUT(img.ch[c], lut);
+      cfg.colorMode = srcImg.isColor ? "luminance" : "rgb";
+      return { algo, cfg };
     }
-    return img;
+    if (algo === "stars") {
+      const boostEl = el("sldStarsBoost");
+      return { algo, amount: parseFloat(el("sldStarsStretch").value), boost: boostEl ? parseFloat(boostEl.value) : 1.0 };
+    }
+    if (algo === "statistical_stretch") {
+      // STAT-STRETCH-PYODIDE->JS: estirado en JS (sin Pyodide), mismo algoritmo (MAD + MTF por canal).
+      return { algo, target: parseFloat(el("sldStretchStatTgt").value), sigma: parseFloat(el("sldStretchStatSigma").value) };
+    }
+    if (algo === "curves") {
+      return { algo, points: stretchPoints.map((p) => [p[0], p[1]]) };
+    }
+    return { algo };
+  }
+
+  // Motor de estirado reutilizable (Preview y Comparar). No destructivo: devuelve una imagen nueva.
+  // V2 (Fase 4): la matemática vive en ImgOps.computeStretch (imgops.js), compartida con el worker.
+  async function computeStretch(algo, srcImg) {
+    return window.ImgOps.computeStretch(srcImg, getStretchParams(algo, srcImg));
   }
 
   // Aplicar estirado (Preview no destructivo)
@@ -3637,20 +3555,22 @@
     setTimeout(async () => {
       try {
         const srcImg = state.stepInputImage || state.activeImage;
-        if (algo === "statistical_stretch") {
-          showLoader(lang === "es" ? "Statistical Stretch (Pyodide, puede tardar la 1ª vez)..." : "Statistical Stretch (Pyodide, may take a while first run)...");
-        }
-        const img = await computeStretch(algo, srcImg);
+        // Los params se leen UNA vez: proxy y resolución completa usan exactamente los mismos.
+        const params = getStretchParams(algo, srcImg);
+        // PROXY-PROBAR (V1) + worker (V2): preview instantáneo sobre el proxy y recomputo a
+        // resolución completa en el Web Worker (fallback CPU), que reemplaza el preview al llegar.
+        await previewProxyThenFull(srcImg, "Stretch", (img) => {
+          if (img === srcImg) {
+            return runImgWorker("stretch", img, params).catch(() => window.ImgOps.computeStretch(img, params));
+          }
+          return window.ImgOps.computeStretch(img, params);
+        }, () => {
+          // Tras estirar, desactivar el estirado de pantalla AutoSTF (vemos los datos ya estirados, no doble)
+          state.screenStretchMode = false;
+          const btnAutoStf = el("btnToolAutoSTF");
+          if (btnAutoStf) btnAutoStf.classList.remove("active");
+        });
         logConsole(lang === "es" ? `Estirado aplicado: ${algo}` : `Stretch applied: ${algo}`, "info");
-
-        // Preview NO destructivo sobre la Imagen Inicial; el commit lo hace el botón grande "Aplicar Estirado".
-        previewActiveImage(img, srcImg, "Stretch");
-        // Tras estirar, desactivar el estirado de pantalla AutoSTF (vemos los datos ya estirados, no doble)
-        state.screenStretchMode = false;
-        const btnAutoStf = el("btnToolAutoSTF");
-        if (btnAutoStf) btnAutoStf.classList.remove("active");
-        render();
-        drawHistogram();
         logConsole(lang === "es" ? "Vista previa de estirado (Preview). Pulsa 'Aplicar Estirado' para confirmar." : "Stretch preview. Press 'Apply Stretch' to commit.", "info");
       } catch (err) {
         logConsole(`Error en estirado: ${err.message}`, "err");
@@ -4208,59 +4128,9 @@
   // CURVES-BEGIN
   // Aplica las curvas actuales (state.curves) a srcImg y devuelve la imagen resultante SIN mutar
   // la entrada. Reutilizado por "Aplicar Curvas" (commit) y por el preview Live.
+  // V2 (Fase 4): la matemática vive en ImgOps.computeCurves (imgops.js), compartida con el worker.
   function computeCurvesImage(srcImg) {
-    const lutK = window.LUT.buildLUT(getCubicSpline(state.curves.K));
-    const lutR = window.LUT.buildLUT(getCubicSpline(state.curves.R));
-    const lutG = window.LUT.buildLUT(getCubicSpline(state.curves.G));
-    const lutB = window.LUT.buildLUT(getCubicSpline(state.curves.B));
-    const lutS = window.LUT.buildLUT(getCubicSpline(state.curves.S));
-
-    const w = srcImg.w, h = srcImg.h, nc = srcImg.nc;
-    const isColor = srcImg.isColor || nc === 3;
-    const size = w * h;
-    const dstCh = [];
-    for (let c = 0; c < nc; c++) dstCh.push(new Float32Array(size));
-    const clampIdx = (val) => { let idx = Math.round(val * 65535); return idx < 0 ? 0 : (idx > 65535 ? 65535 : idx); };
-
-    if (isColor && nc === 3) {
-      const rSrc = srcImg.ch[0], gSrc = srcImg.ch[1], bSrc = srcImg.ch[2];
-      const rDst = dstCh[0], gDst = dstCh[1], bDst = dstCh[2];
-      const isSatModified = state.curves.S.some(p => Math.abs(p.x - p.y) > 1e-4);
-      for (let i = 0; i < size; i++) {
-        let r = rSrc[i], g = gSrc[i], b = bSrc[i];
-        r = lutK[clampIdx(r)]; g = lutK[clampIdx(g)]; b = lutK[clampIdx(b)];
-        r = lutR[clampIdx(r)]; g = lutG[clampIdx(g)]; b = lutB[clampIdx(b)];
-        if (isSatModified) {
-          let max = r, min = r;
-          if (g > max) max = g; if (b > max) max = b;
-          if (g < min) min = g; if (b < min) min = b;
-          let hh = 0, s = 0, l = (max + min) / 2;
-          if (max !== min) {
-            const d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            if (max === r) hh = (g - b) / d + (g < b ? 6 : 0);
-            else if (max === g) hh = (b - r) / d + 2;
-            else hh = (r - g) / d + 4;
-            hh /= 6;
-          }
-          s = lutS[clampIdx(s)];
-          if (s === 0) { r = g = b = l; }
-          else {
-            const hue2rgb = (p, q, t) => { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1/6) return p + (q - p) * 6 * t; if (t < 1/2) return q; if (t < 2/3) return p + (q - p) * (2/3 - t) * 6; return p; };
-            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            const p = 2 * l - q;
-            r = hue2rgb(p, q, hh + 1/3); g = hue2rgb(p, q, hh); b = hue2rgb(p, q, hh - 1/3);
-          }
-        }
-        rDst[i] = r < 0 ? 0 : (r > 1 ? 1 : r);
-        gDst[i] = g < 0 ? 0 : (g > 1 ? 1 : g);
-        bDst[i] = b < 0 ? 0 : (b > 1 ? 1 : b);
-      }
-    } else {
-      const srcCh = srcImg.ch[0], dstCh0 = dstCh[0];
-      for (let i = 0; i < size; i++) { const v = lutK[clampIdx(srcCh[i])]; dstCh0[i] = v < 0 ? 0 : (v > 1 ? 1 : v); }
-    }
-    return { ch: dstCh, w, h, nc, isColor };
+    return window.ImgOps.computeCurves(srcImg, { curves: state.curves });
   }
 
   el("btnApplyPostCurves").addEventListener("click", () => {
@@ -4269,130 +4139,47 @@
 
     const lang = document.documentElement.lang || "es";
     showLoader(lang === "es" ? "Aplicando curvas..." : "Applying curves...");
-
-    setTimeout(() => {
-      try {
-        commitActiveImage(computeCurvesImage(srcImg), "Curves", srcImg);
-
-        render();
-        refreshPathBar();
-        logConsole(
-          lang === "es"
-            ? "Ajuste de curvas aplicado con éxito."
-            : "Curves adjustment applied successfully.",
-          "ok"
-        );
-      } catch (err) {
-        logConsole(`Error al aplicar curvas: ${err.message}`, "err");
-      } finally {
-        hideLoader();
-      }
-    }, 50);
+    // V2 (Fase 4): resolución completa en el Web Worker (fallback CPU si el worker falla).
+    applyImgOp("curves", srcImg, { curves: state.curves }, "Curves", () => computeCurvesImage(srcImg));
   });
   // CURVES-END
 
   // COLOR-WHEEL-BEGIN
-  // Aplica el balance de color actual (multiplicadores RGB + saturación + SCNR de los controles)
-  // a srcImg y devuelve la imagen resultante SIN mutar la entrada. Reutilizado por "Aplicar
+  // Params PLANOS (serializables) del balance de color leídos de los controles: multiplicadores
+  // RGB + saturación + SCNR (scnrAmt 0 = desactivado). Los usan ImgOps.computeColorBalance en el
+  // hilo principal (Live) y el Web Worker (Aplicar a resolución completa).
+  function getColorBalanceParams() {
+    const doScnr = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
+    return {
+      rMult:   parseFloat(el("sldPostBalanceR").value),
+      gMult:   parseFloat(el("sldPostBalanceG").value),
+      bMult:   parseFloat(el("sldPostBalanceB").value),
+      satMult: parseFloat(el("sldPostBalanceSat").value),
+      scnrAmt: doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0
+    };
+  }
+  // Aplica el balance de color actual a srcImg SIN mutar la entrada. Reutilizado por "Aplicar
   // Balance" (commit) y por el preview Live.
+  // V2 (Fase 4): la matemática vive en ImgOps.computeColorBalance (imgops.js), compartida con el worker.
   function computeColorBalanceImage(srcImg) {
-    const rMult   = parseFloat(el("sldPostBalanceR").value);
-    const gMult   = parseFloat(el("sldPostBalanceG").value);
-    const bMult   = parseFloat(el("sldPostBalanceB").value);
-    const satMult = parseFloat(el("sldPostBalanceSat").value);
-    const doScnr  = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
-    const scnrAmt = doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0;
-
-    const img = cloneImage(srcImg);
-    const n = img.w * img.h;
-    const isColor = img.isColor;
-
-    // 1. Multiplicadores RGB por canal
-    const rCh = img.ch[0];
-    if (rMult !== 1) {
-      for (let i = 0; i < n; ++i) { rCh[i] = rCh[i] * rMult; if (rCh[i] > 1) rCh[i] = 1; else if (rCh[i] < 0) rCh[i] = 0; }
-    }
-    if (isColor) {
-      const gCh = img.ch[1];
-      if (gMult !== 1) {
-        for (let i = 0; i < n; ++i) { gCh[i] = gCh[i] * gMult; if (gCh[i] > 1) gCh[i] = 1; else if (gCh[i] < 0) gCh[i] = 0; }
-      }
-      const bCh = img.ch[2];
-      if (bMult !== 1) {
-        for (let i = 0; i < n; ++i) { bCh[i] = bCh[i] * bMult; if (bCh[i] > 1) bCh[i] = 1; else if (bCh[i] < 0) bCh[i] = 0; }
-      }
-    }
-
-    // 2. Ajuste de saturación vía HSL
-    if (satMult !== 1 && isColor) {
-      const rCh2 = img.ch[0], gCh2 = img.ch[1], bCh2 = img.ch[2];
-      const hue2rgb = (p, q, t) => {
-        if (t < 0) t += 1; if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      for (let i = 0; i < n; ++i) {
-        const rv = rCh2[i], gv = gCh2[i], bv = bCh2[i];
-        const mx = Math.max(rv, gv, bv);
-        const mn = Math.min(rv, gv, bv);
-        const d = mx - mn;
-        if (d === 0) continue;
-        const l = (mx + mn) / 2;
-        const s = d / (l < 0.5 ? mx + mn : 2 - mx - mn);
-        const sNew = s * satMult > 1 ? 1 : s * satMult < 0 ? 0 : s * satMult;
-        const hh = rv === mx ? ((gv - bv) / d + (gv < bv ? 6 : 0)) / 6
-                : gv === mx ? ((bv - rv) / d + 2) / 6
-                :             ((rv - gv) / d + 4) / 6;
-        const q2 = l < 0.5 ? l * (1 + sNew) : l + sNew - l * sNew;
-        const p2 = 2 * l - q2;
-        rCh2[i] = hue2rgb(p2, q2, hh + 1/3);
-        gCh2[i] = hue2rgb(p2, q2, hh);
-        bCh2[i] = hue2rgb(p2, q2, hh - 1/3);
-      }
-    }
-
-    // 3. SCNR Green (opcional)
-    if (doScnr && isColor) {
-      const rCh3 = img.ch[0], gCh3 = img.ch[1], bCh3 = img.ch[2];
-      for (let i = 0; i < n; ++i) {
-        const limit = (rCh3[i] + bCh3[i]) / 2;
-        if (gCh3[i] > limit) gCh3[i] = (1 - scnrAmt) * gCh3[i] + scnrAmt * limit;
-      }
-    }
-    return img;
+    return window.ImgOps.computeColorBalance(srcImg, getColorBalanceParams());
   }
 
   el("btnApplyPostColor").addEventListener("click", () => {
     if (!state.activeImage) return;
     const lang = document.documentElement.lang || "es";
 
-    const rMult   = parseFloat(el("sldPostBalanceR").value);
-    const gMult   = parseFloat(el("sldPostBalanceG").value);
-    const bMult   = parseFloat(el("sldPostBalanceB").value);
-    const satMult = parseFloat(el("sldPostBalanceSat").value);
-    const doScnr  = !!(el("chkPostBalanceSCNR") && el("chkPostBalanceSCNR").checked);
-    const scnrAmt = doScnr ? parseFloat(el("sldPostBalanceSCNR").value) : 0;
-
-    if (rMult === 1 && gMult === 1 && bMult === 1 && satMult === 1 && !doScnr) {
+    const p = getColorBalanceParams();
+    if (p.rMult === 1 && p.gMult === 1 && p.bMult === 1 && p.satMult === 1 && !p.scnrAmt) {
       logConsole(lang === "es" ? "Balance de color: ajuste neutro, sin cambios." : "Color balance: neutral adjustment, no changes.", "info");
       return;
     }
 
     showLoader(lang === "es" ? "Aplicando balance de color..." : "Applying color balance...");
-    setTimeout(() => {
-      try {
-        const srcImg = state.stepInputImage || state.activeImage;
-        commitActiveImage(computeColorBalanceImage(srcImg), "Color Balance", srcImg);
-        render(); refreshPathBar();
-        logConsole(`Balance de color: R×${rMult.toFixed(3)} G×${gMult.toFixed(3)} B×${bMult.toFixed(3)} Sat×${satMult.toFixed(2)}${doScnr ? ` + SCNR(${(scnrAmt*100).toFixed(0)}%)` : ""}`, "info");
-      } catch (err) {
-        logConsole(`Error en balance de color: ${err.message}`, "err");
-      } finally {
-        hideLoader();
-      }
-    }, 50);
+    const srcImg = state.stepInputImage || state.activeImage;
+    logConsole(`Balance de color: R×${p.rMult.toFixed(3)} G×${p.gMult.toFixed(3)} B×${p.bMult.toFixed(3)} Sat×${p.satMult.toFixed(2)}${p.scnrAmt ? ` + SCNR(${(p.scnrAmt*100).toFixed(0)}%)` : ""}`, "info");
+    // V2 (Fase 4): resolución completa en el Web Worker (fallback CPU si el worker falla).
+    applyImgOp("colorBalance", srcImg, p, "Color Balance", () => window.ImgOps.computeColorBalance(srcImg, p));
   });
   // COLOR-WHEEL-END
 
@@ -4411,41 +4198,119 @@
       if (f) { try { f(); } catch (e) { console.warn("Live preview:", e); } }
     });
   }
-  // Fuente REDUCIDA de la Imagen Inicial (lado largo ≤ 1000 px, promediado por área) cacheada por
-  // objeto: computar curvas/balance sobre ~1 MP en vez de 16-36 MP hace el Live realmente instantáneo.
-  let _liveSmallSrc = null, _liveSmallSrcOf = null;
+  // PROXY-PROBAR-BEGIN (Fase 4 V1)
+  // Proxy de BAJA RESOLUCIÓN (lado largo ≤ 1000 px, promediado por área) por imagen fuente,
+  // cacheado por referencia (WeakMap; se libera solo con la imagen). Lo usan el preview Live y
+  // los "Probar" no-IA de operaciones GLOBALES (gradiente, calibración, estirados), donde el
+  // resultado a ~1 MP es visualmente representativo. Las operaciones a escala de píxel
+  // (deconv/denoise/sharpen) NO usan proxy: a baja resolución mienten (un radio de 2 px no
+  // significa lo mismo tras reescalar).
+  const PROXY_MAX_DIM = 1000;
+  const _proxyCache = new WeakMap();
+  function getProxyOf(img) {
+    if (!img || Math.max(img.w, img.h) <= PROXY_MAX_DIM) return null; // ya es pequeña: sin proxy
+    let p = _proxyCache.get(img);
+    if (!p) {
+      const capped = window.AutoGHS.capChannels(img.ch, img.w, img.h, img.nc, PROXY_MAX_DIM);
+      p = { ch: capped.ch, w: capped.w, h: capped.h, nc: img.nc, isColor: img.isColor };
+      _proxyCache.set(img, p);
+    }
+    return p;
+  }
+  // "Probar" en dos fases: 1) cálculo INSTANTÁNEO sobre el proxy, mostrado como preview marcado
+  // con img._proxy; 2) recomputo a resolución COMPLETA (computeFn puede devolver una promesa,
+  // p. ej. del Web Worker) que reemplaza el preview al terminar. commitPreview (botón grande
+  // "Aplicar") espera al full-res pendiente y NUNCA commitea un proxy (véase updateBigApply).
+  // computeFn(img) recibe el proxy o srcImg; extraFn (opcional) corre tras cada preview.
+  let _proxySeq = 0;
+  let _proxyPendingFull = null;
+  async function previewProxyThenFull(srcImg, stageLabel, computeFn, extraFn) {
+    const job = ++_proxySeq;
+    // La promesa "pendiente" se publica ANTES de cualquier fase para que un "Aplicar" que llegue
+    // en cualquier momento del Probar (incluso con el proxy recién pintado) siempre la encuentre
+    // y espere al full-res, en vez de creer que no hay nada en marcha.
+    let _resolveDone;
+    const done = new Promise((r) => { _resolveDone = r; });
+    _proxyPendingFull = done;
+    const finish = () => { if (_proxyPendingFull === done) _proxyPendingFull = null; _resolveDone(); };
+    try {
+      const small = getProxyOf(srcImg);
+      if (small) {
+        try {
+          const resS = await computeFn(small);
+          if (job !== _proxySeq) return;
+          const pv = previewActiveImage(resS, srcImg, stageLabel);
+          pv._proxy = true;
+          if (extraFn) extraFn(true);
+          hideLoader(); // el usuario ya ve el resultado; el full-res sigue en segundo plano
+          render();
+          drawHistogram();
+        } catch (e) {
+          console.warn("Proxy Probar:", e); // el proxy es solo feedback; el full-res sigue
+        }
+        await new Promise((r) => setTimeout(r, 30)); // deja pintar el proxy antes del cómputo pesado
+        if (job !== _proxySeq) return;
+      }
+      try {
+        const resF = await computeFn(srcImg);
+        if (job !== _proxySeq) return;
+        previewActiveImage(resF, srcImg, stageLabel);
+        if (extraFn) extraFn(false);
+        render();
+        drawHistogram();
+      } catch (e) {
+        if (job === _proxySeq) {
+          const lang = document.documentElement.lang || "es";
+          logConsole((lang === "es" ? "Error a resolución completa: " : "Full-resolution error: ") + (e && e.message ? e.message : e), "err");
+        }
+      }
+    } finally {
+      finish();
+    }
+  }
+  // PROXY-PROBAR-END
+
+  // Fuente REDUCIDA de la Imagen Inicial: mismo proxy cacheado que usan los "Probar" —
+  // computar curvas/balance sobre ~1 MP en vez de 16-36 MP hace el Live realmente instantáneo.
   function _getLiveSmallSrc() {
     const base = state.stepInputImage;
     if (!base) return null;
-    if (_liveSmallSrc && _liveSmallSrcOf === base) return _liveSmallSrc;
-    const capped = window.AutoGHS.capChannels(base.ch, base.w, base.h, base.nc, 1000);
-    _liveSmallSrc = { ch: capped.ch, w: capped.w, h: capped.h, nc: base.nc, isColor: base.isColor };
-    _liveSmallSrcOf = base;
-    return _liveSmallSrc;
+    return getProxyOf(base) || base;
   }
   // Motor Live común: 1) preview instantáneo en baja resolución (coalescido a 1/frame);
-  //                   2) al quedar quieto ~220 ms, recalcula a resolución COMPLETA para una vista nítida.
-  let _liveSettleTimer = 0;
-  function _runLive(chkId, computeFn, label) {
+  //                   2) al quedar quieto ~220 ms, recalcula a resolución COMPLETA para una vista
+  //                      nítida — en el Web Worker si la op lo soporta (workerSpec), con fallback CPU.
+  let _liveSettleTimer = 0, _liveJobSeq = 0;
+  function _runLive(chkId, computeFn, label, workerSpec) {
     const chk = el(chkId);
     if (!chk || !chk.checked) return;
     const full = state.stepInputImage;
     if (!full) return;
+    const job = ++_liveJobSeq;
     const small = _getLiveSmallSrc() || full;
     scheduleLivePreview(() => {
-      previewActiveImage(computeFn(small), full, label);
+      const pv = previewActiveImage(computeFn(small), full, label);
+      if (small !== full) pv._proxy = true; // nunca commitear el preview de baja resolución
       render();
     });
     if (_liveSettleTimer) clearTimeout(_liveSettleTimer);
     _liveSettleTimer = setTimeout(() => {
       _liveSettleTimer = 0;
-      if (!chk.checked || state.stepInputImage !== full) return;
-      previewActiveImage(computeFn(full), full, label);
-      render();
+      const stillValid = () => job === _liveJobSeq && chk.checked && state.stepInputImage === full;
+      if (!stillValid()) return;
+      const spec = workerSpec ? workerSpec() : null;
+      if (spec) {
+        runImgWorker(spec.op, full, spec.params)
+          .then((res) => { if (!stillValid()) return; previewActiveImage(res, full, label); render(); })
+          .catch(() => { if (!stillValid()) return; previewActiveImage(computeFn(full), full, label); render(); });
+      } else {
+        previewActiveImage(computeFn(full), full, label);
+        render();
+      }
     }, 220);
   }
-  function livePreviewCurves() { _runLive("chkPostCurvesLive", computeCurvesImage, "Curves"); }
-  function livePreviewColorBalance() { _runLive("chkPostColorBalanceLive", computeColorBalanceImage, "Color Balance"); }
+  function livePreviewCurves() { _runLive("chkPostCurvesLive", computeCurvesImage, "Curves", () => ({ op: "curves", params: { curves: state.curves } })); }
+  function livePreviewColorBalance() { _runLive("chkPostColorBalanceLive", computeColorBalanceImage, "Color Balance", () => ({ op: "colorBalance", params: getColorBalanceParams() })); }
   // Al (des)marcar Live: si se activa, muestra el preview ya; si se desactiva, descarta el preview
   // no aplicado y vuelve a la Imagen Inicial del menú (para no dejar un preview "pegado").
   {
@@ -5105,7 +4970,7 @@
     if (el("sldCmSat")) { el("sldCmSat").value = b.saturation; el("valCmSat").textContent = String(b.saturation); }
     if (el("sldCmLum")) { el("sldCmLum").value = b.luminance; el("valCmLum").textContent = String(b.luminance); }
   }
-  function livePreviewColorMixer() { _runLive("chkCmLive", (img) => computeColorMixer(img, state.colorMixer), "Color Mixer"); }
+  function livePreviewColorMixer() { _runLive("chkCmLive", (img) => computeColorMixer(img, state.colorMixer), "Color Mixer", () => ({ op: "colorMixer", params: state.colorMixer })); }
   {
     const selBand = el("selCmBand");
     if (selBand) {
@@ -5161,7 +5026,7 @@
   }
   // Delegado al módulo común ImgOps (misma matemática, unificada; también la usa el Web Worker).
   function computeDetail(srcImg, algo, pr) { const p = Object.assign({ algo: algo }, pr); return window.ImgOps.computeDetail(srcImg, algo, p); }
-  function livePreviewDetail() { const algo = el("selDetailAlgo") ? el("selDetailAlgo").value : "localContrast"; _runLive("chkDetailLive", (img) => computeDetail(img, algo, detailParams()), "Detail"); }
+  function livePreviewDetail() { const algo = el("selDetailAlgo") ? el("selDetailAlgo").value : "localContrast"; _runLive("chkDetailLive", (img) => computeDetail(img, algo, detailParams()), "Detail", () => ({ op: "detail", params: Object.assign({ algo }, detailParams()) })); }
   {
     const selD = el("selDetailAlgo");
     if (selD) selD.addEventListener("change", () => {
@@ -5535,17 +5400,23 @@
     const n = img.w * img.h;
     const bins = new Uint32Array(256).fill(0);
 
-    // Calcular distribución de luminancia
-    const lum = new Float32Array(n);
+    // Distribución de luminancia por SUBMUESTREO regular (V1 Fase 4): 256 bins no ganan nada
+    // recorriendo 16-36M de píxeles; con ≤500k muestras el redibujado tras cada Probar/Live es
+    // instantáneo y la forma del histograma es indistinguible.
+    const step = Math.max(1, Math.floor(n / 500000));
     if (img.isColor) {
-      for (let i = 0; i < n; ++i) lum[i] = wl[0]*img.ch[0][i] + wl[1]*img.ch[1][i] + wl[2]*img.ch[2][i];
+      const r = img.ch[0], g = img.ch[1], b = img.ch[2];
+      for (let i = 0; i < n; i += step) {
+        const lum = wl[0] * r[i] + wl[1] * g[i] + wl[2] * b[i];
+        const idx = Math.min(255, Math.max(0, Math.floor(lum * 255)));
+        bins[idx]++;
+      }
     } else {
-      lum.set(img.ch[0]);
-    }
-
-    for (let i = 0; i < n; ++i) {
-      const idx = Math.min(255, Math.max(0, Math.floor(lum[i] * 255)));
-      bins[idx]++;
+      const c = img.ch[0];
+      for (let i = 0; i < n; i += step) {
+        const idx = Math.min(255, Math.max(0, Math.floor(c[i] * 255)));
+        bins[idx]++;
+      }
     }
 
     // Encontrar máximo para escalar (ignorando picos extremos del fondo)
@@ -5608,28 +5479,9 @@
   }
 
   // Spline cúbica monótona (Hermite con tangentes acotadas) por stretchPoints (ordenados por x).
+  // V2 (Fase 4): la matemática vive en ImgOps.monotoneCurveFn (imgops.js), compartida con el worker.
   function curveEval(x) {
-    const P = stretchPoints;
-    const last = P.length - 1;
-    if (x <= P[0][0]) return P[0][1];
-    if (x >= P[last][0]) return P[last][1];
-    let i = 0;
-    while (i < last && x > P[i + 1][0]) i++;
-    const x0 = P[i][0], y0 = P[i][1], x1 = P[i + 1][0], y1 = P[i + 1][1];
-    const h = x1 - x0;
-    if (h <= 1e-9) return y0;
-    const sec = (a, b) => (P[b][1] - P[a][1]) / Math.max(1e-9, P[b][0] - P[a][0]);
-    const s = sec(i, i + 1);
-    let m0 = (i > 0) ? (sec(i - 1, i) + s) / 2 : s;
-    let m1 = (i < last - 1) ? (s + sec(i + 1, i + 2)) / 2 : s;
-    if (s === 0) { m0 = 0; m1 = 0; } else {
-      if (m0 / s < 0) m0 = 0; if (m1 / s < 0) m1 = 0;
-      const a = m0 / s, b = m1 / s;
-      if (a * a + b * b > 9) { const tau = 3 / Math.sqrt(a * a + b * b); m0 = tau * a * s; m1 = tau * b * s; }
-    }
-    const t = (x - x0) / h, t2 = t * t, t3 = t2 * t;
-    let v = (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m0 + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m1;
-    return v < 0 ? 0 : (v > 1 ? 1 : v);
+    return window.ImgOps.monotoneCurveFn(stretchPoints)(x);
   }
 
   function drawStretchCurve() {
@@ -6845,60 +6697,10 @@
   let activeCurveChan = "K";
 
   // Monotone Cubic Hermite Interpolation (Fritsch-Carlson)
+  // V2 (Fase 4): la spline cúbica monótona vive en ImgOps.cubicSplineFn (imgops.js), compartida
+  // con el worker; aquí queda el delegado para el widget de curvas y llamadores existentes.
   function getCubicSpline(points) {
-    const n = points.length;
-    if (n < 2) return (x) => 0;
-    if (n === 2) {
-      const p0 = points[0], p1 = points[1];
-      return (x) => p0.y + (x - p0.x) * (p1.y - p0.y) / ((p1.x - p0.x) || 1e-6);
-    }
-    
-    const dx = [];
-    const dy = [];
-    const ms = [];
-    for (let i = 0; i < n - 1; i++) {
-      dx[i] = points[i+1].x - points[i].x;
-      dy[i] = points[i+1].y - points[i].y;
-      ms[i] = dy[i] / (dx[i] || 1e-6);
-    }
-    
-    const ds = [];
-    ds[0] = ms[0];
-    ds[n-1] = ms[n-2];
-    for (let i = 1; i < n - 1; i++) {
-      const m0 = ms[i-1];
-      const m1 = ms[i];
-      if (m0 * m1 <= 0) {
-        ds[i] = 0;
-      } else {
-        ds[i] = 2 * m0 * m1 / (m0 + m1);
-      }
-    }
-    
-    return function(x) {
-      if (x <= points[0].x) return points[0].y;
-      if (x >= points[n-1].x) return points[n-1].y;
-      
-      let idx = 0;
-      for (let i = 0; i < n - 1; i++) {
-        if (x >= points[i].x && x <= points[i+1].x) {
-          idx = i;
-          break;
-        }
-      }
-      
-      const x0 = points[idx].x;
-      const x1 = points[idx+1].x;
-      const h = x1 - x0;
-      const t = (x - x0) / (h || 1e-6);
-      
-      const a = points[idx].y;
-      const b = h * ds[idx];
-      const c = 3 * (points[idx+1].y - points[idx].y) - h * (2 * ds[idx] + ds[idx+1]);
-      const d = 2 * (points[idx].y - points[idx+1].y) + h * (ds[idx] + ds[idx+1]);
-      
-      return a + b * t + c * t * t + d * t * t * t;
-    };
+    return window.ImgOps.cubicSplineFn(points);
   }
 
   function drawCurvesWidget() {
@@ -7373,7 +7175,7 @@
     const applyKey = activeSection.dataset ? (activeSection.dataset.apply || "") : "";
     const lang = document.documentElement.lang || "es";
 
-    const commitPreview = () => {
+    const doCommit = () => {
       if (state.activeImage) {
         recordUndo(); // registra el estado committeado anterior para poder deshacer
         state.stepInputImage = cloneImage(state.activeImage);
@@ -7385,6 +7187,28 @@
         logConsole(lang === "es" ? "Cambios aplicados y guardados en el flujo" : "Changes saved and committed to workflow", "ok");
         updateBigApply();
       }
+    };
+    // PROXY-PROBAR: NUNCA commitear un preview proxy (baja resolución) — perdería la imagen
+    // real. Si el pase a resolución completa sigue en marcha, esperar a que reemplace al proxy
+    // y commitear entonces; si no hay pase pendiente (falló o el Live aún no asentó), avisar.
+    const commitPreview = () => {
+      if (state.activeImage && state.activeImage._proxy) {
+        if (_proxyPendingFull) {
+          showLoader(lang === "es" ? "Terminando el cálculo a resolución completa..." : "Finishing the full-resolution pass...");
+          _proxyPendingFull.then(() => {
+            hideLoader();
+            if (state.activeImage && state.activeImage._proxy) {
+              logConsole(lang === "es" ? "No se pudo aplicar: el cálculo a resolución completa falló. Vuelve a pulsar Probar." : "Could not apply: the full-resolution pass failed. Press Test again.", "err");
+            } else {
+              doCommit();
+            }
+          });
+        } else {
+          logConsole(lang === "es" ? "La vista a resolución completa aún no está lista. Espera un instante y vuelve a pulsar Aplicar." : "The full-resolution view is not ready yet. Wait a moment and press Apply again.", "warn");
+        }
+        return;
+      }
+      doCommit();
     };
 
     // Mapa declarativo: etiqueta ES/EN + gating. noGate = secciones con flujo propio (aplican desde

@@ -1,8 +1,11 @@
 /* =========================================================================
  * lut.js — Módulo para precomputación y aplicación de tablas de búsqueda (LUT)
+ *
+ * Expone (window|self).LUT: funciona igual en el hilo principal y en un
+ * Web Worker (importScripts desde imgworker.js).
  * ========================================================================= */
 
-window.LUT = (function () {
+(function (root) {
   "use strict";
 
   /**
@@ -79,11 +82,11 @@ window.LUT = (function () {
     maxDiffMeasured = runAutoTest();
   }
   // LUT-SELFTEST-END
-  
-  return {
+
+  root.LUT = {
     buildLUT,
     applyLUT,
     runAutoTest,
     maxDiffMeasured
   };
-})();
+})(typeof window !== "undefined" ? window : self);
