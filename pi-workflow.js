@@ -7300,6 +7300,11 @@
       setAstrometryProxyUrl: (url) => { ASTROMETRY_PROXY_URL = url; }
       // CF-WORKER-END
     };
+    // R3: carga la suite de humo (tools/piw-smoke.js) SOLO en modo test. Define
+    // window.__piwSmoke(); el resultado queda en window.__piwSmokeResult.
+    const _smokeScript = document.createElement("script");
+    _smokeScript.src = "tools/piw-smoke.js?v=" + (window.PIW_BUILD || "0");
+    document.head.appendChild(_smokeScript);
   }
   // E2E-HOOK-END
 

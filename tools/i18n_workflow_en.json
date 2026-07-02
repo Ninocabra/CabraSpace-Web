@@ -1,0 +1,894 @@
+[
+ {
+  "es": "  <!-- I18N-A2: este archivo es la FUENTE UNICA. cabraspace-imaging-workflow-en.html se GENERA\n       desde aqui con `python tools/build_workflow_en.py` (traducciones en tools/i18n_workflow_en.json).\n       Edita SOLO este HTML, actualiza el JSON si cambia texto visible, y regenera. -->",
+  "en": "  <!-- I18N-A2: GENERATED FILE - do NOT edit by hand. This page is generated from the Spanish\n       source cabraspace-imaging-workflow.html by `python tools/build_workflow_en.py`\n       (translations live in tools/i18n_workflow_en.json). Edit the ES file and regenerate. -->"
+ },
+ {
+  "es": "<html lang=\"es\">",
+  "en": "<html lang=\"en\">"
+ },
+ {
+  "es": "  <!-- COI-SW-REMOVED: el service worker de cross-origin isolation interceptaba/re-emitía las peticiones\n       y rompía el POST multipart del plate solve (HTTP 503). Se desactiva y se DESREGISTRA cualquier SW\n       previo (los usuarios que ya lo tenían registrado lo pierden en la próxima recarga). WASM vuelve a\n       monohilo; WebGPU (la IA principal) intacto. Para reactivar isolation algún día, ver coi-serviceworker.min.js. -->",
+  "en": "  <!-- COI-SW-REMOVED: the cross-origin isolation service worker intercepted/re-issued requests and broke\n       the plate-solve multipart POST (HTTP 503). It is disabled and any previously-registered SW is\n       UNREGISTERED on next reload. WASM falls back to single-thread; WebGPU (the main AI path) unaffected.\n       To re-enable isolation later, see coi-serviceworker.min.js. -->"
+ },
+ {
+  "es": "  <meta name=\"description\" content=\"Sistema web de procesamiento y análisis de imágenes astronómicas basado en el cockpit de PixInsight. Estirado, calibración y mezcla en tiempo real.\">",
+  "en": "  <meta name=\"description\" content=\"Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.\">"
+ },
+ {
+  "es": "    /* AI-CREDITS: línea de crédito a los creadores de los modelos de IA */",
+  "en": "    /* AI-CREDITS: credit line to the AI model creators */"
+ },
+ {
+  "es": "    /* iPad y tablets: reduce la fuente global para que la barra lateral ocupe menos y la imagen\n       gane sitio (casi todo el UI está en rem, así que esto escala toda la interfaz). */",
+  "en": "    /* iPad/tablets: reduce global font so the sidebar takes less room and the image gets more. */"
+ },
+ {
+  "es": "    /* Layout imagen-protagonista a alto completo desde iPad (768px). Antes empezaba en 1100px, por\n       eso en iPad todo se apilaba y la imagen quedaba minúscula. La barra lateral es proporcional. */",
+  "en": "    /* Image-first full-height layout from iPad (768px) up. It used to start at 1100px, so on iPad\n       everything stacked and the image was tiny. Sidebar width is proportional. */"
+ },
+ {
+  "es": "        overflow-x: hidden;   /* nada del sidebar puede invadir/quedar bajo la imagen */",
+  "en": "        overflow-x: hidden;   /* nothing in the sidebar can spill under the image */"
+ },
+ {
+  "es": "    /* Pestañas como flechas/chevrones solapados (breadcrumb), todas en una fila */",
+  "en": "    /* Tabs as overlapping arrows/chevrons (breadcrumb), all in one row */"
+ },
+ {
+  "es": "      min-width: max-content;   /* nunca recorta el texto de la pestaña */",
+  "en": "      min-width: max-content;   /* never clips the tab label */"
+ },
+ {
+  "es": "      /* Flecha con punta y muesca ROMAS (achaflanadas) para suavizar los picos; se encajan solapadas */",
+  "en": ""
+ },
+ {
+  "es": "    /* Desplegable de resolución integrado en la fila de la etiqueta: misma fuente dorada pequeña que .piw-value */",
+  "en": "    /* Resolution dropdown inlined in the label row: same small gold font as .piw-value */"
+ },
+ {
+  "es": "      min-width: 0;   /* permite encoger dentro de filas flex estrechas (iPad) */",
+  "en": "      min-width: 0;   /* allows shrinking inside narrow flex rows (iPad) */"
+ },
+ {
+  "es": "    /* Las filas de botones del sidebar envuelven cuando no caben (iPad) en vez de desbordar sobre la\n       imagen. En escritorio (barra ancha) siguen en una sola línea. */",
+  "en": "    /* Sidebar button rows wrap when they don't fit (iPad) instead of spilling under the image.\n       On desktop (wide sidebar) they stay on one line. */"
+ },
+ {
+  "es": "    /* Táctil: los widgets con arrastre por Pointer Events desactivan el gesto por defecto del\n       navegador (scroll/zoom) para que el arrastre funcione en iPad/táctil. */",
+  "en": "    /* Touch: drag widgets driven by Pointer Events disable the browser's default gesture\n       (scroll/zoom) so dragging works on iPad/touch. */"
+ },
+ {
+  "es": "    /* Zona de agarre transparente y ancha alrededor de la fina línea de 2px, para poder\n       arrastrar la cortinilla con facilidad (antes solo eran agarrables 2px). */",
+  "en": "    /* Wide transparent grab zone around the thin 2px line so the wipe is easy to drag. */"
+ },
+ {
+  "es": "      /* Grabable: antes era pointer-events:none, así que agarrar el círculo dejaba pasar el\n         evento al canvas y paneaba la imagen en vez de mover la cortinilla. */",
+  "en": "      /* Grabbable: it was pointer-events:none, so grabbing the circle passed the event to the\n         canvas underneath and panned the image instead of moving the wipe. */"
+ },
+ {
+  "es": "    /* Toasts de estado: aviso efímero visible sin mirar la consola (clave en iPad) */",
+  "en": "    /* Status toasts: ephemeral notice visible without looking at the console (key on iPad) */"
+ },
+ {
+  "es": "    /* U3: historial de pasos aplicados (stages) bajo la barra de canales */",
+  "en": "    /* U3: history of applied steps (stages) under the channel bar */"
+ },
+ {
+  "es": "      content: \"vacío\";",
+  "en": "      content: \"empty\";"
+ },
+ {
+  "es": "      content: \"Slot \" attr(data-slot) \" (Click: guardar | Click Dcho: cargar)\";",
+  "en": "      content: \"Slot \" attr(data-slot) \" (Click: save | Right-click: load)\";"
+ },
+ {
+  "es": "    /* Mezcla drag & drop (estilo Photoshop) */",
+  "en": "    /* Blend drag & drop (Photoshop-style) */"
+ },
+ {
+  "es": "  <link rel=\"canonical\" href=\"https://cabraspace.com/cabraspace-imaging-workflow.html\">",
+  "en": "  <link rel=\"canonical\" href=\"https://cabraspace.com/cabraspace-imaging-workflow-en.html\">"
+ },
+ {
+  "es": "  <meta property=\"og:locale\" content=\"es_ES\">\n  <meta property=\"og:url\" content=\"https://cabraspace.com/cabraspace-imaging-workflow.html\">",
+  "en": "  <meta property=\"og:locale\" content=\"en_GB\">\n  <meta property=\"og:url\" content=\"https://cabraspace.com/cabraspace-imaging-workflow-en.html\">"
+ },
+ {
+  "es": "  <meta property=\"og:description\" content=\"Sistema web de procesamiento y análisis de imágenes astronómicas basado en el cockpit de PixInsight. Estirado, calibración y mezcla en tiempo real.\">",
+  "en": "  <meta property=\"og:description\" content=\"Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.\">"
+ },
+ {
+  "es": "  <meta name=\"twitter:description\" content=\"Sistema web de procesamiento y análisis de imágenes astronómicas basado en el cockpit de PixInsight. Estirado, calibración y mezcla en tiempo real.\">",
+  "en": "  <meta name=\"twitter:description\" content=\"Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.\">"
+ },
+ {
+  "es": "      <a href=\"index.html\" class=\"logo-link\">",
+  "en": "      <a href=\"en.html\" class=\"logo-link\">"
+ },
+ {
+  "es": "      <button class=\"hamburger-btn\" id=\"hamburger-btn\" aria-label=\"Abrir menú\" aria-expanded=\"false\">",
+  "en": "      <button class=\"hamburger-btn\" id=\"hamburger-btn\" aria-label=\"Open menu\" aria-expanded=\"false\">"
+ },
+ {
+  "es": "        <li><a href=\"index.html\" class=\"nav-link\">Inicio</a></li>",
+  "en": "        <li><a href=\"en.html\" class=\"nav-link\">Home</a></li>"
+ },
+ {
+  "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Novedades <span class=\"arrow\">▾</span></a>",
+  "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Latest News <span class=\"arrow\">▾</span></a>"
+ },
+ {
+  "es": "            <li><a href=\"equipamiento.html\" class=\"dropdown-item\">Equipamiento</a></li>\n            <li><a href=\"novedades.html\" class=\"dropdown-item\">PixInsight</a></li>",
+  "en": "            <li><a href=\"equipamiento-en.html\" class=\"dropdown-item\">Equipment</a></li>\n            <li><a href=\"novedades-en.html\" class=\"dropdown-item\">PixInsight</a></li>"
+ },
+ {
+  "es": "        <li><a href=\"cabraspace-imaging-workflow.html\" class=\"nav-link\">CabraSpace Imaging Workflow (BETA)</a></li>",
+  "en": "        <li><a href=\"cabraspace-imaging-workflow-en.html\" class=\"nav-link\">CabraSpace Imaging Workflow (BETA)</a></li>"
+ },
+ {
+  "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Astrofotografía <span class=\"arrow\">▾</span></a>",
+  "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Astrophotography <span class=\"arrow\">▾</span></a>"
+ },
+ {
+  "es": "            <li><a href=\"astroforecast.html\" class=\"dropdown-item\">Astro Forecast</a></li>",
+  "en": "            <li><a href=\"astroforecast-en.html\" class=\"dropdown-item\">Astro Forecast</a></li>"
+ },
+ {
+  "es": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Recursos PixInsight <span class=\"arrow\">▸</span></a>",
+  "en": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">PixInsight Resources <span class=\"arrow\">▸</span></a>"
+ },
+ {
+  "es": "                <li><a href=\"cabrascripts.html\" class=\"dropdown-item\">CabraScripts</a></li>\n                <li><a href=\"pixelmath.html\" class=\"dropdown-item\">PixelMath-teca</a></li>\n                <li><a href=\"cursos-youtube.html\" class=\"dropdown-item\">Cursos Youtube</a></li>",
+  "en": "                <li><a href=\"cabrascripts-en.html\" class=\"dropdown-item\">CabraScripts</a></li>\n                <li><a href=\"pixelmath-en.html\" class=\"dropdown-item\">PixelMath-teca</a></li>\n                <li><a href=\"cursos-youtube-en.html\" class=\"dropdown-item\">YouTube Courses</a></li>"
+ },
+ {
+  "es": "                <li><a href=\"autoghs.html\" class=\"dropdown-item\">AutoGHS</a></li>",
+  "en": "                <li><a href=\"autoghs-en.html\" class=\"dropdown-item\">AutoGHS</a></li>"
+ },
+ {
+  "es": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Contaminación Lumínica <span class=\"arrow\">▸</span></a>",
+  "en": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Light Pollution <span class=\"arrow\">▸</span></a>"
+ },
+ {
+  "es": "                <li><a href=\"contaminacion-mapa.html\" class=\"dropdown-item\">Mapa de Contaminación</a></li>\n                <li><a href=\"contaminacion.html\" class=\"dropdown-item\">Vídeos y Guías</a></li>",
+  "en": "                <li><a href=\"contaminacion-mapa-en.html\" class=\"dropdown-item\">Light Pollution Map</a></li>\n                <li><a href=\"contaminacion-en.html\" class=\"dropdown-item\">Videos & Guides</a></li>"
+ },
+ {
+  "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Divulgación <span class=\"arrow\">▾</span></a>",
+  "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Outreach <span class=\"arrow\">▾</span></a>"
+ },
+ {
+  "es": "            <li><a href=\"divulgacion-coffeebreak.html\" class=\"dropdown-item\">Coffee Break: señal y ruido</a></li>",
+  "en": "            <li><a href=\"divulgacion-coffeebreak-en.html\" class=\"dropdown-item\">Coffee Break: señal y ruido</a></li>"
+ },
+ {
+  "es": "        <button id=\"nightmode-toggle\" class=\"nightmode-btn\" aria-label=\"Modo Noche\" title=\"Modo Noche Astronómico\">",
+  "en": "        <button id=\"nightmode-toggle\" class=\"nightmode-btn\" aria-label=\"Night Mode\" title=\"Astronomical Night Mode\">"
+ },
+ {
+  "es": "          <a href=\"cabraspace-imaging-workflow.html\" class=\"lang-link active\">ES</a>",
+  "en": "          <a href=\"cabraspace-imaging-workflow.html\" class=\"lang-link\">ES</a>"
+ },
+ {
+  "es": "          <a href=\"cabraspace-imaging-workflow-en.html\" class=\"lang-link\">EN</a>",
+  "en": "          <a href=\"cabraspace-imaging-workflow-en.html\" class=\"lang-link active\">EN</a>"
+ },
+ {
+  "es": "      Modelos de IA por sus creadores:",
+  "en": "      AI models by their creators:"
+ },
+ {
+  "es": "      <!-- Barra lateral izquierda (Workflow Panel) -->",
+  "en": "      <!-- Left sidebar (Workflow Panel) -->"
+ },
+ {
+  "es": "        <!-- Pestañas -->",
+  "en": "        <!-- Tabs -->"
+ },
+ {
+  "es": "          <button class=\"piw-tab-btn\" data-tab=\"tab-combine\">Mezcla</button>\n          <button class=\"piw-tab-btn\" data-tab=\"tab-enhance\">Mejora</button>",
+  "en": "          <button class=\"piw-tab-btn\" data-tab=\"tab-combine\">Blend</button>\n          <button class=\"piw-tab-btn\" data-tab=\"tab-enhance\">Enhance</button>"
+ },
+ {
+  "es": "        <!-- Contenido Tab 0: Pre-Procesado -->",
+  "en": "        <!-- Tab 0: Pre Processing -->"
+ },
+ {
+  "es": "          <!-- SECCIÓN 1: Selección y Carga -->",
+  "en": "          <!-- SECTION 1: Selection & Load -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Selección y Carga</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Selection & Load</h3>"
+ },
+ {
+  "es": "                <span class=\"piw-label\">Resolución de trabajo</span>\n                <select class=\"piw-res-inline\" id=\"selWorkRes\" title=\"Lado largo máximo de la imagen de trabajo. Más alto = más detalle pero más lento y más memoria. Se aplica al cargar la imagen.\">",
+  "en": "                <span class=\"piw-label\">Working resolution</span>\n                <select class=\"piw-res-inline\" id=\"selWorkRes\" title=\"Maximum long-edge size of the working image. Higher = more detail but slower and more memory. Applied when loading the image.\">"
+ },
+ {
+  "es": "            <!-- Subzona R+G+B -->",
+  "en": "            <!-- R+G+B Subzone -->"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal R / Rojo</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-0\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">R / Red Channel</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-0\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal G / Verde</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-1\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">G / Green Channel</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-1\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal B / Azul</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-2\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">B / Blue Channel</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-2\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Luminancia (L) - opcional</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-3\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">Luminance (L) - optional</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-3\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                <button class=\"piw-btn primary\" id=\"btnCombineRGB\" style=\"flex:1;\" disabled>Combinar Canales RGB</button>\n                <button class=\"piw-btn\" id=\"btnSeparateRGB\" style=\"flex:1;\" disabled>Por Separado</button>",
+  "en": "                <button class=\"piw-btn primary\" id=\"btnCombineRGB\" style=\"flex:1;\" disabled>Combine RGB Channels</button>\n                <button class=\"piw-btn\" id=\"btnSeparateRGB\" style=\"flex:1;\" disabled>Separately</button>"
+ },
+ {
+  "es": "            <!-- Subzona NB (Banda Estrecha) -->",
+  "en": "            <!-- NB Subzone (Narrowband) -->"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal Ha (Hidrógeno Alfa)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-5\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">Ha Channel (Hydrogen Alpha)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-5\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal OIII (Oxígeno III)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-6\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">OIII Channel (Oxygen III)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-6\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\">Canal SII (Azufre II)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-4\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\">SII Channel (Sulfur II)</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-4\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "                <label class=\"piw-label-row\" style=\"font-size: 0.72rem; margin-bottom: 4px;\">Fórmula NB:</label>",
+  "en": "                <label class=\"piw-label-row\" style=\"font-size: 0.72rem; margin-bottom: 4px;\">NB Palette:</label>"
+ },
+ {
+  "es": "                <a href=\"pixelmath.html\" class=\"piw-link\" target=\"_blank\" style=\"display:block; font-size:0.65rem; margin-top:4px; text-align:right; color:var(--gold-secondary); text-decoration:none;\">Ver fórmulas en PixelMath-teca ↗</a>",
+  "en": "                <a href=\"pixelmath-en.html\" class=\"piw-link\" target=\"_blank\" style=\"display:block; font-size:0.65rem; margin-top:4px; text-align:right; color:var(--gold-secondary); text-decoration:none;\">View formulas in PixelMath-teca ↗</a>"
+ },
+ {
+  "es": "                <button class=\"piw-btn primary\" id=\"btnCombineNB\" style=\"flex:1;\" disabled>Combinar Canales NB</button>\n                <button class=\"piw-btn\" id=\"btnSeparateNB\" style=\"flex:1;\" disabled>Por Separado</button>",
+  "en": "                <button class=\"piw-btn primary\" id=\"btnCombineNB\" style=\"flex:1;\" disabled>Combine NB Channels</button>\n                <button class=\"piw-btn\" id=\"btnSeparateNB\" style=\"flex:1;\" disabled>Separately</button>"
+ },
+ {
+  "es": "            <!-- Subzona RGB (Imagen Color Directa) -->",
+  "en": "            <!-- RGB Subzone (Direct Color Image) -->"
+ },
+ {
+  "es": "                  <span class=\"piw-channel-name\" style=\"margin-left: 8px;\">Imagen Color RGB Directa</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-7\">vacío</span>\n                  <span class=\"piw-drop-icon\" title=\"Arrastra un archivo aquí\">↓</span>",
+  "en": "                  <span class=\"piw-channel-name\" style=\"margin-left: 8px;\">Direct RGB Color Image</span>\n                  <span class=\"piw-channel-file\" id=\"file-name-7\">empty</span>\n                  <span class=\"piw-drop-icon\" title=\"Drop a file here\">↓</span>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnLoadRGBColor\" disabled>Cargar Imagen Color</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnLoadRGBColor\" disabled>Load Color Image</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 2: Crop (Recorte) -->",
+  "en": "          <!-- SECTION 2: Crop -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Crop (Recorte)</h3>\n            <div class=\"piw-readout-lbl\" id=\"lblCropStatus\">● Sin selección</div>\n            <div class=\"piw-crop-hint\">Mantén <strong>SHIFT</strong> + arrastra en la imagen para dibujar un rectángulo de recorte. Arrastra los bordes/esquinas para redimensionar.</div>",
+  "en": "            <h3 class=\"piw-section-title\">Crop</h3>\n            <div class=\"piw-readout-lbl\" id=\"lblCropStatus\">● No selection</div>\n            <div class=\"piw-crop-hint\">Hold <strong>SHIFT</strong> + drag on image to draw a crop rectangle. Drag edges/corners to resize.</div>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnCropApplyCurrent\" disabled style=\"flex:1;\">Aplicar Actual</button>\n              <button class=\"piw-btn primary\" id=\"btnCropApplyAll\" disabled style=\"flex:1;\">Aplicar a Todo</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnCropApplyCurrent\" disabled style=\"flex:1;\">Apply Current</button>\n              <button class=\"piw-btn primary\" id=\"btnCropApplyAll\" disabled style=\"flex:1;\">Apply All</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 3: Plate Solving -->",
+  "en": "          <!-- SECTION 3: Plate Solving -->"
+ },
+ {
+  "es": "            <div class=\"piw-readout-lbl\" id=\"lblSolveStatus\">● No resuelto</div>",
+  "en": "            <div class=\"piw-readout-lbl\" id=\"lblSolveStatus\">● Not solved</div>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnSolveImage\" style=\"flex:1;\">Resolver Imagen</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnSolveImage\" style=\"flex:1;\">Solve Image</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 4: Gradient Correction -->",
+  "en": "          <!-- SECTION 4: Gradient Correction -->"
+ },
+ {
+  "es": "              <option value=\"graxpert_ia\" selected>GraXpert - GraXpert Team (Extracción de fondo IA)</option>",
+  "en": "              <option value=\"graxpert_ia\" selected>GraXpert - GraXpert Team (AI Background Extraction)</option>"
+ },
+ {
+  "es": "            <!-- Controles AutoDBE -->",
+  "en": "            <!-- AutoDBE Controls -->"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Densidad de muestreo</span>",
+  "en": "                    <span class=\"piw-label\">Sample Density</span>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Corrección</span>",
+  "en": "                    <span class=\"piw-label\">Correction</span>"
+ },
+ {
+  "es": "                    <option value=\"subtraction\">Resta (Subtraction)</option>\n                    <option value=\"division\">División (Division)</option>",
+  "en": "                    <option value=\"subtraction\">Subtraction</option>\n                    <option value=\"division\">Division</option>"
+ },
+ {
+  "es": "            <!-- Controles ABE -->",
+  "en": "            <!-- ABE Controls -->"
+ },
+ {
+  "es": "                  <option value=\"subtraction\">Resta (Subtraction)</option>\n                  <option value=\"division\">División (Division)</option>",
+  "en": "                  <option value=\"subtraction\">Subtraction</option>\n                  <option value=\"division\">Division</option>"
+ },
+ {
+  "es": "            <!-- Controles GraXpert -->",
+  "en": "            <!-- GraXpert Controls -->"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyGradient\" style=\"flex:2;\">Probar Gradiente</button>\n              <button class=\"piw-btn primary\" id=\"btnCompareGradient\" style=\"flex:1;\">Comparar</button>\n              <button class=\"piw-btn primary\" id=\"btnGradientApplyAll\" style=\"flex:1; padding: 10px 0;\" title=\"Aplicar a Todo\">⧉</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyGradient\" style=\"flex:2;\">Test Gradient</button>\n              <button class=\"piw-btn primary\" id=\"btnCompareGradient\" style=\"flex:1;\">Compare</button>\n              <button class=\"piw-btn primary\" id=\"btnGradientApplyAll\" style=\"flex:1; padding: 10px 0;\" title=\"Apply to All\">⧉</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 5: Calibración de Color (Activa / Parcial) -->",
+  "en": "          <!-- SECTION 5: Color Calibration (Active / Partial) -->"
+ },
+ {
+  "es": "            <span class=\"piw-eyebrow\">ELIGE UN MÉTODO</span>",
+  "en": "            <span class=\"piw-eyebrow\">CHOOSE A METHOD</span>"
+ },
+ {
+  "es": "            <!-- SPCC (Fotométrica) -->",
+  "en": "            <!-- SPCC (Photometric) -->"
+ },
+ {
+  "es": "                <div class=\"piw-action-card-hint\">Calibración fotométrica (Gaia DR3) · requiere Plate Solving</div>",
+  "en": "                <div class=\"piw-action-card-hint\">Photometric calibration (Gaia DR3) · requires Plate Solving</div>"
+ },
+ {
+  "es": "            <!-- Auto Linear Fit - Activa -->",
+  "en": "            <!-- Auto Linear Fit - Active -->"
+ },
+ {
+  "es": "                <div class=\"piw-action-card-hint\">Balance de blancos estadístico</div>",
+  "en": "                <div class=\"piw-action-card-hint\">Statistical white balance</div>"
+ },
+ {
+  "es": "                <div class=\"piw-action-card-hint\">Alineación de histograma Wasserstein 1D</div>",
+  "en": "                <div class=\"piw-action-card-hint\">1D Wasserstein exact histogram match</div>"
+ },
+ {
+  "es": "            <!-- Background Neutralization - Activa -->",
+  "en": "            <!-- Background Neutralization - Active -->"
+ },
+ {
+  "es": "                <div class=\"piw-action-card-title\">Bkg. Neutralization</div>\n                <div class=\"piw-action-card-hint\">Resta el color del fondo</div>",
+  "en": "                <div class=\"piw-action-card-title\">Background Neutralization</div>\n                <div class=\"piw-action-card-hint\">Subtracts background color</div>"
+ },
+ {
+  "es": "            <button class=\"piw-btn\" id=\"btnCompareColor\" disabled style=\"margin-top: 8px;\">Comparar Métodos</button>",
+  "en": "            <button class=\"piw-btn\" id=\"btnCompareColor\" disabled style=\"margin-top: 8px;\">Compare Methods</button>"
+ },
+ {
+  "es": "              <div class=\"piw-subcard-header\">SCNR Green (Lineal)</div>",
+  "en": "              <div class=\"piw-subcard-header\">SCNR Green (Linear)</div>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Intensidad k</span>\n                  <span class=\"piw-value\" id=\"valScnrIntPre\">0.90</span>",
+  "en": "                  <span class=\"piw-label\">Amount k</span>\n                  <span class=\"piw-value\" id=\"valScnrIntPre\">0.90</span>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyScnrPre\" disabled>Aplicar SCNR Green</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyScnrPre\" disabled>Apply SCNR Green</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 6: Deconvolución (Activa / Parcial) -->",
+  "en": "          <!-- SECTION 6: Deconvolution (Active / Partial) -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Deconvolución</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Deconvolution</h3>"
+ },
+ {
+  "es": "              <option value=\"rl_auto\" selected>Richardson-Lucy (auto-PSF, rápida)</option>",
+  "en": "              <option value=\"rl_auto\" selected>Richardson-Lucy (auto-PSF, fast)</option>"
+ },
+ {
+  "es": "            <!-- Richardson-Lucy clásica (auto-PSF + deringing) -->",
+  "en": "            <!-- Richardson-Lucy classic (auto-PSF + deringing) -->"
+ },
+ {
+  "es": "                <div class=\"piw-subcard-header\">Richardson-Lucy (clásica)</div>\n                <div class=\"piw-value\" id=\"lblRlPsf\" style=\"margin-bottom:8px;color:var(--piw-gold,#d4af37);\">PSF estimada: — px (σ)</div>",
+  "en": "                <div class=\"piw-subcard-header\">Richardson-Lucy (classic)</div>\n                <div class=\"piw-value\" id=\"lblRlPsf\" style=\"margin-bottom:8px;color:var(--piw-gold,#d4af37);\">Estimated PSF: — px (σ)</div>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Iteraciones</span>",
+  "en": "                    <span class=\"piw-label\">Iterations</span>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Realce</span>",
+  "en": "                    <span class=\"piw-label\">Strength</span>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Protección estrellas</span>",
+  "en": "                    <span class=\"piw-label\">Star protection</span>"
+ },
+ {
+  "es": "            <!-- CS IA Deconvolution (Beta) — modelo de IA propio de CabraSpace (deconv.js) -->",
+  "en": "            <!-- CS IA Deconvolution (Beta) — CabraSpace's own AI model (deconv.js) -->"
+ },
+ {
+  "es": "                <div class=\"piw-value\" style=\"margin-bottom:8px;color:var(--piw-gold,#d4af37);\">Modelo de IA propio (Beta). Funciona mejor en imagen lineal.</div>",
+  "en": "                <div class=\"piw-value\" style=\"margin-bottom:8px;color:var(--piw-gold,#d4af37);\">CabraSpace's own AI model (Beta). Works best on linear images.</div>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Intensidad</span>",
+  "en": "                    <span class=\"piw-label\">Strength</span>"
+ },
+ {
+  "es": "            <!-- Cosmic Clarity - Activo -->",
+  "en": "            <!-- Cosmic Clarity - Active -->"
+ },
+ {
+  "es": "                  <option value=\"nonstellar\" selected>Non-Stellar Only (rápido, sin halos)</option>",
+  "en": "                  <option value=\"nonstellar\" selected>Non-Stellar Only (fast, no halos)</option>"
+ },
+ {
+  "es": "                  <option value=\"both\">Both (Estrellas y Fondo)</option>",
+  "en": "                  <option value=\"both\">Both (Stars & Background)</option>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyDecon\" disabled>Probar Deconvolución</button>\n              <button class=\"piw-btn\" id=\"btnCompareDecon\" disabled>Comparar</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyDecon\" disabled>Test Deconvolution</button>\n              <button class=\"piw-btn\" id=\"btnCompareDecon\" disabled>Compare</button>"
+ },
+ {
+  "es": "        <!-- Contenido Tab 1: Estirado (Stretching) -->",
+  "en": "        <!-- Tab 1: Stretching -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Star Split (Separación)</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Star Split (Separation)</h3>"
+ },
+ {
+  "es": "              <input type=\"checkbox\" id=\"chkStarlessView\"> Trabajar capa sin estrellas (Starless)",
+  "en": "              <input type=\"checkbox\" id=\"chkStarlessView\"> Work with starless layer (Starless)"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnLoadStarless\" style=\"flex: 1; font-size: 0.65rem;\">Cargar Starless</button>\n              <button class=\"piw-btn\" id=\"btnLoadStars\" style=\"flex: 1; font-size: 0.65rem;\">Cargar Estrellas</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnLoadStarless\" style=\"flex: 1; font-size: 0.65rem;\">Load Starless</button>\n              <button class=\"piw-btn\" id=\"btnLoadStars\" style=\"flex: 1; font-size: 0.65rem;\">Load Stars</button>"
+ },
+ {
+  "es": "            <button class=\"piw-btn primary\" id=\"btnRemoveStars\" style=\"width: 100%; font-size: 0.75rem; margin-bottom: 8px;\">Separar estrellas</button>",
+  "en": "            <button class=\"piw-btn primary\" id=\"btnRemoveStars\" style=\"width: 100%; font-size: 0.75rem; margin-bottom: 8px;\">Separate stars</button>"
+ },
+ {
+  "es": "                <span class=\"piw-label\" title=\"Conserva textura de nebulosa que el modelo suaviza. 0 = starless crudo (máximo quitado de estrellas).\">Recuperar nebulosa</span>",
+  "en": "                <span class=\"piw-label\" title=\"Keeps nebula texture the model smooths. 0 = raw starless (max star removal).\">Recover nebula</span>"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Algoritmo de Estirado</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Stretch Algorithm</h3>"
+ },
+ {
+  "es": "              <option value=\"curves\">Curva Manual / Sigmoide</option>",
+  "en": "              <option value=\"curves\">Manual Curve / Sigmoidal</option>"
+ },
+ {
+  "es": "            <!-- Controles dinámicos STF -->",
+  "en": "            <!-- Dynamic STF controls -->"
+ },
+ {
+  "es": "            <!-- Controles dinámicos GHS -->",
+  "en": "            <!-- Dynamic GHS controls -->"
+ },
+ {
+  "es": "                  <span class=\"piw-label\" title=\"Menos iteraciones = estirado más suave (protege el color de las estrellas)\">Iteraciones</span>",
+  "en": "                  <span class=\"piw-label\" title=\"Fewer iterations = gentler stretch (protects star color)\">Iterations</span>"
+ },
+ {
+  "es": "            <!-- Controles Statistical Stretch (SetiAstro, JS) -->",
+  "en": "            <!-- Statistical Stretch (SetiAstro, JS) controls -->"
+ },
+ {
+  "es": "            <!-- Controles dinámicos Stars Stretch -->",
+  "en": "            <!-- Dynamic Stars Stretch controls -->"
+ },
+ {
+  "es": "                  <span class=\"piw-label\" title=\"Estirado hiperbólico de estrellas (3^amount). Más = más brillo de estrellas.\">Stretch Amount</span>",
+  "en": "                  <span class=\"piw-label\" title=\"Hyperbolic star stretch (3^amount). Higher = brighter stars.\">Stretch Amount</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\" title=\"Realza el color de las estrellas alrededor de su luminancia (1 = sin cambio)\">Color Boost</span>",
+  "en": "                  <span class=\"piw-label\" title=\"Boosts star color around its luminance (1 = no change)\">Color Boost</span>"
+ },
+ {
+  "es": "            <!-- Curva Manual / Sigmoide: histograma + curva controlada por sliders -->",
+  "en": "            <!-- Manual Curve / Sigmoid: histogram + slider-driven curve -->"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Punto Negro</span><span class=\"piw-value\" id=\"valStretchBlack\">0.00</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Black Point</span><span class=\"piw-value\" id=\"valStretchBlack\">0.00</span></div>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Medios</span><span class=\"piw-value\" id=\"valStretchMid\">0.50</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Midtones</span><span class=\"piw-value\" id=\"valStretchMid\">0.50</span></div>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Contraste (S)</span><span class=\"piw-value\" id=\"valStretchContrast\">0.00</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Contrast (S)</span><span class=\"piw-value\" id=\"valStretchContrast\">0.00</span></div>"
+ },
+ {
+  "es": "            <button class=\"piw-btn primary\" id=\"btnApplyStretch\" disabled>Preview Estirado</button>\n            <button class=\"piw-btn\" id=\"btnCompareStretch\" style=\"width:100%; margin-top:6px;\" title=\"Ejecuta todos los algoritmos de estirado y guarda cada resultado en un Slot de memoria para compararlos\">Comparar estirados</button>",
+  "en": "            <button class=\"piw-btn primary\" id=\"btnApplyStretch\" disabled>Preview Stretch</button>\n            <button class=\"piw-btn\" id=\"btnCompareStretch\" style=\"width:100%; margin-top:6px;\" title=\"Runs all stretch algorithms and saves each result to a memory Slot for comparison\">Compare stretches</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 14: SAS Pro (100% JS: autoghs.js + stretches JS) -->",
+  "en": "          <!-- SECTION 14: SAS Pro (100% JS: autoghs.js + JS stretches) -->"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnInitSaspro\" style=\"width:100%;\">Inicializar Entorno Python</button>\n              <div class=\"piw-readout-lbl\" id=\"lblSasproStatus\" style=\"font-size:0.65rem; margin-top:4px; text-align:center;\">● No Inicializado</div>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnInitSaspro\" style=\"width:100%;\">Initialize Python Env</button>\n              <div class=\"piw-readout-lbl\" id=\"lblSasproStatus\" style=\"font-size:0.65rem; margin-top:4px; text-align:center;\">● Not Initialized</div>"
+ },
+ {
+  "es": "              <label class=\"piw-label\">Algoritmo SASPro</label>",
+  "en": "              <label class=\"piw-label\">SASPro Algorithm</label>"
+ },
+ {
+  "es": "              <!-- Parámetros Statistical / Star Stretch -->",
+  "en": "              <!-- Parameters Statistical / Star Stretch -->"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Clipping Sigmas</span>\n                  <span class=\"piw-value\" id=\"valSasproSigma\">2.8</span>",
+  "en": "                  <span class=\"piw-label\">Sigma Clip</span>\n                  <span class=\"piw-value\" id=\"valSasproSigma\">2.8</span>"
+ },
+ {
+  "es": "                <!-- Específico Star Stretch -->",
+  "en": "                <!-- Star Stretch Specific -->"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Preservación Color</span>",
+  "en": "                    <span class=\"piw-label\">Color Preservation</span>"
+ },
+ {
+  "es": "                <button class=\"piw-btn primary\" id=\"btnSasproUploadTrigger\" style=\"width:100%;\">Procesar Imagen FITS/TIFF</button>",
+  "en": "                <button class=\"piw-btn primary\" id=\"btnSasproUploadTrigger\" style=\"width:100%;\">Process FITS/TIFF Image</button>"
+ },
+ {
+  "es": "        <!-- Contenido Tab 2: Post-Procesado -->",
+  "en": "        <!-- Tab 2: Post Processing -->"
+ },
+ {
+  "es": "          <!-- SECCIÓN 1: Reducción de Ruido (Noise Reduction) - Desactivado -->",
+  "en": "          <!-- SECTION 1: Noise Reduction - Disabled -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Reducción de Ruido</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Noise Reduction</h3>"
+ },
+ {
+  "es": "              <option value=\"graxpert\">GraXpert Denoise - GraXpert Team (lento)</option>",
+  "en": "              <option value=\"graxpert\">GraXpert Denoise - GraXpert Team (slow)</option>"
+ },
+ {
+  "es": "                <div class=\"piw-subcard-header\">Parámetros de GraXpert Denoise</div>",
+  "en": "                <div class=\"piw-subcard-header\">GraXpert Denoise Settings</div>"
+ },
+ {
+  "es": "                    <span class=\"piw-label\">Fuerza</span>",
+  "en": "                    <span class=\"piw-label\">Strength</span>"
+ },
+ {
+  "es": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\" disabled> Usar máscara activa",
+  "en": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\" disabled> Use active mask"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnComparePostNR\" disabled style=\"flex:1;\">Comparar</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnComparePostNR\" disabled style=\"flex:1;\">Compare</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 2: Enfoque (Sharpening) - Desactivado -->",
+  "en": "          <!-- SECTION 2: Sharpening - Disabled -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Enfoque / Detalles</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Sharpening & Detail</h3>"
+ },
+ {
+  "es": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\" disabled> Usar máscara activa",
+  "en": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\" disabled> Use active mask"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnApplyPostSharp\" disabled style=\"flex:2;\">Preview Enfoque</button>\n              <button class=\"piw-btn\" id=\"btnComparePostSharp\" disabled style=\"flex:1;\">Comparar</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnApplyPostSharp\" disabled style=\"flex:2;\">Preview Sharpening</button>\n              <button class=\"piw-btn\" id=\"btnComparePostSharp\" disabled style=\"flex:1;\">Compare</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 3: Balance de Color - Desactivado -->",
+  "en": "          <!-- SECTION 3: Color Balance - Disabled -->"
+ },
+ {
+  "es": "                <span class=\"piw-label\">Saturación Tono (Hue sat)</span>",
+  "en": "                <span class=\"piw-label\">Hue sat</span>"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:2; padding: 6px 10px;\">Restablecer Ancla</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnPostColorBalanceReset\" disabled style=\"flex:2; padding: 6px 10px;\">Reset Hue Anchor</button>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Saturación</span>",
+  "en": "                  <span class=\"piw-label\">Saturation</span>"
+ },
+ {
+  "es": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\" disabled> Usar máscara activa",
+  "en": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\" disabled> Use active mask"
+ },
+ {
+  "es": "            <button class=\"piw-btn\" id=\"btnApplyPostColor\" disabled>Aplicar Balance de Color</button>",
+  "en": "            <button class=\"piw-btn\" id=\"btnApplyPostColor\" disabled>Apply Color Balance</button>"
+ },
+ {
+  "es": "              <div class=\"piw-subcard-header\">SCNR Green (Ruido Verde)</div>",
+  "en": "              <div class=\"piw-subcard-header\">SCNR Green (Green Noise)</div>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Intensidad k</span>\n                  <span class=\"piw-value\" id=\"valScnrInt\">0.90</span>",
+  "en": "                  <span class=\"piw-label\">Intensity k</span>\n                  <span class=\"piw-value\" id=\"valScnrInt\">0.90</span>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyScnr\" disabled>Aplicar SCNR Green</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyScnr\" disabled>Apply SCNR Green</button>"
+ },
+ {
+  "es": "              <div class=\"piw-subcard-header\">Color y Saturación</div>",
+  "en": "              <div class=\"piw-subcard-header\">Color & Saturation</div>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Saturación Cromática</span>",
+  "en": "                  <span class=\"piw-label\">Color Saturation</span>"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnApplySat\" disabled>Aplicar Saturación</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnApplySat\" disabled>Apply Saturation</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 4: Curvas (Curves) - Desactivado -->",
+  "en": "          <!-- SECTION 4: Curves - Disabled -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Curves (Curvas)</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Curves</h3>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Contraste</span>",
+  "en": "                  <span class=\"piw-label\">Contrast</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Brillo</span>",
+  "en": "                  <span class=\"piw-label\">Brightness</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Sombras</span>",
+  "en": "                  <span class=\"piw-label\">Shadows</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Iluminaciones</span>",
+  "en": "                  <span class=\"piw-label\">Highlights</span>"
+ },
+ {
+  "es": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\" disabled> Usar máscara",
+  "en": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\" disabled> Use mask"
+ },
+ {
+  "es": "            <div class=\"piw-readout-lbl\" id=\"lblPostCurvesHint\" style=\"font-size:0.6rem; margin-bottom:8px;\">Curvas: click izquierdo añade/arrastra, click derecho elimina.</div>\n            <button class=\"piw-btn\" id=\"btnApplyPostCurves\" disabled>Aplicar Curvas</button>",
+  "en": "            <div class=\"piw-readout-lbl\" id=\"lblPostCurvesHint\" style=\"font-size:0.6rem; margin-bottom:8px;\">Curves: left click adds/drags, right click removes.</div>\n            <button class=\"piw-btn\" id=\"btnApplyPostCurves\" disabled>Apply Curves</button>"
+ },
+ {
+  "es": "          <!-- SECCIÓN 6: Generador de Máscaras (Activa / Parcial) -->",
+  "en": "          <!-- SECTION 6: Mask Generator (Active / Partial) -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Generador de Máscaras</h3>",
+  "en": "            <h3 class=\"piw-section-title\">Mask Generator</h3>"
+ },
+ {
+  "es": "              <option value=\"range\">Range Selection (Luminancia)</option>\n              <option value=\"color\">Color Mask (Tono de Color)</option>",
+  "en": "              <option value=\"range\">Range Selection (Luminance)</option>\n              <option value=\"color\">Color Mask (Color Hue)</option>"
+ },
+ {
+  "es": "            <!-- Controles Range Mask - Activo -->",
+  "en": "            <!-- Range Mask controls - Active -->"
+ },
+ {
+  "es": "            <!-- Controles Color Mask - Activo -->",
+  "en": "            <!-- Color Mask controls - Active -->"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Ángulo de Tono</span>",
+  "en": "                  <span class=\"piw-label\">Hue Angle</span>"
+ },
+ {
+  "es": "                  <span class=\"piw-label\">Rango de Tono (±)</span>",
+  "en": "                  <span class=\"piw-label\">Hue Range (±)</span>"
+ },
+ {
+  "es": "            <!-- Controles FAME - Desactivado -->",
+  "en": "            <!-- FAME Controls - Disabled -->"
+ },
+ {
+  "es": "                  <button class=\"piw-btn\" id=\"btnPostFameNext\" disabled style=\"flex:1; font-size:0.65rem; padding: 6px 4px;\">Siguiente</button>\n                  <button class=\"piw-btn\" id=\"btnPostFameUndo\" disabled style=\"flex:1; font-size:0.65rem; padding: 6px 4px;\">Deshacer</button>",
+  "en": "                  <button class=\"piw-btn\" id=\"btnPostFameNext\" disabled style=\"flex:1; font-size:0.65rem; padding: 6px 4px;\">Next</button>\n                  <button class=\"piw-btn\" id=\"btnPostFameUndo\" disabled style=\"flex:1; font-size:0.65rem; padding: 6px 4px;\">Undo</button>"
+ },
+ {
+  "es": "              <button class=\"piw-btn\" id=\"btnPreviewMask\" disabled style=\"flex:1;\">Previsualizar</button>\n              <button class=\"piw-btn primary\" id=\"btnApplyMask\" disabled style=\"flex:1;\">Guardar Máscara</button>",
+  "en": "              <button class=\"piw-btn\" id=\"btnPreviewMask\" disabled style=\"flex:1;\">Preview Mask</button>\n              <button class=\"piw-btn primary\" id=\"btnApplyMask\" disabled style=\"flex:1;\">Save Mask</button>"
+ },
+ {
+  "es": "        <!-- Contenido Tab 3: Mezcla de Canales (estilo Photoshop, drag & drop) -->",
+  "en": "        <!-- Tab 3: Channel Blending (Photoshop-style drag & drop) -->"
+ },
+ {
+  "es": "            <h3 class=\"piw-section-title\">Mezcla de Capas</h3>\n            <div class=\"piw-mix-help\">Arrastra las etiquetas a la <b>pila de capas</b>. La de <b>arriba se funde sobre</b> las de abajo (como Photoshop). Reordena arrastrando. <b>Clic derecho</b> en una capa: opacidad.</div>",
+  "en": "            <h3 class=\"piw-section-title\">Blending Layers</h3>\n            <div class=\"piw-mix-help\">Drag the tags into the <b>layer stack</b>. The <b>top layer blends over</b> the ones below (like Photoshop). Reorder by dragging. <b>Right-click</b> a layer: opacity.</div>"
+ },
+ {
+  "es": "            <div class=\"piw-mix-sublabel\">Imágenes disponibles</div>",
+  "en": "            <div class=\"piw-mix-sublabel\">Available images</div>"
+ },
+ {
+  "es": "            <div class=\"piw-mix-sublabel\">Pila de capas <span style=\"opacity:.6\">(arriba = encima)</span></div>",
+  "en": "            <div class=\"piw-mix-sublabel\">Layer stack <span style=\"opacity:.6\">(top = above)</span></div>"
+ },
+ {
+  "es": "              <div class=\"piw-mix-empty\" id=\"mixStackEmpty\">Arrastra aquí una imagen para empezar</div>",
+  "en": "              <div class=\"piw-mix-empty\" id=\"mixStackEmpty\">Drag an image here to start</div>"
+ },
+ {
+  "es": "              <input type=\"checkbox\" id=\"chkMixPreview\"> Ver mezcla (preview en vivo)",
+  "en": "              <input type=\"checkbox\" id=\"chkMixPreview\"> Preview blend (live)"
+ },
+ {
+  "es": "            <button class=\"piw-btn primary\" id=\"btnGenerateBlend\" disabled style=\"width:100%;\">Componer y Renderizar Mezcla</button>",
+  "en": "            <button class=\"piw-btn primary\" id=\"btnGenerateBlend\" disabled style=\"width:100%;\">Compose and Render Blend</button>"
+ },
+ {
+  "es": "        <!-- Contenido Tab 4: Mejora (Image Enhancement — port de PI Workflow) -->",
+  "en": "        <!-- Tab 4: Enhance (Image Enhancement — PI Workflow port) -->"
+ },
+ {
+  "es": "            <span class=\"piw-eyebrow\">COLOR SELECTIVO POR BANDAS DE TONO</span>",
+  "en": "            <span class=\"piw-eyebrow\">SELECTIVE COLOR BY HUE BAND</span>"
+ },
+ {
+  "es": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Tono (Hue)</span><span class=\"piw-value\" id=\"valCmHue\">0</span></div>",
+  "en": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Hue</span><span class=\"piw-value\" id=\"valCmHue\">0</span></div>"
+ },
+ {
+  "es": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Saturación</span><span class=\"piw-value\" id=\"valCmSat\">0</span></div>",
+  "en": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Saturation</span><span class=\"piw-value\" id=\"valCmSat\">0</span></div>"
+ },
+ {
+  "es": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Luminancia</span><span class=\"piw-value\" id=\"valCmLum\">0</span></div>",
+  "en": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Luminance</span><span class=\"piw-value\" id=\"valCmLum\">0</span></div>"
+ },
+ {
+  "es": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Fuerza global</span><span class=\"piw-value\" id=\"valCmStrength\">1.00</span></div>",
+  "en": "              <div class=\"piw-label-row\"><span class=\"piw-label\">Global strength</span><span class=\"piw-value\" id=\"valCmStrength\">1.00</span></div>"
+ },
+ {
+  "es": "            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectStars\" checked> Proteger estrellas (altas luces)</label>\n            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectLowSat\" checked> Proteger fondo (baja saturación)</label>",
+  "en": "            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectStars\" checked> Protect stars (highlights)</label>\n            <label class=\"piw-checkbox-row\" style=\"margin-bottom:4px;\"><input type=\"checkbox\" id=\"chkCmProtectLowSat\" checked> Protect background (low saturation)</label>"
+ },
+ {
+  "es": "              <button class=\"piw-btn primary\" id=\"btnApplyColorMixer\" disabled style=\"flex:2;\">Aplicar Color Mixer</button>",
+  "en": "              <button class=\"piw-btn primary\" id=\"btnApplyColorMixer\" disabled style=\"flex:2;\">Apply Color Mixer</button>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radio (px)</span><span class=\"piw-value\" id=\"valDetailLcRadius\">80</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radius (px)</span><span class=\"piw-value\" id=\"valDetailLcRadius\">80</span></div>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Detalle fino</span><span class=\"piw-value\" id=\"valDetailMdFine\">0.40</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Fine detail</span><span class=\"piw-value\" id=\"valDetailMdFine\">0.40</span></div>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Detalle medio</span><span class=\"piw-value\" id=\"valDetailMdMedium\">0.20</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Medium detail</span><span class=\"piw-value\" id=\"valDetailMdMedium\">0.20</span></div>"
+ },
+ {
+  "es": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radio (px)</span><span class=\"piw-value\" id=\"valDetailHpRadius\">3</span></div>",
+  "en": "                <div class=\"piw-label-row\"><span class=\"piw-label\">Radius (px)</span><span class=\"piw-value\" id=\"valDetailHpRadius\">3</span></div>"
+ },
+ {
+  "es": "            <button class=\"piw-btn primary\" id=\"btnApplyDetail\" disabled style=\"width:100%;\">Aplicar Detalle</button>",
+  "en": "            <button class=\"piw-btn primary\" id=\"btnApplyDetail\" disabled style=\"width:100%;\">Apply Detail</button>"
+ },
+ {
+  "es": "\n      <!-- Panel de previsualización central (Shared Preview Pane) -->",
+  "en": "      <!-- Preview panel -->"
+ },
+ {
+  "es": "        <!-- Almacén de slots temporales de memoria -->",
+  "en": "        <!-- Temporary Memory Slots -->"
+ },
+ {
+  "es": "            <span class=\"piw-slots-label\" id=\"lblMemUse\" title=\"RAM estimada ocupada por imágenes (flujo + slots + historial)\"></span>\n            <button class=\"btn-reset-inputs\" id=\"btnClearSlots\" style=\"font-size:0.6rem; padding:2px 6px;\">Borrar todo</button>",
+  "en": "            <span class=\"piw-slots-label\" id=\"lblMemUse\" title=\"Estimated RAM used by images (workflow + slots + history)\"></span>\n            <button class=\"btn-reset-inputs\" id=\"btnClearSlots\" style=\"font-size:0.6rem; padding:2px 6px;\">Clear all</button>"
+ },
+ {
+  "es": "        <!-- Barra de canales del flujo de trabajo (path buttons) -->",
+  "en": "        <!-- Workflow channel path buttons -->"
+ },
+ {
+  "es": "        <!-- U3: historial de pasos aplicados (stages) de la imagen mostrada -->",
+  "en": "        <!-- U3: history of applied steps (stages) for the displayed image -->"
+ },
+ {
+  "es": "              <span id=\"piwLoaderText\">Procesando...</span>",
+  "en": "              <span id=\"piwLoaderText\">Processing...</span>"
+ },
+ {
+  "es": "            <button class=\"piw-apply-btn-big\" id=\"btnBigApply\">Aplicar</button>",
+  "en": "            <button class=\"piw-apply-btn-big\" id=\"btnBigApply\">Apply</button>"
+ },
+ {
+  "es": "              <button class=\"piw-tool-btn piw-tool-disabled\" id=\"btnToolUndo\" disabled title=\"Deshacer (Ctrl+Z)\">↶</button>\n              <button class=\"piw-tool-btn piw-tool-disabled\" id=\"btnToolRedo\" disabled title=\"Rehacer (Ctrl+Y / Ctrl+Shift+Z)\">↷</button>",
+  "en": "              <button class=\"piw-tool-btn piw-tool-disabled\" id=\"btnToolUndo\" disabled title=\"Undo (Ctrl+Z)\">↶</button>\n              <button class=\"piw-tool-btn piw-tool-disabled\" id=\"btnToolRedo\" disabled title=\"Redo (Ctrl+Y / Ctrl+Shift+Z)\">↷</button>"
+ },
+ {
+  "es": "              <button class=\"piw-tool-btn\" id=\"btnToolAutoSTF\" title=\"Estirado de pantalla AutoSTF (MAD) para imágenes lineales\">AutoSTF</button>\n              <button class=\"piw-tool-btn active\" id=\"btnToolViewCurrent\" title=\"Ver imagen activa actual\">Imagen</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolViewMask\" title=\"Ver máscara activa actual\">Máscara</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolViewGradient\" style=\"display:none;\" title=\"Ver modelo de gradiente sustraído\">Gradiente</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolToggleAB\" title=\"Alternar vista entre antes/después (A/B)\">Toggle A/B</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolSplitView\" title=\"Activar cortinilla de comparación A/B\">Split A/B</button>",
+  "en": "              <button class=\"piw-tool-btn\" id=\"btnToolAutoSTF\" title=\"AutoSTF (MAD) screen stretch for linear images\">AutoSTF</button>\n              <button class=\"piw-tool-btn active\" id=\"btnToolViewCurrent\" title=\"View active image\">Image</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolViewMask\" title=\"View active mask\">Mask</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolViewGradient\" style=\"display:none;\" title=\"View subtracted gradient model\">Gradient</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolToggleAB\" title=\"Toggle view between before/after (A/B)\">Toggle A/B</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolSplitView\" title=\"Toggle split view comparison\">Split A/B</button>"
+ },
+ {
+  "es": "              <button class=\"piw-tool-btn\" id=\"btnToolReset\" title=\"Reiniciar imagen de trabajo y empezar de cero\">Reset</button>",
+  "en": "              <button class=\"piw-tool-btn\" id=\"btnToolReset\" title=\"Reset active image and start from scratch\">Reset</button>"
+ },
+ {
+  "es": "              <button class=\"piw-tool-btn\" id=\"btnToolZoomFit\" title=\"Ajustar imagen al panel\">Ajustar</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolZoomReset\" title=\"Zoom 100%\">1:1</button>",
+  "en": "              <button class=\"piw-tool-btn\" id=\"btnToolZoomFit\" title=\"Fit image inside panel\">Fit</button>\n              <button class=\"piw-tool-btn\" id=\"btnToolZoomReset\" title=\"Zoom to 100%\">1:1</button>"
+ },
+ {
+  "es": "              Arrastra y suelta o haz clic en los canales de la barra lateral izquierda para cargar archivos astronómicos <strong>FITS, XISF o TIFF</strong> lineales de 16/32 bits, o imágenes PNG/JPG.",
+  "en": "              Drag and drop or click the channels on the left sidebar to load linear <strong>FITS, XISF or TIFF</strong> 16/32-bit astronomical files, or standard PNG/JPG images."
+ },
+ {
+  "es": "        </div>\n\n        <!-- Consola de logs -->",
+  "en": "        </div>        <!-- Logs Console -->"
+ },
+ {
+  "es": "              <span>Consola de Procesado CabraSpace Imaging Workflow <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Limpiar</span>",
+  "en": "              <span>CabraSpace Imaging Workflow Processing Console <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Clear</span>"
+ },
+ {
+  "es": "              <div class=\"piw-console-line\"><span class=\"time\">[09:21:35]</span><span class=\"info\">Listo para el procesado. Esperando entrada...</span></div>",
+  "en": "              <div class=\"piw-console-line\"><span class=\"time\">[09:21:35]</span><span class=\"info\">Ready for processing. Waiting for input...</span></div>"
+ },
+ {
+  "es": "        <!-- Exportación: PNG = lo que ves (8-bit); TIFF/FITS = los DATOS reales (16/32-bit) -->",
+  "en": "        <!-- Export: PNG = what you see (8-bit); TIFF/FITS = the real DATA (16/32-bit) -->"
+ },
+ {
+  "es": "          <select class=\"piw-select\" id=\"selExportFormat\" style=\"flex:1.4; margin-bottom:0;\" title=\"PNG exporta la vista actual (8 bits). TIFF y FITS exportan los datos reales para seguir en PixInsight/Photoshop.\">\n            <option value=\"png\">PNG 8-bit (vista actual)</option>\n            <option value=\"tiff16\" selected>TIFF 16-bit (datos)</option>\n            <option value=\"fits\">FITS 32-bit (datos)</option>",
+  "en": "          <select class=\"piw-select\" id=\"selExportFormat\" style=\"flex:1.4; margin-bottom:0;\" title=\"PNG exports the current view (8 bits). TIFF and FITS export the real data to continue in PixInsight/Photoshop.\">\n            <option value=\"png\">PNG 8-bit (current view)</option>\n            <option value=\"tiff16\" selected>TIFF 16-bit (data)</option>\n            <option value=\"fits\">FITS 32-bit (data)</option>"
+ },
+ {
+  "es": "            Exportar",
+  "en": "            Export"
+ },
+ {
+  "es": "      <p>&copy; 2026 CabraSpace. Diseñado para la comunidad de astrofotografía.</p>",
+  "en": "      <p>&copy; 2026 CabraSpace. Designed for the astrophotography community.</p>"
+ },
+ {
+  "es": "  <!-- Librerías de soporte -->",
+  "en": "  <!-- Support scripts -->"
+ },
+ {
+  "es": "  <!-- pyodide.js (CDN) eliminado: SAS Pro + SPCC + stretches son 100% JS; loadPyodide ya no se invoca. -->",
+  "en": "  <!-- pyodide.js (CDN) removed: SAS Pro + SPCC + stretches are 100% JS; loadPyodide is never invoked. -->"
+ }
+]
