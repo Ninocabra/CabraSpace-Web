@@ -14,23 +14,66 @@
     cv.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
   }
 
-  // Zoom de la rueda del ratón
+  // U5: zoom ANCLADO a un punto de pantalla (cursor o centro del pellizco): el punto de la
+  // imagen que está bajo (clientX, clientY) se queda quieto al cambiar la escala. Con
+  // transform-origin en el centro, el centro TRANSFORMADO del canvas es C0+pan (la escala no
+  // lo mueve), así que basta corregir el pan con (1 - nuevo/viejo) · (punto - centroRect).
+  function zoomAt(clientX, clientY, newZoom) {
+    newZoom = Math.max(0.2, Math.min(15, newZoom));
+    const r = cv.getBoundingClientRect();
+    const k = newZoom / state.zoom;
+    state.panX += (1 - k) * (clientX - (r.left + r.width / 2));
+    state.panY += (1 - k) * (clientY - (r.top + r.height / 2));
+    state.zoom = newZoom;
+    updateTransform();
+  }
+
+  // Zoom de la rueda del ratón, centrado en el cursor (U5)
   container.addEventListener("wheel", (e) => {
     if (!state.activeImage) return;
     e.preventDefault();
     const zoomFactor = 1.15;
-    if (e.deltaY < 0) {
-      state.zoom = Math.min(15, state.zoom * zoomFactor);
-    } else {
-      state.zoom = Math.max(0.2, state.zoom / zoomFactor);
-    }
-    updateTransform();
+    zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? state.zoom * zoomFactor : state.zoom / zoomFactor);
   }, { passive: false });
+
+  // U5: pinch-zoom con dos dedos (Pointer Events; el canvas ya tiene touch-action:none).
+  // El segundo dedo CANCELA el paneo/crop en curso; la escala sigue la distancia entre dedos
+  // (anclada al punto medio) y el punto medio arrastra la imagen (paneo a dos dedos). Al
+  // soltar un dedo termina el gesto: seguir paneando requiere levantar y volver a tocar
+  // (evita el salto clásico al retirar el primer dedo).
+  const _pinch = { pointers: new Map(), active: false, dist0: 1, zoom0: 1, mid: null };
+  function _pinchDist() { const p = [..._pinch.pointers.values()]; return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1; }
+  function _pinchMid() { const p = [..._pinch.pointers.values()]; return { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2 }; }
+  function _pinchEnd(e) {
+    if (!_pinch.pointers.delete(e.pointerId)) return;
+    if (_pinch.active && _pinch.pointers.size < 2) {
+      _pinch.active = false;
+      state.isDragging = false;
+    }
+  }
+  window.addEventListener("pointercancel", _pinchEnd);
 
   // Paneo y Crop con arrastre del ratón
   cv.addEventListener("pointerdown", (e) => {
     if (!state.activeImage) return;
-    
+
+    // U5: registro de dedos; con el segundo dedo se entra en modo pellizco
+    if (e.pointerType === "touch") {
+      _pinch.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (_pinch.pointers.size >= 2) {
+        state.isDragging = false;
+        cropState.drawing = false;
+        cropState.dragMode = "";
+        cropState.dragStartRect = null;
+        _pinch.active = true;
+        _pinch.dist0 = _pinchDist();
+        _pinch.zoom0 = state.zoom;
+        _pinch.mid = _pinchMid();
+        cv.style.cursor = "default";
+        return;
+      }
+    }
+
     // Check if Crop section is expanded/visible to allow crop mode
     const sectionCrop = el("sectionCrop");
     const cropActive = sectionCrop && !sectionCrop.classList.contains("collapsed");
@@ -76,6 +119,18 @@
   });
 
   window.addEventListener("pointermove", (e) => {
+    // U5: seguimiento del pellizco — escala anclada al punto medio + paneo a dos dedos
+    if (_pinch.pointers.has(e.pointerId)) _pinch.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_pinch.active && _pinch.pointers.size >= 2) {
+      const mid = _pinchMid();
+      zoomAt(mid.x, mid.y, _pinch.zoom0 * (_pinchDist() / _pinch.dist0));
+      state.panX += mid.x - _pinch.mid.x;
+      state.panY += mid.y - _pinch.mid.y;
+      updateTransform();
+      _pinch.mid = mid;
+      return;
+    }
+
     if (cropState.drawing && state.activeImage) {
       const { x: ix, y: iy } = getImageCoordsFromEvent(e);
       const imgW = state.activeImage.w;
@@ -122,7 +177,9 @@
     }
   });
 
-  window.addEventListener("pointerup", () => {
+  window.addEventListener("pointerup", (e) => {
+    _pinchEnd(e); // U5: al soltar un dedo termina el pellizco (sin reanudar paneo)
+
     if (cropState.drawing) {
       cropState.drawing = false;
       cropState.dragMode = "";
@@ -131,7 +188,7 @@
       cv.style.cursor = "default";
       return;
     }
-    
+
     if (state.isDragging) {
       state.isDragging = false;
       cv.style.cursor = "grab";
