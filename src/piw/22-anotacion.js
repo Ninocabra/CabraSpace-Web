@@ -475,7 +475,16 @@
     const sky = [[0, 0], [img.w, 0], [0, img.h]].map(c => annotPxToSky(T, c[0], c[1]));
     const update = () => {
       const cnv = mapDiv.querySelector("canvas");
-      const kk = (cnv && cnv.width) ? (cnv.clientWidth / cnv.width) : 1; // world2pix da px de canvas → CSS (HiDPI)
+      // world2pix puede devolver px de DISPOSITIVO (device) o CSS según versión/escala de pantalla
+      // (dpr). Autodetecta: proyecta el CENTRO de la vista y mira si cae en width/2 (device) o en
+      // clientWidth/2 (CSS); así funciona con Windows a 125/150%, Retina, etc.
+      let kk = 1;
+      if (cnv && cnv.width && cnv.clientWidth) {
+        try {
+          const cc = aladin.getRaDec(); const cp = aladin.world2pix(cc[0], cc[1]);
+          if (cp) kk = (Math.abs(cp[0] - cnv.width / 2) < Math.abs(cp[0] - cnv.clientWidth / 2)) ? (cnv.clientWidth / cnv.width) : 1;
+        } catch (e) {}
+      }
       let p;
       try { p = sky.map(s => aladin.world2pix(s.ra, s.dec)); } catch (e) { p = null; }
       if (!p || p.some(q => !q || !isFinite(q[0]) || !isFinite(q[1]))) { cv2.style.visibility = "hidden"; return; }
