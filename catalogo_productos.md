@@ -127,6 +127,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: NightVis**
   - [NightVis: Pronóstico astronómico que te dice exactamente por qué esta noche es buena o mala](https://www.reddit.com/r/telescopes/comments/1tw7xg3/nightvis_astro_forecast_that_tells_you_exactly/) (2026-06-04)
 - **Modelo: Script**
+  - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
   - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
 - **Modelo: scripts**
   - [Elementos y scripts no descargados al actualizar PixInsight a la versión 1.9.4](https://stargazerslounge.com/topic/445730-what-items-or-scripts-are-not-downloaded-when-up-grading-pixinsight-to-latest-version-v194/) (2026-06-04)
@@ -355,8 +356,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: cámara astronómica**
   - [ToupTek lanza una cámara que acerca el espacio profundo como nunca antes](https://www.youtube.com/shorts/CqZ5UwR62JE) (2026-05-10)
   - [Captura la Vía Láctea infrarroja bajo una fuerte contaminación lumínica urbana con ToupTek](https://www.youtube.com/shorts/cwangzNFMUI) (2026-05-30)
-- **Modelo: cámara infrarroja**
-  - [Configuración para Vía Láctea Infrarroja: Capturar la Vía Láctea Incluso con Fuerte Contaminación Lumínica](https://www.youtube.com/watch?v=iBDfnxJkHQU) (2026-06-01)
 
 ### SOFTWARE
 - **Modelo: StellaVita**
