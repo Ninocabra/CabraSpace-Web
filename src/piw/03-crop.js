@@ -210,6 +210,7 @@
       }
       const hadWcs = !!state.wcs;
       state.wcs = null; // geometría cambiada → plate-solve invalidado
+      if (typeof annotOnWcsChanged === "function") annotOnWcsChanged(); // apaga la anotación si estaba activa
       cropState.rect = null;
       cropUpdateStatus();
       refreshPathBar();
@@ -234,6 +235,7 @@
       }
       const hadWcs = !!state.wcs;
       state.wcs = null; // geometría cambiada → plate-solve invalidado
+      if (typeof annotOnWcsChanged === "function") annotOnWcsChanged(); // apaga la anotación si estaba activa
       cropState.rect = null;
       cropUpdateStatus();
       refreshPathBar();

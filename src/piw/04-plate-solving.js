@@ -229,10 +229,15 @@
           radius: calibration.radius,
           pixscale: calibration.pixscale,
           orientation: calibration.orientation,
-          parity: calibration.parity
+          parity: calibration.parity,
+          // Dimensiones de la imagen al resolver: la pestaña Anotar rechaza el WCS
+          // si la geometría cambió después (además del crop, que ya lo anula).
+          imgW: state.activeImage.w,
+          imgH: state.activeImage.h
         };
         // También en la imagen activa por compatibilidad
         state.activeImage.wcs = state.wcs;
+        if (typeof annotOnWcsChanged === "function") annotOnWcsChanged();
         
         // Actualizar UI
         const statusLbl = el("lblSolveStatus");

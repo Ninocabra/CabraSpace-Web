@@ -249,12 +249,12 @@
       background: rgba(255, 255, 255, 0.035);
       border: none;
       color: var(--text-secondary);
-      font-size: 0.57rem;
+      font-size: 0.53rem;   /* 0.57 -> 0.53: con 6 pestanas (Anotar) deben caber sin scroll a 1024px+ */
       font-family: var(--font-sans);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0;
-      padding: 8px 4px 8px 12px;
+      padding: 8px 2px 8px 10px;
       cursor: pointer;
       transition: var(--transition-smooth);
       text-align: center;
@@ -266,14 +266,14 @@
     }
     .piw-tab-btn:first-child {
       margin-left: 0;
-      padding-left: 11px;
+      padding-left: 9px;
       clip-path: polygon(0 0, calc(100% - 8px) 0, calc(100% - 1px) 42%, calc(100% - 1px) 58%, calc(100% - 8px) 100%, 0 100%);
       border-top-left-radius: 7px;
       border-bottom-left-radius: 7px;
     }
     .piw-tab-btn:last-child {
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 7px 58%, 7px 42%);
-      padding-right: 8px;
+      padding-right: 6px;
       border-top-right-radius: 7px;
       border-bottom-right-radius: 7px;
     }
@@ -1251,6 +1251,23 @@
       background: var(--gold-dark);
       box-shadow: inset 0 0 0 1px var(--gold-border);
     }
+
+    /* ANOTAR: chips de categorías, tarjeta de objeto y panel Aladin */
+    .piw-annot-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .piw-annot-chip input { display: none; }
+    .piw-annot-chip span { display: inline-block; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-color, #444); font-size: 0.62rem; letter-spacing: 0.04em; cursor: pointer; color: var(--text-muted, #9a9a9a); background: rgba(255,255,255,0.03); user-select: none; }
+    .piw-annot-chip input:checked + span { color: var(--gold-primary); border-color: var(--gold-primary); background: rgba(207,171,74,0.12); }
+    .piw-annot-status { font-size: 0.62rem; margin: 6px 0 2px; color: var(--text-muted, #9a9a9a); }
+    .piw-annot-hint { font-size: 0.58rem; color: var(--text-muted, #777); margin-top: 8px; }
+    .piw-annot-card { position: absolute; z-index: 60; min-width: 190px; max-width: 250px; background: rgba(12,12,14,0.95); border: 1px solid var(--gold-primary); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); font-size: 0.7rem; color: #d8d8d8; }
+    .piw-annot-card h4 { margin: 0 14px 2px 0; font-size: 0.8rem; color: #f0e6da; }
+    .piw-annot-card .sub { color: #9a9a9a; margin-bottom: 8px; }
+    .piw-annot-card a { display: inline-block; margin-right: 8px; color: var(--gold-primary); text-decoration: none; border: 1px solid rgba(207,171,74,0.4); padding: 2px 8px; border-radius: 6px; }
+    .piw-annot-card .close { position: absolute; top: 4px; right: 6px; background: none; border: none; color: #888; cursor: pointer; font-size: 0.8rem; }
+    .piw-aladin-panel { position: absolute; inset: 4%; z-index: 55; background: #0a0a0c; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+    .piw-aladin-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 0.65rem; color: #bbb; border-bottom: 1px solid #222; }
+    .piw-aladin-close { background: none; border: none; color: #bbb; cursor: pointer; font-size: 0.9rem; }
+    .piw-aladin-map { flex: 1; min-height: 0; }
   </style>
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/cabraspace-imaging-workflow.html">
@@ -1361,7 +1378,9 @@
       <a href="https://www.starnetastro.com/" target="_blank" rel="noopener">StarNet2</a> &amp;
       <a href="https://www.starnetastro.com/cli-tools/deepsnr/" target="_blank" rel="noopener">DeepSNR</a> - Nikita Misiura ·
       <a href="https://www.setiastro.com/cosmic-clarity" target="_blank" rel="noopener">Cosmic Clarity</a> - Seti Astro ·
-      <a href="https://graxpert.com/" target="_blank" rel="noopener">GraXpert</a> - GraXpert Team
+      <a href="https://graxpert.com/" target="_blank" rel="noopener">GraXpert</a> - GraXpert Team ·
+      Anotación: <a href="https://github.com/mattiaverga/OpenNGC" target="_blank" rel="noopener">OpenNGC</a> (CC-BY-SA) ·
+      <a href="https://aladin.cds.unistra.fr/AladinLite/" target="_blank" rel="noopener">Aladin Lite</a> - CDS
     </div>
     <!-- AI-CREDITS-END -->
     <div class="piw-grid">
@@ -1374,6 +1393,7 @@
           <button class="piw-tab-btn" data-tab="tab-post">Post</button>
           <button class="piw-tab-btn" data-tab="tab-combine">Mezcla</button>
           <button class="piw-tab-btn" data-tab="tab-enhance">Mejora</button>
+          <button class="piw-tab-btn" data-tab="tab-annotate">Anotar</button>
         </nav>
 
         <!-- Contenido Tab 0: Pre-Procesado -->
@@ -2710,6 +2730,30 @@
             <button class="piw-btn primary" id="btnApplyDetail" disabled style="width:100%;">Preview</button>
           </div>
         </div>
+        <!-- Contenido Tab 6: Anotación (catálogo local + WCS del Plate Solving; motor en src/piw/22-anotacion.js) -->
+        <div class="piw-tab-content" id="tab-annotate">
+          <div class="piw-section">
+            <h3 class="piw-section-title">Anotación de Objetos</h3>
+            <span class="piw-eyebrow">NGC · IC · MESSIER · SHARPLESS · BARNARD</span>
+            <div class="piw-annot-status" id="lblAnnotWcs">Sin solución astrométrica.</div>
+            <button class="piw-btn" id="btnAnnotGoSolve" style="width:100%; display:none;">Ir a Plate Solving (pestaña Pre)</button>
+            <div class="piw-annot-chips">
+              <label class="piw-annot-chip"><input type="checkbox" id="chkAnnotG" checked><span>🌌 Galaxias</span></label>
+              <label class="piw-annot-chip"><input type="checkbox" id="chkAnnotN" checked><span>☁️ Nebulosas</span></label>
+              <label class="piw-annot-chip"><input type="checkbox" id="chkAnnotC" checked><span>✨ Cúmulos</span></label>
+              <label class="piw-annot-chip"><input type="checkbox" id="chkAnnotS" checked><span>⭐ Estrellas</span></label>
+            </div>
+            <div class="piw-control-group">
+              <div class="piw-label-row"><span class="piw-label">Densidad (magnitud límite)</span><span class="piw-value" id="valAnnotMag">12.0</span></div>
+              <input type="range" class="piw-slider" id="sldAnnotMag" min="6" max="16" step="0.5" value="12">
+            </div>
+            <button class="piw-btn primary" id="btnAnnotate" disabled style="width:100%;">Anotar imagen</button>
+            <button class="piw-btn" id="btnAnnotSky" disabled style="width:100%; margin-top:6px;">🗺 Ver en el cielo (Aladin)</button>
+            <button class="piw-btn" id="btnAnnotFlip" style="width:100%; margin-top:6px; display:none;">⇄ Voltear Este/Oeste (etiquetas en espejo)</button>
+            <div class="piw-annot-hint">Haz click sobre un objeto anotado para ver sus datos y enlaces (Wikipedia · SIMBAD).</div>
+          </div>
+        </div>
+
       </aside>
 
       <!-- Panel de previsualización central (Shared Preview Pane) -->
@@ -2754,6 +2798,14 @@
 
         <div class="piw-card piw-viewport-card" style="padding: 10px; width: 100%;">
           <div class="piw-canvas-container" id="canvasContainer">
+            <!-- ANOTAR: mapa del cielo (Aladin Lite v3, CDS; script cargado bajo demanda) -->
+            <div class="piw-aladin-panel" id="aladinPanel" style="display:none;">
+              <div class="piw-aladin-head">
+                <span>Tu imagen en el cielo — Aladin Lite (CDS)</span>
+                <button class="piw-aladin-close" id="btnAladinClose" type="button">✕</button>
+              </div>
+              <div class="piw-aladin-map" id="aladinMap"></div>
+            </div>
             <div class="piw-loader" id="piwLoader" style="display:none;">
               <div class="spinner"></div>
               <span id="piwLoaderText">Procesando...</span>
@@ -2831,25 +2883,25 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <!-- pyodide.js (CDN) eliminado: SAS Pro + SPCC + stretches son 100% JS; loadPyodide ya no se invoca. -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
-  <script>window.PIW_BUILD="20260703c";</script>
-  <script src="onnx-engine.js?v=20260703c"></script>
-  <script src="star-removal.js?v=20260703c"></script>
-  <script src="deconv.js?v=20260703c"></script>
-  <script src="io.js?v=20260703c"></script>
-  <script src="autoghs.js?v=20260703c"></script>
+  <script>window.PIW_BUILD="20260703d";</script>
+  <script src="onnx-engine.js?v=20260703d"></script>
+  <script src="star-removal.js?v=20260703d"></script>
+  <script src="deconv.js?v=20260703d"></script>
+  <script src="io.js?v=20260703d"></script>
+  <script src="autoghs.js?v=20260703d"></script>
   <!-- saspro-pyodide.js eliminado: SAS Pro + SPCC son 100% JS (spcc.js + AutoGHS), sin Pyodide. -->
-  <script src="lut.js?v=20260703c"></script>
-  <script src="resample.js?v=20260703c"></script>
-  <script src="background.js?v=20260703c"></script>
-  <script src="graxpert.js?v=20260703c"></script>
+  <script src="lut.js?v=20260703d"></script>
+  <script src="resample.js?v=20260703d"></script>
+  <script src="background.js?v=20260703d"></script>
+  <script src="graxpert.js?v=20260703d"></script>
   <!-- USM-SHARP-BEGIN -->
-  <script src="sharpening.js?v=20260703c"></script>
+  <script src="sharpening.js?v=20260703d"></script>
   <!-- USM-SHARP-END -->
-  <script src="spcc.js?v=20260703c"></script>
-  <script src="imgproc.js?v=20260703c"></script>
-  <script src="imgops.js?v=20260703c"></script>
+  <script src="spcc.js?v=20260703d"></script>
+  <script src="imgproc.js?v=20260703d"></script>
+  <script src="imgops.js?v=20260703d"></script>
   <!-- A5: bundle minificado por esbuild (tools/build_piw.py desde src/piw/); sourcemap apunta a pi-workflow.js -->
-  <script src="pi-workflow.min.js?v=20260703c"></script>
-  <script src="mobile-menu.js?v=20260703c"></script>
+  <script src="pi-workflow.min.js?v=20260703d"></script>
+  <script src="mobile-menu.js?v=20260703d"></script>
 </body>
 </html>

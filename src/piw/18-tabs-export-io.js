@@ -12,6 +12,8 @@
         document.querySelectorAll("#tab-combine .piw-section").forEach(s => s.classList.remove("collapsed"));
         updateMixSourceOptions();
       }
+      // La pestaña Anotar refresca su estado WCS y precarga el catálogo al entrar.
+      if (_tabId === "tab-annotate" && typeof annotOnTabOpen === "function") annotOnTabOpen();
       updateBigApply();
     });
   });

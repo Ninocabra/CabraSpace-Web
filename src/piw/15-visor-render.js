@@ -220,6 +220,9 @@
     if (cropState.rect) {
       drawCropOverlay(ctx, cropState.rect);
     }
+
+    // ANOTAR: overlay de objetos del catálogo (definido en 22-anotacion.js).
+    if (typeof drawAnnotationsOverlay === "function") drawAnnotationsOverlay();
   }
 
   // Dibujar Histograma SVG
