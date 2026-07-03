@@ -7764,7 +7764,11 @@
       const cat = o[2];
       if (!cats[cat]) continue;
       const mag = o[8];
-      if (mag != null && mag > magLim) continue; // sin magnitud (Sh2/Barnard): pasan
+      // Los objetos "más señalados" (nombre común o número Messier) SIEMPRE se muestran; la
+      // magnitud límite (densidad) solo filtra las designaciones anónimas NGC/IC más débiles.
+      // Las nebulosas Sh2/Barnard no traen magnitud (null) y también pasan siempre.
+      const named = !!o[1] || o[0].indexOf("M ") === 0;
+      if (!named && mag != null && mag > magLim) continue;
       const de = o[4] * D2R;
       const cosSep = sinDe0 * Math.sin(de) + cosDe0 * Math.cos(de) * Math.cos(o[3] * D2R - T.ra0);
       if (cosSep < cosRMax) continue;
@@ -8064,6 +8068,66 @@
     return _aladinReady;
   }
 
+  // Construye un FITS (8-bit gris + cabecera WCS TAN) de la imagen mostrada, reducida,
+  // para incrustarla en Aladin vía displayFITS. La cabecera se deriva de la MISMA
+  // transformación con la que anotamos (annotBuildTransform), así la imagen cae en Aladin
+  // exactamente donde está la huella. Filas de arriba abajo (y-down), coherente con la CD.
+  function annotBuildFitsBlob() {
+    const wcs = annotWcs(), img = state.activeImage, T = annotBuildTransform();
+    if (!wcs || !img || !T || typeof displayImageDataFor !== "function") return null;
+    const MAX = 512;
+    const sc = Math.min(1, MAX / Math.max(img.w, img.h));
+    const fw = Math.max(1, Math.round(img.w * sc));
+    const fh = Math.max(1, Math.round(img.h * sc));
+    // Reducir la imagen mostrada (con el estirado de pantalla ya aplicado) a fw×fh.
+    let px;
+    try {
+      const full = displayImageDataFor(img);
+      const c1 = document.createElement("canvas"); c1.width = img.w; c1.height = img.h;
+      c1.getContext("2d").putImageData(full, 0, 0);
+      const c2 = document.createElement("canvas"); c2.width = fw; c2.height = fh;
+      const cx2 = c2.getContext("2d"); cx2.drawImage(c1, 0, 0, fw, fh);
+      px = cx2.getImageData(0, 0, fw, fh).data;
+    } catch (e) { return null; }
+    const g = fw / img.w;                     // px de imagen → px del FITS
+    const k = 1 / (T.sf * g);                 // deg/px(JPEG) → deg/px(FITS)
+    const D11 = T.cd11 * k, D12 = T.cd12 * k, D21 = T.cd21 * k, D22 = T.cd22 * k;
+    const fnum = (x) => (isFinite(x) ? x.toFixed(12) : "0");
+    const pad80 = (s) => (s.length >= 80 ? s.slice(0, 80) : s + " ".repeat(80 - s.length));
+    const kv = (key, val) => pad80(key.padEnd(8) + "= " + val);
+    const cards = [
+      kv("SIMPLE", "T".padStart(20)),
+      kv("BITPIX", "8".padStart(20)),
+      kv("NAXIS", "2".padStart(20)),
+      kv("NAXIS1", String(fw).padStart(20)),
+      kv("NAXIS2", String(fh).padStart(20)),
+      kv("CTYPE1", "'RA---TAN'".padEnd(20)),
+      kv("CTYPE2", "'DEC--TAN'".padEnd(20)),
+      kv("CUNIT1", "'deg'".padEnd(20)),
+      kv("CUNIT2", "'deg'".padEnd(20)),
+      kv("CRPIX1", fnum(fw / 2 + 0.5).padStart(20)),
+      kv("CRPIX2", fnum(fh / 2 + 0.5).padStart(20)),
+      kv("CRVAL1", fnum(wcs.ra).padStart(20)),
+      kv("CRVAL2", fnum(wcs.dec).padStart(20)),
+      kv("CD1_1", fnum(D11).padStart(20)),
+      kv("CD1_2", fnum(D12).padStart(20)),
+      kv("CD2_1", fnum(D21).padStart(20)),
+      kv("CD2_2", fnum(D22).padStart(20)),
+      kv("EQUINOX", fnum(2000).padStart(20)),
+      pad80("END")
+    ];
+    let hs = cards.join("");
+    while (hs.length % 2880 !== 0) hs += " ";
+    const n = fw * fh;
+    const dataLen = Math.ceil(n / 2880) * 2880;
+    const out = new Uint8Array(hs.length + dataLen);
+    for (let i = 0; i < hs.length; i++) out[i] = hs.charCodeAt(i) & 0xff;
+    for (let i = 0, p = 0, o = hs.length; i < n; i++, p += 4, o++) {
+      out[o] = (px[p] * 0.299 + px[p + 1] * 0.587 + px[p + 2] * 0.114) | 0;
+    }
+    return new Blob([out], { type: "application/fits" });
+  }
+
   async function annotOpenSky() {
     const lang = annotLang();
     const wcs = annotWcs(), img = state.activeImage;
@@ -8089,7 +8153,19 @@
       showProjectionControl: false,
       showContextMenu: false
     });
-    // Huella de la imagen: esquinas px → cielo.
+    // Imagen del usuario incrustada en el cielo: FITS con WCS → displayFITS (se coloca por
+    // WCS y se conserva al hacer zoom/pan). Si la versión de Aladin no lo soporta, queda la huella.
+    try {
+      const fitsBlob = annotBuildFitsBlob();
+      if (fitsBlob && typeof aladin.displayFITS === "function") {
+        const url = URL.createObjectURL(fitsBlob);
+        const revoke = () => setTimeout(() => URL.revokeObjectURL(url), 15000);
+        try { aladin.displayFITS(url, { colormap: "grayscale" }, revoke, revoke); }
+        catch (e) { try { aladin.displayFITS(url); } catch (e2) {} revoke(); }
+      }
+    } catch (e) { /* sin incrustación: seguimos con la huella */ }
+
+    // Huella de la imagen (resalte naranja): esquinas px → cielo.
     const T = annotBuildTransform();
     if (T) {
       const corners = [[0, 0], [img.w, 0], [img.w, img.h], [0, img.h]].map(c => {
@@ -8111,7 +8187,7 @@
   if (typeof window !== "undefined" && window.location.search.includes("e2ehook=1")) {
     window.__piwAnnot = {
       annot, annotBuildTransform, annotSkyToPx, annotPxToSky, annotCompute, annotToggle, annotJpegDims, annotWcs,
-      annotLoadCatalog, annotRefreshStatus,
+      annotLoadCatalog, annotRefreshStatus, annotBuildFitsBlob,
       _setWcs: (w) => { state.wcs = w; }   // solo para tests: inyectar una solución astrométrica
     };
   }
