@@ -562,6 +562,22 @@
   });
   // COLOR-WHEEL-END
 
+  // MASK-USE-HINT: al marcar "Usar máscara activa" sin una máscara generada/cargada, avisar (si no,
+  // el usuario cree que no funciona). La mezcla real se hace en previewActiveImage/commitActiveImage.
+  ["chkPostNRUseMask", "chkPostSharpUseMask", "chkPostColorUseMask", "chkPostCurvesUseMask"].forEach((id) => {
+    const c = el(id);
+    if (!c) return;
+    c.addEventListener("change", () => {
+      if (!c.checked) return;
+      const img = state.activeImage;
+      const ok = state.activeMask && img && state.activeMask.length === img.w * img.h;
+      const lang = document.documentElement.lang || "es";
+      if (!ok) showToast(lang === "es"
+        ? "No hay máscara activa: genérala o cárgala (sección Máscara / slots M) para que surta efecto."
+        : "No active mask: generate or load one (Mask section / M slots) for it to take effect.", "err");
+    });
+  });
+
   // LIVE-PREVIEW-BEGIN
   // Preview Live de Color Balance y Curvas: con el checkbox "Live" marcado, cada cambio en los
   // controles muestra el efecto sobre la imagen en tiempo real (preview NO destructivo desde la

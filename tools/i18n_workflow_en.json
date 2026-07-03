@@ -584,8 +584,8 @@
     "en": "                    <span class=\"piw-label\">Strength</span>"
   },
   {
-    "es": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\" disabled> Usar máscara activa",
-    "en": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\" disabled> Use active mask"
+    "es": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\"> Usar máscara activa",
+    "en": "              <input type=\"checkbox\" id=\"chkPostNRUseMask\"> Use active mask"
   },
   {
     "es": "              <button class=\"piw-btn\" id=\"btnComparePostNR\" disabled style=\"flex:1;\">Comparar</button>",
@@ -600,8 +600,8 @@
     "en": "            <h3 class=\"piw-section-title\">Sharpening & Detail</h3>"
   },
   {
-    "es": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\" disabled> Usar máscara activa",
-    "en": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\" disabled> Use active mask"
+    "es": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\"> Usar máscara activa",
+    "en": "              <input type=\"checkbox\" id=\"chkPostSharpUseMask\"> Use active mask"
   },
   {
     "es": "              <button class=\"piw-btn\" id=\"btnApplyPostSharp\" disabled style=\"flex:2;\">Preview Enfoque</button>\n              <button class=\"piw-btn\" id=\"btnComparePostSharp\" disabled style=\"flex:1;\">Comparar</button>",
@@ -624,8 +624,8 @@
     "en": "                  <span class=\"piw-label\">Saturation</span>"
   },
   {
-    "es": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\" disabled> Usar máscara activa",
-    "en": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\" disabled> Use active mask"
+    "es": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\"> Usar máscara activa",
+    "en": "              <input type=\"checkbox\" id=\"chkPostColorUseMask\"> Use active mask"
   },
   {
     "es": "            <button class=\"piw-btn\" id=\"btnApplyPostColor\" disabled>Aplicar Balance de Color</button>",
@@ -680,8 +680,8 @@
     "en": "                  <span class=\"piw-label\">Highlights</span>"
   },
   {
-    "es": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\" disabled> Usar máscara",
-    "en": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\" disabled> Use mask"
+    "es": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\"> Usar máscara",
+    "en": "                <input type=\"checkbox\" id=\"chkPostCurvesUseMask\"> Use mask"
   },
   {
     "es": "            <div class=\"piw-readout-lbl\" id=\"lblPostCurvesHint\" style=\"font-size:0.6rem; margin-bottom:8px;\">Curvas: click izquierdo añade/arrastra, click derecho elimina.</div>\n            <button class=\"piw-btn\" id=\"btnApplyPostCurves\" disabled>Aplicar Curvas</button>",

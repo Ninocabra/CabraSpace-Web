@@ -10,9 +10,42 @@
   //      secundario de render()).
   // `result` debe traer al menos { ch, w, h, nc, isColor }. `sourceImg` es el origen del que
   // heredar wcs e historial (por defecto, la entrada del paso actual).
+  // MASK-BLEND: algunas operaciones de POST ofrecen "Usar máscara activa". Si su checkbox está
+  // marcado y hay una máscara del MISMO tamaño que el resultado (no un proxy de baja resolución),
+  // se mezcla el resultado con la imagen de ENTRADA a través de la máscara:
+  //   out = entrada·(1−m) + resultado·m   (blanco = afecta, negro = protege; igual convención que el resto).
+  // Así la operación solo se aplica en las zonas blancas de la máscara. Se llama desde preview y
+  // commit; ningún camino de estas 4 ops pasa por ambos, así que no hay doble aplicación.
+  const _MASK_CHK_BY_STAGE = {
+    "Noise Reduction": "chkPostNRUseMask",
+    "Sharpening": "chkPostSharpUseMask",
+    "Color Balance": "chkPostColorUseMask",
+    "Curves": "chkPostCurvesUseMask"
+  };
+  function maskBlendForStage(result, src, stageLabel) {
+    const chkId = _MASK_CHK_BY_STAGE[stageLabel];
+    if (!chkId) return result;
+    const chk = el(chkId);
+    if (!chk || !chk.checked) return result;
+    const m = state.activeMask;
+    if (!m || !src || !src.ch || !result || !result.ch) return result;
+    const n = result.w * result.h;
+    if (m.length !== n || src.w !== result.w || src.h !== result.h) return result; // proxy/geometría distinta → sin máscara
+    const nc = result.nc, out = [];
+    for (let c = 0; c < nc; c++) {
+      const rc = result.ch[c];
+      const sc = src.ch[Math.min(c, src.ch.length - 1)];
+      const oc = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const mm = m[i]; oc[i] = sc[i] * (1 - mm) + rc[i] * mm; }
+      out.push(oc);
+    }
+    return { ch: out, w: result.w, h: result.h, nc: nc, isColor: result.isColor, wcs: result.wcs };
+  }
+
   function commitActiveImage(result, stageLabel, sourceImg) {
     recordUndo(); // guarda el estado committeado anterior para poder deshacer
     const src = sourceImg || state.stepInputImage || state.activeImage;
+    result = maskBlendForStage(result, src, stageLabel); // POST: aplica la máscara activa si procede
     const img = {
       ch: result.ch,
       w: result.w,
@@ -48,6 +81,7 @@
   // para que, al confirmar, el resultado quede consistente.
   function previewActiveImage(result, sourceImg, stageLabel) {
     const src = sourceImg || state.stepInputImage || state.activeImage;
+    result = maskBlendForStage(result, src, stageLabel); // POST: aplica la máscara activa si procede
     const img = {
       ch: result.ch, w: result.w, h: result.h, nc: result.nc, isColor: result.isColor,
       hasTransforms: true

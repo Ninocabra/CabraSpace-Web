@@ -407,6 +407,8 @@
       selectWorkflowKey: (key) => { selectWorkflowKey(key); },
       getCurves: () => state.curves,
       setCurves: (curves) => { state.curves = curves; drawCurvesWidget(); },
+      setActiveMask: (m) => { state.activeMask = m; },       // solo test (máscara POST)
+      maskBlend: (result, src, stage) => maskBlendForStage(result, src, stage), // solo test
       // CF-WORKER-BEGIN
       setAstrometryProxyUrl: (url) => { ASTROMETRY_PROXY_URL = url; }
       // CF-WORKER-END
