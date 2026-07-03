@@ -8,7 +8,9 @@
       "chkPostBalanceSCNR", "sldPostBalanceSCNR", "btnPostColorBalanceReset",
       "chkPostColorBalanceLive", "chkPostCurvesLive",
       "sldPostCurvesContrast", "sldPostCurvesBright", "sldPostCurvesShadows",
-      "sldPostCurvesHighlights", "sldPostCurvesSaturation"
+      "sldPostCurvesHighlights", "sldPostCurvesSaturation",
+      // Máscara en POST: sus labels tenían piw-disabled-control (pointer-events:none) → no clicables.
+      "chkPostNRUseMask", "chkPostSharpUseMask", "chkPostColorUseMask", "chkPostCurvesUseMask"
     ].forEach((id) => {
       const e = el(id);
       if (!e) return;
