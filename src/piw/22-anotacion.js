@@ -446,68 +446,49 @@
     return _aladinReady;
   }
 
-  // Construye un FITS RGB (8-bit, 3 planos + cabecera WCS TAN) de la imagen mostrada, reducida,
-  // para incrustarla EN COLOR en Aladin vía displayFITS (colormap "native" = colores del propio
-  // FITS). La cabecera se deriva de la MISMA
-  // transformación con la que anotamos (annotBuildTransform), así la imagen cae en Aladin
-  // exactamente donde está la huella. Filas de arriba abajo (y-down), coherente con la CD.
-  function annotBuildFitsBlob() {
-    const wcs = annotWcs(), img = state.activeImage, T = annotBuildTransform();
-    if (!wcs || !img || !T || typeof displayImageDataFor !== "function") return null;
-    const MAX = 512;
+  // Superpone la imagen del usuario EN COLOR sobre la vista de Aladin. Aladin Lite v3 no pinta
+  // FITS de usuario en color (solo 1 canal + colormap; el color solo existe vía HiPS pre-teselado),
+  // así que la incrustamos nosotros: un <canvas> reducido a color se coloca con una matriz AFÍN
+  // calculada proyectando 3 esquinas de la imagen con world2pix, y se reajusta en cada zoom/pan.
+  // La afín es exacta para campos pequeños (la proyección es localmente conforme).
+  function annotSetupColorOverlay(aladin, img) {
+    const mapDiv = el("aladinMap"), T = annotBuildTransform();
+    if (!mapDiv || !T || typeof aladin.world2pix !== "function" || typeof displayImageDataFor !== "function") return;
+    const MAX = 700;
     const sc = Math.min(1, MAX / Math.max(img.w, img.h));
-    const fw = Math.max(1, Math.round(img.w * sc));
-    const fh = Math.max(1, Math.round(img.h * sc));
-    // Reducir la imagen mostrada (con el estirado de pantalla ya aplicado) a fw×fh.
-    let px;
+    const fw = Math.max(1, Math.round(img.w * sc)), fh = Math.max(1, Math.round(img.h * sc));
+    const cv2 = document.createElement("canvas");
+    cv2.width = fw; cv2.height = fh;
     try {
-      const full = displayImageDataFor(img);
+      const full = displayImageDataFor(img);         // ImageData a color (estirado de pantalla incluido)
       const c1 = document.createElement("canvas"); c1.width = img.w; c1.height = img.h;
       c1.getContext("2d").putImageData(full, 0, 0);
-      const c2 = document.createElement("canvas"); c2.width = fw; c2.height = fh;
-      const cx2 = c2.getContext("2d"); cx2.drawImage(c1, 0, 0, fw, fh);
-      px = cx2.getImageData(0, 0, fw, fh).data;
-    } catch (e) { return null; }
-    const g = fw / img.w;                     // px de imagen → px del FITS
-    const k = 1 / (T.sf * g);                 // deg/px(JPEG) → deg/px(FITS)
-    const D11 = T.cd11 * k, D12 = T.cd12 * k, D21 = T.cd21 * k, D22 = T.cd22 * k;
-    const fnum = (x) => (isFinite(x) ? x.toFixed(12) : "0");
-    const pad80 = (s) => (s.length >= 80 ? s.slice(0, 80) : s + " ".repeat(80 - s.length));
-    const kv = (key, val) => pad80(key.padEnd(8) + "= " + val);
-    const cards = [
-      kv("SIMPLE", "T".padStart(20)),
-      kv("BITPIX", "8".padStart(20)),
-      kv("NAXIS", "3".padStart(20)),
-      kv("NAXIS1", String(fw).padStart(20)),
-      kv("NAXIS2", String(fh).padStart(20)),
-      kv("NAXIS3", "3".padStart(20)),
-      kv("CTYPE1", "'RA---TAN'".padEnd(20)),
-      kv("CTYPE2", "'DEC--TAN'".padEnd(20)),
-      kv("CUNIT1", "'deg'".padEnd(20)),
-      kv("CUNIT2", "'deg'".padEnd(20)),
-      kv("CRPIX1", fnum(fw / 2 + 0.5).padStart(20)),
-      kv("CRPIX2", fnum(fh / 2 + 0.5).padStart(20)),
-      kv("CRVAL1", fnum(wcs.ra).padStart(20)),
-      kv("CRVAL2", fnum(wcs.dec).padStart(20)),
-      kv("CD1_1", fnum(D11).padStart(20)),
-      kv("CD1_2", fnum(D12).padStart(20)),
-      kv("CD2_1", fnum(D21).padStart(20)),
-      kv("CD2_2", fnum(D22).padStart(20)),
-      kv("EQUINOX", fnum(2000).padStart(20)),
-      pad80("END")
-    ];
-    let hs = cards.join("");
-    while (hs.length % 2880 !== 0) hs += " ";
-    const plane = fw * fh;
-    const dataLen = Math.ceil(plane * 3 / 2880) * 2880;
-    const out = new Uint8Array(hs.length + dataLen);
-    for (let i = 0; i < hs.length; i++) out[i] = hs.charCodeAt(i) & 0xff;
-    // Planos BSQ: todo R, luego todo G, luego todo B (px es RGBA de fw×fh).
-    let o = hs.length;
-    for (let cch = 0; cch < 3; cch++) {
-      for (let i = 0; i < plane; i++) out[o++] = px[i * 4 + cch];
-    }
-    return new Blob([out], { type: "application/fits" });
+      cv2.getContext("2d").drawImage(c1, 0, 0, fw, fh);
+    } catch (e) { return; }
+    if (getComputedStyle(mapDiv).position === "static") mapDiv.style.position = "relative";
+    const wrap = document.createElement("div");     // recorta la imagen a los límites del mapa
+    wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5;";
+    cv2.style.cssText = "position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;";
+    wrap.appendChild(cv2);
+    mapDiv.appendChild(wrap);
+    // Esquinas de la imagen (px) → cielo; en cada frame se proyectan a pantalla y se resuelve la afín.
+    const sky = [[0, 0], [img.w, 0], [0, img.h]].map(c => annotPxToSky(T, c[0], c[1]));
+    const update = () => {
+      const cnv = mapDiv.querySelector("canvas");
+      const kk = (cnv && cnv.width) ? (cnv.clientWidth / cnv.width) : 1; // world2pix da px de canvas → CSS (HiDPI)
+      let p;
+      try { p = sky.map(s => aladin.world2pix(s.ra, s.dec)); } catch (e) { p = null; }
+      if (!p || p.some(q => !q || !isFinite(q[0]) || !isFinite(q[1]))) { cv2.style.visibility = "hidden"; return; }
+      const P = p.map(q => [q[0] * kk, q[1] * kk]);
+      const a = (P[1][0] - P[0][0]) / fw, b = (P[1][1] - P[0][1]) / fw;
+      const c = (P[2][0] - P[0][0]) / fh, d = (P[2][1] - P[0][1]) / fh;
+      cv2.style.visibility = "visible";
+      cv2.style.transform = "matrix(" + a + "," + b + "," + c + "," + d + "," + P[0][0] + "," + P[0][1] + ")";
+    };
+    update();
+    try { aladin.on("zoomChanged", update); aladin.on("positionChanged", update); } catch (e) {}
+    // La vista puede no estar lista en el primer frame: reintentos cortos.
+    [150, 500, 1200].forEach(ms => setTimeout(update, ms));
   }
 
   async function annotOpenSky() {
@@ -536,36 +517,11 @@
       showContextMenu: false
     });
     if (window.__piwAnnot) window.__piwAnnot._aladin = aladin; // solo test (hook e2e)
-    // Imagen del usuario incrustada en el cielo. OJO: displayFITS carga el FITS como capa
-    // BASE (tapa el mapa del cielo y deja un vacío gris fuera del encuadre). Por eso, cuando
-    // termina, movemos el FITS a una capa OVERLAY y restauramos DSS como base: así la imagen
-    // queda SOBRE el cielo real y se conserva colocada al hacer zoom/pan.
-    try {
-      const fitsBlob = annotBuildFitsBlob();
-      if (fitsBlob && typeof aladin.displayFITS === "function") {
-        const url = URL.createObjectURL(fitsBlob);
-        const revoke = () => setTimeout(() => URL.revokeObjectURL(url), 20000);
-        aladin.displayFITS(url);
-        // displayFITS pone el FITS como capa BASE (tapa el cielo → vacío gris fuera del encuadre).
-        // Sondeamos hasta que la base SEA el FITS (blob), lo pasamos a overlay y restauramos DSS
-        // como base. Pase lo que pase, forzamos DSS al final para no dejar nunca el vacío gris.
-        let tries = 0;
-        const iv = setInterval(() => {
-          let bid = "";
-          try { const b = aladin.getBaseImageLayer(); bid = String((b && (b.rootUrl || b.id || b.name)) || ""); } catch (e) {}
-          if (bid.indexOf("blob") >= 0) {
-            clearInterval(iv);
-            try { aladin.setOverlayImageLayer(aladin.getBaseImageLayer(), "cabraspace-img"); } catch (e) {}
-            try { aladin.setImageSurvey("P/DSS2/color"); } catch (e) {}
-            revoke();
-          } else if (++tries > 30) {           // ~6 s de margen
-            clearInterval(iv);
-            try { aladin.setImageSurvey("P/DSS2/color"); } catch (e) {} // garantiza el cielo de fondo
-            revoke();
-          }
-        }, 200);
-      }
-    } catch (e) { /* sin incrustación: seguimos con la huella */ }
+    // Imagen del usuario EN COLOR: Aladin Lite v3 no puede pintar FITS de usuario en color, así
+    // que la incrustamos NOSOTROS como un <canvas> HTML superpuesto sobre la vista, siguiendo al
+    // cielo: en cada zoom/pan proyectamos 3 esquinas con world2pix y aplicamos una transform afín
+    // (exacta para campos pequeños). El cielo DSS a color queda de fondo intacto.
+    annotSetupColorOverlay(aladin, img);
 
     // Huella de la imagen (resalte naranja): esquinas px → cielo.
     const T = annotBuildTransform();
@@ -589,7 +545,7 @@
   if (typeof window !== "undefined" && window.location.search.includes("e2ehook=1")) {
     window.__piwAnnot = {
       annot, annotBuildTransform, annotSkyToPx, annotPxToSky, annotCompute, annotToggle, annotJpegDims, annotWcs,
-      annotLoadCatalog, annotRefreshStatus, annotBuildFitsBlob,
+      annotLoadCatalog, annotRefreshStatus, annotSetupColorOverlay,
       _setWcs: (w) => { state.wcs = w; }   // solo para tests: inyectar una solución astrométrica
     };
   }
