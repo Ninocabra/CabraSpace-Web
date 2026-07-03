@@ -6,26 +6,21 @@
   let ASTROMETRY_PROXY_URL = "https://astronomy-proxy.vercel.app";
   // CF-WORKER-END
 
-  // Redirige a través del proxy CORS local (puerto 8010) para gestionar OPTIONS y subidas de archivos
+  // Redirige las peticiones a Astrometry.net a través del proxy CORS de Vercel. El proxy admite
+  // orígenes localhost, así que se usa el MISMO tanto en local como en producción. (Antes, en
+  // localhost se apuntaba a http://localhost:8010 —un proxy de dev que normalmente no está
+  // levantado—, por lo que el plate solve fallaba al probar en local.)
   function corsFetch(url, options = {}) {
     // CF-WORKER-BEGIN
-    const hostname = window.location.hostname;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      const proxyUrl = url.replace("https://nova.astrometry.net", "http://localhost:8010");
+    if (ASTROMETRY_PROXY_URL) {
+      const proxyUrl = url.replace("https://nova.astrometry.net", ASTROMETRY_PROXY_URL);
       return fetch(proxyUrl, options);
-    } else {
-      if (ASTROMETRY_PROXY_URL) {
-        // Rewrite request URL to point to the Cloudflare Worker
-        const proxyUrl = url.replace("https://nova.astrometry.net", ASTROMETRY_PROXY_URL);
-        return fetch(proxyUrl, options);
-      } else {
-        const errMsg = document.documentElement.lang === "es"
-          ? "El plate solve en producción requiere configurar ASTROMETRY_PROXY_URL (proxy Vercel). Consulta vercel-proxy/README.md."
-          : "Plate solving in production requires configuring ASTROMETRY_PROXY_URL (Vercel proxy). Refer to vercel-proxy/README.md.";
-        logConsole(errMsg, "error");
-        return Promise.reject(new Error(errMsg));
-      }
     }
+    const errMsg = document.documentElement.lang === "es"
+      ? "El plate solve requiere configurar ASTROMETRY_PROXY_URL (proxy Vercel). Consulta vercel-proxy/README.md."
+      : "Plate solving requires configuring ASTROMETRY_PROXY_URL (Vercel proxy). Refer to vercel-proxy/README.md.";
+    logConsole(errMsg, "error");
+    return Promise.reject(new Error(errMsg));
     // CF-WORKER-END
   }
 
