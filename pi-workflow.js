@@ -8075,8 +8075,9 @@
     return _aladinReady;
   }
 
-  // Construye un FITS (8-bit gris + cabecera WCS TAN) de la imagen mostrada, reducida,
-  // para incrustarla en Aladin vía displayFITS. La cabecera se deriva de la MISMA
+  // Construye un FITS RGB (8-bit, 3 planos + cabecera WCS TAN) de la imagen mostrada, reducida,
+  // para incrustarla EN COLOR en Aladin vía displayFITS (colormap "native" = colores del propio
+  // FITS). La cabecera se deriva de la MISMA
   // transformación con la que anotamos (annotBuildTransform), así la imagen cae en Aladin
   // exactamente donde está la huella. Filas de arriba abajo (y-down), coherente con la CD.
   function annotBuildFitsBlob() {
@@ -8105,9 +8106,10 @@
     const cards = [
       kv("SIMPLE", "T".padStart(20)),
       kv("BITPIX", "8".padStart(20)),
-      kv("NAXIS", "2".padStart(20)),
+      kv("NAXIS", "3".padStart(20)),
       kv("NAXIS1", String(fw).padStart(20)),
       kv("NAXIS2", String(fh).padStart(20)),
+      kv("NAXIS3", "3".padStart(20)),
       kv("CTYPE1", "'RA---TAN'".padEnd(20)),
       kv("CTYPE2", "'DEC--TAN'".padEnd(20)),
       kv("CUNIT1", "'deg'".padEnd(20)),
@@ -8125,12 +8127,14 @@
     ];
     let hs = cards.join("");
     while (hs.length % 2880 !== 0) hs += " ";
-    const n = fw * fh;
-    const dataLen = Math.ceil(n / 2880) * 2880;
+    const plane = fw * fh;
+    const dataLen = Math.ceil(plane * 3 / 2880) * 2880;
     const out = new Uint8Array(hs.length + dataLen);
     for (let i = 0; i < hs.length; i++) out[i] = hs.charCodeAt(i) & 0xff;
-    for (let i = 0, p = 0, o = hs.length; i < n; i++, p += 4, o++) {
-      out[o] = (px[p] * 0.299 + px[p + 1] * 0.587 + px[p + 2] * 0.114) | 0;
+    // Planos BSQ: todo R, luego todo G, luego todo B (px es RGBA de fw×fh).
+    let o = hs.length;
+    for (let cch = 0; cch < 3; cch++) {
+      for (let i = 0; i < plane; i++) out[o++] = px[i * 4 + cch];
     }
     return new Blob([out], { type: "application/fits" });
   }
