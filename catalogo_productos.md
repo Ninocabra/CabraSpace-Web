@@ -281,8 +281,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sv535 Sc571cc, una nueva cámara astrofotográfica de Svbony](https://www.youtube.com/watch?v=LvS19OipaJc) (2026-06-24)
 - **Modelo: Av503 70**
   - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
-- **Modelo: COOLCAM SC571CC**
-  - [COOLCAM SC571CC: Cámara enfriada económica para astrofotografía - Revisión de Pros y Contras](https://www.youtube.com/watch?v=_LEwLFKDZIE) (2026-06-01)
 - **Modelo: SC571CC**
   - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
   - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
@@ -350,6 +348,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: HOPE D60**
   - [ToupTek HOPE D60: nueva cámara astronómica](https://www.youtube.com/shorts/hFQxtN2F45c) (2026-05-03)
+- **Modelo: astronomical camera**
+  - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 - **Modelo: cámara astrofotografía**
   - [Cada fotograma cuenta una historia del universo 🌌 con cámaras ToupTek Astro](https://www.youtube.com/shorts/rf8yMq7JIT4) (2026-05-01)
 - **Modelo: cámara astronómica**
