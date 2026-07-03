@@ -1265,6 +1265,12 @@
     .piw-aladin-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 0.65rem; color: #bbb; border-bottom: 1px solid #222; }
     .piw-aladin-close { background: none; border: none; color: #bbb; cursor: pointer; font-size: 0.9rem; }
     .piw-aladin-map { flex: 1; min-height: 0; }
+    .piw-annot-list { margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color,#333); border-radius: 8px; }
+    .piw-annot-list-head { font-size: 0.58rem; color: var(--text-muted,#9a9a9a); padding: 6px 8px; position: sticky; top: 0; background: rgba(20,20,22,0.96); }
+    .piw-annot-list-item { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.05); color: #d2d2d2; font-size: 0.66rem; padding: 5px 8px; cursor: pointer; text-align: left; }
+    .piw-annot-list-item:hover { background: rgba(207,171,74,0.12); color: #f0e6da; }
+    .piw-annot-list-item .nm { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .piw-annot-list-item .mg { flex: 0 0 auto; color: var(--text-muted,#888); font-size: 0.58rem; }
   </style>
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/cabraspace-imaging-workflow-en.html">
@@ -2748,6 +2754,8 @@
             <button class="piw-btn" id="btnAnnotSky" disabled style="width:100%; margin-top:6px;">🗺 View in the sky (Aladin)</button>
             <button class="piw-btn" id="btnAnnotFlip" style="width:100%; margin-top:6px; display:none;">⇄ Flip East/West (mirrored labels)</button>
             <div class="piw-annot-hint">Click an annotated object to see its details and links (Wikipedia · SIMBAD).</div>
+            <div class="piw-annot-list" id="annotObjList" style="display:none;"></div>
+            <button class="piw-btn" id="btnAnnotExport" disabled style="width:100%; margin-top:6px;">💾 Export annotated PNG</button>
           </div>
         </div>
 
@@ -2877,25 +2885,25 @@
   <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
   <!-- pyodide.js (CDN) removed: SAS Pro + SPCC + stretches are 100% JS; loadPyodide is never invoked. -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
-  <script>window.PIW_BUILD="20260703d";</script>
-  <script src="onnx-engine.js?v=20260703d"></script>
-  <script src="star-removal.js?v=20260703d"></script>
-  <script src="deconv.js?v=20260703d"></script>
-  <script src="io.js?v=20260703d"></script>
-  <script src="autoghs.js?v=20260703d"></script>
+  <script>window.PIW_BUILD="20260703e";</script>
+  <script src="onnx-engine.js?v=20260703e"></script>
+  <script src="star-removal.js?v=20260703e"></script>
+  <script src="deconv.js?v=20260703e"></script>
+  <script src="io.js?v=20260703e"></script>
+  <script src="autoghs.js?v=20260703e"></script>
   <!-- saspro-pyodide.js eliminado: SAS Pro + SPCC son 100% JS (spcc.js + AutoGHS), sin Pyodide. -->
-  <script src="lut.js?v=20260703d"></script>
-  <script src="resample.js?v=20260703d"></script>
-  <script src="background.js?v=20260703d"></script>
-  <script src="graxpert.js?v=20260703d"></script>
+  <script src="lut.js?v=20260703e"></script>
+  <script src="resample.js?v=20260703e"></script>
+  <script src="background.js?v=20260703e"></script>
+  <script src="graxpert.js?v=20260703e"></script>
   <!-- USM-SHARP-BEGIN -->
-  <script src="sharpening.js?v=20260703d"></script>
+  <script src="sharpening.js?v=20260703e"></script>
   <!-- USM-SHARP-END -->
-  <script src="spcc.js?v=20260703d"></script>
-  <script src="imgproc.js?v=20260703d"></script>
-  <script src="imgops.js?v=20260703d"></script>
+  <script src="spcc.js?v=20260703e"></script>
+  <script src="imgproc.js?v=20260703e"></script>
+  <script src="imgops.js?v=20260703e"></script>
   <!-- A5: bundle minificado por esbuild (tools/build_piw.py desde src/piw/); sourcemap apunta a pi-workflow.js -->
-  <script src="pi-workflow.min.js?v=20260703d"></script>
-  <script src="mobile-menu.js?v=20260703d"></script>
+  <script src="pi-workflow.min.js?v=20260703e"></script>
+  <script src="mobile-menu.js?v=20260703e"></script>
 </body>
 </html>

@@ -153,6 +153,7 @@
     // cap de seguridad para campos enormes con magnitud alta.
     annot.list.sort((a, b) => b.rx - a.rx);
     if (annot.list.length > 400) annot.list.length = 400;
+    annotRenderList();
     return annot.list.length;
   }
 
@@ -250,6 +251,64 @@
     });
   }
 
+  // --- F3: lista lateral de objetos encontrados y exportación del PNG anotado ---
+  function annotShowCardForObject(a) {
+    const rect = cv.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const clientX = rect.left + a.x * rect.width / cv.width;
+    const clientY = rect.top + a.y * rect.height / cv.height;
+    annotShowCard(a, clientX, clientY);
+  }
+
+  function annotRenderList() {
+    const box = el("annotObjList");
+    const expBtn = el("btnAnnotExport");
+    const active = annot.on && annot.list.length > 0;
+    if (expBtn) expBtn.disabled = !active;
+    if (!box) return;
+    if (!active) { box.style.display = "none"; box.innerHTML = ""; return; }
+    const lang = annotLang();
+    const icon = { g: "🌌", n: "☁️", c: "✨", s: "⭐" };
+    // Lista ordenada por brillo (los objetos sin magnitud —Sh2/Barnard— al final).
+    const items = annot.list.slice().sort((a, b) => (a.mag == null ? 99 : a.mag) - (b.mag == null ? 99 : b.mag));
+    box.innerHTML = "";
+    const head = document.createElement("div");
+    head.className = "piw-annot-list-head";
+    head.textContent = (lang === "es" ? "Objetos en el campo: " : "Objects in field: ") + annot.list.length;
+    box.appendChild(head);
+    items.forEach(a => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "piw-annot-list-item";
+      row.innerHTML = '<span class="ic"></span><span class="nm"></span><span class="mg"></span>';
+      row.querySelector(".ic").textContent = icon[a.cat] || "•";
+      row.querySelector(".nm").textContent = a.common || a.name;
+      row.querySelector(".mg").textContent = a.mag != null ? ("m" + a.mag) : "";
+      row.addEventListener("click", () => annotShowCardForObject(a));
+      box.appendChild(row);
+    });
+    box.style.display = "block";
+  }
+
+  // Exporta el canvas actual (imagen mostrada + overlay ya pintado) como PNG.
+  function annotExportPng() {
+    const lang = annotLang();
+    if (!annot.on || !annot.list.length) return;
+    render(); // garantiza el overlay pintado en el canvas antes de capturar
+    const done = (blob) => {
+      if (!blob) { showToast(lang === "es" ? "No se pudo exportar el PNG" : "PNG export failed", "err"); return; }
+      _downloadBlob(blob, "cabraspace-anotada.png");
+      showToast(lang === "es" ? "PNG anotado exportado" : "Annotated PNG exported", "ok");
+    };
+    if (cv.toBlob) { cv.toBlob(done, "image/png"); return; }
+    try {
+      const parts = cv.toDataURL("image/png").split(",");
+      const bin = atob(parts[1]); const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      done(new Blob([arr], { type: "image/png" }));
+    } catch (e) { done(null); }
+  }
+
   // --- Estado de la sección y arranque ---
   function annotRefreshStatus() {
     const lbl = el("lblAnnotWcs");
@@ -288,6 +347,7 @@
         annot.on = false;
         annot.list = [];
         annotHideCard();
+        annotRenderList();
         const btn = el("btnAnnotate");
         if (btn) { btn.classList.remove("active"); btn.textContent = annotLang() === "es" ? "Anotar imagen" : "Annotate image"; }
       }
@@ -303,6 +363,7 @@
       annot.on = false;
       annot.list = [];
       annotHideCard();
+      annotRenderList();
       if (btn) { btn.classList.remove("active"); btn.textContent = lang === "es" ? "Anotar imagen" : "Annotate image"; }
       render();
       return;
@@ -319,8 +380,8 @@
         if (btn) btn.disabled = false;
       }
     }
-    const n = annotCompute();
     annot.on = true;
+    const n = annotCompute();
     if (btn) { btn.classList.add("active"); btn.textContent = lang === "es" ? "Ocultar anotaciones" : "Hide annotations"; }
     if (el("btnAnnotFlip")) el("btnAnnotFlip").style.display = "";
     render();
@@ -329,6 +390,7 @@
   }
 
   if (el("btnAnnotate")) el("btnAnnotate").addEventListener("click", annotToggle);
+  if (el("btnAnnotExport")) el("btnAnnotExport").addEventListener("click", annotExportPng);
   ["chkAnnotG", "chkAnnotN", "chkAnnotC", "chkAnnotS"].forEach(id => {
     if (el(id)) el(id).addEventListener("change", () => { if (annot.on) { annotCompute(); render(); } });
   });
