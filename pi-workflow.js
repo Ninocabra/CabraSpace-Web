@@ -7759,18 +7759,20 @@
     // cuyo centro cae algo fuera del encuadre).
     const fieldR = T.radius || (Math.hypot(img.w, img.h) / 2) * T.pixscaleImg / 3600;
     const cosRMax = Math.cos(Math.min(89, fieldR + 1.5) * D2R);
+    let cosNearest = -1, nearest = null; // objeto más cercano al centro (para avisar en campos escasos)
     for (let i = 0; i < annot.catalog.length; i++) {
       const o = annot.catalog[i];
       const cat = o[2];
       if (!cats[cat]) continue;
+      const de = o[4] * D2R;
+      const cosSep = sinDe0 * Math.sin(de) + cosDe0 * Math.cos(de) * Math.cos(o[3] * D2R - T.ra0);
+      if (cosSep > cosNearest) { cosNearest = cosSep; nearest = o; }
       const mag = o[8];
       // Los objetos "más señalados" (nombre común o número Messier) SIEMPRE se muestran; la
       // magnitud límite (densidad) solo filtra las designaciones anónimas NGC/IC más débiles.
       // Las nebulosas Sh2/Barnard no traen magnitud (null) y también pasan siempre.
       const named = !!o[1] || o[0].indexOf("M ") === 0;
       if (!named && mag != null && mag > magLim) continue;
-      const de = o[4] * D2R;
-      const cosSep = sinDe0 * Math.sin(de) + cosDe0 * Math.cos(de) * Math.cos(o[3] * D2R - T.ra0);
       if (cosSep < cosRMax) continue;
       const px = annotSkyToPx(T, o[3], o[4]);
       if (!px) continue;
@@ -7789,6 +7791,9 @@
     }
     // Los grandes se dibujan primero (los pequeños quedan encima y clicables);
     // cap de seguridad para campos enormes con magnitud alta.
+    annot.nearest = nearest
+      ? { name: nearest[1] || nearest[0], sep: Math.acos(Math.min(1, cosNearest)) / D2R }
+      : null;
     annot.list.sort((a, b) => b.rx - a.rx);
     if (annot.list.length > 400) annot.list.length = 400;
     annotRenderList();
@@ -8024,7 +8029,14 @@
     if (el("btnAnnotFlip")) el("btnAnnotFlip").style.display = "";
     render();
     logConsole(lang === "es" ? `Anotación: ${n} objetos del catálogo en el campo.` : `Annotation: ${n} catalog objects in the field.`, "info");
-    if (!n) showToast(lang === "es" ? "Ningún objeto del catálogo en el campo con los filtros actuales" : "No catalog objects in the field with current filters", "err");
+    if (!n) {
+      const near = annot.nearest;
+      showToast(near
+        ? (lang === "es"
+            ? `Campo escaso: nada del catálogo dentro del encuadre. Lo más cercano: ${near.name} a ${near.sep.toFixed(1)}° del centro.`
+            : `Sparse field: nothing from the catalog inside the frame. Nearest: ${near.name} at ${near.sep.toFixed(1)}° from center.`)
+        : (lang === "es" ? "Ningún objeto del catálogo en el campo con los filtros actuales" : "No catalog objects in the field with current filters"), "err");
+    }
   }
 
   if (el("btnAnnotate")) el("btnAnnotate").addEventListener("click", annotToggle);
@@ -8153,15 +8165,35 @@
       showProjectionControl: false,
       showContextMenu: false
     });
-    // Imagen del usuario incrustada en el cielo: FITS con WCS → displayFITS (se coloca por
-    // WCS y se conserva al hacer zoom/pan). Si la versión de Aladin no lo soporta, queda la huella.
+    if (window.__piwAnnot) window.__piwAnnot._aladin = aladin; // solo test (hook e2e)
+    // Imagen del usuario incrustada en el cielo. OJO: displayFITS carga el FITS como capa
+    // BASE (tapa el mapa del cielo y deja un vacío gris fuera del encuadre). Por eso, cuando
+    // termina, movemos el FITS a una capa OVERLAY y restauramos DSS como base: así la imagen
+    // queda SOBRE el cielo real y se conserva colocada al hacer zoom/pan.
     try {
       const fitsBlob = annotBuildFitsBlob();
       if (fitsBlob && typeof aladin.displayFITS === "function") {
         const url = URL.createObjectURL(fitsBlob);
-        const revoke = () => setTimeout(() => URL.revokeObjectURL(url), 15000);
-        try { aladin.displayFITS(url, { colormap: "grayscale" }, revoke, revoke); }
-        catch (e) { try { aladin.displayFITS(url); } catch (e2) {} revoke(); }
+        const revoke = () => setTimeout(() => URL.revokeObjectURL(url), 20000);
+        aladin.displayFITS(url);
+        // displayFITS pone el FITS como capa BASE (tapa el cielo → vacío gris fuera del encuadre).
+        // Sondeamos hasta que la base SEA el FITS (blob), lo pasamos a overlay y restauramos DSS
+        // como base. Pase lo que pase, forzamos DSS al final para no dejar nunca el vacío gris.
+        let tries = 0;
+        const iv = setInterval(() => {
+          let bid = "";
+          try { const b = aladin.getBaseImageLayer(); bid = String((b && (b.rootUrl || b.id || b.name)) || ""); } catch (e) {}
+          if (bid.indexOf("blob") >= 0) {
+            clearInterval(iv);
+            try { aladin.setOverlayImageLayer(aladin.getBaseImageLayer(), "cabraspace-img"); } catch (e) {}
+            try { aladin.setImageSurvey("P/DSS2/color"); } catch (e) {}
+            revoke();
+          } else if (++tries > 30) {           // ~6 s de margen
+            clearInterval(iv);
+            try { aladin.setImageSurvey("P/DSS2/color"); } catch (e) {} // garantiza el cielo de fondo
+            revoke();
+          }
+        }, 200);
       }
     } catch (e) { /* sin incrustación: seguimos con la huella */ }
 
