@@ -338,8 +338,14 @@
     });
     return { ch: out, w: srcImg.w, h: srcImg.h, nc: srcImg.nc, isColor: srcImg.isColor };
   }
+  // OPTIMIZACIÓN (HDR/DSE lentos): antes delegaba en window.Sharpening.gaussianBlur, una convolución
+  // por fuerza bruta con kernel de radio ceil(3*sigma) — con HDR iterando sigma=2^0..2^(layers-1) el
+  // coste por capa crece EXPONENCIALMENTE (radio ~48 con sigma=16, ~1500 con sigma=512...). ImgProc.
+  // boxBlur usa una ventana deslizante con suma acumulada: coste CONSTANTE por píxel sea cual sea el
+  // radio. Es la misma aproximación (box ≈ gaussiana) que ya usa Detail & Contrast para este mismo
+  // propósito (realce multiescala), así que el resultado visual es coherente con el resto de la app.
   function sharpGaussCh(ch, w, h, sigma) {
-    return window.Sharpening.gaussianBlur({ ch: [ch], w, h, nc: 1, isColor: false }, sigma).ch[0];
+    return window.ImgProc.boxBlur(ch, w, h, Math.max(1, Math.round(sigma)));
   }
 
   // HDR Multiscale: descompone L en capas de detalle (à-trous) + residual; realza el detalle.
@@ -726,38 +732,47 @@
   const wheel = el("maskColorWheel");
   const wheelIndicator = el("maskWheelIndicator");
 
+  // HUE-WHEEL-FIX: la rueda CSS es un conic-gradient(red,yellow,lime,cyan,blue,magenta,red), que por
+  // definición del propio conic-gradient arranca ARRIBA (12 en punto = 0°) y gira en sentido horario
+  // (red=0°, yellow=60°, lime=120°, cyan=180°, blue=240°, magenta=300°, igual que el hue HSL estándar
+  // usado para generar la máscara). Pero Math.atan2(y,x) mide el ángulo con 0°=DERECHA (3 en punto),
+  // no arriba: al clicar sobre el rojo visual (arriba) se capturaba hue=270 en vez de 0, y el
+  // indicador nunca coincidía con el hue real de la máscara ("el tono se capta pero no el ángulo").
+  // Conversión: hue_visual = atan2(0°=arriba) = atan2(0°=derecha) + 90°, y su inversa -90°.
   wheel.addEventListener("click", (e) => {
     const rect = wheel.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    
-    // Obtener ángulo en grados [0, 360]
-    let angle = Math.atan2(y, x) * (180 / Math.PI);
-    if (angle < 0) angle += 360;
-    
-    state.selectedHue = Math.round(angle);
+
+    // Ángulo en coordenadas de pantalla (0°=derecha) → hue visual de la rueda (0°=arriba, horario)
+    let screenAngle = Math.atan2(y, x) * (180 / Math.PI);
+    let hue = screenAngle + 90;
+    hue = ((hue % 360) + 360) % 360;
+
+    state.selectedHue = Math.round(hue);
     el("sldMaskHue").value = state.selectedHue;
     el("valMaskHue").textContent = state.selectedHue + "°";
 
-    // Mover indicador
+    // Mover indicador exactamente donde se hizo clic (mismo ángulo de pantalla, sin convertir)
     const rad = Math.min(rect.width / 2 - 10, Math.sqrt(x*x + y*y));
-    const radAngle = angle * (Math.PI / 180);
+    const radAngle = screenAngle * (Math.PI / 180);
     const indX = rect.width / 2 + rad * Math.cos(radAngle);
     const indY = rect.height / 2 + rad * Math.sin(radAngle);
-    
+
     wheelIndicator.style.left = indX + "px";
     wheelIndicator.style.top = indY + "px";
+    livePreviewMask();
   });
 
   el("sldMaskHue").addEventListener("input", (e) => {
     state.selectedHue = parseInt(e.target.value, 10);
     el("valMaskHue").textContent = state.selectedHue + "°";
-    
-    // Mover indicador
+
+    // Mover indicador: inverso de la conversión de arriba (hue visual → ángulo de pantalla)
     const rect = wheel.getBoundingClientRect();
-    const angle = state.selectedHue;
+    const screenAngle = state.selectedHue - 90;
     const rad = rect.width / 2 - 12;
-    const radAngle = angle * (Math.PI / 180);
+    const radAngle = screenAngle * (Math.PI / 180);
     const indX = rect.width / 2 + rad * Math.cos(radAngle);
     const indY = rect.height / 2 + rad * Math.sin(radAngle);
     

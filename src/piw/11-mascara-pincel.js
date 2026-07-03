@@ -97,6 +97,7 @@
         : "FAME active: draw the mask on the image with the mouse (add/subtract, adjustable brush). 'Apply mask' saves it.", "info");
     }
     fameUpdateLabel();
+    if (!fameActive) livePreviewMask();
   });
 
   // Previsualizar Máscara
@@ -119,6 +120,38 @@
       }
     }, 50);
   });
+
+  // LIVE-MASK-BEGIN: con "Live" marcado, cualquier cambio de tipo/umbral/tono recalcula y muestra
+  // la máscara al instante (mismo patrón que Live en Curvas/Balance). generateMaskData() es un
+  // recorrido O(n) sin blur pesado, así que no hace falta proxy ni worker: es barato en cualquier
+  // resolución. No afecta a FAME (pincel manual, generateMaskData no toca esa máscara).
+  function livePreviewMask() {
+    const chk = el("chkMaskLive");
+    if (!chk || !chk.checked) return;
+    if (!state.activeImage) return;
+    if (el("selMaskType").value === "fame") return; // FAME es manual, nada que recalcular
+    try {
+      generateMaskData();
+      state.previewMaskMode = true;
+      el("btnToolViewMask").classList.add("active");
+      el("btnToolViewCurrent").classList.remove("active");
+      render();
+    } catch (err) {
+      logConsole(`Error al generar máscara: ${err.message}`, "err");
+    }
+  }
+  {
+    const chkLive = el("chkMaskLive");
+    if (chkLive) chkLive.addEventListener("change", () => {
+      if (chkLive.checked) livePreviewMask();
+      else { state.previewMaskMode = false; el("btnToolViewMask").classList.remove("active"); el("btnToolViewCurrent").classList.add("active"); render(); }
+    });
+    ["sldMaskLow", "sldMaskHigh", "sldMaskFuzz", "sldMaskHueRange"].forEach((id) => {
+      const s = el(id); if (s) s.addEventListener("input", livePreviewMask);
+    });
+    const sldHue = el("sldMaskHue"); if (sldHue) sldHue.addEventListener("input", livePreviewMask);
+  }
+  // LIVE-MASK-END
 
   // Función matemática de generación de máscaras
   function generateMaskData() {
