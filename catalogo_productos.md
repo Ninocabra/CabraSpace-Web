@@ -214,10 +214,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Sky-Watcher
 
-### ACCESSORIES
-- **Modelo: Heritage 150p**
-  - [Asesoramiento sobre accesorios para Skywatcher Heritage 150p](https://www.reddit.com/r/telescopes/comments/1tuwvsi/are_these_good_for_skywatcher_heritage_150p/) (2026-06-02)
-
 ### MOUNTS
 - **Modelo: HEQ5-R**
   - [Webcast de Sky-Watcher USA: Descripción general de la montura HEQ5-R](https://www.youtube.com/watch?v=RThq3RWPazU) (2026-05-23)
@@ -301,6 +297,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Mak 127**
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
 - **Modelo: SV503**
+  - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
   - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
   - [Telescopio Refractor SV503 70mm de Svbony: Explorando el Cosmos sin gastar una fortuna](https://www.youtube.com/shorts/bK21vw9ipaY) (2026-06-26)
 - **Modelo: SV503 70**
