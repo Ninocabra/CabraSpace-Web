@@ -99,10 +99,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: roll-off roof**
   - [Observatorio retráctil de Alan Midkiff (Tours de Observatorios #7)](https://www.youtube.com/watch?v=S8y0CbtjlRA) (2026-05-27)
 
-### CAMERAS
-- **Modelo: DSLR**
-  - [Cámara réflex para astrofotografía de cielo profundo](https://www.reddit.com/r/telescopes/comments/1tuudke/camara_reflex_para_astrofotografia_de_cielo/) (2026-06-02)
-
 ### MOUNTS
 - **Modelo: Cuiv The Lazy Geek**
   - [Montura de seguimiento de cohetes: de demo a montaje exterior resistente a la intemperie](https://www.youtube.com/shorts/IYkqkAOXWSM) (2026-05-25)
@@ -193,6 +189,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Automatización de telescopios: control más allá de la simplicidad](https://www.youtube.com/watch?v=SQRxVXkhavs) (2026-02-25)
 
 ### MOUNTS
+- **Modelo: ASTRO-RES**
+  - [Instalación del ASTRO-RES de la Estación Observacional en el ITS Academy G. Caboto](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-its-academy-g-caboto/) (2026-07-06)
 - **Modelo: SATURN mount**
   - [Lanzamiento de productos en NEAF 2026: montura SATURN y CPC Deluxe HD](https://www.youtube.com/watch?v=lyDgjIc2VFs) (2026-04-13)
 
