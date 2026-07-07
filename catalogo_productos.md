@@ -133,6 +133,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Astrofotografía con un Dobsoniano de 8 pulgadas económico](https://www.reddit.com/r/telescopes/comments/1tv3crj/cheap_8_dobsonian_astrophotography/) (2026-06-02)
 - **Modelo: Construcción**
   - [Construcción de un Telescopio Refractor de Tubo Abierto de 6 pulgadas f/15](https://stargazerslounge.com/topic/427985-6-inch-f15-open-tube-refractor-build/) (2026-06-04)
+- **Modelo: Dwarf Mini**
+  - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
 - **Actualizaciones Generales / Revisiones:**
   - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
   - [Consejos sobre telescopios y astrofotografía](https://stargazerslounge.com/topic/445738-telescope-and-astrophotography-advice/) (2026-06-04)
@@ -249,8 +251,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Svbony
 
 ### ACCESSORIES
-- **Modelo: Astro-Tech**
-  - [¿Es el Astro-Tech 13mm 100° excesivo para un SvBony SV520?](https://www.reddit.com/r/telescopes/comments/1tv9uxo/astrotech_13mm_100_is_it_overkill_for_a_svbony/) (2026-06-03)
 - **Actualizaciones Generales / Revisiones:**
   - [Nuevas actualizaciones de equipamiento SVBONY con Arie Nouwen](https://www.youtube.com/watch?v=mE3kjkS2vi0) (2026-05-28)
 - **Modelo: OAG SV238**
@@ -268,8 +268,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Revisión de los Binoculares Svbony SA207 Pro](https://www.youtube.com/watch?v=Ds_KabHKoew) (2026-06-08)
   - [Nuevos prismáticos SA207 Pro: mejoras significativas en la experiencia del usuario](https://www.youtube.com/shorts/U8Emj1T0ecE) (2026-05-20)
   - [Nuevos binoculares SA207 Pro 8x32 APO de Svbony](https://www.youtube.com/shorts/tTw5fCBwM8c) (2026-05-16)
-- **Modelo: SV535**
-  - [Guía de uso del SV535 como telescopio guía](https://www.youtube.com/watch?v=Vg8XNKfpFMc) (2026-06-03)
+- **Modelo: SA207pro**
+  - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 
 ### CAMERAS
 - **Modelo: Astro Camera**
