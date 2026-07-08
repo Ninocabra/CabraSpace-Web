@@ -92,8 +92,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Comparativa: Filtro UHC vs O-III para el cielo de verano en el Reino Unido](https://stargazerslounge.com/topic/445676-uhc-vs-o-iii-filter-for-summer-uk/) (2026-06-03)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
-- **Modelo: dovetail rails**
-  - [Múltiples rieles en un tubo óptico](https://www.reddit.com/r/telescopes/comments/1tvam7s/multiple_rails_on_a_tube/) (2026-06-03)
 - **Modelo: motorized focuser**
   - [Convierte cualquier telescopio en un sistema inteligente y remoto](https://www.youtube.com/shorts/UYRdcl4qaN4) (2026-05-25)
 - **Modelo: roll-off roof**
@@ -296,6 +294,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
 - **Modelo: Mak 127**
   - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
+- **Modelo: SA401 Pro**
+  - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
 - **Modelo: SV503**
   - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
   - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
