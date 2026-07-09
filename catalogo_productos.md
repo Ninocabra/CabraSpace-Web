@@ -231,8 +231,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
 - **Modelo: Heliostar 100Ha**
   - [Vista general del Heliostar 100Ha de Sky-Watcher](https://www.youtube.com/watch?v=wKLNY2Rk9bQ) (2026-05-09)
-- **Modelo: Heritage 130p**
-  - [Consejos para el primer telescopio: modelos recomendados](https://www.reddit.com/r/telescopes/comments/1tvj51m/first_telescope_model_tips/) (2026-06-03)
 - **Modelo: NEAF**
   - [Resumen de NEAIC/NEAF 2026: Novedades de Equipos de Astrofotografía](https://www.youtube.com/watch?v=LcyOOeVvOg4) (2026-04-18)
 
@@ -254,6 +252,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
 - **Modelo: Prime Day**
+  - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
   - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
   - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
   - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
