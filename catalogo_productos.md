@@ -31,8 +31,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: EclipSmart**
   - [Cómo ver el eclipse de forma segura con kits EclipSmart de Celestron](https://www.youtube.com/watch?v=3Va8zB4XYk4) (2026-03-09)
-- **Modelo: Evolution 8**
-  - [Oculares de primera calidad para Celestron Evolution 8](https://www.reddit.com/r/telescopes/comments/1tvn09r/if_price_is_not_a_problem_what_about_those/) (2026-06-03)
 - **Modelo: Proyección**
   - [Oculares de proyección recomendados para telescopios de astrofotografía](https://www.youtube.com/watch?v=nxTnBf7jYmI) (2026-06-07)
 
@@ -177,6 +175,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Eagle**
   - [Filippo y Zoltan discuten astrofotografía moderna y control remoto en AstroFest Europeo 2026](https://www.youtube.com/watch?v=0gWm3hn2HkU) (2026-02-09)
 - **Modelo: OUTPOST 3M**
+  - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
   - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
 - **Modelo: PL GSS**
