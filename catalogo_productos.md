@@ -45,8 +45,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Por qué me arrepiento de haber comprado un Celestron EdgeHD 925 para astrofotografía](https://www.youtube.com/watch?v=N5tuVy9sdpQ) (2026-06-06)
 - **Modelo: Nexstar 8SE**
   - [Ayuda con Celestron Nexstar 8SE](https://www.reddit.com/r/telescopes/comments/1twbouf/celestron_nexstar_8se_help/) (2026-06-04)
-- **Modelo: Nexstar C11**
-  - [Nexstar C11: ¿Sigue siendo una buena opción en 2026?](https://www.reddit.com/r/telescopes/comments/1tvprmw/nexstar_c11_still_worth_it_in_2026/) (2026-06-03)
 
 ## Explore Scientific
 
@@ -284,6 +282,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cámaras enfriadas SV605CC y SC571CC de Svbony: transmisión en vivo](https://www.youtube.com/watch?v=GyJ-faxMcYk) (2026-05-21)
 
 ### SOFTWARE
+- **Modelo: ASIAIR**
+  - [Tertulia de Astronomos: Consejos y Equipos Recomendados por los Expertos](https://www.youtube.com/watch?v=-3xCc6VTfm4) (2026-07-08)
 - **Modelo: INDI Library**
   - [Lanzamiento de la Librería INDI v2.2.3](https://github.com/indilib/indi/releases/tag/v2.2.3) (2026-06-14)
 
