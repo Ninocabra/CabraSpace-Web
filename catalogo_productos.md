@@ -84,8 +84,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Equilibrado de una plataforma ecuacional Dobsoniana con bolsa de aire](https://www.reddit.com/r/telescopes/comments/1tvwjig/unweighting_an_dobsonian_eq_platformtable_air_bag/) (2026-06-03)
 - **Actualizaciones Generales / Revisiones:**
   - [Evaluación del aspecto del espejo de un telescopio](https://www.reddit.com/r/telescopes/comments/1tvbdis/how_does_my_mirror_look/) (2026-06-03)
-- **Modelo: UHC filter**
-  - [Comparativa: Filtro UHC vs O-III para el cielo de verano en el Reino Unido](https://stargazerslounge.com/topic/445676-uhc-vs-o-iii-filter-for-summer-uk/) (2026-06-03)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
 - **Modelo: motorized focuser**
@@ -264,6 +262,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevos binoculares SA207 Pro 8x32 APO de Svbony](https://www.youtube.com/shorts/tTw5fCBwM8c) (2026-05-16)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
+- **Modelo: SV545**
+  - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
 
 ### CAMERAS
 - **Modelo: Astro Camera**
