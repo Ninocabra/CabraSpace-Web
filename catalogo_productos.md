@@ -94,8 +94,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### MOUNTS
 - **Modelo: Cuiv The Lazy Geek**
   - [Montura de seguimiento de cohetes: de demo a montaje exterior resistente a la intemperie](https://www.youtube.com/shorts/IYkqkAOXWSM) (2026-05-25)
-- **Modelo: Saturn**
-  - [Nueva montura Saturn: la próxima gran innovación](https://www.youtube.com/shorts/VxK2DBVOdCM) (2026-05-25)
 - **Modelo: harmonic drive mount**
   - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
 - **Modelo: montura armónica**
@@ -242,6 +240,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Svbony
 
 ### ACCESSORIES
+- **Modelo: Francisco Perez**
+  - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
 - **Actualizaciones Generales / Revisiones:**
   - [Nuevas actualizaciones de equipamiento SVBONY con Arie Nouwen](https://www.youtube.com/watch?v=mE3kjkS2vi0) (2026-05-28)
 - **Modelo: OAG SV238**
