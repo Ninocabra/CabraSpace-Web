@@ -86,8 +86,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Evaluación del aspecto del espejo de un telescopio](https://www.reddit.com/r/telescopes/comments/1tvbdis/how_does_my_mirror_look/) (2026-06-03)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
-- **Modelo: motorized focuser**
-  - [Convierte cualquier telescopio en un sistema inteligente y remoto](https://www.youtube.com/shorts/UYRdcl4qaN4) (2026-05-25)
 - **Modelo: roll-off roof**
   - [Observatorio retráctil de Alan Midkiff (Tours de Observatorios #7)](https://www.youtube.com/watch?v=S8y0CbtjlRA) (2026-05-27)
 
@@ -263,6 +261,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV545**
+  - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
   - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
 
 ### CAMERAS
