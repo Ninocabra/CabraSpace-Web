@@ -86,12 +86,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Evaluación del aspecto del espejo de un telescopio](https://www.reddit.com/r/telescopes/comments/1tvbdis/how_does_my_mirror_look/) (2026-06-03)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
-- **Modelo: roll-off roof**
-  - [Observatorio retráctil de Alan Midkiff (Tours de Observatorios #7)](https://www.youtube.com/watch?v=S8y0CbtjlRA) (2026-05-27)
 
 ### MOUNTS
-- **Modelo: Cuiv The Lazy Geek**
-  - [Montura de seguimiento de cohetes: de demo a montaje exterior resistente a la intemperie](https://www.youtube.com/shorts/IYkqkAOXWSM) (2026-05-25)
 - **Modelo: harmonic drive mount**
   - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
 - **Modelo: montura armónica**
@@ -351,6 +347,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: StellaVita**
+  - [Cómo Usar el Asistente de Campo Plano en ToupTek StellaVita](https://www.youtube.com/watch?v=ePd8uiMa8F4) (2026-07-13)
   - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
   - [Tutorial de StellaVita App 2.0: Configuración de Plan de Captura](https://www.youtube.com/watch?v=2b8Obk4QVUw) (2026-05-12)
 
@@ -398,6 +395,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
 
 ### SOFTWARE
+- **Modelo: ASIAIR**
+  - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: ASIAir**
   - [Configuración completa de ASIAir en observatorio](https://www.youtube.com/watch?v=4HbqlIXPiaE) (2026-05-30)
 
