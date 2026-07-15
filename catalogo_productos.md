@@ -80,6 +80,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Otros / No especificado
 
 ### ACCESSORIES
+- **Modelo: Astrocitas**
+  - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
 - **Modelo: EQ platform**
   - [Equilibrado de una plataforma ecuacional Dobsoniana con bolsa de aire](https://www.reddit.com/r/telescopes/comments/1tvwjig/unweighting_an_dobsonian_eq_platformtable_air_bag/) (2026-06-03)
 - **Actualizaciones Generales / Revisiones:**
@@ -102,6 +104,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
 - **Modelo: BlurXTerminator**
   - [BlurXTerminator sin PixInsight: Llegó el Momento](https://www.youtube.com/watch?v=Vrw90sNdOyE) (2026-06-26)
+- **Modelo: Lightroom**
+  - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: NightVis**
@@ -316,8 +320,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Touptek
 
 ### ACCESSORIES
-- **Modelo: AE676C**
-  - [Astro Noticias Junio 2026: Touptek AE676C, SQA60 Pro, Askar 111F y 131F](https://www.youtube.com/watch?v=1xaJ6UgdrAg) (2026-05-29)
 - **Modelo: GS-100AC**
   - [GS-100AC/AR: Nuevo buscador guía de la serie GS de ToupTek](https://www.youtube.com/watch?v=KG_WuqnXu_o) (2026-06-04)
 - **Actualizaciones Generales / Revisiones:**
@@ -343,7 +345,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cada fotograma cuenta una historia del universo 🌌 con cámaras ToupTek Astro](https://www.youtube.com/shorts/rf8yMq7JIT4) (2026-05-01)
 - **Modelo: cámara astronómica**
   - [ToupTek lanza una cámara que acerca el espacio profundo como nunca antes](https://www.youtube.com/shorts/CqZ5UwR62JE) (2026-05-10)
-  - [Captura la Vía Láctea infrarroja bajo una fuerte contaminación lumínica urbana con ToupTek](https://www.youtube.com/shorts/cwangzNFMUI) (2026-05-30)
 
 ### SOFTWARE
 - **Modelo: StellaVita**
@@ -397,9 +398,9 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: ASIAIR**
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
-- **Modelo: ASIAir**
-  - [Configuración completa de ASIAir en observatorio](https://www.youtube.com/watch?v=4HbqlIXPiaE) (2026-05-30)
 
 ### TELESCOPES
+- **Modelo: FF131**
+  - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
 - **Modelo: distributed aperture**
   - [Telescopios de apertura distribuida de ZWO](https://www.zwoastro.com/2026/04/24/distributed-aperture-telescopes/) (2026-04-24)
