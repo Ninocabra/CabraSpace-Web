@@ -212,8 +212,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sky-Watcher Wave 150i: Montura strainwave con sistema PrimaLuceLab](https://www.youtube.com/watch?v=W6--bNohEYw) (2025-12-12)
 
 ### TELESCOPES
-- **Modelo: 90/900**
-  - [Comparativa de telescopios Sky-Watcher 90/900 AZ3 y 130/900 EQ2](https://www.youtube.com/watch?v=jq0WUhEDxi4) (2026-05-31)
 - **Modelo: Blanket Scopes**
   - [Webcast '¿Qué hay de nuevo?' revela nuevos telescopios de Sky-Watcher](https://www.youtube.com/watch?v=-Xi0dCg03lc) (2026-04-10)
 - **Modelo: Esprit EDX**
@@ -397,6 +395,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
+  - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 
 ### TELESCOPES
