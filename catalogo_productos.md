@@ -117,8 +117,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Elementos y scripts no descargados al actualizar PixInsight a la versión 1.9.4](https://stargazerslounge.com/topic/445730-what-items-or-scripts-are-not-downloaded-when-up-grading-pixinsight-to-latest-version-v194/) (2026-06-04)
 
 ### TELESCOPES
-- **Modelo: 8-inch**
-  - [Astrofotografía con un Dobsoniano de 8 pulgadas económico](https://www.reddit.com/r/telescopes/comments/1tv3crj/cheap_8_dobsonian_astrophotography/) (2026-06-02)
 - **Modelo: Construcción**
   - [Construcción de un Telescopio Refractor de Tubo Abierto de 6 pulgadas f/15](https://stargazerslounge.com/topic/427985-6-inch-f15-open-tube-refractor-build/) (2026-06-04)
 - **Modelo: Dwarf Mini**
@@ -188,6 +186,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Radio2Space**
   - [Radio2Space presenta nuevas funciones de su software en Space Tech Expo Europe 2025](https://www.youtube.com/watch?v=7F1EZstEr1A) (2025-11-20)
+
+## QHYCCD
+
+### CAMERAS
+- **Modelo: QHY585**
+  - [Cámara Astronómica QHY585M con Sensor Sony IMX585](https://www.qhyccd.com/qhy585-imx585/) (2026-07-16)
 
 ## Sharpstar
 
