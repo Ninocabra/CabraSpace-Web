@@ -46,6 +46,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Nexstar 8SE**
   - [Ayuda con Celestron Nexstar 8SE](https://www.reddit.com/r/telescopes/comments/1twbouf/celestron_nexstar_8se_help/) (2026-06-04)
 
+## DayStar
+
+### ACCESSORIES
+- **Modelo: Electronic Focusers**
+  - [Día de NEAF 2026: Filtros Daystar, enfocador electrónico, capas planas y Quark Smart](https://www.youtube.com/watch?v=v0H1_hFQvGg) (2026-07-17)
+
 ## Explore Scientific
 
 ### ACCESSORIES
@@ -71,21 +77,15 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Hotfix**
   - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
 
-## Orion
-
-### ACCESSORIES
-- **Modelo: SkyQuest XT10**
-  - [Mejor ocular para observación planetaria en el Orion SkyQuest XT10](https://www.reddit.com/r/telescopes/comments/1tvwy7g/what_is_the_best_eyepiece_for_planetary_viewing/) (2026-06-03)
-
 ## Otros / No especificado
 
 ### ACCESSORIES
 - **Modelo: Astrocitas**
   - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
-- **Modelo: EQ platform**
-  - [Equilibrado de una plataforma ecuacional Dobsoniana con bolsa de aire](https://www.reddit.com/r/telescopes/comments/1tvwjig/unweighting_an_dobsonian_eq_platformtable_air_bag/) (2026-06-03)
 - **Actualizaciones Generales / Revisiones:**
   - [Evaluación del aspecto del espejo de un telescopio](https://www.reddit.com/r/telescopes/comments/1tvbdis/how_does_my_mirror_look/) (2026-06-03)
+- **Modelo: Oberwerk**
+  - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
 
