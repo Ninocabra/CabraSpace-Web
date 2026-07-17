@@ -190,6 +190,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## QHYCCD
 
 ### CAMERAS
+- **Modelo: Cámara Mosaico**
+  - [Solución de Cámara Mosaico CMOS de QHYCCD](https://www.qhyccd.com/cmos-mosaic-camera-solution/) (2026-07-17)
 - **Modelo: QHY585**
   - [Cámara Astronómica QHY585M con Sensor Sony IMX585](https://www.qhyccd.com/qhy585-imx585/) (2026-07-16)
 
@@ -232,8 +234,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Planetario**
   - [Lanzamiento de Stellarium v26.2: Nuevas Culturas Celestes y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.2) (2026-06-24)
-- **Modelo: planet visibility**
-  - [Aplicaciones para ver disponibilidad de planetas](https://www.reddit.com/r/telescopes/comments/1tv5iua/hi_is_there_an_app_to_see_when_the_planet_be/) (2026-06-02)
 - **Modelo: planetarium software**
   - [Lanzamiento de Stellarium v26.1](https://github.com/Stellarium/stellarium/releases/tag/v26.1) (2026-04-05)
 
