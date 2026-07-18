@@ -141,12 +141,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Altair**
   - [Nueva versión de PHD2 Guiding v2.6.14](https://github.com/OpenPHDGuiding/phd2/releases/tag/v2.6.14) (2025-12-10)
 
-## Planewave
-
-### TELESCOPES
-- **Modelo: Observable Space**
-  - [Telescopios de Observable Space (antes PlaneWave) y su comunicación con la misión Artemis de la NASA](https://www.youtube.com/watch?v=YVQsshuQppI) (2026-05-30)
-
 ## Player One
 
 ### CAMERAS
@@ -302,6 +296,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV503 70**
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
 - **Modelo: SV535**
+  - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
   - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
 - **Modelo: SV555**
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
