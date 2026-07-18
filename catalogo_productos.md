@@ -38,6 +38,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: 9.25 Edge HD**
   - [Celestron 9.25 Edge HD como telescopio visual](https://www.reddit.com/r/telescopes/comments/1tx6ezv/celestron_925_edge_as_a_visual_telescope/) (2026-06-05)
 - **Modelo: CPC Deluxe HD**
+  - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Celestron Origin**
   - [Tutorial Celestron Origin: La Magia del Dithering con el Dr. Sasse](https://www.youtube.com/watch?v=qOxpzE5EwL8) (2026-05-21)
@@ -82,8 +83,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Astrocitas**
   - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
-- **Actualizaciones Generales / Revisiones:**
-  - [Evaluación del aspecto del espejo de un telescopio](https://www.reddit.com/r/telescopes/comments/1tvbdis/how_does_my_mirror_look/) (2026-06-03)
 - **Modelo: Oberwerk**
   - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: barn door tracker**
