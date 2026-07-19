@@ -315,8 +315,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Touptek
 
 ### ACCESSORIES
-- **Modelo: GS-100AC**
-  - [GS-100AC/AR: Nuevo buscador guía de la serie GS de ToupTek](https://www.youtube.com/watch?v=KG_WuqnXu_o) (2026-06-04)
 - **Actualizaciones Generales / Revisiones:**
   - [ToupTek Anuncia Nuevo Telescopio Guía de la Serie GS](https://www.youtube.com/shorts/CCX-ewrNMAY) (2026-06-05)
 
@@ -375,6 +373,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: Willie Stickley**
   - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
+- **Modelo: espacio**
+  - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
 - **Modelo: space**
   - [Novedades de ZWO en Equipamiento Astrophotography](https://www.youtube.com/shorts/T_WA6jYybyo) (2026-07-18)
 - **Modelo: star tracker**
