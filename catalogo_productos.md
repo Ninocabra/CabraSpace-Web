@@ -123,7 +123,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Actualizaciones Generales / Revisiones:**
   - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
   - [Consejos sobre telescopios y astrofotografía](https://stargazerslounge.com/topic/445738-telescope-and-astrophotography-advice/) (2026-06-04)
-  - [Mi primer telescopio](https://www.reddit.com/r/telescopes/comments/1tvo6ah/my_first_telescope/) (2026-06-03)
 - **Modelo: Marketing**
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
@@ -376,6 +375,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: Willie Stickley**
   - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
+- **Modelo: space**
+  - [Novedades de ZWO en Equipamiento Astrophotography](https://www.youtube.com/shorts/T_WA6jYybyo) (2026-07-18)
 - **Modelo: star tracker**
   - [Ya no necesitas una Star Tracker para Astrofotografía](https://www.youtube.com/watch?v=tvPlLafd7sk) (2026-06-07)
 
