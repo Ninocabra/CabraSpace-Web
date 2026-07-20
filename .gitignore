@@ -14,3 +14,6 @@ scratch/
 
 # Node (solo tooling de build: esbuild)
 node_modules/
+
+# Suite de IA: repo propio anidado (Modelos IA/.git); la web solo consume los .onnx via Releases
+Modelos IA/
