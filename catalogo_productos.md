@@ -107,11 +107,11 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
-- **Modelo: NightVis**
-  - [NightVis: Pronóstico astronómico que te dice exactamente por qué esta noche es buena o mala](https://www.reddit.com/r/telescopes/comments/1tw7xg3/nightvis_astro_forecast_that_tells_you_exactly/) (2026-06-04)
 - **Modelo: Script**
   - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
   - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
+- **Modelo: Veil**
+  - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
 - **Modelo: scripts**
   - [Elementos y scripts no descargados al actualizar PixInsight a la versión 1.9.4](https://stargazerslounge.com/topic/445730-what-items-or-scripts-are-not-downloaded-when-up-grading-pixinsight-to-latest-version-v194/) (2026-06-04)
 
