@@ -17,6 +17,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Baader
 
 ### ACCESSORIES
+- **Modelo: Solar Filter**
+  - [Haz tu propio filtro solar para casi cualquier telescopio (Guía DIY de película solar Baader)](https://www.youtube.com/watch?v=bDvwnYecK7o) (2026-07-19)
 - **Modelo: filtros**
   - [Baader lanza nuevos filtros SLOAN/SDSS de 36mm (ugriz)](https://stargazerslounge.com/topic/445793-baader-new-gen-sloansdss-filter-sets-36mm-ugriz/) (2026-06-06)
 
@@ -44,8 +46,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tutorial Celestron Origin: La Magia del Dithering con el Dr. Sasse](https://www.youtube.com/watch?v=qOxpzE5EwL8) (2026-05-21)
 - **Modelo: EdgeHD 925**
   - [Por qué me arrepiento de haber comprado un Celestron EdgeHD 925 para astrofotografía](https://www.youtube.com/watch?v=N5tuVy9sdpQ) (2026-06-06)
-- **Modelo: Nexstar 8SE**
-  - [Ayuda con Celestron Nexstar 8SE](https://www.reddit.com/r/telescopes/comments/1twbouf/celestron_nexstar_8se_help/) (2026-06-04)
 
 ## DayStar
 
