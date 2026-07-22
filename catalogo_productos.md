@@ -283,8 +283,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: MK127**
   - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
-- **Modelo: Mak 127**
-  - [Opiniones sobre el Set Completo Svbony Mak 127](https://www.reddit.com/r/telescopes/comments/1twek0t/what_is_everyones_opinion_about_the_complete/) (2026-06-04)
 - **Modelo: SA401 Pro**
   - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
 - **Modelo: SV503**
@@ -320,6 +318,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### CAMERAS
 - **Modelo: AE676C**
+  - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
   - [ToupTek AE676C: nueva cámara astronómica multiuso](https://www.youtube.com/shorts/TVxn5QNvEwY) (2026-05-22)
