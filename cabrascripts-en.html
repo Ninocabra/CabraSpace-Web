@@ -458,6 +458,128 @@
       line-height: 1.4;
     }
 
+    /* Changelog sub-block (auto-synced with the repo) */
+    .changelog-showcase {
+      margin-top: 40px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 32px;
+    }
+
+    .changelog-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .changelog-head h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .changelog-src {
+      font-size: 0.78rem;
+      color: var(--gold-primary);
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .changelog-src:hover {
+      color: var(--gold-light);
+      text-decoration: underline;
+    }
+
+    .cl-version {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .cl-ver-badge {
+      background: var(--gold-primary);
+      color: var(--bg-color);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 2px 12px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .cl-ver-date {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-family: monospace;
+    }
+
+    .cl-intro {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      font-weight: 300;
+      margin-bottom: 18px;
+    }
+
+    .cl-section {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold-primary);
+      margin: 18px 0 10px;
+    }
+
+    .cl-list {
+      list-style: none;
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 6px;
+    }
+
+    .cl-list li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    .cl-list li::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 9px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold-border);
+    }
+
+    .cl-list li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .cl-list li code {
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: rgba(207, 171, 74, 0.08);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--gold-light);
+    }
+
   </style>
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/cabrascripts-en.html">
@@ -569,14 +691,14 @@
   <!-- Content Grid -->
   <main class="container scripts-grid">
     <!-- Showcase Block (Left) -->
-    <section class="showcase-card">
+    <section class="showcase-card" id="pi-workflow">
       <div class="script-meta">
         <div class="script-logo-container">
           <img src="pi-workflow-logo.svg" alt="PI Workflow Icon">
         </div>
         <div class="script-title-block">
           <h2>PI Workflow</h2>
-          <span class="version-badge">v0.9 Beta</span>
+          <span class="version-badge">v2.0</span>
         </div>
       </div>
 
@@ -632,6 +754,44 @@
             <h4 class="video-card-title">PI Workflow PixInsight Walkthrough</h4>
             <p class="video-card-desc">Watch how to install the CabraSpace script and navigate the interactive panels to perform a complete broadband and narrowband processing workflow.</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Changelog (auto-synced with CHANGELOG.md from the PI-Workflow repo) -->
+      <div class="changelog-showcase">
+        <div class="changelog-head">
+          <h3>What's New</h3>
+          <a class="changelog-src" href="https://github.com/Ninocabra/PI-Workflow/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">View full changelog ↗</a>
+        </div>
+        <!-- Filled live from the repo; this block is the static fallback -->
+        <div class="changelog-body" id="changelogBody" data-changelog-url="https://raw.githubusercontent.com/Ninocabra/PI-Workflow/main/CHANGELOG.md">
+          <div class="cl-version">
+            <span class="cl-ver-badge">2.0</span>
+            <span class="cl-ver-date">2026-07-20</span>
+          </div>
+          <p class="cl-intro">PI Workflow 2.0 — the modular rewrite. Major release (build 32): the public version number resets from the v8.x series to 2.0 to mark the modular rewrite.</p>
+          <h4 class="cl-section">Changed — architecture</h4>
+          <ul class="cl-list">
+            <li><strong>Modular rewrite.</strong> The monolithic two-file build is replaced by a thin loader (<code>PI Workflow.js</code>) that includes an <code>engine/</code> tree (28 modules) and a UI shim that includes a <code>ui/</code> tree (11 modules).</li>
+          </ul>
+          <h4 class="cl-section">Added</h4>
+          <ul class="cl-list">
+            <li><strong>Image Enhancement</strong> tab.</li>
+            <li><strong>Configuration</strong> tab — user-configurable defaults and per-stage algorithm selection.</li>
+            <li><strong>Continuum Subtraction</strong> — scaled continuum removal for narrowband data.</li>
+            <li><strong>Batch "Apply all"</strong> in Pre-processing — Gradient/Deconvolution across every loaded slot, plate-solve propagation, and Star Split across all images.</li>
+            <li><strong>Layer-mask export</strong> and an <strong>on-export processing log</strong>.</li>
+            <li><strong>Bilingual EN/ES interface</strong> with hot language switching.</li>
+            <li><strong>SyQon V3 engines</strong> — Starless (Axiom V3) runs fully hidden; Parallax v1.5 gains a Natural/Defined Model Style selector; Prism verified.</li>
+          </ul>
+          <h4 class="cl-section">Fixed</h4>
+          <ul class="cl-list">
+            <li><strong>AI tools no longer fail silently</strong> — BXT/SXT/NXT/DeepSNR/StarNet2 now throw when the AI engine fails instead of leaving the image untouched and reporting success.</li>
+            <li><strong>SyQon Starless was broken with the new executable</strong> (opened a visible window, used obsolete flags): reintegrated to run hidden; fallback window leaks closed.</li>
+            <li><strong>Image Enhancement sections</strong> opened expanded on entry → corrected.</li>
+            <li><strong>SSSC</strong> was missing from Configuration → Color Correction → added.</li>
+            <li><strong>DeepSNR</strong> was undocumented in the help → documented (EN + ES).</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -718,6 +878,79 @@
         });
       });
     }
+  </script>
+  <script>
+    // Live changelog: reads the CHANGELOG from the PI-Workflow repo and renders the
+    // latest version block. If the fetch fails, the static HTML fallback is kept.
+    (function () {
+      var box = document.getElementById('changelogBody');
+      if (!box) return;
+      var url = box.getAttribute('data-changelog-url');
+      if (!url) return;
+
+      function esc(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function inline(s) {
+        s = esc(s);
+        s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/`([^`]+?)`/g, '<code>$1</code>');
+        return s;
+      }
+      function parseLatest(md) {
+        var lines = md.replace(/\r/g, '').split('\n');
+        var i = 0, n = lines.length;
+        while (i < n && !/^##\s+\[/.test(lines[i])) i++;
+        if (i >= n) return null;
+        var m = lines[i].match(/^##\s+\[(.+?)\]\s*(?:-\s*(.+))?\s*$/);
+        var version = m ? m[1] : '';
+        var date = m && m[2] ? m[2].trim() : '';
+        i++;
+        var intro = [], sections = [], cur = null;
+        for (; i < n; i++) {
+          var line = lines[i];
+          if (/^##\s+/.test(line)) break; // next version
+          var sm = line.match(/^###\s+(.+?)\s*$/);
+          if (sm) { cur = { title: sm[1], items: [] }; sections.push(cur); continue; }
+          var bm = line.match(/^\s*[-*]\s+(.+)$/);
+          if (bm) { if (cur) cur.items.push(bm[1]); continue; }
+          var cont = line.match(/^\s{2,}(\S.*)$/); // continuation of a multiline bullet
+          if (cont && cur && cur.items.length) {
+            cur.items[cur.items.length - 1] += ' ' + cont[1].trim();
+            continue;
+          }
+          var t = line.trim();
+          if (t) {
+            if (!sections.length) intro.push(t);
+            else if (cur && cur.items.length) cur.items[cur.items.length - 1] += ' ' + t;
+          }
+        }
+        return { version: version, date: date, intro: intro, sections: sections };
+      }
+      function render(d) {
+        var html = '<div class="cl-version"><span class="cl-ver-badge">' + esc(d.version) + '</span>';
+        if (d.date) html += '<span class="cl-ver-date">' + esc(d.date) + '</span>';
+        html += '</div>';
+        if (d.intro.length) html += '<p class="cl-intro">' + d.intro.map(inline).join(' ') + '</p>';
+        d.sections.forEach(function (s) {
+          if (!s.items.length) return;
+          html += '<h4 class="cl-section">' + inline(s.title) + '</h4>';
+          html += '<ul class="cl-list">' + s.items.map(function (it) {
+            return '<li>' + inline(it) + '</li>';
+          }).join('') + '</ul>';
+        });
+        box.innerHTML = html;
+        var vb = document.querySelector('.version-badge');
+        if (vb && d.version) vb.textContent = /^\d/.test(d.version) ? 'v' + d.version : d.version;
+      }
+      fetch(url, { cache: 'no-store' }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.text();
+      }).then(function (md) {
+        var d = parseLatest(md);
+        if (d && d.sections.length) render(d);
+      }).catch(function () { /* keep the static fallback */ });
+    })();
   </script>
   <script src="index.js"></script>
   <script src="mobile-menu.js"></script>
