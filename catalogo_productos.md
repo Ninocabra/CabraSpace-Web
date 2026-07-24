@@ -112,8 +112,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
 - **Modelo: Veil**
   - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
-- **Modelo: scripts**
-  - [Elementos y scripts no descargados al actualizar PixInsight a la versión 1.9.4](https://stargazerslounge.com/topic/445730-what-items-or-scripts-are-not-downloaded-when-up-grading-pixinsight-to-latest-version-v194/) (2026-06-04)
 
 ### TELESCOPES
 - **Modelo: Construcción**
@@ -295,6 +293,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
   - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
 - **Modelo: SV555**
+  - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
   - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
 
