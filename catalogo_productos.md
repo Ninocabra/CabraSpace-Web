@@ -59,6 +59,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: eyepieces**
   - [Cómo limpiar y almacenar tus oculares: consejos de Explore Scientific](https://www.youtube.com/shorts/3d9hTWm_gl0) (2025-12-22)
 
+### MOUNTS
+- **Modelo: Astronomical League**
+  - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
+
 ### SOFTWARE
 - **Modelo: Scott Roberts**
   - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
@@ -114,8 +118,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
 
 ### TELESCOPES
-- **Modelo: Construcción**
-  - [Construcción de un Telescopio Refractor de Tubo Abierto de 6 pulgadas f/15](https://stargazerslounge.com/topic/427985-6-inch-f15-open-tube-refractor-build/) (2026-06-04)
 - **Modelo: Dwarf Mini**
   - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
 - **Actualizaciones Generales / Revisiones:**
