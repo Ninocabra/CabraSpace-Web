@@ -120,6 +120,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Dwarf Mini**
   - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
+- **Modelo: Ed Ting**
+  - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Actualizaciones Generales / Revisiones:**
   - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
   - [Consejos sobre telescopios y astrofotografía](https://stargazerslounge.com/topic/445738-telescope-and-astrophotography-advice/) (2026-06-04)
@@ -308,8 +310,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: FC100DZ**
   - [Reseña del Takahashi FC100DZ: la grandeza de fluorita de 4 pulgadas de Tak continúa](https://www.youtube.com/watch?v=lzJ0anAw7D8) (2026-06-28)
-- **Actualizaciones Generales / Revisiones:**
-  - [Nuevo telescopio Takahashi anunciado](https://stargazerslounge.com/topic/444195-new-takahashi-scope/) (2026-06-04)
 
 ## Touptek
 
