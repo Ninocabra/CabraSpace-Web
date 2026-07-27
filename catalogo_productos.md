@@ -105,6 +105,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: AI Denoise**
   - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
+- **Modelo: Autopalette**
+  - [Actualización de Autopalette y Novedades en PixInsight](https://www.youtube.com/watch?v=F8kAp3xG3Fo) (2026-07-27)
 - **Modelo: BlurXTerminator**
   - [BlurXTerminator sin PixInsight: Llegó el Momento](https://www.youtube.com/watch?v=Vrw90sNdOyE) (2026-06-26)
 - **Modelo: Lightroom**
@@ -124,7 +126,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Actualizaciones Generales / Revisiones:**
   - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
-  - [Consejos sobre telescopios y astrofotografía](https://stargazerslounge.com/topic/445738-telescope-and-astrophotography-advice/) (2026-06-04)
 - **Modelo: Marketing**
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
