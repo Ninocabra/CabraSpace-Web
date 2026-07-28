@@ -155,6 +155,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: 2025**
   - [2025 en Primalucelab: Un año de innovación en astronomía y espacio](https://www.youtube.com/watch?v=zWPa2Ch1NWY) (2025-12-30)
+- **Modelo: ASTRO-RES**
+  - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
 - **Modelo: ESATTO 3.5" LP**
   - [Actualización del Takahashi Epsilon 160ED con el enfocador robótico ESATTO 3.5" LP](https://www.youtube.com/watch?v=xsQ3W9nTESk) (2026-01-07)
 - **Modelo: Eagle**
@@ -215,8 +217,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Blanket Scopes**
   - [Webcast '¿Qué hay de nuevo?' revela nuevos telescopios de Sky-Watcher](https://www.youtube.com/watch?v=-Xi0dCg03lc) (2026-04-10)
-- **Modelo: Esprit EDX**
-  - [Sky-Watcher Esprit EDX: Nuevo telescopio apocromático de triple lente](https://www.youtube.com/watch?v=qzheZZFEYnA) (2026-05-16)
 - **Modelo: Evostar EDX**
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
 - **Modelo: Heliostar 100Ha**
