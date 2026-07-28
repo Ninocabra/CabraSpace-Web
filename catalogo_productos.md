@@ -156,6 +156,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: 2025**
   - [2025 en Primalucelab: Un año de innovación en astronomía y espacio](https://www.youtube.com/watch?v=zWPa2Ch1NWY) (2025-12-30)
 - **Modelo: ASTRO-RES**
+  - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
 - **Modelo: ESATTO 3.5" LP**
   - [Actualización del Takahashi Epsilon 160ED con el enfocador robótico ESATTO 3.5" LP](https://www.youtube.com/watch?v=xsQ3W9nTESk) (2026-01-07)
@@ -325,8 +326,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
   - [ToupTek AE676C: nueva cámara astronómica multiuso](https://www.youtube.com/shorts/TVxn5QNvEwY) (2026-05-22)
   - [Nueva Cámara Astronómica ToupTek AE676C Multiusos](https://www.youtube.com/watch?v=Brq_MnkY5a4) (2026-05-21)
-- **Modelo: ASTROEYE**
-  - [ToupTek Astro ASTROEYE: Nueva cámara próxima a lanzarse](https://www.youtube.com/watch?v=e4_YcWrd_gU) (2026-05-17)
 - **Modelo: ATR585M**
   - [Desafiando el Sol con la cámara ToupTek ATR585M y un telescopio solar modificado](https://www.youtube.com/watch?v=uPhraUvZUOs) (2026-05-14)
 - **Modelo: CMOS**
