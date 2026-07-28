@@ -93,8 +93,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
 
 ### MOUNTS
-- **Modelo: harmonic drive mount**
-  - [Hilo de colaboración para construir tu propia montura de onda armónica DIY](https://stargazerslounge.com/topic/436179-make-your-own-diy-harmonic-strain-wave-mount-collaboration-thread/) (2026-06-04)
 - **Modelo: montura armónica**
   - [La Nueva Generación de Monturas Armónicas Ha Llegado](https://www.youtube.com/watch?v=y9Ktz3GHPAg) (2026-06-26)
 
@@ -133,6 +131,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: StellaLyra**
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
   - [Nuevo telescopio Newtoniano StellaLyra 8" f/5 M-LRN con enfocador de doble velocidad de 2"](https://stargazerslounge.com/topic/445765-stellalyra-8-f5-m-lrn-newt-2-dual-speed-focuser/) (2026-06-05)
+- **Modelo: Telescopio Principiante**
+  - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
 - **Modelo: sampling**
   - [¿Son los telescopios grandes peores para la astrofotografía?](https://www.youtube.com/watch?v=bOyjWlGmKoc) (2026-06-05)
 
