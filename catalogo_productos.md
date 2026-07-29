@@ -236,6 +236,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Svbony
 
 ### ACCESSORIES
+- **Modelo: Filtro Solar**
+  - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Francisco Perez**
   - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
 - **Actualizaciones Generales / Revisiones:**
@@ -276,7 +278,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Domina el SV535 en 3 minutos: Unboxing y configuración con Ben](https://www.youtube.com/watch?v=JRYZll75rcA) (2026-05-29)
 - **Modelo: SV605CC**
   - [Clase magistral reeditada: aprovecha al máximo la cámara SV605CC de SVBONY](https://www.youtube.com/watch?v=NTTvTVdlxK8) (2026-05-29)
-  - [Cámaras enfriadas SV605CC y SC571CC de Svbony: transmisión en vivo](https://www.youtube.com/watch?v=GyJ-faxMcYk) (2026-05-21)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
