@@ -273,7 +273,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
   - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
   - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
-  - [Comparativa APS-C vs. Formato Cuadrado: ¿Cómo elegir entre Svbony SC571CC y SV605CC?](https://www.youtube.com/watch?v=G1-ojw_hRbc) (2026-05-21)
 - **Modelo: SV535**
   - [Domina el SV535 en 3 minutos: Unboxing y configuración con Ben](https://www.youtube.com/watch?v=JRYZll75rcA) (2026-05-29)
 - **Modelo: SV605CC**
@@ -331,6 +330,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Desafiando el Sol con la cámara ToupTek ATR585M y un telescopio solar modificado](https://www.youtube.com/watch?v=uPhraUvZUOs) (2026-05-14)
 - **Modelo: CMOS**
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
+- **Modelo: Cámara CMOS**
+  - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: HOPE D60**
   - [ToupTek HOPE D60: nueva cámara astronómica](https://www.youtube.com/shorts/hFQxtN2F45c) (2026-05-03)
 - **Modelo: astronomical camera**
