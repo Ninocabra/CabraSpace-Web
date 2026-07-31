@@ -42,8 +42,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: CPC Deluxe HD**
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
-- **Modelo: Celestron Origin**
-  - [Tutorial Celestron Origin: La Magia del Dithering con el Dr. Sasse](https://www.youtube.com/watch?v=qOxpzE5EwL8) (2026-05-21)
 - **Modelo: EdgeHD 925**
   - [Por qué me arrepiento de haber comprado un Celestron EdgeHD 925 para astrofotografía](https://www.youtube.com/watch?v=N5tuVy9sdpQ) (2026-06-06)
 
@@ -224,6 +222,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Vista general del Heliostar 100Ha de Sky-Watcher](https://www.youtube.com/watch?v=wKLNY2Rk9bQ) (2026-05-09)
 - **Modelo: NEAF**
   - [Resumen de NEAIC/NEAF 2026: Novedades de Equipos de Astrofotografía](https://www.youtube.com/watch?v=LcyOOeVvOg4) (2026-04-18)
+
+## Skywatcher
+
+### ACCESSORIES
+- **Modelo: MightyCat 71**
+  - [Resumen de las últimas novedades astrotivissas agosto 2026](https://www.youtube.com/watch?v=w1nH7oWCw8U) (2026-07-31)
 
 ## Stellarium
 
