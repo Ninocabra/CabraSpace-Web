@@ -1,5 +1,47 @@
 [
   {
+    "id": "https://github.com/indilib/indi/releases/tag/v2.2.4",
+    "title_es": "Lanzamiento de la Biblioteca INDI v2.2.4",
+    "title_en": "INDI Library Release INDI Library v2.2.4",
+    "summary_es": "La versión 2.2.4 de la Biblioteca INDI ha sido lanzada, introduciendo nuevas compatibilidades para el driver SkyWatcher Alt-Az (Wave 100i), optimizaciones para drivers Wanderer Astro, soporte mejorado para Myfocuserpro2 sin sonda de temperatura, y correcciones en el soporte Alpaca. También se han añadido drivers para el filtro Pegasus Flat Master Neo y el telescopio TOUPTEK SH20, junto con simulaciones de inclinación en el simulador CCD.",
+    "summary_en": "The INDI Library v2.2.4 has been released, bringing new support for the SkyWatcher Alt-Az driver (Wave 100i), optimizations for Wanderer Astro drivers, enhanced support for Myfocuserpro2 without temperature probes, and fixes for Alpaca support. New drivers for the Pegasus Flat Master Neo filter and the TOUPTEK SH20 telescope have also been added, along with tilt simulation in the CCD simulator.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-08-01",
+    "url": "https://github.com/indilib/indi/releases/tag/v2.2.4",
+    "tags": [
+      "INDI",
+      "INDI Library",
+      "SkyWatcher",
+      "Wanderer Astro",
+      "Pegasus Astro",
+      "TOUPTEK"
+    ],
+    "source_type": "official",
+    "source": "GitHub Releases (INDI Library)"
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=5aFmfiffPVM",
+    "title_es": "Cómo añadir autoenfoque a tu telescopio",
+    "title_en": "How to add autofocus to your telescope",
+    "summary_es": "Este video de Nebula Photos explica cómo mejorar la precisión del enfoque en telescopios, especialmente para astrofotografía, mediante la adición de un sistema de autoenfoque. Se detallan los componentes necesarios y los pasos para su instalación y configuración.",
+    "summary_en": "This Nebula Photos video explains how to enhance telescope focusing accuracy, particularly for astrophotography, by adding an autofocus system. It details the necessary components and the steps for installation and configuration.",
+    "category_es": "ACCESORIOS",
+    "category_en": "ACCESSORIES",
+    "date": "2026-07-31",
+    "url": "https://www.youtube.com/watch?v=5aFmfiffPVM",
+    "tags": [
+      "Nebula Photos",
+      "Autofocus",
+      "Telescope",
+      "Astrophotography",
+      "Focuser",
+      "DIY"
+    ],
+    "source_type": "reviewer",
+    "source": "Nebula Photos"
+  },
+  {
     "id": "https://www.youtube.com/watch?v=SYHEdKS-2h8",
     "title_es": "SVBONY SA207 8x32 ED APO Binoculars de Exploración",
     "title_en": "SVBONY SA207 8x32 ED APO Binoculars Review and Unboxing",
@@ -2900,44 +2942,6 @@
       "montura",
       "astrophotography mount",
       "overview"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/shorts/TVxn5QNvEwY",
-    "title_es": "ToupTek AE676C: nueva cámara astronómica multiuso",
-    "title_en": "ToupTek AE676C: New multipurpose astronomy camera unboxing",
-    "summary_es": "ToupTek Astro muestra el unboxing de su nueva cámara AE676C, una cámara de color multiuso diseñada para astrofotografía. Se destaca su sensor de 6.4 megapíxeles y construcción robusta.",
-    "summary_en": "ToupTek Astro unveils the unboxing of their new AE676C camera, a multipurpose color camera for astrophotography. Features a 6.4 MP sensor and sturdy build.",
-    "category_es": "CÁMARAS",
-    "category_en": "CAMERAS",
-    "date": "2026-05-22",
-    "url": "https://www.youtube.com/shorts/TVxn5QNvEwY",
-    "tags": [
-      "ToupTek",
-      "AE676C",
-      "astronomy camera",
-      "unboxing",
-      "CMOS",
-      "color camera"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=1-QClL71_tI",
-    "title_es": "Revisión del telescopio SV535 combinado con la cámara SC571CC",
-    "title_en": "Review of the SV535 Telescope and SC571CC Camera Combo",
-    "summary_es": "Este video de Svbony muestra las capacidades de astrofotografía del telescopio SV535 y la cámara SC571CC. Se presentan imágenes del cielo profundo con esta combinación, destacando su rendimiento y calidad de imagen.",
-    "summary_en": "This video by Svbony demonstrates the astrophotography capabilities of the SV535 telescope and SC571CC camera. It showcases deep-sky images captured with this gear combination, highlighting its performance and image quality.",
-    "category_es": "TELESCOPIOS",
-    "category_en": "TELESCOPES",
-    "date": "2026-05-22",
-    "url": "https://www.youtube.com/watch?v=1-QClL71_tI",
-    "tags": [
-      "Svbony",
-      "SV535",
-      "SC571CC",
-      "telescopio",
-      "cámara",
-      "astrophotography"
     ]
   }
 ]

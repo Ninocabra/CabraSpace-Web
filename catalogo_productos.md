@@ -79,12 +79,16 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Hotfix**
   - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
+- **Modelo: INDI Library**
+  - [Lanzamiento de la Biblioteca INDI v2.2.4](https://github.com/indilib/indi/releases/tag/v2.2.4) (2026-08-01)
 
 ## Otros / No especificado
 
 ### ACCESSORIES
 - **Modelo: Astrocitas**
   - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
+- **Modelo: Nebula Photos**
+  - [Cómo añadir autoenfoque a tu telescopio](https://www.youtube.com/watch?v=5aFmfiffPVM) (2026-07-31)
 - **Modelo: Oberwerk**
   - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: barn door tracker**
@@ -302,7 +306,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
 - **Modelo: SV535**
   - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
-  - [Revisión del telescopio SV535 combinado con la cámara SC571CC](https://www.youtube.com/watch?v=1-QClL71_tI) (2026-05-22)
 - **Modelo: SV555**
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
@@ -329,7 +332,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
-  - [ToupTek AE676C: nueva cámara astronómica multiuso](https://www.youtube.com/shorts/TVxn5QNvEwY) (2026-05-22)
 - **Modelo: ATR585M**
   - [Desafiando el Sol con la cámara ToupTek ATR585M y un telescopio solar modificado](https://www.youtube.com/watch?v=uPhraUvZUOs) (2026-05-14)
 - **Modelo: CMOS**
