@@ -256,6 +256,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Rumak**
   - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
+  - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
   - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
 - **Modelo: SA207 Pro**
@@ -329,7 +330,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
   - [ToupTek AE676C: nueva cámara astronómica multiuso](https://www.youtube.com/shorts/TVxn5QNvEwY) (2026-05-22)
-  - [Nueva Cámara Astronómica ToupTek AE676C Multiusos](https://www.youtube.com/watch?v=Brq_MnkY5a4) (2026-05-21)
 - **Modelo: ATR585M**
   - [Desafiando el Sol con la cámara ToupTek ATR585M y un telescopio solar modificado](https://www.youtube.com/watch?v=uPhraUvZUOs) (2026-05-14)
 - **Modelo: CMOS**
