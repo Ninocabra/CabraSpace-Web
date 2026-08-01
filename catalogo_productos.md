@@ -212,8 +212,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Sky-Watcher
 
 ### MOUNTS
-- **Modelo: HEQ5-R**
-  - [Webcast de Sky-Watcher USA: Descripción general de la montura HEQ5-R](https://www.youtube.com/watch?v=RThq3RWPazU) (2026-05-23)
 - **Modelo: Wave 150i**
   - [Sky-Watcher Wave 150i: Montura strainwave con sistema PrimaLuceLab](https://www.youtube.com/watch?v=W6--bNohEYw) (2025-12-12)
 
@@ -306,6 +304,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
 - **Modelo: SV535**
   - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
+- **Modelo: SV550**
+  - [SVBONY SV550 80mm Triplet APO: Desempaquetado y Ensamblaje](https://www.youtube.com/watch?v=la9dpejHKxA) (2026-08-01)
 - **Modelo: SV555**
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
