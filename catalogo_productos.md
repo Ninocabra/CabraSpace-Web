@@ -81,6 +81,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
 - **Modelo: INDI Library**
   - [Lanzamiento de la Biblioteca INDI v2.2.4](https://github.com/indilib/indi/releases/tag/v2.2.4) (2026-08-01)
+- **Modelo: Linux**
+  - [INDI Library v2.2.4.1: Corrección de errores menores](https://github.com/indilib/indi/releases/tag/v2.2.4.1) (2026-08-02)
 
 ## Otros / No especificado
 
@@ -246,8 +248,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Francisco Perez**
   - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
-- **Actualizaciones Generales / Revisiones:**
-  - [Nuevas actualizaciones de equipamiento SVBONY con Arie Nouwen](https://www.youtube.com/watch?v=mE3kjkS2vi0) (2026-05-28)
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
 - **Modelo: Prime Day**
