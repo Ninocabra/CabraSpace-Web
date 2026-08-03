@@ -113,6 +113,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [BlurXTerminator sin PixInsight: Llegó el Momento](https://www.youtube.com/watch?v=Vrw90sNdOyE) (2026-06-26)
 - **Modelo: Lightroom**
   - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
+- **Modelo: Luminar Neo**
+  - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: Script**
@@ -282,8 +284,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
 - **Modelo: SV535**
   - [Domina el SV535 en 3 minutos: Unboxing y configuración con Ben](https://www.youtube.com/watch?v=JRYZll75rcA) (2026-05-29)
-- **Modelo: SV605CC**
-  - [Clase magistral reeditada: aprovecha al máximo la cámara SV605CC de SVBONY](https://www.youtube.com/watch?v=NTTvTVdlxK8) (2026-05-29)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
