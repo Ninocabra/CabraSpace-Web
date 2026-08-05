@@ -6,6 +6,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Askar
 
+### ACCESSORIES
+- **Modelo: WAF**
+  - [Presentación del focuser automático WAF de Askar](https://www.youtube.com/watch?v=KKe6wz0bM9Y) (2026-08-05)
+
 ### TELESCOPES
 - **Actualizaciones Generales / Revisiones:**
   - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
@@ -282,8 +286,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
   - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
   - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
-- **Modelo: SV535**
-  - [Domina el SV535 en 3 minutos: Unboxing y configuración con Ben](https://www.youtube.com/watch?v=JRYZll75rcA) (2026-05-29)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
