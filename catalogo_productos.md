@@ -55,6 +55,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Electronic Focusers**
   - [Día de NEAF 2026: Filtros Daystar, enfocador electrónico, capas planas y Quark Smart](https://www.youtube.com/watch?v=v0H1_hFQvGg) (2026-07-17)
 
+## Ekos
+
+### SOFTWARE
+- **Modelo: INDI Library**
+  - [INDI Library lanza la versión 2.2.4.2 con corrección de errores](https://github.com/indilib/indi/releases/tag/v2.2.4.2) (2026-08-05)
+
 ## Explore Scientific
 
 ### ACCESSORIES
@@ -224,8 +230,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sky-Watcher Wave 150i: Montura strainwave con sistema PrimaLuceLab](https://www.youtube.com/watch?v=W6--bNohEYw) (2025-12-12)
 
 ### TELESCOPES
-- **Modelo: Blanket Scopes**
-  - [Webcast '¿Qué hay de nuevo?' revela nuevos telescopios de Sky-Watcher](https://www.youtube.com/watch?v=-Xi0dCg03lc) (2026-04-10)
 - **Modelo: Evostar EDX**
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
 - **Modelo: Heliostar 100Ha**

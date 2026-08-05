@@ -1,5 +1,26 @@
 [
   {
+    "id": "https://github.com/indilib/indi/releases/tag/v2.2.4.2",
+    "title_es": "INDI Library lanza la versión 2.2.4.2 con corrección de errores",
+    "title_en": "INDI Library Releases Version 2.2.4.2 with Bug Fixes",
+    "summary_es": "La versión 2.2.4.2 de la INDI Library introduce correcciones de errores menores y mejoras en varios drivers. Se han solucionado problemas relacionados con la operación de 'home' en monturas iEQ, la precisión de movimiento en el rotador WandererRotator y se ha añadido información sobre el lado del pilar en el driver PMC8.",
+    "summary_en": "INDI Library version 2.2.4.2 introduces minor bug fixes and improvements across several drivers. Issues concerning the 'home' operation in iEQ mounts, movement accuracy in the WandererRotator, and pier side information in the PMC8 driver have been addressed.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-08-05",
+    "url": "https://github.com/indilib/indi/releases/tag/v2.2.4.2",
+    "tags": [
+      "INDI Library",
+      "EKOS",
+      "Bugfix",
+      "Mount",
+      "Rotator",
+      "Software"
+    ],
+    "source_type": "official",
+    "source": "GitHub Releases (INDI Library)"
+  },
+  {
     "id": "https://www.youtube.com/watch?v=KKe6wz0bM9Y",
     "title_es": "Presentación del focuser automático WAF de Askar",
     "title_en": "Askar WAF Automatic Telescope Focuser Promotion",
@@ -2934,24 +2955,6 @@
       "NEAF 2026",
       "telescope mount",
       "telescope"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=-Xi0dCg03lc",
-    "title_es": "Webcast '¿Qué hay de nuevo?' revela nuevos telescopios de Sky-Watcher",
-    "title_en": "\"What's Up?\" Webcast Reveals New Sky-Watcher Telescopes",
-    "summary_es": "En este webcast, Sky-Watcher USA anuncia y muestra nuevos telescopios, incluyendo probablemente modelos de la serie 'Blanket Scopes', revelando sus especificaciones y características.",
-    "summary_en": "In this webcast, Sky-Watcher USA announces and showcases new telescopes, likely including models from their 'Blanket Scopes' series, revealing specs and features.",
-    "category_es": "TELESCOPIOS",
-    "category_en": "TELESCOPES",
-    "date": "2026-04-10",
-    "url": "https://www.youtube.com/watch?v=-Xi0dCg03lc",
-    "tags": [
-      "Sky-Watcher",
-      "telescope",
-      "announcement",
-      "new product",
-      "Blanket Scopes"
     ]
   }
 ]
