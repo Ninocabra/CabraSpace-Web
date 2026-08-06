@@ -194,8 +194,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### MOUNTS
 - **Modelo: ASTRO-RES**
   - [Instalación del ASTRO-RES de la Estación Observacional en el ITS Academy G. Caboto](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-its-academy-g-caboto/) (2026-07-06)
-- **Modelo: SATURN mount**
-  - [Lanzamiento de productos en NEAF 2026: montura SATURN y CPC Deluxe HD](https://www.youtube.com/watch?v=lyDgjIc2VFs) (2026-04-13)
 
 ### SOFTWARE
 - **Modelo: Radio2Space**
@@ -322,6 +320,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Hi-LE**
   - [Anuncio de nuevos oculares Takahashi](https://stargazerslounge.com/topic/411644-new-takahashi-eyepieces-announced/) (2026-06-24)
+
+### EYEPIECES
+- **Modelo: eyepieces**
+  - [Takahashi lanza nuevos oculares eyecuativo TOE de 58°](https://stargazerslounge.com/topic/447288-takahashi-released-new-toe-25mm-58%C2%B0toe-33mm-58%C2%B0toe-40mm-58%C2%B0-eyepieces/) (2026-08-05)
 
 ### TELESCOPES
 - **Modelo: FC100DZ**
