@@ -41,6 +41,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Proyección**
   - [Oculares de proyección recomendados para telescopios de astrofotografía](https://www.youtube.com/watch?v=nxTnBf7jYmI) (2026-06-07)
 
+### GENERAL
+- **Modelo: Total Solar Eclipse**
+  - [La Eclips Solar Total de Agosto de 2026: Guía para Observadores](https://www.celestron.com/blogs/news/pursuing-the-shadow-the-august-2026-total-solar-eclipse) (2026-07-01)
+
 ### TELESCOPES
 - **Modelo: 9.25 Edge HD**
   - [Celestron 9.25 Edge HD como telescopio visual](https://www.reddit.com/r/telescopes/comments/1tx6ezv/celestron_925_edge_as_a_visual_telescope/) (2026-06-05)
@@ -219,8 +223,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Siril
 
 ### SOFTWARE
-- **Actualizaciones Generales / Revisiones:**
-  - [Siril 1.4.2: Nueva versión del software de astrofotografía con correcciones y mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.2) (2026-05-02)
 - **Modelo: Procesamiento de Imágenes**
   - [Siril Versión 1.4.4: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.4) (2026-06-16)
 
@@ -349,8 +351,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
-- **Modelo: HOPE D60**
-  - [ToupTek HOPE D60: nueva cámara astronómica](https://www.youtube.com/shorts/hFQxtN2F45c) (2026-05-03)
 - **Modelo: astronomical camera**
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 - **Modelo: cámara astrofotografía**
@@ -416,6 +416,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASIAIR**
   - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
+- **Modelo: communty**
+  - [Más allá de la astrofotografía. Un mensaje de ZWO](https://www.youtube.com/shorts/MdM5e4MdjKI) (2026-08-05)
 
 ### TELESCOPES
 - **Modelo: FF131**
