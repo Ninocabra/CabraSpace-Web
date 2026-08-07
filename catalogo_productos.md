@@ -8,6 +8,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### ACCESSORIES
 - **Modelo: WAF**
+  - [Video Demostrativo del Askar WAF: Cómo Instalar el WAF (Ejemplo con SQA106)](https://www.youtube.com/watch?v=7y95ZS5r9lU) (2026-08-07)
   - [Presentación del focuser automático WAF de Askar](https://www.youtube.com/watch?v=KKe6wz0bM9Y) (2026-08-05)
 
 ### TELESCOPES
@@ -416,5 +417,3 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: FF131**
   - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
-- **Modelo: distributed aperture**
-  - [Telescopios de apertura distribuida de ZWO](https://www.zwoastro.com/2026/04/24/distributed-aperture-telescopes/) (2026-04-24)
