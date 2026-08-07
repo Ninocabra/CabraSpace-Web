@@ -128,6 +128,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: N.I.N.A.**
   - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
+- **Modelo: SHO**
+  - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
   - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
   - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
@@ -365,7 +367,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: HOPE D60**
   - [ToupTek Astro Presenta el Dispositivo de Astrofotografía HOPE D60](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
-  - [Unboxing del telescopio HOPE D60 de ToupTek](https://www.youtube.com/shorts/OlJ7FbLOPVo) (2026-04-27)
 
 ## Vaonis
 
@@ -397,13 +398,15 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: star tracker**
   - [Ya no necesitas una Star Tracker para Astrofotografía](https://www.youtube.com/watch?v=tvPlLafd7sk) (2026-06-07)
 
+### ASTROPHOTOGRAPHY
+- **Modelo: ASI2600MC Duo**
+  - [De Bortle 8 a las Estrellas - Andrea Arbizzi desafía la polución lumínica](https://www.zwoastro.com/2026/08/04/light-pollution-astrophotography-andrea-arbizzi/) (2026-08-04)
+
 ### CAMERAS
 - **Modelo: ASI2600MC Air**
   - [Astrofotografía de campo amplio con ASI2600MC Air](https://www.youtube.com/shorts/NrdtWWIAR_c) (2026-05-13)
 - **Modelo: ATT 2026**
   - [Resumen de ATT 2026 de ZWO](https://www.youtube.com/shorts/g91t3DjdgzM) (2026-05-12)
-- **Modelo: Pillars of Creation**
-  - [ZWO: Capturando los Pilares de la Creación con equipos terrestres](https://www.youtube.com/shorts/8NW33-CdiHg) (2026-04-28)
 - **Modelo: S50**
   - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 - **Modelo: Seestar S30 Pro**
