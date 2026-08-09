@@ -235,8 +235,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Evostar EDX**
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
-- **Modelo: Heliostar 100Ha**
-  - [Vista general del Heliostar 100Ha de Sky-Watcher](https://www.youtube.com/watch?v=wKLNY2Rk9bQ) (2026-05-09)
 - **Modelo: NEAF**
   - [Resumen de NEAIC/NEAF 2026: Novedades de Equipos de Astrofotografía](https://www.youtube.com/watch?v=LcyOOeVvOg4) (2026-04-18)
 
@@ -418,6 +416,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: communty**
   - [Más allá de la astrofotografía. Un mensaje de ZWO](https://www.youtube.com/shorts/MdM5e4MdjKI) (2026-08-05)
+- **Modelo: planetary-imaging**
+  - [ZWO Reconoce a Un Astrógrafo y Comparte La Pasión Por La Imagen Planetaria](https://www.zwoastro.com/2026/08/04/konstantinos-planetary-astrophotography-journey/) (2026-08-04)
 
 ### TELESCOPES
 - **Modelo: FF131**
