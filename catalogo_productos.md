@@ -53,6 +53,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: CPC Deluxe HD**
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
+- **Modelo: Ed Ting**
+  - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
 - **Modelo: EdgeHD 925**
   - [Por qué me arrepiento de haber comprado un Celestron EdgeHD 925 para astrofotografía](https://www.youtube.com/watch?v=N5tuVy9sdpQ) (2026-06-06)
 
@@ -402,8 +404,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [De Bortle 8 a las Estrellas - Andrea Arbizzi desafía la polución lumínica](https://www.zwoastro.com/2026/08/04/light-pollution-astrophotography-andrea-arbizzi/) (2026-08-04)
 
 ### CAMERAS
-- **Modelo: ASI2600MC Air**
-  - [Astrofotografía de campo amplio con ASI2600MC Air](https://www.youtube.com/shorts/NrdtWWIAR_c) (2026-05-13)
 - **Modelo: ATT 2026**
   - [Resumen de ATT 2026 de ZWO](https://www.youtube.com/shorts/g91t3DjdgzM) (2026-05-12)
 - **Modelo: S50**
