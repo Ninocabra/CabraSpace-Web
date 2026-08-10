@@ -9,7 +9,7 @@
     "author": "Adam Block",
     "length": "1:09:18",
     "published_relative": "hace 3 años",
-    "views": 44809,
+    "views": 44815,
     "url": "https://www.youtube.com/watch?v=ergLZMlkGE8"
   },
   {
@@ -22,7 +22,7 @@
     "author": "Adam Block",
     "length": "20:19",
     "published_relative": "hace 1 año",
-    "views": 50262,
+    "views": 50310,
     "url": "https://www.youtube.com/watch?v=td4Z4_fIQOE"
   },
   {
@@ -61,21 +61,8 @@
     "author": "Adam Block",
     "length": "9:36",
     "published_relative": "hace 2 años",
-    "views": 30973,
+    "views": 30983,
     "url": "https://www.youtube.com/watch?v=Q3V58wdVb1c"
-  },
-  {
-    "youtube_id": "S_1nXlzJspI",
-    "title_es": "Procesamiento de polvo galáctico en PixInsight con mayor facilidad (flujo de trabajo de alto nivel)",
-    "title_en": "Processing Galactic Dust in PixInsight with Greater Ease (High-Level Workflow)",
-    "summary_es": "Este tutorial presenta un flujo de trabajo simplificado para procesar el polvo galáctico en PixInsight. Se enfoca en técnicas de alto nivel para resaltar estructuras de polvo débiles y lograr una imagen natural. El video guía a los usuarios a través de las herramientas y pasos clave para optimizar el procesamiento de este tipo de objetivo.",
-    "summary_en": "This tutorial presents a simplified workflow for processing galactic dust in PixInsight. It focuses on high-level techniques to enhance faint dust structures and achieve a natural-looking image. The video guides users through the key tools and steps to optimize the processing of this type of target.",
-    "level": "MEDIO",
-    "author": "Adam Block",
-    "length": "14:01",
-    "published_relative": "hace 1 año",
-    "views": 15799,
-    "url": "https://www.youtube.com/watch?v=S_1nXlzJspI"
   },
   {
     "youtube_id": "rfmWigz66v0",
@@ -91,17 +78,30 @@
     "url": "https://www.youtube.com/watch?v=rfmWigz66v0"
   },
   {
-    "youtube_id": "df8ilkeGpKA",
-    "title_es": "Script ImageBlend de PixInsight con Adam Block",
-    "title_en": "PixInsight's ImageBlend Script with Adam Block",
-    "summary_es": "Este video ofrece un tutorial detallado sobre el script ImageBlend de PixInsight, con las aportaciones de Adam Block. Explica cómo usar eficazmente el script ImageBlend para combinar múltiples imágenes, mejorar los detalles y gestionar el ruido en el procesamiento de astrofotografía. Los espectadores aprenderán técnicas prácticas para una integración de imágenes perfecta en PixInsight.",
-    "summary_en": "This video presents a detailed tutorial on PixInsight's ImageBlend script, featuring insights from Adam Block. It explains how to effectively use the ImageBlend script for combining multiple images, enhancing details, and managing noise in astrophotography processing. Viewers will learn practical techniques for seamless image integration within PixInsight.",
+    "youtube_id": "S_1nXlzJspI",
+    "title_es": "Procesamiento de polvo galáctico en PixInsight con mayor facilidad (flujo de trabajo de alto nivel)",
+    "title_en": "Processing Galactic Dust in PixInsight with Greater Ease (High-Level Workflow)",
+    "summary_es": "Este tutorial presenta un flujo de trabajo simplificado para procesar el polvo galáctico en PixInsight. Se enfoca en técnicas de alto nivel para resaltar estructuras de polvo débiles y lograr una imagen natural. El video guía a los usuarios a través de las herramientas y pasos clave para optimizar el procesamiento de este tipo de objetivo.",
+    "summary_en": "This tutorial presents a simplified workflow for processing galactic dust in PixInsight. It focuses on high-level techniques to enhance faint dust structures and achieve a natural-looking image. The video guides users through the key tools and steps to optimize the processing of this type of target.",
     "level": "MEDIO",
-    "author": "TAIC",
-    "length": "1:22:06",
-    "published_relative": "Emitido hace 11 meses",
-    "views": 6152,
-    "url": "https://www.youtube.com/watch?v=df8ilkeGpKA"
+    "author": "Adam Block",
+    "length": "14:01",
+    "published_relative": "hace 1 año",
+    "views": 15819,
+    "url": "https://www.youtube.com/watch?v=S_1nXlzJspI"
+  },
+  {
+    "youtube_id": "DQjs2yB_MAw",
+    "title_es": "PixInsight: Efecto Orton Glow con ImageBlend",
+    "title_en": "PixInsight: ImageBlend: Orton Glow Effect",
+    "summary_es": "Este tutorial de PixInsight explica cómo aplicar el popular efecto Orton Glow a tus astrofotografías. Se demuestra el uso del proceso ImageBlend para crear una versión suave y difusa de la imagen original, que luego se mezcla para realzar detalles y añadir un brillo etéreo. Es una técnica eficaz para mejorar el atractivo visual de las imágenes.",
+    "summary_en": "This PixInsight tutorial demonstrates how to apply the popular Orton Glow effect to your astrophotography images. It shows how to use the ImageBlend process to create a soft, diffused version of the original image, which is then blended back to enhance details and add an ethereal glow. This technique effectively improves the visual appeal of astronomical images.",
+    "level": "MEDIO",
+    "author": "Adam Block",
+    "length": "13:52",
+    "published_relative": "hace 1 año",
+    "views": 6251,
+    "url": "https://www.youtube.com/watch?v=DQjs2yB_MAw"
   },
   {
     "youtube_id": "iv-HmCG59D4",
@@ -117,45 +117,6 @@
     "url": "https://www.youtube.com/watch?v=iv-HmCG59D4"
   },
   {
-    "youtube_id": "0XxB-sOFD0Q",
-    "title_es": "PixInsight: Script Mapeador de Color en Banda Estrecha",
-    "title_en": "PixInsight: Narrow band Colour Mapper Script",
-    "summary_es": "Este video explica el uso del script Mapeador de Color en Banda Estrecha dentro de PixInsight. Detalla cómo esta herramienta permite asignar colores específicos a las diferentes emisiones de banda estrecha (Ha, OIII, SII) para crear imágenes a color balanceadas. La sesión cubre la interfaz, los parámetros clave y la aplicación práctica para la calibración y el mapeo de color en astrofotografía.",
-    "summary_en": "This video demonstrates the application of the Narrowband Colour Mapper script within PixInsight. It elucidates how this powerful tool facilitates the assignment of specific colors to different narrowband emissions (e.g., Ha, OIII, SII) to produce balanced color astrophotographs. The tutorial likely covers the script's interface, its key parameters, and practical usage for color calibration and mapping.",
-    "level": "MEDIO",
-    "author": "Adam Block",
-    "length": "32:28",
-    "published_relative": "hace 2 años",
-    "views": 18987,
-    "url": "https://www.youtube.com/watch?v=0XxB-sOFD0Q"
-  },
-  {
-    "youtube_id": "DQjs2yB_MAw",
-    "title_es": "PixInsight: Efecto Orton Glow con ImageBlend",
-    "title_en": "PixInsight: ImageBlend: Orton Glow Effect",
-    "summary_es": "Este tutorial de PixInsight explica cómo aplicar el popular efecto Orton Glow a tus astrofotografías. Se demuestra el uso del proceso ImageBlend para crear una versión suave y difusa de la imagen original, que luego se mezcla para realzar detalles y añadir un brillo etéreo. Es una técnica eficaz para mejorar el atractivo visual de las imágenes.",
-    "summary_en": "This PixInsight tutorial demonstrates how to apply the popular Orton Glow effect to your astrophotography images. It shows how to use the ImageBlend process to create a soft, diffused version of the original image, which is then blended back to enhance details and add an ethereal glow. This technique effectively improves the visual appeal of astronomical images.",
-    "level": "MEDIO",
-    "author": "Adam Block",
-    "length": "13:52",
-    "published_relative": "hace 1 año",
-    "views": 6249,
-    "url": "https://www.youtube.com/watch?v=DQjs2yB_MAw"
-  },
-  {
-    "youtube_id": "xq_T0uLOXf8",
-    "title_es": "PixInsight: Procesamiento de estrellas extraídas",
-    "title_en": "PixInsight: Processing Extracted Stars",
-    "summary_es": "Este tutorial de PixInsight se centra en las técnicas para manejar y procesar las estrellas después de haber sido extraídas de la imagen principal. Se exploran métodos para mejorar las estrellas de forma independiente, como la reducción de tamaño o el ajuste de color. El video enseña cómo reintegrar las estrellas procesadas con el objeto de cielo profundo para obtener una imagen final de alta calidad.",
-    "summary_en": "This PixInsight tutorial focuses on techniques for managing and processing stars after they have been extracted from the main image. It explores methods to independently enhance stars, such as size reduction or color adjustment. The video teaches how to reintegrate the processed stars with the deep-sky object to achieve a high-quality final image.",
-    "level": "AVANZADO",
-    "author": "Adam Block",
-    "length": "15:15",
-    "published_relative": "hace 2 años",
-    "views": 12645,
-    "url": "https://www.youtube.com/watch?v=xq_T0uLOXf8"
-  },
-  {
     "youtube_id": "etZTo0rjQEY",
     "title_es": "Re-Screen Stars con ImageBlend - Adam Block",
     "title_en": "Re-Screen Stars with ImageBlend - Adam Block",
@@ -165,21 +126,8 @@
     "author": "TAIC",
     "length": "4:53",
     "published_relative": "hace 11 meses",
-    "views": 1139,
+    "views": 1143,
     "url": "https://www.youtube.com/watch?v=etZTo0rjQEY"
-  },
-  {
-    "youtube_id": "3DdSDoJfjM4",
-    "title_es": "Reducción de Estrellas (Énfasis Negativo) en PixInsight",
-    "title_en": "Star Reduction (De-Emphasis) in PixInsight",
-    "summary_es": "Este tutorial de Adam Block explica diversas técnicas para la reducción del tamaño y el brillo de las estrellas en PixInsight. El objetivo es enfatizar las nebulosas y galaxias circundantes. Se abordan métodos como la transformación morfológica y el uso de máscaras para lograr un control preciso sobre el efecto.",
-    "summary_en": "This Adam Block tutorial explains various techniques for reducing the size and brightness of stars in PixInsight. The goal is to emphasize surrounding nebulae and galaxies. Methods like morphological transformation and the use of masks are covered to achieve precise control over the effect.",
-    "level": "MEDIO",
-    "author": "Adam Block",
-    "length": "26:09",
-    "published_relative": "hace 6 años",
-    "views": 22090,
-    "url": "https://www.youtube.com/watch?v=3DdSDoJfjM4"
   },
   {
     "youtube_id": "NP0EXGbwo_I",
@@ -191,21 +139,60 @@
     "author": "Adam Block",
     "length": "13:27",
     "published_relative": "hace 6 meses",
-    "views": 6921,
+    "views": 6927,
     "url": "https://www.youtube.com/watch?v=NP0EXGbwo_I"
   },
   {
-    "youtube_id": "mYFfcvwTndk",
-    "title_es": "Función de Transferencia de Pantalla de PixInsight: Aclarando la Confusión Básica",
-    "title_en": "PixInsight Screen Transfer Function: Basic Confusion Clarified",
-    "summary_es": "Este video explica la Función de Transferencia de Pantalla (STF) de PixInsight, una herramienta crucial para la visualización de imágenes lineales sin aplicar estiramientos permanentes. Aclara su propósito fundamental y cómo se diferencia de los procesos de estiramiento no lineal, resolviendo las confusiones básicas que suelen surgir entre los usuarios principiantes sobre su uso correcto y efectos.",
-    "summary_en": "This video explains PixInsight's Screen Transfer Function (STF), a crucial tool for visualizing linear images without applying permanent stretches. It clarifies its fundamental purpose and how it differs from non-linear stretching processes, resolving basic confusions that often arise among beginner users regarding its correct use and effects.",
-    "level": "PRINCIPIANTE",
+    "youtube_id": "3DdSDoJfjM4",
+    "title_es": "Reducción de Estrellas (Énfasis Negativo) en PixInsight",
+    "title_en": "Star Reduction (De-Emphasis) in PixInsight",
+    "summary_es": "Este tutorial de Adam Block explica diversas técnicas para la reducción del tamaño y el brillo de las estrellas en PixInsight. El objetivo es enfatizar las nebulosas y galaxias circundantes. Se abordan métodos como la transformación morfológica y el uso de máscaras para lograr un control preciso sobre el efecto.",
+    "summary_en": "This Adam Block tutorial explains various techniques for reducing the size and brightness of stars in PixInsight. The goal is to emphasize surrounding nebulae and galaxies. Methods like morphological transformation and the use of masks are covered to achieve precise control over the effect.",
+    "level": "MEDIO",
     "author": "Adam Block",
-    "length": "11:28",
+    "length": "26:09",
+    "published_relative": "hace 6 años",
+    "views": 22091,
+    "url": "https://www.youtube.com/watch?v=3DdSDoJfjM4"
+  },
+  {
+    "youtube_id": "j14lPwcNeeo",
+    "title_es": "PixInsight: Nuevo Script para Combinar Imágenes",
+    "title_en": "PixInsight: New Image Blend Script",
+    "summary_es": "Este tutorial presenta y explica la funcionalidad de un nuevo script para la combinación de imágenes dentro de PixInsight. Demuestra cómo utilizar esta herramienta de manera efectiva para fusionar múltiples tomas. El video busca mejorar las capacidades de integración de imágenes del usuario.",
+    "summary_en": "This tutorial introduces and explains the functionality of a new Image Blend script within PixInsight. It demonstrates how to effectively use this tool to combine multiple images. The video aims to enhance the user's image integration capabilities.",
+    "level": "AVANZADO",
+    "author": "Adam Block",
+    "length": "22:41",
+    "published_relative": "hace 2 años",
+    "views": 19015,
+    "url": "https://www.youtube.com/watch?v=j14lPwcNeeo"
+  },
+  {
+    "youtube_id": "6Kg3jfaGgeM",
+    "title_es": "PixInsight: Script ColorMask Completo",
+    "title_en": "PixInsight: Complete ColorMask Script Guide",
+    "summary_es": "Este video ofrece una guía exhaustiva sobre el script ColorMask en PixInsight. Aprenderás a generar máscaras precisas basadas en rangos de color específicos, lo que es fundamental para realizar ajustes selectivos y mejoras en áreas determinadas de tus imágenes astronómicas.",
+    "summary_en": "This video provides a comprehensive guide to the ColorMask script in PixInsight. You will learn how to generate precise masks based on specific color ranges, which is essential for making selective adjustments and enhancements to particular areas of your astronomical images.",
+    "level": "MEDIO",
+    "author": "Adam Block",
+    "length": "21:50",
     "published_relative": "hace 3 años",
-    "views": 11410,
-    "url": "https://www.youtube.com/watch?v=mYFfcvwTndk"
+    "views": 17036,
+    "url": "https://www.youtube.com/watch?v=6Kg3jfaGgeM"
+  },
+  {
+    "youtube_id": "0XxB-sOFD0Q",
+    "title_es": "PixInsight: Script Mapeador de Color en Banda Estrecha",
+    "title_en": "PixInsight: Narrow band Colour Mapper Script",
+    "summary_es": "Este video explica el uso del script Mapeador de Color en Banda Estrecha dentro de PixInsight. Detalla cómo esta herramienta permite asignar colores específicos a las diferentes emisiones de banda estrecha (Ha, OIII, SII) para crear imágenes a color balanceadas. La sesión cubre la interfaz, los parámetros clave y la aplicación práctica para la calibración y el mapeo de color en astrofotografía.",
+    "summary_en": "This video demonstrates the application of the Narrowband Colour Mapper script within PixInsight. It elucidates how this powerful tool facilitates the assignment of specific colors to different narrowband emissions (e.g., Ha, OIII, SII) to produce balanced color astrophotographs. The tutorial likely covers the script's interface, its key parameters, and practical usage for color calibration and mapping.",
+    "level": "MEDIO",
+    "author": "Adam Block",
+    "length": "32:28",
+    "published_relative": "hace 2 años",
+    "views": 18990,
+    "url": "https://www.youtube.com/watch?v=0XxB-sOFD0Q"
   },
   {
     "youtube_id": "XCotRiUIWtg",
@@ -217,7 +204,7 @@
     "author": "Cuiv, The Lazy Geek",
     "length": "3:10:24",
     "published_relative": "hace 1 año",
-    "views": 190561,
+    "views": 190652,
     "url": "https://www.youtube.com/watch?v=XCotRiUIWtg"
   },
   {
@@ -230,112 +217,8 @@
     "author": "Cuiv, The Lazy Geek",
     "length": "17:09",
     "published_relative": "hace 4 años",
-    "views": 24129,
+    "views": 24135,
     "url": "https://www.youtube.com/watch?v=1OoCtt6VPHw"
-  },
-  {
-    "youtube_id": "aMR70ULTyHY",
-    "title_es": "Guía completa y sencilla de banda estrecha OSC con PixInsight, presentando la Nebulosa Trompa de Elefante",
-    "title_en": "Easy OSC Narrowband Full Guide with PixInsight, featuring the Elephant Trunk Nebula",
-    "summary_es": "Este tutorial ofrece una guía completa y accesible para el procesamiento de imágenes de banda estrecha obtenidas con cámaras OSC (One-Shot Color) utilizando PixInsight. El vídeo detalla un flujo de trabajo para extraer, procesar y combinar los datos de banda estrecha, permitiendo crear una imagen final de la Nebulosa Trompa de Elefante con colores vibrantes y detalles mejorados. Se enfoca en las herramientas y técnicas clave dentro de PixInsight para manejar este tipo de datos especializados.",
-    "summary_en": "This tutorial provides a comprehensive and accessible guide for processing narrowband images captured with One-Shot Color (OSC) cameras using PixInsight. The video details a workflow to extract, process, and combine narrowband data, enabling the creation of a final image of the Elephant Trunk Nebula with vibrant colors and enhanced details. It focuses on the key tools and techniques within PixInsight for handling this specialized type of data.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "30:26",
-    "published_relative": "hace 4 años",
-    "views": 28926,
-    "url": "https://www.youtube.com/watch?v=aMR70ULTyHY"
-  },
-  {
-    "youtube_id": "l1w0yHJmSzM",
-    "title_es": "¿El fin de PixInsight? El procesamiento astronómico cambia para siempre con RC-Astro como aplicación independiente",
-    "title_en": "The Future of PixInsight: RC-Astro Becomes Standalone",
-    "summary_es": "Este video analiza el impacto de que las herramientas de RC-Astro, como NoiseXterminator y StarXterminator, se conviertan en aplicaciones independientes. Explora cómo este cambio podría alterar el flujo de trabajo de procesamiento de astrofotografía y la relevancia futura de PixInsight. La discusión se centra en las implicaciones para los usuarios de PixInsight y el ecosistema de software de astrofotografía.",
-    "summary_en": "This video discusses the implications of RC-Astro tools, such as NoiseXterminator and StarXterminator, becoming standalone applications. It explores how this shift might alter astrophotography processing workflows and the future relevance of PixInsight. The discussion centers on the impact for PixInsight users and the broader astrophotography software ecosystem.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "17:53",
-    "published_relative": "hace 1 mes",
-    "views": 26255,
-    "url": "https://www.youtube.com/watch?v=l1w0yHJmSzM"
-  },
-  {
-    "youtube_id": "44864OBrWN4",
-    "title_es": "Mejora el rendimiento de PixInsight gratis (aunque puede costarte la cordura)",
-    "title_en": "Unlock MORE performance in PixInsight for FREE! (may cost you your sanity)",
-    "summary_es": "Este video explica cómo optimizar el rendimiento de PixInsight ajustando configuraciones del sistema operativo y del software, como la memoria virtual, el uso de múltiples núcleos y la gestión de procesos en segundo plano. Incluye pasos detallados para Windows y macOS, y advierte sobre posibles efectos secundarios como inestabilidad del sistema. Ideal para usuarios que buscan exprimir al máximo su hardware actual.",
-    "summary_en": "This video shows how to boost PixInsight performance by tweaking OS and software settings, such as virtual memory, multi-core usage, and background process management. It provides step-by-step instructions for Windows and macOS, with warnings about potential side effects. Ideal for users wanting to maximize their current hardware.",
-    "level": "AVANZADO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "27:51",
-    "published_relative": "hace 2 meses",
-    "views": 6581,
-    "url": "https://www.youtube.com/watch?v=44864OBrWN4"
-  },
-  {
-    "youtube_id": "w2WXp-6_tU8",
-    "title_es": "Suite gratuita de procesamiento astrofotográfico: Tutorial y comparación con PixInsight",
-    "title_en": "Free Astrophotography Processing Suite: Tutorial and Comparison to PixInsight",
-    "summary_es": "Este video presenta una nueva suite gratuita para el procesamiento astrofotográfico, ofreciendo un tutorial detallado sobre su uso. Además, compara sus capacidades y resultados con las funcionalidades de PixInsight, destacando las ventajas y desventajas de cada plataforma para diferentes flujos de trabajo.",
-    "summary_en": "This video introduces a new free astrophotography processing suite, providing a detailed tutorial on its usage. It also compares its capabilities and results against PixInsight's functionalities, highlighting the pros and cons of each platform for various workflows.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "51:13",
-    "published_relative": "hace 1 año",
-    "views": 55276,
-    "url": "https://www.youtube.com/watch?v=w2WXp-6_tU8"
-  },
-  {
-    "youtube_id": "cJ9oAA_9HCU",
-    "title_es": "Optimizando PixInsight: Carpetas Temporales y Rendimiento en Linux",
-    "title_en": "Optimizing PixInsight: Temporary Folders and Performance on Linux",
-    "summary_es": "Este video detalla cómo mejorar la velocidad de procesamiento de PixInsight mediante la optimización de la configuración de las carpetas temporales. También explora consideraciones de rendimiento específicas y ofrece consejos para ejecutar PixInsight de manera más eficiente en un entorno Linux. El tutorial busca reducir los tiempos de procesamiento para flujos de trabajo de astrofotografía.",
-    "summary_en": "This video explains how to improve PixInsight's processing speed by optimizing the configuration of temporary folders. It also explores specific performance considerations and provides tips for running PixInsight more efficiently in a Linux environment. The tutorial aims to reduce processing times for astrophotography workflows.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "27:13",
-    "published_relative": "hace 6 años",
-    "views": 4468,
-    "url": "https://www.youtube.com/watch?v=cJ9oAA_9HCU"
-  },
-  {
-    "youtube_id": "7Cx86wxooT0",
-    "title_es": "Procesamiento Automatizado de Astrofotografía: ¡El Sueño de un Pereza Hecho Realidad en PixInsight!",
-    "title_en": "Automated Astrophotography Processing: A Lazy Geek's Dream Come True in PixInsight!",
-    "summary_es": "Este video muestra cómo automatizar el procesamiento de astrofotografías utilizando herramientas y scripts dentro de PixInsight. El autor explica paso a paso la configuración de un flujo de trabajo automático que ahorra tiempo y esfuerzo, ideal para astrónomos aficionados que buscan eficiencia. Se demuestran técnicas prácticas para reducir la intervención manual y lograr resultados consistentes.",
-    "summary_en": "This video demonstrates how to automate astrophotography processing using tools and scripts within PixInsight. The author provides a step-by-step guide to setting up an automated workflow that saves time and effort, ideal for amateur astronomers seeking efficiency. Practical techniques are shown to reduce manual intervention and achieve consistent results.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "14:09",
-    "published_relative": "hace 6 años",
-    "views": 14863,
-    "url": "https://www.youtube.com/watch?v=7Cx86wxooT0"
-  },
-  {
-    "youtube_id": "9PQKC5SIhKw",
-    "title_es": "La Nebulosa Trompa de Elefante - Procesamiento de Banda Estrecha en Bicolor con PixInsight",
-    "title_en": "The Elephant Trunk Nebula - Bicolor Narrowband Processing in PixInsight",
-    "summary_es": "Este video tutorial muestra el procesamiento de datos de banda estrecha en bicolor (HOO) de la Nebulosa Trompa de Elefante utilizando PixInsight. Se cubren técnicas como la combinación de canales, el uso de máscaras, y la mejora del color y detalle con herramientas específicas de PixInsight como HistogramTransformation y CurvesTransformation.",
-    "summary_en": "This video tutorial demonstrates bicolor narrowband (HOO) processing of the Elephant Trunk Nebula using PixInsight. Techniques covered include channel combination, masking, and enhancing color and detail with specific PixInsight tools such as HistogramTransformation and CurvesTransformation.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "29:57",
-    "published_relative": "hace 5 años",
-    "views": 10745,
-    "url": "https://www.youtube.com/watch?v=9PQKC5SIhKw"
-  },
-  {
-    "youtube_id": "WSnK4iistAQ",
-    "title_es": "Aceleración por GPU para AMD e Intel en PixInsight (RCAstro BXT/NXT/SXT)",
-    "title_en": "GPU Acceleration for AMD and Intel in PixInsight (RCAstro BXT/NXT/SXT)",
-    "summary_es": "Este video detalla cómo habilitar y utilizar la aceleración por GPU para tarjetas gráficas AMD e Intel dentro de PixInsight. Se enfoca en optimizar el rendimiento del software, probablemente a través de la configuración de procesos o scripts como los de RCAstro BXT/NXT/SXT, para reducir los tiempos de procesamiento en astrofotografía.",
-    "summary_en": "This video details how to enable and utilize GPU acceleration for AMD and Intel graphics cards within PixInsight. It focuses on optimizing the software's performance, likely through configuring processes or scripts like RCAstro BXT/NXT/SXT, to reduce astrophotography processing times.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "8:15",
-    "published_relative": "hace 1 mes",
-    "views": 3598,
-    "url": "https://www.youtube.com/watch?v=WSnK4iistAQ"
   },
   {
     "youtube_id": "ItmrAZyLeek",
@@ -347,21 +230,60 @@
     "author": "Cuiv, The Lazy Geek",
     "length": "17:04",
     "published_relative": "hace 3 años",
-    "views": 27091,
+    "views": 27102,
     "url": "https://www.youtube.com/watch?v=ItmrAZyLeek"
   },
   {
-    "youtube_id": "fLGGOUg7mZw",
-    "title_es": "Técnica de la Paleta Hubble en PixInsight: Aplicación en la Nebulosa Cabeza de Caballo",
-    "title_en": "Hubble Palette Technique in PixInsight: Applying it to the Horsehead Nebula",
-    "summary_es": "Este video tutorial demuestra cómo aplicar la técnica de la Paleta Hubble para el procesado de imágenes de nebulosas en PixInsight. Se explican los pasos y herramientas necesarios para asignar los canales H-alfa, OIII y SII a los colores RGB, utilizando como ejemplo la Nebulosa Cabeza de Caballo. El objetivo es obtener una imagen de banda estrecha con la estética de los telescopios espaciales.",
-    "summary_en": "This tutorial demonstrates how to apply the Hubble Palette technique for processing nebula images in PixInsight. It explains the necessary steps and tools to map H-alpha, OIII, and SII channels to RGB colors, using the Horsehead Nebula as an example. The goal is to achieve a narrow-band image with the aesthetic often seen from space telescopes.",
+    "youtube_id": "Wf4mt7St_4E",
+    "title_es": "Desmitificando los Requisitos de PixInsight y Cómo Evaluar tu PC",
+    "title_en": "Demystifying PixInsight Requirements and Benchmarking Your PC",
+    "summary_es": "Este video explica los requisitos de hardware necesarios para ejecutar PixInsight de manera eficiente, detallando las especificaciones recomendadas para CPU, RAM y almacenamiento. Además, proporciona una guía sobre cómo evaluar el rendimiento de tu PC actual o futuro para asegurarte de que cumpla con las demandas del software.",
+    "summary_en": "This video demystifies the hardware requirements essential for running PixInsight efficiently, outlining recommended specifications for CPU, RAM, and storage. It also guides viewers on how to benchmark their current or prospective PC to ensure it meets the software's demands.",
+    "level": "PRINCIPIANTE",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "31:11",
+    "published_relative": "hace 1 año",
+    "views": 15810,
+    "url": "https://www.youtube.com/watch?v=Wf4mt7St_4E"
+  },
+  {
+    "youtube_id": "w2WXp-6_tU8",
+    "title_es": "Suite gratuita de procesamiento astrofotográfico: Tutorial y comparación con PixInsight",
+    "title_en": "Free Astrophotography Processing Suite: Tutorial and Comparison to PixInsight",
+    "summary_es": "Este video presenta una nueva suite gratuita para el procesamiento astrofotográfico, ofreciendo un tutorial detallado sobre su uso. Además, compara sus capacidades y resultados con las funcionalidades de PixInsight, destacando las ventajas y desventajas de cada plataforma para diferentes flujos de trabajo.",
+    "summary_en": "This video introduces a new free astrophotography processing suite, providing a detailed tutorial on its usage. It also compares its capabilities and results against PixInsight's functionalities, highlighting the pros and cons of each platform for various workflows.",
     "level": "MEDIO",
     "author": "Cuiv, The Lazy Geek",
-    "length": "17:39",
-    "published_relative": "hace 3 años",
-    "views": 13942,
-    "url": "https://www.youtube.com/watch?v=fLGGOUg7mZw"
+    "length": "51:13",
+    "published_relative": "hace 1 año",
+    "views": 55287,
+    "url": "https://www.youtube.com/watch?v=w2WXp-6_tU8"
+  },
+  {
+    "youtube_id": "aMR70ULTyHY",
+    "title_es": "Guía completa y sencilla de banda estrecha OSC con PixInsight, presentando la Nebulosa Trompa de Elefante",
+    "title_en": "Easy OSC Narrowband Full Guide with PixInsight, featuring the Elephant Trunk Nebula",
+    "summary_es": "Este tutorial ofrece una guía completa y accesible para el procesamiento de imágenes de banda estrecha obtenidas con cámaras OSC (One-Shot Color) utilizando PixInsight. El vídeo detalla un flujo de trabajo para extraer, procesar y combinar los datos de banda estrecha, permitiendo crear una imagen final de la Nebulosa Trompa de Elefante con colores vibrantes y detalles mejorados. Se enfoca en las herramientas y técnicas clave dentro de PixInsight para manejar este tipo de datos especializados.",
+    "summary_en": "This tutorial provides a comprehensive and accessible guide for processing narrowband images captured with One-Shot Color (OSC) cameras using PixInsight. The video details a workflow to extract, process, and combine narrowband data, enabling the creation of a final image of the Elephant Trunk Nebula with vibrant colors and enhanced details. It focuses on the key tools and techniques within PixInsight for handling this specialized type of data.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "30:26",
+    "published_relative": "hace 4 años",
+    "views": 28933,
+    "url": "https://www.youtube.com/watch?v=aMR70ULTyHY"
+  },
+  {
+    "youtube_id": "WSnK4iistAQ",
+    "title_es": "Aceleración por GPU para AMD e Intel en PixInsight (RCAstro BXT/NXT/SXT)",
+    "title_en": "GPU Acceleration for AMD and Intel in PixInsight (RCAstro BXT/NXT/SXT)",
+    "summary_es": "Este video detalla cómo habilitar y utilizar la aceleración por GPU para tarjetas gráficas AMD e Intel dentro de PixInsight. Se enfoca en optimizar el rendimiento del software, probablemente a través de la configuración de procesos o scripts como los de RCAstro BXT/NXT/SXT, para reducir los tiempos de procesamiento en astrofotografía.",
+    "summary_en": "This video details how to enable and utilize GPU acceleration for AMD and Intel graphics cards within PixInsight. It focuses on optimizing the software's performance, likely through configuring processes or scripts like RCAstro BXT/NXT/SXT, to reduce astrophotography processing times.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "8:15",
+    "published_relative": "hace 1 mes",
+    "views": 3603,
+    "url": "https://www.youtube.com/watch?v=WSnK4iistAQ"
   },
   {
     "youtube_id": "2SMIuCM9j8k",
@@ -373,8 +295,86 @@
     "author": "Cuiv, The Lazy Geek",
     "length": "35:45",
     "published_relative": "hace 1 año",
-    "views": 52597,
+    "views": 52651,
     "url": "https://www.youtube.com/watch?v=2SMIuCM9j8k"
+  },
+  {
+    "youtube_id": "cJ9oAA_9HCU",
+    "title_es": "Optimizando PixInsight: Carpetas Temporales y Rendimiento en Linux",
+    "title_en": "Optimizing PixInsight: Temporary Folders and Performance on Linux",
+    "summary_es": "Este video detalla cómo mejorar la velocidad de procesamiento de PixInsight mediante la optimización de la configuración de las carpetas temporales. También explora consideraciones de rendimiento específicas y ofrece consejos para ejecutar PixInsight de manera más eficiente en un entorno Linux. El tutorial busca reducir los tiempos de procesamiento para flujos de trabajo de astrofotografía.",
+    "summary_en": "This video explains how to improve PixInsight's processing speed by optimizing the configuration of temporary folders. It also explores specific performance considerations and provides tips for running PixInsight more efficiently in a Linux environment. The tutorial aims to reduce processing times for astrophotography workflows.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "27:13",
+    "published_relative": "hace 6 años",
+    "views": 4470,
+    "url": "https://www.youtube.com/watch?v=cJ9oAA_9HCU"
+  },
+  {
+    "youtube_id": "44864OBrWN4",
+    "title_es": "Mejora el rendimiento de PixInsight gratis (aunque puede costarte la cordura)",
+    "title_en": "Unlock MORE performance in PixInsight for FREE! (may cost you your sanity)",
+    "summary_es": "Este video explica cómo optimizar el rendimiento de PixInsight ajustando configuraciones del sistema operativo y del software, como la memoria virtual, el uso de múltiples núcleos y la gestión de procesos en segundo plano. Incluye pasos detallados para Windows y macOS, y advierte sobre posibles efectos secundarios como inestabilidad del sistema. Ideal para usuarios que buscan exprimir al máximo su hardware actual.",
+    "summary_en": "This video shows how to boost PixInsight performance by tweaking OS and software settings, such as virtual memory, multi-core usage, and background process management. It provides step-by-step instructions for Windows and macOS, with warnings about potential side effects. Ideal for users wanting to maximize their current hardware.",
+    "level": "AVANZADO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "27:51",
+    "published_relative": "hace 2 meses",
+    "views": 6583,
+    "url": "https://www.youtube.com/watch?v=44864OBrWN4"
+  },
+  {
+    "youtube_id": "7Cx86wxooT0",
+    "title_es": "Procesamiento Automatizado de Astrofotografía: ¡El Sueño de un Pereza Hecho Realidad en PixInsight!",
+    "title_en": "Automated Astrophotography Processing: A Lazy Geek's Dream Come True in PixInsight!",
+    "summary_es": "Este video muestra cómo automatizar el procesamiento de astrofotografías utilizando herramientas y scripts dentro de PixInsight. El autor explica paso a paso la configuración de un flujo de trabajo automático que ahorra tiempo y esfuerzo, ideal para astrónomos aficionados que buscan eficiencia. Se demuestran técnicas prácticas para reducir la intervención manual y lograr resultados consistentes.",
+    "summary_en": "This video demonstrates how to automate astrophotography processing using tools and scripts within PixInsight. The author provides a step-by-step guide to setting up an automated workflow that saves time and effort, ideal for amateur astronomers seeking efficiency. Practical techniques are shown to reduce manual intervention and achieve consistent results.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "14:09",
+    "published_relative": "hace 6 años",
+    "views": 14864,
+    "url": "https://www.youtube.com/watch?v=7Cx86wxooT0"
+  },
+  {
+    "youtube_id": "aRdrwrzNfbQ",
+    "title_es": "Cómo fusionar imágenes muy diferentes del mismo objetivo",
+    "title_en": "How to Merge Wildly Different Images of the Same Target",
+    "summary_es": "Este tutorial explica el proceso de fusionar imágenes de astrofotografía que presentan diferencias significativas, como tiempos de exposición o datos capturados con distintos filtros. Cubre técnicas dentro de PixInsight para combinar estos conjuntos de datos distintos de manera fluida, mejorando el detalle y el rango dinámico para una imagen final unificada. Los métodos discutidos son aplicables a varios escenarios más allá de los ejemplos específicos mostrados.",
+    "summary_en": "This tutorial explains the process of merging astrophotography images that have significant differences, such as varying exposure times or data captured with different filters. It covers techniques within PixInsight to seamlessly combine these distinct datasets, enhancing detail and dynamic range for a unified final image. The methods discussed are applicable for various scenarios beyond the specific examples shown.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "28:02",
+    "published_relative": "hace 1 año",
+    "views": 16692,
+    "url": "https://www.youtube.com/watch?v=aRdrwrzNfbQ"
+  },
+  {
+    "youtube_id": "l1w0yHJmSzM",
+    "title_es": "¿El fin de PixInsight? El procesamiento astronómico cambia para siempre con RC-Astro como aplicación independiente",
+    "title_en": "The Future of PixInsight: RC-Astro Becomes Standalone",
+    "summary_es": "Este video analiza el impacto de que las herramientas de RC-Astro, como NoiseXterminator y StarXterminator, se conviertan en aplicaciones independientes. Explora cómo este cambio podría alterar el flujo de trabajo de procesamiento de astrofotografía y la relevancia futura de PixInsight. La discusión se centra en las implicaciones para los usuarios de PixInsight y el ecosistema de software de astrofotografía.",
+    "summary_en": "This video discusses the implications of RC-Astro tools, such as NoiseXterminator and StarXterminator, becoming standalone applications. It explores how this shift might alter astrophotography processing workflows and the future relevance of PixInsight. The discussion centers on the impact for PixInsight users and the broader astrophotography software ecosystem.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "17:53",
+    "published_relative": "hace 1 mes",
+    "views": 26442,
+    "url": "https://www.youtube.com/watch?v=l1w0yHJmSzM"
+  },
+  {
+    "youtube_id": "qcwtTDGsp94",
+    "title_es": "Hagamos destacar la Galaxia del Girasol en PixInsight: La Etapa Lineal",
+    "title_en": "Making the Sunflower Galaxy Pop in PixInsight: The Linear Stage",
+    "summary_es": "Este tutorial se enfoca en las etapas iniciales de procesamiento de astrofotografía en PixInsight, específicamente en la fase lineal. Cubre las técnicas y herramientas necesarias para calibrar, registrar, integrar y realizar ajustes preliminares a los datos, sentando las bases para obtener una imagen de alta calidad de la Galaxia del Girasol antes de la extensión. El objetivo es maximizar la señal y minimizar el ruido en el estado lineal.",
+    "summary_en": "This tutorial focuses on the initial stages of astrophotography processing in PixInsight, specifically the linear phase. It covers the techniques and tools required for calibrating, registering, integrating, and performing preliminary adjustments to the data, laying the groundwork for a high-quality image of the Sunflower Galaxy before stretching. The goal is to maximize signal and minimize noise while the image is in its linear state.",
+    "level": "MEDIO",
+    "author": "Cuiv, The Lazy Geek",
+    "length": "23:06",
+    "published_relative": "hace 6 años",
+    "views": 7112,
+    "url": "https://www.youtube.com/watch?v=qcwtTDGsp94"
   },
   {
     "youtube_id": "vYcssQitw4U",
@@ -390,43 +390,17 @@
     "url": "https://www.youtube.com/watch?v=vYcssQitw4U"
   },
   {
-    "youtube_id": "OfHY-S7_KII",
-    "title_es": "Preprocesado y Selección de Subexposiciones de la Galaxia de la Aguja en PixInsight",
-    "title_en": "PixInsight Pre-processing and Subframe Selection for the Needle Galaxy",
-    "summary_es": "Este tutorial demuestra el flujo de trabajo de preprocesado en PixInsight, centrándose en la calibración, registro e integración de un gran conjunto de más de 1500 subexposiciones de la Galaxia de la Aguja. Cubre técnicas para inspeccionar y seleccionar las subexposiciones óptimas y mejorar la calidad de la imagen apilada final. Este proceso es fundamental para lograr una alta relación señal/ruido y resultados astrofotográficos detallados.",
-    "summary_en": "This tutorial demonstrates the pre-processing workflow in PixInsight, focusing on the calibration, registration, and integration of a large dataset of over 1500 subframes of the Needle Galaxy. It covers techniques for inspecting and selecting optimal subframes to enhance the quality of the final stacked image. This process is fundamental for achieving high signal-to-noise and detailed astrophotography results.",
+    "youtube_id": "0wB5PS3pGxA",
+    "title_es": "¿Por qué NO tomo tomas oscuras (Dark Frames) y qué hago en su lugar en astrofotografía?",
+    "title_en": "Why I Don't Take Dark Frames (and What I Do Instead) in Astrophotography",
+    "summary_es": "Este video explora las razones por las cuales algunos astrofotógrafos deciden no capturar las tomas oscuras (dark frames) tradicionales. Detalla estrategias de calibración alternativas, como el uso de darks optimizados a partir de un master bias o una combinación de dithering y técnicas avanzadas de reducción de ruido en el software de procesamiento. El tutorial explica cómo estos métodos pueden mitigar eficazmente el ruido térmico y el amp glow sin la necesidad de dark frames dedicados.",
+    "summary_en": "This video explores the reasons why some astrophotographers choose not to capture traditional dark frames. It delves into alternative calibration strategies, such as the use of optimized darks from a master bias or a combination of dithering and advanced noise reduction techniques within processing software. The tutorial explains how these methods can effectively mitigate thermal noise and amp glow without the need for dedicated dark frames.",
     "level": "MEDIO",
     "author": "Cuiv, The Lazy Geek",
-    "length": "26:08",
-    "published_relative": "hace 6 años",
-    "views": 8425,
-    "url": "https://www.youtube.com/watch?v=OfHY-S7_KII"
-  },
-  {
-    "youtube_id": "Wf4mt7St_4E",
-    "title_es": "Desmitificando los Requisitos de PixInsight y Cómo Evaluar tu PC",
-    "title_en": "Demystifying PixInsight Requirements and Benchmarking Your PC",
-    "summary_es": "Este video explica los requisitos de hardware necesarios para ejecutar PixInsight de manera eficiente, detallando las especificaciones recomendadas para CPU, RAM y almacenamiento. Además, proporciona una guía sobre cómo evaluar el rendimiento de tu PC actual o futuro para asegurarte de que cumpla con las demandas del software.",
-    "summary_en": "This video demystifies the hardware requirements essential for running PixInsight efficiently, outlining recommended specifications for CPU, RAM, and storage. It also guides viewers on how to benchmark their current or prospective PC to ensure it meets the software's demands.",
-    "level": "PRINCIPIANTE",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "31:11",
-    "published_relative": "hace 1 año",
-    "views": 15809,
-    "url": "https://www.youtube.com/watch?v=Wf4mt7St_4E"
-  },
-  {
-    "youtube_id": "qudzeaFXC84",
-    "title_es": "Acelerar Starnet y Otras Herramientas de IA en PixInsight",
-    "title_en": "Speed Up Starnet and Other AI Tools in PixInsight",
-    "summary_es": "Este tutorial demuestra cómo optimizar el rendimiento de herramientas basadas en inteligencia artificial como Starnet en PixInsight. Cubre técnicas y configuraciones para reducir significativamente los tiempos de procesamiento de estas tareas computacionalmente intensivas, mejorando la eficiencia en los flujos de trabajo de astrofotografía.",
-    "summary_en": "This tutorial demonstrates how to optimize the performance of AI-based tools like Starnet in PixInsight. It covers techniques and settings to significantly reduce processing times for these computationally intensive tasks, improving efficiency in astrophotography workflows.",
-    "level": "MEDIO",
-    "author": "Cuiv, The Lazy Geek",
-    "length": "11:51",
-    "published_relative": "hace 3 años",
-    "views": 11466,
-    "url": "https://www.youtube.com/watch?v=qudzeaFXC84"
+    "length": "15:12",
+    "published_relative": "hace 2 años",
+    "views": 53921,
+    "url": "https://www.youtube.com/watch?v=0wB5PS3pGxA"
   },
   {
     "youtube_id": "t_hU3cHkKHI",
@@ -438,7 +412,7 @@
     "author": "The Space Koala",
     "length": "20:09",
     "published_relative": "hace 10 meses",
-    "views": 12446,
+    "views": 12483,
     "url": "https://www.youtube.com/watch?v=t_hU3cHkKHI"
   },
   {
@@ -451,21 +425,21 @@
     "author": "The Space Koala",
     "length": "35:43",
     "published_relative": "hace 1 año",
-    "views": 7432,
+    "views": 7435,
     "url": "https://www.youtube.com/watch?v=QdbwxvTMfA8"
   },
   {
-    "youtube_id": "SpURP_TY7go",
-    "title_es": "Tutorial completo de procesamiento HOO en PixInsight: La Nebulosa del Calamar Gigante (Mono)",
-    "title_en": "The Giant Squid - Full HOO Processing Tutorial In PixInsight (Mono)",
-    "summary_es": "Este tutorial cubre el procesamiento completo de una imagen en HOO (Hidrógeno-Oxígeno) de la Nebulosa del Calamar Gigante utilizando PixInsight. Incluye desde la calibración y alineación de los canales hasta la combinación y ajustes de color, aplicando técnicas como la combinación de canales, corrección de fondo, y realce de detalles. Está dirigido a usuarios con experiencia previa en el programa que buscan optimizar el flujo de trabajo en imágenes de banda estrecha.",
-    "summary_en": "This tutorial covers the full HOO (Hydrogen-Oxygen) processing of the Giant Squid Nebula using PixInsight. It includes channel calibration, alignment, combination, background correction, and detail enhancement techniques. Aimed at users with previous PixInsight experience seeking to optimize narrowband workflows.",
+    "youtube_id": "otVKIreU2i8",
+    "title_es": "Los secretos detrás de mi imagen de la Nebulosa Jirafa - Flujo de trabajo completo en PixInsight",
+    "title_en": "The secrets behind my Giraffe Nebula picture - PixInsight End to End Workflow",
+    "summary_es": "Este video presenta un flujo de trabajo completo de PixInsight para procesar la Nebulosa Jirafa, desde la calibración y apilado hasta la combinación de canales y realce de detalles. Se explican técnicas avanzadas como el uso de máscaras de estrellas y la aplicación de procesos de reducción de ruido y contraste.",
+    "summary_en": "This video demonstrates a complete PixInsight workflow for processing the Giraffe Nebula, from calibration and stacking to channel combination and detail enhancement. Advanced techniques such as star masks and noise reduction/contrast stretching are explained.",
     "level": "MEDIO",
     "author": "The Space Koala",
-    "length": "28:58",
-    "published_relative": "hace 5 meses",
-    "views": 4629,
-    "url": "https://www.youtube.com/watch?v=SpURP_TY7go"
+    "length": "37:06",
+    "published_relative": "hace 1 año",
+    "views": 8191,
+    "url": "https://www.youtube.com/watch?v=otVKIreU2i8"
   },
   {
     "youtube_id": "gO0Y4jmwZ38",
@@ -481,30 +455,17 @@
     "url": "https://www.youtube.com/watch?v=gO0Y4jmwZ38"
   },
   {
-    "youtube_id": "otVKIreU2i8",
-    "title_es": "Los secretos detrás de mi imagen de la Nebulosa Jirafa - Flujo de trabajo completo en PixInsight",
-    "title_en": "The secrets behind my Giraffe Nebula picture - PixInsight End to End Workflow",
-    "summary_es": "Este video presenta un flujo de trabajo completo de PixInsight para procesar la Nebulosa Jirafa, desde la calibración y apilado hasta la combinación de canales y realce de detalles. Se explican técnicas avanzadas como el uso de máscaras de estrellas y la aplicación de procesos de reducción de ruido y contraste.",
-    "summary_en": "This video demonstrates a complete PixInsight workflow for processing the Giraffe Nebula, from calibration and stacking to channel combination and detail enhancement. Advanced techniques such as star masks and noise reduction/contrast stretching are explained.",
+    "youtube_id": "SpURP_TY7go",
+    "title_es": "Tutorial completo de procesamiento HOO en PixInsight: La Nebulosa del Calamar Gigante (Mono)",
+    "title_en": "The Giant Squid - Full HOO Processing Tutorial In PixInsight (Mono)",
+    "summary_es": "Este tutorial cubre el procesamiento completo de una imagen en HOO (Hidrógeno-Oxígeno) de la Nebulosa del Calamar Gigante utilizando PixInsight. Incluye desde la calibración y alineación de los canales hasta la combinación y ajustes de color, aplicando técnicas como la combinación de canales, corrección de fondo, y realce de detalles. Está dirigido a usuarios con experiencia previa en el programa que buscan optimizar el flujo de trabajo en imágenes de banda estrecha.",
+    "summary_en": "This tutorial covers the full HOO (Hydrogen-Oxygen) processing of the Giant Squid Nebula using PixInsight. It includes channel calibration, alignment, combination, background correction, and detail enhancement techniques. Aimed at users with previous PixInsight experience seeking to optimize narrowband workflows.",
     "level": "MEDIO",
     "author": "The Space Koala",
-    "length": "37:06",
-    "published_relative": "hace 1 año",
-    "views": 8184,
-    "url": "https://www.youtube.com/watch?v=otVKIreU2i8"
-  },
-  {
-    "youtube_id": "Xd097a8Zlxg",
-    "title_es": "Recibe notificaciones de WBPP en tu teléfono con este script secreto de PixInsight (¡DESCARGA GRATUITA!)",
-    "title_en": "Get WBPP Notifications on Your Phone with This Secret PixInsight Script (FREE DOWNLOAD!)",
-    "summary_es": "Este video muestra un script personalizado de PixInsight que envía notificaciones al teléfono cuando el proceso Weighted Batch Preprocessing (WBPP) finaliza. El script utiliza una integración con servicios de notificaciones push y se ofrece como descarga gratuita para optimizar el flujo de trabajo del astrofotógrafo.",
-    "summary_en": "This video demonstrates a custom PixInsight script that sends push notifications to your phone when the Weighted Batch Preprocessing (WBPP) process completes. The script integrates with push notification services and is available as a free download to streamline the astrophotographer's workflow.",
-    "level": "MEDIO",
-    "author": "The Space Koala",
-    "length": "19:32",
-    "published_relative": "hace 1 año",
-    "views": 5462,
-    "url": "https://www.youtube.com/watch?v=Xd097a8Zlxg"
+    "length": "28:58",
+    "published_relative": "hace 6 meses",
+    "views": 4643,
+    "url": "https://www.youtube.com/watch?v=SpURP_TY7go"
   },
   {
     "youtube_id": "EQGWr34Fu0c",
@@ -516,21 +477,8 @@
     "author": "The Space Koala",
     "length": "27:30",
     "published_relative": "hace 2 años",
-    "views": 16813,
+    "views": 16832,
     "url": "https://www.youtube.com/watch?v=EQGWr34Fu0c"
-  },
-  {
-    "youtube_id": "98iQ9lyBiz4",
-    "title_es": "Todo sobre las palabras clave de agrupación WBPP en PixInsight",
-    "title_en": "All About PixInsight WBPP Grouping Keywords",
-    "summary_es": "Este video explica cómo usar las palabras clave de agrupación en el proceso Weighted Batch Preprocessing (WBPP) de PixInsight. Cubre la sintaxis y diferentes estrategias para controlar cómo se agrupan los datos durante el preprocesamiento.",
-    "summary_en": "This video explains how to use grouping keywords in PixInsight's Weighted Batch Preprocessing (WBPP) process. It covers the syntax and various strategies to control how data is grouped during preprocessing.",
-    "level": "MEDIO",
-    "author": "The Space Koala",
-    "length": "9:03",
-    "published_relative": "hace 1 año",
-    "views": 3842,
-    "url": "https://www.youtube.com/watch?v=98iQ9lyBiz4"
   },
   {
     "youtube_id": "ReD-7a_inzY",
@@ -542,8 +490,21 @@
     "author": "The Space Koala",
     "length": "22:05",
     "published_relative": "hace 1 año",
-    "views": 7181,
+    "views": 7183,
     "url": "https://www.youtube.com/watch?v=ReD-7a_inzY"
+  },
+  {
+    "youtube_id": "Xd097a8Zlxg",
+    "title_es": "Recibe notificaciones de WBPP en tu teléfono con este script secreto de PixInsight (¡DESCARGA GRATUITA!)",
+    "title_en": "Get WBPP Notifications on Your Phone with This Secret PixInsight Script (FREE DOWNLOAD!)",
+    "summary_es": "Este video muestra un script personalizado de PixInsight que envía notificaciones al teléfono cuando el proceso Weighted Batch Preprocessing (WBPP) finaliza. El script utiliza una integración con servicios de notificaciones push y se ofrece como descarga gratuita para optimizar el flujo de trabajo del astrofotógrafo.",
+    "summary_en": "This video demonstrates a custom PixInsight script that sends push notifications to your phone when the Weighted Batch Preprocessing (WBPP) process completes. The script integrates with push notification services and is available as a free download to streamline the astrophotographer's workflow.",
+    "level": "MEDIO",
+    "author": "The Space Koala",
+    "length": "19:32",
+    "published_relative": "hace 1 año",
+    "views": 5461,
+    "url": "https://www.youtube.com/watch?v=Xd097a8Zlxg"
   },
   {
     "youtube_id": "dNhAjZKHWJ8",
@@ -555,8 +516,21 @@
     "author": "The Space Koala",
     "length": "26:16",
     "published_relative": "hace 1 año",
-    "views": 37873,
+    "views": 37887,
     "url": "https://www.youtube.com/watch?v=dNhAjZKHWJ8"
+  },
+  {
+    "youtube_id": "98iQ9lyBiz4",
+    "title_es": "Todo sobre las palabras clave de agrupación WBPP en PixInsight",
+    "title_en": "All About PixInsight WBPP Grouping Keywords",
+    "summary_es": "Este video explica cómo usar las palabras clave de agrupación en el proceso Weighted Batch Preprocessing (WBPP) de PixInsight. Cubre la sintaxis y diferentes estrategias para controlar cómo se agrupan los datos durante el preprocesamiento.",
+    "summary_en": "This video explains how to use grouping keywords in PixInsight's Weighted Batch Preprocessing (WBPP) process. It covers the syntax and various strategies to control how data is grouped during preprocessing.",
+    "level": "MEDIO",
+    "author": "The Space Koala",
+    "length": "9:03",
+    "published_relative": "hace 1 año",
+    "views": 3846,
+    "url": "https://www.youtube.com/watch?v=98iQ9lyBiz4"
   },
   {
     "youtube_id": "-kkpQcW3y_8",
@@ -568,7 +542,7 @@
     "author": "The Space Koala",
     "length": "32:47",
     "published_relative": "hace 1 año",
-    "views": 6985,
+    "views": 6986,
     "url": "https://www.youtube.com/watch?v=-kkpQcW3y_8"
   },
   {
@@ -581,34 +555,8 @@
     "author": "The Space Koala",
     "length": "58:41",
     "published_relative": "hace 3 meses",
-    "views": 19261,
+    "views": 19296,
     "url": "https://www.youtube.com/watch?v=FdpwudSuP2Q"
-  },
-  {
-    "youtube_id": "ND2rOtdoSrM",
-    "title_es": "Seti Astro Suite Pro (SASPro) | 29/03/2026",
-    "title_en": "Seti Astro Suite Pro (SASPro) | 29/03/2026",
-    "summary_es": "Este video presenta el conjunto de herramientas Seti Astro Suite Pro (SASPro) para PixInsight, mostrando su instalación y uso en el procesamiento de imágenes astrofotográficas. Se explican los módulos principales, como la calibración y la integración, así como flujos de trabajo automatizados para mejorar la eficiencia. Es una guía práctica para integrar SASPro en el procesamiento de imágenes en PixInsight.",
-    "summary_en": "This video presents the Seti Astro Suite Pro (SASPro) toolset for PixInsight, showing its installation and use in astrophotography image processing. It explains the main modules, such as calibration and integration, as well as automated workflows to improve efficiency. It is a practical guide for integrating SASPro into PixInsight image processing.",
-    "level": "MEDIO",
-    "author": "TAIC",
-    "length": "1:15:28",
-    "published_relative": "Emitido hace 4 meses",
-    "views": 2279,
-    "url": "https://www.youtube.com/watch?v=ND2rOtdoSrM"
-  },
-  {
-    "youtube_id": "eFllvJX9vms",
-    "title_es": "Scripts de SetiAstro para PixInsight | 2024-08-11",
-    "title_en": "SetiAstro PixInsight Scripts | 2024-08-11",
-    "summary_es": "Este video presenta los scripts de SetiAstro para PixInsight, mostrando su instalación y uso. Se explican las principales herramientas para el procesamiento de imágenes astronómicas, como la calibración y la mejora de datos. Ideal para astrofotógrafos que buscan optimizar su flujo de trabajo en PixInsight.",
-    "summary_en": "This video introduces SetiAstro's PixInsight scripts, demonstrating installation and usage. It covers key tools for astronomical image processing, such as calibration and data enhancement. Ideal for astrophotographers looking to streamline their PixInsight workflow.",
-    "level": "MEDIO",
-    "author": "TAIC",
-    "length": "1:11:58",
-    "published_relative": "Emitido hace 1 año",
-    "views": 2979,
-    "url": "https://www.youtube.com/watch?v=eFllvJX9vms"
   },
   {
     "youtube_id": "N0hSrE_SKGw",
@@ -633,21 +581,8 @@
     "author": "Patriot Astro",
     "length": "16:10",
     "published_relative": "hace 5 años",
-    "views": 5409,
+    "views": 5412,
     "url": "https://www.youtube.com/watch?v=VOvW2H6j5Pw"
-  },
-  {
-    "youtube_id": "Gcekn0lw2IY",
-    "title_es": "Secuencias Avanzadas Compartidas de Patriot Astro (ACTUALIZADO)",
-    "title_en": "Patriot Astro's Shared Advanced PixInsight Sequences (UPDATED)",
-    "summary_es": "Este video presenta una actualización de las secuencias avanzadas de PixInsight desarrolladas por Patriot Astro, diseñadas para optimizar y estandarizar flujos de trabajo complejos. Explica cómo utilizar y adaptar estos conjuntos de procesos para mejorar la calidad y eficiencia del procesamiento de imágenes astronómicas. Los espectadores aprenderán a integrar estas herramientas en su propio software PixInsight.",
-    "summary_en": "This video provides an update on Patriot Astro's advanced PixInsight sequences, designed to optimize and standardize complex astrophotography workflows. It explains how to use and adapt these process containers to enhance the quality and efficiency of astronomical image processing. Viewers will learn to integrate these powerful tools into their own PixInsight software.",
-    "level": "AVANZADO",
-    "author": "Patriot Astro",
-    "length": "40:06",
-    "published_relative": "hace 4 años",
-    "views": 30878,
-    "url": "https://www.youtube.com/watch?v=Gcekn0lw2IY"
   },
   {
     "youtube_id": "z8cvAkl_xBM",
@@ -659,21 +594,34 @@
     "author": "Patriot Astro",
     "length": "16:41",
     "published_relative": "hace 5 años",
-    "views": 8788,
+    "views": 8789,
     "url": "https://www.youtube.com/watch?v=z8cvAkl_xBM"
   },
   {
-    "youtube_id": "u2Szezk7zBE",
-    "title_es": "Creación de estrellas nítidas y esponjosas en PixInsight y Photoshop",
-    "title_en": "Creating Sharp and Fluffy Stars in PixInsight and Photoshop",
-    "summary_es": "Este tutorial enseña técnicas para mejorar la apariencia de las estrellas en astrofotografía, combinando procesos de PixInsight (como desconvolución y máscaras de estrellas) con ajustes finales en Photoshop. Se enfoca en lograr un equilibrio entre nitidez y suavidad para un resultado natural.",
-    "summary_en": "This tutorial teaches techniques to improve star appearance in astrophotography, combining PixInsight processes (such as deconvolution and star masks) with final adjustments in Photoshop. It focuses on achieving a balance between sharpness and softness for a natural result.",
+    "youtube_id": "wbMBnbyTrb0",
+    "title_es": "Animar tus Imágenes de Asteroides",
+    "title_en": "Animate Your Asteroid Images",
+    "summary_es": "Este tutorial demuestra cómo procesar datos de astrofotografía de asteroides para revelar su movimiento a través del cielo nocturno. Cubre técnicas para la alineación y apilado precisos de imágenes dentro de PixInsight, seguido de métodos para generar una animación que visualice la trayectoria del asteroide contra las estrellas de fondo.",
+    "summary_en": "This tutorial demonstrates how to process astrophotography data of asteroids to reveal their motion across the night sky. It covers techniques for precise image alignment and stacking within PixInsight, followed by methods to generate an animation that visualizes the asteroid's path against stationary background stars.",
     "level": "MEDIO",
-    "author": "Utah Desert Remote Observatories",
-    "length": "18:33",
-    "published_relative": "hace 3 años",
-    "views": 1251,
-    "url": "https://www.youtube.com/watch?v=u2Szezk7zBE"
+    "author": "Patriot Astro",
+    "length": "11:18",
+    "published_relative": "hace 4 años",
+    "views": 1295,
+    "url": "https://www.youtube.com/watch?v=wbMBnbyTrb0"
+  },
+  {
+    "youtube_id": "Gcekn0lw2IY",
+    "title_es": "Secuencias Avanzadas Compartidas de Patriot Astro (ACTUALIZADO)",
+    "title_en": "Patriot Astro's Shared Advanced PixInsight Sequences (UPDATED)",
+    "summary_es": "Este video presenta una actualización de las secuencias avanzadas de PixInsight desarrolladas por Patriot Astro, diseñadas para optimizar y estandarizar flujos de trabajo complejos. Explica cómo utilizar y adaptar estos conjuntos de procesos para mejorar la calidad y eficiencia del procesamiento de imágenes astronómicas. Los espectadores aprenderán a integrar estas herramientas en su propio software PixInsight.",
+    "summary_en": "This video provides an update on Patriot Astro's advanced PixInsight sequences, designed to optimize and standardize complex astrophotography workflows. It explains how to use and adapt these process containers to enhance the quality and efficiency of astronomical image processing. Viewers will learn to integrate these powerful tools into their own PixInsight software.",
+    "level": "AVANZADO",
+    "author": "Patriot Astro",
+    "length": "40:06",
+    "published_relative": "hace 4 años",
+    "views": 30886,
+    "url": "https://www.youtube.com/watch?v=Gcekn0lw2IY"
   },
   {
     "youtube_id": "oUD_BoYyOUM",
@@ -684,8 +632,8 @@
     "level": "MEDIO",
     "author": "Utah Desert Remote Observatories",
     "length": "37:39",
-    "published_relative": "hace 9 meses",
-    "views": 4156,
+    "published_relative": "hace 10 meses",
+    "views": 4157,
     "url": "https://www.youtube.com/watch?v=oUD_BoYyOUM"
   },
   {
@@ -698,7 +646,7 @@
     "author": "Utah Desert Remote Observatories",
     "length": "1:07:11",
     "published_relative": "hace 8 meses",
-    "views": 1070,
+    "views": 1072,
     "url": "https://www.youtube.com/watch?v=M3wG45PUqCo"
   },
   {
@@ -711,21 +659,8 @@
     "author": "Utah Desert Remote Observatories",
     "length": "28:26",
     "published_relative": "hace 11 meses",
-    "views": 821,
+    "views": 822,
     "url": "https://www.youtube.com/watch?v=Ci99YzQ0RdE"
-  },
-  {
-    "youtube_id": "bT_dSfx0MFw",
-    "title_es": "Procesamiento SHO de doble banda en PixInsight: La Nebulosa del Velo",
-    "title_en": "Dual Narrowband SHO Processing in PixInsight: The Veil Nebula",
-    "summary_es": "Este video tutorial se centra en el procesamiento de datos de doble banda estrecha (SHO) utilizando PixInsight, específicamente aplicado a la Nebulosa del Velo. Se explican técnicas avanzadas de combinación de canales, calibración de color y mejora de detalles con herramientas como PixelMath y CurvesTransformation. El autor demuestra un flujo de trabajo completo para obtener una imagen final con una paleta Hubble mejorada, ajustando cada paso para maximizar la señal y minimizar el ruido.",
-    "summary_en": "This video tutorial focuses on processing dual narrowband (SHO) data using PixInsight, specifically applied to the Veil Nebula. It explains advanced channel combination techniques, color calibration, and detail enhancement using tools like PixelMath and CurvesTransformation. The author demonstrates a full workflow to achieve a final image with an enhanced Hubble palette, adjusting each step to maximize signal and minimize noise.",
-    "level": "AVANZADO",
-    "author": "Utah Desert Remote Observatories",
-    "length": "18:27",
-    "published_relative": "hace 2 semanas",
-    "views": 322,
-    "url": "https://www.youtube.com/watch?v=bT_dSfx0MFw"
   },
   {
     "youtube_id": "cB7T7KsVpQ4",
@@ -754,17 +689,17 @@
     "url": "https://www.youtube.com/watch?v=2J70fQJihzE"
   },
   {
-    "youtube_id": "fAylZBAyOiU",
-    "title_es": "Procesando la Nebulosa Cabeza de Caballo Azul en PixInsight y Photoshop",
-    "title_en": "Processing the Blue Horse Head Nebula in PixInsight and Photoshop",
-    "summary_es": "Este tutorial detalla un flujo de trabajo combinado para procesar la Nebulosa Cabeza de Caballo Azul. Explica cómo utilizar PixInsight para las etapas cruciales de pre-procesado, calibración, apilado y estirado inicial de los datos. Posteriormente, se muestra cómo refinar y finalizar la imagen empleando herramientas y técnicas avanzadas en Photoshop para mejorar detalles y color.",
-    "summary_en": "This tutorial details a combined workflow for processing the Blue Horse Head Nebula. It explains how to use PixInsight for the crucial stages of pre-processing, calibration, stacking, and initial stretching of the data. Subsequently, it demonstrates how to refine and finalize the image using advanced tools and techniques in Photoshop to enhance details and color.",
-    "level": "MEDIO",
+    "youtube_id": "bT_dSfx0MFw",
+    "title_es": "Procesamiento SHO de doble banda en PixInsight: La Nebulosa del Velo",
+    "title_en": "Dual Narrowband SHO Processing in PixInsight: The Veil Nebula",
+    "summary_es": "Este video tutorial se centra en el procesamiento de datos de doble banda estrecha (SHO) utilizando PixInsight, específicamente aplicado a la Nebulosa del Velo. Se explican técnicas avanzadas de combinación de canales, calibración de color y mejora de detalles con herramientas como PixelMath y CurvesTransformation. El autor demuestra un flujo de trabajo completo para obtener una imagen final con una paleta Hubble mejorada, ajustando cada paso para maximizar la señal y minimizar el ruido.",
+    "summary_en": "This video tutorial focuses on processing dual narrowband (SHO) data using PixInsight, specifically applied to the Veil Nebula. It explains advanced channel combination techniques, color calibration, and detail enhancement using tools like PixelMath and CurvesTransformation. The author demonstrates a full workflow to achieve a final image with an enhanced Hubble palette, adjusting each step to maximize signal and minimize noise.",
+    "level": "AVANZADO",
     "author": "Utah Desert Remote Observatories",
-    "length": "39:07",
-    "published_relative": "hace 4 años",
-    "views": 1319,
-    "url": "https://www.youtube.com/watch?v=fAylZBAyOiU"
+    "length": "18:27",
+    "published_relative": "hace 3 semanas",
+    "views": 322,
+    "url": "https://www.youtube.com/watch?v=bT_dSfx0MFw"
   },
   {
     "youtube_id": "CzEG3DYo-Hw",
@@ -793,6 +728,32 @@
     "url": "https://www.youtube.com/watch?v=tUyFbiqrGLI"
   },
   {
+    "youtube_id": "th93qf1VdTI",
+    "title_es": "De Meh a MARAVILLOSO: Procesando Banda Estrecha OSC a la Paleta SHO - Tutorial de PixInsight",
+    "title_en": "From Meh to MARVELOUS: Processing OSC Narrowband to the SHO Palette - PixInsight Tutorial",
+    "summary_es": "En este tutorial de PixInsight, aprenderás a procesar imágenes de banda estrecha capturadas con una cámara OSC (One Shot Color) y convertirlas a la paleta SHO. El video cubre técnicas como la desmezcla de canales, uso de herramientas de combinación y ajustes de color para obtener resultados impactantes.",
+    "summary_en": "This PixInsight tutorial teaches you how to process narrowband images captured with an OSC (One Shot Color) camera and map them to the SHO palette. The video covers channel extraction, combination tools, and color adjustments to achieve stunning results.",
+    "level": "MEDIO",
+    "author": "Lukomatico",
+    "length": "20:05",
+    "published_relative": "hace 8 meses",
+    "views": 22290,
+    "url": "https://www.youtube.com/watch?v=th93qf1VdTI"
+  },
+  {
+    "youtube_id": "5AhCN530NpM",
+    "title_es": "Tutorial de procesamiento mono en PixInsight - Muro del Cisne - Flujo de trabajo 2025",
+    "title_en": "Cygnus Wall - Mono PixInsight Processing Tutorial - 2025 Workflow",
+    "summary_es": "Este tutorial guía paso a paso el procesamiento de una imagen monocromática del Muro del Cisne usando PixInsight, cubriendo un flujo de trabajo actualizado para 2025. Incluye calibración, alineación, stacking, y técnicas de estiramiento y realce de detalles.",
+    "summary_en": "This tutorial provides a step-by-step guide to processing a monochrome image of the Cygnus Wall in PixInsight, covering an updated workflow for 2025. It includes calibration, alignment, stacking, and techniques for stretching and enhancing details.",
+    "level": "MEDIO",
+    "author": "Lukomatico",
+    "length": "30:15",
+    "published_relative": "hace 1 año",
+    "views": 8793,
+    "url": "https://www.youtube.com/watch?v=5AhCN530NpM"
+  },
+  {
     "youtube_id": "sBB1lVOkMpo",
     "title_es": "Tutorial de PixInsight: Flujo de trabajo para M33 con cámara OSC - Desafío TriangulumTroubles",
     "title_en": "PixInsight Tutorial Workflow - M33 OSC - TriangulumTroubles Challenge",
@@ -806,17 +767,17 @@
     "url": "https://www.youtube.com/watch?v=sBB1lVOkMpo"
   },
   {
-    "youtube_id": "th93qf1VdTI",
-    "title_es": "De Meh a MARAVILLOSO: Procesando Banda Estrecha OSC a la Paleta SHO - Tutorial de PixInsight",
-    "title_en": "From Meh to MARVELOUS: Processing OSC Narrowband to the SHO Palette - PixInsight Tutorial",
-    "summary_es": "En este tutorial de PixInsight, aprenderás a procesar imágenes de banda estrecha capturadas con una cámara OSC (One Shot Color) y convertirlas a la paleta SHO. El video cubre técnicas como la desmezcla de canales, uso de herramientas de combinación y ajustes de color para obtener resultados impactantes.",
-    "summary_en": "This PixInsight tutorial teaches you how to process narrowband images captured with an OSC (One Shot Color) camera and map them to the SHO palette. The video covers channel extraction, combination tools, and color adjustments to achieve stunning results.",
+    "youtube_id": "M7NxEUbqaXY",
+    "title_es": "Tutorial OSC en PixInsight - Flujo de trabajo 2025, resultados fáciles, ¡datos gratuitos! + Desafío de procesamiento",
+    "title_en": "PixInsight OSC Tutorial - 2025 Workflow, Easy Results, Free Data! + Processing Challenge",
+    "summary_es": "Este video presenta un flujo de trabajo actualizado para 2025 en PixInsight, específicamente para datos OSC (one-shot color). Incluye pasos clave como calibración, apilado y procesamiento, utilizando datos gratuitos. Además, lanza un desafío de procesamiento para que los espectadores practiquen.",
+    "summary_en": "This video presents an updated 2025 workflow in PixInsight for OSC (one-shot color) data, covering key steps like calibration, stacking, and processing using free data. It also introduces a processing challenge for viewers to practice their skills.",
     "level": "MEDIO",
     "author": "Lukomatico",
-    "length": "20:05",
-    "published_relative": "hace 8 meses",
-    "views": 22222,
-    "url": "https://www.youtube.com/watch?v=th93qf1VdTI"
+    "length": "21:01",
+    "published_relative": "hace 1 año",
+    "views": 16968,
+    "url": "https://www.youtube.com/watch?v=M7NxEUbqaXY"
   },
   {
     "youtube_id": "UKd0pUBSZ6o",
@@ -828,7 +789,7 @@
     "author": "Lukomatico",
     "length": "34:29",
     "published_relative": "hace 3 años",
-    "views": 60110,
+    "views": 60118,
     "url": "https://www.youtube.com/watch?v=UKd0pUBSZ6o"
   },
   {
@@ -841,60 +802,8 @@
     "author": "Lukomatico",
     "length": "30:17",
     "published_relative": "hace 1 año",
-    "views": 18839,
+    "views": 18858,
     "url": "https://www.youtube.com/watch?v=B8UXjefiuQM"
-  },
-  {
-    "youtube_id": "5AhCN530NpM",
-    "title_es": "Tutorial de procesamiento mono en PixInsight - Muro del Cisne - Flujo de trabajo 2025",
-    "title_en": "Cygnus Wall - Mono PixInsight Processing Tutorial - 2025 Workflow",
-    "summary_es": "Este tutorial guía paso a paso el procesamiento de una imagen monocromática del Muro del Cisne usando PixInsight, cubriendo un flujo de trabajo actualizado para 2025. Incluye calibración, alineación, stacking, y técnicas de estiramiento y realce de detalles.",
-    "summary_en": "This tutorial provides a step-by-step guide to processing a monochrome image of the Cygnus Wall in PixInsight, covering an updated workflow for 2025. It includes calibration, alignment, stacking, and techniques for stretching and enhancing details.",
-    "level": "MEDIO",
-    "author": "Lukomatico",
-    "length": "30:15",
-    "published_relative": "hace 1 año",
-    "views": 8786,
-    "url": "https://www.youtube.com/watch?v=5AhCN530NpM"
-  },
-  {
-    "youtube_id": "q8vIcPc1Jgk",
-    "title_es": "Tutorial de procesamiento de galaxias OSC en PixInsight - Datos gratuitos y flujo de trabajo",
-    "title_en": "OSC Galaxy Processing Tutorial in PixInsight - Free Data & Workflow",
-    "summary_es": "Este tutorial cubre el procesamiento de galaxias con datos OSC (cámara a color de un solo disparo) en PixInsight. Incluye un flujo de trabajo completo desde calibración hasta mejora de detalles, y proporciona datos gratuitos para seguir el tutorial.",
-    "summary_en": "This tutorial covers OSC (one-shot color) galaxy processing in PixInsight. It includes a full workflow from calibration to detail enhancement, and provides free data to follow along.",
-    "level": "MEDIO",
-    "author": "Lukomatico",
-    "length": "28:33",
-    "published_relative": "hace 2 años",
-    "views": 28747,
-    "url": "https://www.youtube.com/watch?v=q8vIcPc1Jgk"
-  },
-  {
-    "youtube_id": "M7NxEUbqaXY",
-    "title_es": "Tutorial OSC en PixInsight - Flujo de trabajo 2025, resultados fáciles, ¡datos gratuitos! + Desafío de procesamiento",
-    "title_en": "PixInsight OSC Tutorial - 2025 Workflow, Easy Results, Free Data! + Processing Challenge",
-    "summary_es": "Este video presenta un flujo de trabajo actualizado para 2025 en PixInsight, específicamente para datos OSC (one-shot color). Incluye pasos clave como calibración, apilado y procesamiento, utilizando datos gratuitos. Además, lanza un desafío de procesamiento para que los espectadores practiquen.",
-    "summary_en": "This video presents an updated 2025 workflow in PixInsight for OSC (one-shot color) data, covering key steps like calibration, stacking, and processing using free data. It also introduces a processing challenge for viewers to practice their skills.",
-    "level": "MEDIO",
-    "author": "Lukomatico",
-    "length": "21:01",
-    "published_relative": "hace 1 año",
-    "views": 16952,
-    "url": "https://www.youtube.com/watch?v=M7NxEUbqaXY"
-  },
-  {
-    "youtube_id": "p_N4J-lPTOM",
-    "title_es": "Guía de la Paleta Hubble para OSC - Tutorial fácil de PixInsight",
-    "title_en": "OSC Hubble Palette Guide - Easy PixInsight Tutorial",
-    "summary_es": "Este video tutorial enseña cómo crear la paleta Hubble (SHO) con datos de cámara OSC (una sola exposición color) en PixInsight. Explica el uso de herramientas como ChannelCombination, PixelMath y ajustes de color para mapear los canales en tonos característicos. Adecuado para astrofotógrafos de nivel principiante o intermedio que quieran ampliar sus técnicas de procesamiento.",
-    "summary_en": "This tutorial guides you through creating the Hubble Palette (SHO) using OSC (one-shot color) data in PixInsight. It covers tools like ChannelCombination, PixelMath, and color adjustments to map channels into characteristic hues. Suitable for beginner to intermediate astrophotographers looking to expand their processing techniques.",
-    "level": "PRINCIPIANTE",
-    "author": "Lukomatico",
-    "length": "35:01",
-    "published_relative": "hace 4 años",
-    "views": 41648,
-    "url": "https://www.youtube.com/watch?v=p_N4J-lPTOM"
   },
   {
     "youtube_id": "T6B9K6JUgIw",
@@ -906,8 +815,34 @@
     "author": "Lukomatico",
     "length": "29:20",
     "published_relative": "hace 1 año",
-    "views": 20591,
+    "views": 20594,
     "url": "https://www.youtube.com/watch?v=T6B9K6JUgIw"
+  },
+  {
+    "youtube_id": "q8vIcPc1Jgk",
+    "title_es": "Tutorial de procesamiento de galaxias OSC en PixInsight - Datos gratuitos y flujo de trabajo",
+    "title_en": "OSC Galaxy Processing Tutorial in PixInsight - Free Data & Workflow",
+    "summary_es": "Este tutorial cubre el procesamiento de galaxias con datos OSC (cámara a color de un solo disparo) en PixInsight. Incluye un flujo de trabajo completo desde calibración hasta mejora de detalles, y proporciona datos gratuitos para seguir el tutorial.",
+    "summary_en": "This tutorial covers OSC (one-shot color) galaxy processing in PixInsight. It includes a full workflow from calibration to detail enhancement, and provides free data to follow along.",
+    "level": "MEDIO",
+    "author": "Lukomatico",
+    "length": "28:33",
+    "published_relative": "hace 2 años",
+    "views": 28751,
+    "url": "https://www.youtube.com/watch?v=q8vIcPc1Jgk"
+  },
+  {
+    "youtube_id": "p_N4J-lPTOM",
+    "title_es": "Guía de la Paleta Hubble para OSC - Tutorial fácil de PixInsight",
+    "title_en": "OSC Hubble Palette Guide - Easy PixInsight Tutorial",
+    "summary_es": "Este video tutorial enseña cómo crear la paleta Hubble (SHO) con datos de cámara OSC (una sola exposición color) en PixInsight. Explica el uso de herramientas como ChannelCombination, PixelMath y ajustes de color para mapear los canales en tonos característicos. Adecuado para astrofotógrafos de nivel principiante o intermedio que quieran ampliar sus técnicas de procesamiento.",
+    "summary_en": "This tutorial guides you through creating the Hubble Palette (SHO) using OSC (one-shot color) data in PixInsight. It covers tools like ChannelCombination, PixelMath, and color adjustments to map channels into characteristic hues. Suitable for beginner to intermediate astrophotographers looking to expand their processing techniques.",
+    "level": "PRINCIPIANTE",
+    "author": "Lukomatico",
+    "length": "35:01",
+    "published_relative": "hace 4 años",
+    "views": 41663,
+    "url": "https://www.youtube.com/watch?v=p_N4J-lPTOM"
   },
   {
     "youtube_id": "MLEA5bbzwkM",
@@ -919,7 +854,7 @@
     "author": "Lukomatico",
     "length": "27:08",
     "published_relative": "hace 1 año",
-    "views": 9389,
+    "views": 9393,
     "url": "https://www.youtube.com/watch?v=MLEA5bbzwkM"
   },
   {
@@ -932,7 +867,7 @@
     "author": "Lukomatico",
     "length": "25:41",
     "published_relative": "hace 2 años",
-    "views": 16452,
+    "views": 16454,
     "url": "https://www.youtube.com/watch?v=6XJUg-hMjN0"
   },
   {
@@ -945,7 +880,7 @@
     "author": "Lukomatico",
     "length": "19:07",
     "published_relative": "hace 4 años",
-    "views": 27862,
+    "views": 27863,
     "url": "https://www.youtube.com/watch?v=SQmFFkF6XhM"
   },
   {
@@ -958,34 +893,8 @@
     "author": "Lukomatico",
     "length": "16:23",
     "published_relative": "hace 11 meses",
-    "views": 6993,
+    "views": 6994,
     "url": "https://www.youtube.com/watch?v=AK-20sU394I"
-  },
-  {
-    "youtube_id": "k3OxGK5dt50",
-    "title_es": "Tutorial para principiantes con datos gratuitos - PixInsight Paleta Hubble Mono SHO",
-    "title_en": "Beginner Tutorial with Free Data - PixInsight Hubble Palette Mono SHO",
-    "summary_es": "Este tutorial de PixInsight para principiantes guía a los usuarios a través del procesamiento de imágenes astronómicas en monocromo utilizando la paleta Hubble (SHO). El video utiliza datos gratuitos para demostrar un flujo de trabajo completo, desde la calibración hasta la combinación y mejora de colores. Es ideal para quienes comienzan en el procesamiento de imágenes del espacio profundo con PixInsight.",
-    "summary_en": "This beginner PixInsight tutorial guides users through processing monochrome astronomical images using the Hubble palette (SHO). The video uses free data to demonstrate a complete workflow, from calibration to channel combination and color enhancement. It's ideal for those starting out in deep-sky image processing with PixInsight.",
-    "level": "PRINCIPIANTE",
-    "author": "Lukomatico",
-    "length": "50:03",
-    "published_relative": "hace 2 años",
-    "views": 9909,
-    "url": "https://www.youtube.com/watch?v=k3OxGK5dt50"
-  },
-  {
-    "youtube_id": "fFLvb1MMR7k",
-    "title_es": "De OSC a Hubble: Flujo de trabajo/tutorial de procesamiento en PixInsight",
-    "title_en": "OSC to Hubble: PixInsight Processing Workflow/Tutorial",
-    "summary_es": "Este tutorial muestra cómo convertir datos de cámara de color de un solo disparo (OSC) en una paleta de colores al estilo Hubble utilizando PixInsight. Se explican técnicas de combinación de canales, ajustes de color y procesamiento avanzado para lograr imágenes espectaculares.",
-    "summary_en": "This tutorial demonstrates how to convert one-shot color (OSC) camera data into a Hubble-style color palette using PixInsight. It covers channel combination techniques, color adjustments, and advanced processing to achieve stunning images.",
-    "level": "AVANZADO",
-    "author": "Lukomatico",
-    "length": "24:03",
-    "published_relative": "hace 2 años",
-    "views": 26796,
-    "url": "https://www.youtube.com/watch?v=fFLvb1MMR7k"
   },
   {
     "youtube_id": "MSU18s0xqqc",
@@ -997,7 +906,7 @@
     "author": "Lukomatico",
     "length": "19:18",
     "published_relative": "hace 2 años",
-    "views": 16888,
+    "views": 16889,
     "url": "https://www.youtube.com/watch?v=MSU18s0xqqc"
   },
   {
@@ -1010,8 +919,47 @@
     "author": "Lukomatico",
     "length": "23:03",
     "published_relative": "hace 2 años",
-    "views": 16447,
+    "views": 16451,
     "url": "https://www.youtube.com/watch?v=Jk2T_P9dldg"
+  },
+  {
+    "youtube_id": "k3OxGK5dt50",
+    "title_es": "Tutorial para principiantes con datos gratuitos - PixInsight Paleta Hubble Mono SHO",
+    "title_en": "Beginner Tutorial with Free Data - PixInsight Hubble Palette Mono SHO",
+    "summary_es": "Este tutorial de PixInsight para principiantes guía a los usuarios a través del procesamiento de imágenes astronómicas en monocromo utilizando la paleta Hubble (SHO). El video utiliza datos gratuitos para demostrar un flujo de trabajo completo, desde la calibración hasta la combinación y mejora de colores. Es ideal para quienes comienzan en el procesamiento de imágenes del espacio profundo con PixInsight.",
+    "summary_en": "This beginner PixInsight tutorial guides users through processing monochrome astronomical images using the Hubble palette (SHO). The video uses free data to demonstrate a complete workflow, from calibration to channel combination and color enhancement. It's ideal for those starting out in deep-sky image processing with PixInsight.",
+    "level": "PRINCIPIANTE",
+    "author": "Lukomatico",
+    "length": "50:03",
+    "published_relative": "hace 2 años",
+    "views": 9923,
+    "url": "https://www.youtube.com/watch?v=k3OxGK5dt50"
+  },
+  {
+    "youtube_id": "fFLvb1MMR7k",
+    "title_es": "De OSC a Hubble: Flujo de trabajo/tutorial de procesamiento en PixInsight",
+    "title_en": "OSC to Hubble: PixInsight Processing Workflow/Tutorial",
+    "summary_es": "Este tutorial muestra cómo convertir datos de cámara de color de un solo disparo (OSC) en una paleta de colores al estilo Hubble utilizando PixInsight. Se explican técnicas de combinación de canales, ajustes de color y procesamiento avanzado para lograr imágenes espectaculares.",
+    "summary_en": "This tutorial demonstrates how to convert one-shot color (OSC) camera data into a Hubble-style color palette using PixInsight. It covers channel combination techniques, color adjustments, and advanced processing to achieve stunning images.",
+    "level": "AVANZADO",
+    "author": "Lukomatico",
+    "length": "24:03",
+    "published_relative": "hace 2 años",
+    "views": 26799,
+    "url": "https://www.youtube.com/watch?v=fFLvb1MMR7k"
+  },
+  {
+    "youtube_id": "PCAHLApkfeo",
+    "title_es": "Cómo apilar imágenes astronómicas en PixInsight: script WBPP en 5 minutos",
+    "title_en": "How to Stack Astrophotography Images in PixInsight: WBPP Script in 5 Minutes",
+    "summary_es": "Este video tutorial enseña a utilizar el script Weighted Batch Preprocessing (WBPP) de PixInsight para apilar imágenes astronómicas de forma rápida y automatizada. Explica los parámetros básicos como la calibración con darks, flats y bias, y la integración de los frames para obtener una imagen final con mejor relación señal-ruido. Es ideal para principiantes que quieren dominar el flujo de preprocesamiento en PixInsight.",
+    "summary_en": "This tutorial teaches how to use the Weighted Batch Preprocessing (WBPP) script in PixInsight to stack astronomical images quickly and automatically. It covers basic parameters such as calibration with darks, flats, and bias, and integration of frames to achieve a final image with better signal-to-noise ratio. Ideal for beginners wanting to master the preprocessing workflow in PixInsight.",
+    "level": "PRINCIPIANTE",
+    "author": "Lukomatico",
+    "length": "5:14",
+    "published_relative": "hace 5 años",
+    "views": 33983,
+    "url": "https://www.youtube.com/watch?v=PCAHLApkfeo"
   },
   {
     "youtube_id": "WXY5kOFaxaI",
@@ -1023,21 +971,8 @@
     "author": "Lukomatico",
     "length": "16:11",
     "published_relative": "hace 3 años",
-    "views": 32251,
+    "views": 32261,
     "url": "https://www.youtube.com/watch?v=WXY5kOFaxaI"
-  },
-  {
-    "youtube_id": "rM3-yAcAbZc",
-    "title_es": "La MEJOR herramienta de reducción de estrellas ¡GRATIS! para PixInsight",
-    "title_en": "The BEST Free Star Reduction Tool for PixInsight!",
-    "summary_es": "Este video presenta una herramienta gratuita de reducción de estrellas para PixInsight, destacando su eficacia y facilidad de uso. El autor explica paso a paso cómo instalarla y aplicarla en tus imágenes, comparándola con otros métodos. Ideal para astrofotógrafos que buscan mejorar el detalle de sus fotos sin gastar dinero.",
-    "summary_en": "This video showcases a free star reduction tool for PixInsight, emphasizing its effectiveness and ease of use. The author walks through installation and application steps, comparing it with other techniques. Perfect for astrophotographers looking to enhance their images without spending money.",
-    "level": "MEDIO",
-    "author": "Lukomatico",
-    "length": "41:47",
-    "published_relative": "hace 4 años",
-    "views": 33407,
-    "url": "https://www.youtube.com/watch?v=rM3-yAcAbZc"
   },
   {
     "youtube_id": "4Zp5o1nS_r4",
@@ -1079,32 +1014,6 @@
     "url": "https://www.youtube.com/watch?v=bh05gPCk94w"
   },
   {
-    "youtube_id": "HoaZk5tdksA",
-    "title_es": "Procesamiento para Principiantes en PixInsight | 2026-03-15",
-    "title_en": "Beginner Processing in PixInsight | 2026-03-15",
-    "summary_es": "Este video tutorial guía a principiantes a través del flujo de trabajo básico de procesamiento de imágenes astronómicas en PixInsight. Cubre desde la calibración de imágenes raw hasta la combinación y estiramiento inicial, explicando herramientas esenciales como WeightedBatchPreprocessing, DynamicCrop y HistogramTransformation.",
-    "summary_en": "This tutorial guides beginners through the basic astronomical image processing workflow in PixInsight. It covers from raw image calibration to stacking and initial stretching, explaining essential tools such as WeightedBatchPreprocessing, DynamicCrop, and HistogramTransformation.",
-    "level": "PRINCIPIANTE",
-    "author": "TAIC",
-    "length": "1:12:29",
-    "published_relative": "Emitido hace 4 meses",
-    "views": 1454,
-    "url": "https://www.youtube.com/watch?v=HoaZk5tdksA"
-  },
-  {
-    "youtube_id": "urcTP3IMg1I",
-    "title_es": "Mejor unión con el script Photometric Mosaic de PixInsight [TAIC Short]",
-    "title_en": "Better Stitching with PixInsight's Photometric Mosaic Script [TAIC Short]",
-    "summary_es": "Este video enseña cómo utilizar el script Photometric Mosaic de PixInsight para unir paneles de imágenes astronómicas de forma más precisa y eficiente, explicando los parámetros clave y flujo de trabajo para obtener un mosaico sin costuras.",
-    "summary_en": "This video demonstrates how to use PixInsight's Photometric Mosaic script to seamlessly stitch together astronomical image panels, covering key parameters and workflow for precise alignment and blending.",
-    "level": "MEDIO",
-    "author": "TAIC",
-    "length": "22:57",
-    "published_relative": "hace 4 años",
-    "views": 10555,
-    "url": "https://www.youtube.com/watch?v=urcTP3IMg1I"
-  },
-  {
     "youtube_id": "Cj033eQTuag",
     "title_es": "Mejorar la nitidez de las imágenes con ImageBlend",
     "title_en": "Enhancing Image Sharpness with ImageBlend",
@@ -1114,7 +1023,7 @@
     "author": "TAIC",
     "length": "2:45",
     "published_relative": "hace 11 meses",
-    "views": 1527,
+    "views": 1529,
     "url": "https://www.youtube.com/watch?v=Cj033eQTuag"
   },
   {
@@ -1127,21 +1036,34 @@
     "author": "TAIC",
     "length": "3:50",
     "published_relative": "hace 11 meses",
-    "views": 866,
+    "views": 867,
     "url": "https://www.youtube.com/watch?v=qhrB1Uax-rk"
   },
   {
-    "youtube_id": "4rhYObESRyk",
-    "title_es": "Voluntarios de TAIC procesan datos de M33 de Eric Coles",
-    "title_en": "TAIC Volunteers Process Eric Coles' M33 Data",
-    "summary_es": "En este video, voluntarios de The Astro Imaging Channel procesan datos de la galaxia M33 capturados por Eric Coles. Se muestra el flujo de trabajo en PixInsight, incluyendo apilado, calibración, mejora de color y realce de detalles. Los espectadores aprenderán técnicas prácticas de procesamiento aplicadas a datos reales.",
-    "summary_en": "In this video, volunteers from The Astro Imaging Channel process data of galaxy M33 captured by Eric Coles. The workflow in PixInsight is demonstrated, including stacking, calibration, color enhancement, and detail sharpening. Viewers will learn practical processing techniques applied to real data.",
+    "youtube_id": "iUYZN5Wy70k",
+    "title_es": "GeneralizedHyperbolicStretch [TAIC Corto]",
+    "title_en": "GeneralizedHyperbolicStretch [TAIC Short]",
+    "summary_es": "Este video presenta el script GeneralizedHyperbolicStretch de PixInsight, una herramienta para estirar imágenes astronómicas de forma no lineal. Explica su uso para mejorar el contraste y recuperar detalles en las sombras y luces. Incluye ejemplos prácticos de aplicación y ajustes recomendados.",
+    "summary_en": "This video introduces the GeneralizedHyperbolicStretch script in PixInsight, a tool for non-linear stretching of astronomical images. It explains how to use it to enhance contrast and recover details in shadows and highlights. Practical examples and recommended settings are provided.",
     "level": "MEDIO",
     "author": "TAIC",
-    "length": "1:16:42",
-    "published_relative": "Emitido hace 4 años",
-    "views": 1895,
-    "url": "https://www.youtube.com/watch?v=4rhYObESRyk"
+    "length": "20:49",
+    "published_relative": "hace 4 años",
+    "views": 12721,
+    "url": "https://www.youtube.com/watch?v=iUYZN5Wy70k"
+  },
+  {
+    "youtube_id": "HoaZk5tdksA",
+    "title_es": "Procesamiento para Principiantes en PixInsight | 2026-03-15",
+    "title_en": "Beginner Processing in PixInsight | 2026-03-15",
+    "summary_es": "Este video tutorial guía a principiantes a través del flujo de trabajo básico de procesamiento de imágenes astronómicas en PixInsight. Cubre desde la calibración de imágenes raw hasta la combinación y estiramiento inicial, explicando herramientas esenciales como WeightedBatchPreprocessing, DynamicCrop y HistogramTransformation.",
+    "summary_en": "This tutorial guides beginners through the basic astronomical image processing workflow in PixInsight. It covers from raw image calibration to stacking and initial stretching, explaining essential tools such as WeightedBatchPreprocessing, DynamicCrop, and HistogramTransformation.",
+    "level": "PRINCIPIANTE",
+    "author": "TAIC",
+    "length": "1:12:29",
+    "published_relative": "Emitido hace 4 meses",
+    "views": 1454,
+    "url": "https://www.youtube.com/watch?v=HoaZk5tdksA"
   },
   {
     "youtube_id": "ptlC2EWtGv8",
@@ -1157,17 +1079,17 @@
     "url": "https://www.youtube.com/watch?v=ptlC2EWtGv8"
   },
   {
-    "youtube_id": "iUYZN5Wy70k",
-    "title_es": "GeneralizedHyperbolicStretch [TAIC Corto]",
-    "title_en": "GeneralizedHyperbolicStretch [TAIC Short]",
-    "summary_es": "Este video presenta el script GeneralizedHyperbolicStretch de PixInsight, una herramienta para estirar imágenes astronómicas de forma no lineal. Explica su uso para mejorar el contraste y recuperar detalles en las sombras y luces. Incluye ejemplos prácticos de aplicación y ajustes recomendados.",
-    "summary_en": "This video introduces the GeneralizedHyperbolicStretch script in PixInsight, a tool for non-linear stretching of astronomical images. It explains how to use it to enhance contrast and recover details in shadows and highlights. Practical examples and recommended settings are provided.",
+    "youtube_id": "urcTP3IMg1I",
+    "title_es": "Mejor unión con el script Photometric Mosaic de PixInsight [TAIC Short]",
+    "title_en": "Better Stitching with PixInsight's Photometric Mosaic Script [TAIC Short]",
+    "summary_es": "Este video enseña cómo utilizar el script Photometric Mosaic de PixInsight para unir paneles de imágenes astronómicas de forma más precisa y eficiente, explicando los parámetros clave y flujo de trabajo para obtener un mosaico sin costuras.",
+    "summary_en": "This video demonstrates how to use PixInsight's Photometric Mosaic script to seamlessly stitch together astronomical image panels, covering key parameters and workflow for precise alignment and blending.",
     "level": "MEDIO",
     "author": "TAIC",
-    "length": "20:49",
+    "length": "22:57",
     "published_relative": "hace 4 años",
-    "views": 12717,
-    "url": "https://www.youtube.com/watch?v=iUYZN5Wy70k"
+    "views": 10560,
+    "url": "https://www.youtube.com/watch?v=urcTP3IMg1I"
   },
   {
     "youtube_id": "5PpAzUHvcr4",
@@ -1179,8 +1101,21 @@
     "author": "TAIC",
     "length": "2:35",
     "published_relative": "hace 11 meses",
-    "views": 795,
+    "views": 796,
     "url": "https://www.youtube.com/watch?v=5PpAzUHvcr4"
+  },
+  {
+    "youtube_id": "2L4JrlTM6xM",
+    "title_es": "2022-10-09 | Ron Brecher: Novedades en PixInsight",
+    "title_en": "2022-10-09 | Ron Brecher: What's New in PixInsight",
+    "summary_es": "Este video presenta las actualizaciones y nuevas funcionalidades en PixInsight, explicadas por Ron Brecher, un astrofotógrafo experimentado. Se cubren mejoras en herramientas existentes, nuevas herramientas, y cambios en el flujo de trabajo que pueden optimizar el procesamiento de imágenes astronómicas. Adecuado para usuarios que deseen mantenerse al día con el software.",
+    "summary_en": "This video presents updates and new features in PixInsight, explained by Ron Brecher, an experienced astrophotographer. It covers improvements to existing tools, new tools, and workflow changes that can optimize astronomical image processing. Suitable for users who want to stay current with the software.",
+    "level": "MEDIO",
+    "author": "TAIC",
+    "length": "1:11:18",
+    "published_relative": "Emitido hace 3 años",
+    "views": 3285,
+    "url": "https://www.youtube.com/watch?v=2L4JrlTM6xM"
   },
   {
     "youtube_id": "hBZ2E87eKQ4",
@@ -1192,8 +1127,21 @@
     "author": "TAIC",
     "length": "1:10:51",
     "published_relative": "Emitido hace 3 meses",
-    "views": 2870,
+    "views": 2875,
     "url": "https://www.youtube.com/watch?v=hBZ2E87eKQ4"
+  },
+  {
+    "youtube_id": "4rhYObESRyk",
+    "title_es": "Voluntarios de TAIC procesan datos de M33 de Eric Coles",
+    "title_en": "TAIC Volunteers Process Eric Coles' M33 Data",
+    "summary_es": "En este video, voluntarios de The Astro Imaging Channel procesan datos de la galaxia M33 capturados por Eric Coles. Se muestra el flujo de trabajo en PixInsight, incluyendo apilado, calibración, mejora de color y realce de detalles. Los espectadores aprenderán técnicas prácticas de procesamiento aplicadas a datos reales.",
+    "summary_en": "In this video, volunteers from The Astro Imaging Channel process data of galaxy M33 captured by Eric Coles. The workflow in PixInsight is demonstrated, including stacking, calibration, color enhancement, and detail sharpening. Viewers will learn practical processing techniques applied to real data.",
+    "level": "MEDIO",
+    "author": "TAIC",
+    "length": "1:16:42",
+    "published_relative": "Emitido hace 4 años",
+    "views": 1895,
+    "url": "https://www.youtube.com/watch?v=4rhYObESRyk"
   },
   {
     "youtube_id": "7ROtBql62sk",
@@ -1205,7 +1153,7 @@
     "author": "TAIC",
     "length": "1:25:24",
     "published_relative": "Emitido hace 6 meses",
-    "views": 2597,
+    "views": 2600,
     "url": "https://www.youtube.com/watch?v=7ROtBql62sk"
   },
   {
@@ -1218,7 +1166,7 @@
     "author": "View into Space",
     "length": "28:51",
     "published_relative": "hace 4 meses",
-    "views": 3481,
+    "views": 3484,
     "url": "https://www.youtube.com/watch?v=bDvCiRzP578"
   },
   {
@@ -1244,8 +1192,21 @@
     "author": "View into Space",
     "length": "15:32",
     "published_relative": "hace 2 meses",
-    "views": 6647,
+    "views": 6658,
     "url": "https://www.youtube.com/watch?v=RMTpQSTMMtg"
+  },
+  {
+    "youtube_id": "uw_88wD2NWM",
+    "title_es": "Tutorial de procesamiento de estrellas en PixInsight: ¡haz que brillen!",
+    "title_en": "PixInsight Star Processing Tutorial: Let Them Shine!",
+    "summary_es": "Este video tutorial enseña técnicas para mejorar el brillo y la apariencia de las estrellas en imágenes astrofotográficas utilizando PixInsight. Se cubren procesos como la reducción de estrellas, ajuste de puntos de saturación y métodos para hacer que las estrellas destaquen sin perder detalle en el fondo. Ideal para quienes buscan refinar sus imágenes con un enfoque específico en el tratamiento estelar.",
+    "summary_en": "This tutorial covers techniques for enhancing star brightness and appearance in astrophotography images using PixInsight. It includes processes like star reduction, adjusting saturation points, and methods to make stars stand out without losing background detail. Perfect for those looking to refine their images with a focus on stellar processing.",
+    "level": "MEDIO",
+    "author": "View into Space",
+    "length": "30:57",
+    "published_relative": "hace 3 años",
+    "views": 16710,
+    "url": "https://www.youtube.com/watch?v=uw_88wD2NWM"
   },
   {
     "youtube_id": "M5xSEAgU2U4",
@@ -1257,7 +1218,7 @@
     "author": "View into Space",
     "length": "12:11",
     "published_relative": "hace 1 mes",
-    "views": 4984,
+    "views": 4988,
     "url": "https://www.youtube.com/watch?v=M5xSEAgU2U4"
   },
   {
@@ -1270,34 +1231,8 @@
     "author": "View into Space",
     "length": "8:01",
     "published_relative": "hace 1 mes",
-    "views": 4734,
+    "views": 4748,
     "url": "https://www.youtube.com/watch?v=jEPu_IkTSUM"
-  },
-  {
-    "youtube_id": "KcJEa739LE8",
-    "title_es": "PixInsight PIXELMATH - Tutorial completo para principiantes",
-    "title_en": "PixInsight PIXELMATH - Full Beginner Tutorial",
-    "summary_es": "Este tutorial explica los fundamentos de PixelMath en PixInsight, cubriendo la sintaxis básica, el uso de canales RGB y las expresiones habituales para combinar y corregir imágenes astronómicas. Está diseñado para principiantes que desean automatizar procesos de mejora de imagen sin depender de scripts complejos.",
-    "summary_en": "This tutorial covers the fundamentals of PixelMath in PixInsight, including basic syntax, RGB channel usage, and common expressions for combining and correcting astrophotography images. It is aimed at beginners who want to automate image enhancement processes without relying on complex scripts.",
-    "level": "PRINCIPIANTE",
-    "author": "View into Space",
-    "length": "19:12",
-    "published_relative": "hace 2 años",
-    "views": 7076,
-    "url": "https://www.youtube.com/watch?v=KcJEa739LE8"
-  },
-  {
-    "youtube_id": "-__fKdJ5wsg",
-    "title_es": "Actualización MAS 1.1 para PixInsight: Características que realmente deberías usar",
-    "title_en": "MAS 1.1 Upgrade for PixInsight: Features You Should Actually Use",
-    "summary_es": "Este video cubre las nuevas características de la versión 1.1 del conjunto de scripts MAS (Multi-Area Stretching) para PixInsight, incluyendo mejoras en la interfaz, nuevos algoritmos de estiramiento y opciones de enmascaramiento. Se explica cómo estas herramientas optimizan el procesamiento de imágenes astronómicas, destacando las funciones más útiles para flujos de trabajo avanzados.",
-    "summary_en": "This video covers the new features of version 1.1 of the MAS (Multi-Area Stretching) script suite for PixInsight, including interface improvements, new stretching algorithms, and masking options. It explains how these tools optimize astronomical image processing, highlighting the most useful functions for advanced workflows.",
-    "level": "MEDIO",
-    "author": "View into Space",
-    "length": "10:12",
-    "published_relative": "hace 6 meses",
-    "views": 5449,
-    "url": "https://www.youtube.com/watch?v=-__fKdJ5wsg"
   },
   {
     "youtube_id": "4cnSFUbo19E",
@@ -1309,8 +1244,73 @@
     "author": "View into Space",
     "length": "53:53",
     "published_relative": "hace 3 años",
-    "views": 16531,
+    "views": 16538,
     "url": "https://www.youtube.com/watch?v=4cnSFUbo19E"
+  },
+  {
+    "youtube_id": "-__fKdJ5wsg",
+    "title_es": "Actualización MAS 1.1 para PixInsight: Características que realmente deberías usar",
+    "title_en": "MAS 1.1 Upgrade for PixInsight: Features You Should Actually Use",
+    "summary_es": "Este video cubre las nuevas características de la versión 1.1 del conjunto de scripts MAS (Multi-Area Stretching) para PixInsight, incluyendo mejoras en la interfaz, nuevos algoritmos de estiramiento y opciones de enmascaramiento. Se explica cómo estas herramientas optimizan el procesamiento de imágenes astronómicas, destacando las funciones más útiles para flujos de trabajo avanzados.",
+    "summary_en": "This video covers the new features of version 1.1 of the MAS (Multi-Area Stretching) script suite for PixInsight, including interface improvements, new stretching algorithms, and masking options. It explains how these tools optimize astronomical image processing, highlighting the most useful functions for advanced workflows.",
+    "level": "MEDIO",
+    "author": "View into Space",
+    "length": "10:12",
+    "published_relative": "hace 6 meses",
+    "views": 5450,
+    "url": "https://www.youtube.com/watch?v=-__fKdJ5wsg"
+  },
+  {
+    "youtube_id": "KcJEa739LE8",
+    "title_es": "PixInsight PIXELMATH - Tutorial completo para principiantes",
+    "title_en": "PixInsight PIXELMATH - Full Beginner Tutorial",
+    "summary_es": "Este tutorial explica los fundamentos de PixelMath en PixInsight, cubriendo la sintaxis básica, el uso de canales RGB y las expresiones habituales para combinar y corregir imágenes astronómicas. Está diseñado para principiantes que desean automatizar procesos de mejora de imagen sin depender de scripts complejos.",
+    "summary_en": "This tutorial covers the fundamentals of PixelMath in PixInsight, including basic syntax, RGB channel usage, and common expressions for combining and correcting astrophotography images. It is aimed at beginners who want to automate image enhancement processes without relying on complex scripts.",
+    "level": "PRINCIPIANTE",
+    "author": "View into Space",
+    "length": "19:12",
+    "published_relative": "hace 2 años",
+    "views": 7075,
+    "url": "https://www.youtube.com/watch?v=KcJEa739LE8"
+  },
+  {
+    "youtube_id": "9XgklwAICkM",
+    "title_es": "PIXINSIGHT - TAN FÁCIL COMO 1-2-3 - Parte 1 - Introducción y Apilado con WBPP",
+    "title_en": "PIXINSIGHT - AS EASY AS 1-2-3 - Part 1 - Introduction & Stacking with WBPP",
+    "summary_es": "Este video introduce el flujo de trabajo básico en PixInsight, comenzando con el proceso de apilado utilizando el script Weighted Batch Preprocessing (WBPP). Se cubre la configuración inicial y la carga de imágenes, explicando cómo WBPP automatiza la calibración y alineación, preparando los datos para su posterior procesamiento.",
+    "summary_en": "This video introduces the basic PixInsight workflow, starting with the stacking process using the Weighted Batch Preprocessing (WBPP) script. It covers initial setup and image loading, explaining how WBPP automates calibration and alignment, preparing data for further processing.",
+    "level": "PRINCIPIANTE",
+    "author": "View into Space",
+    "length": "36:42",
+    "published_relative": "hace 3 años",
+    "views": 30451,
+    "url": "https://www.youtube.com/watch?v=9XgklwAICkM"
+  },
+  {
+    "youtube_id": "CTimPM7eCcA",
+    "title_es": "Tutorial Completo de Procesamiento RGB en PixInsight, incluyendo SPCC",
+    "title_en": "Comprehensive PixInsight RGB Processing Tutorial, including SPCC",
+    "summary_es": "Este tutorial detalla un flujo de trabajo completo para el procesamiento de datos de astrofotografía RGB en PixInsight. Cubre desde las etapas lineales hasta las no lineales, haciendo especial énfasis en la calibración de color precisa mediante el proceso de Calibración Colorimétrica Espectrofotométrico (SPCC).",
+    "summary_en": "This tutorial provides a comprehensive workflow for processing RGB astrophotography data in PixInsight. It covers essential steps from linear to non-linear stages, specifically highlighting accurate color calibration using the Spectrophotometric Color Calibration (SPCC) process.",
+    "level": "AVANZADO",
+    "author": "View into Space",
+    "length": "45:33",
+    "published_relative": "hace 3 años",
+    "views": 11189,
+    "url": "https://www.youtube.com/watch?v=CTimPM7eCcA"
+  },
+  {
+    "youtube_id": "OY33zCDoGv4",
+    "title_es": "Este script gratuito de PixInsight te da los controles deslizantes de Lightroom",
+    "title_en": "This Free PixInsight Script Gives You Lightroom's Sliders",
+    "summary_es": "El video presenta un script gratuito para PixInsight que emula los controles deslizantes de Lightroom, permitiendo ajustes intuitivos de exposición, contraste, luces y sombras. El autor demuestra su instalación y uso en un flujo de procesamiento de astrofotografía, explicando cómo integrarlo eficazmente. Dirigido a usuarios de PixInsight que buscan una interfaz más amigable para el ajuste de imágenes.",
+    "summary_en": "The video introduces a free PixInsight script that emulates Lightroom's sliders, allowing intuitive adjustments for exposure, contrast, highlights, and shadows. The author demonstrates its installation and use in an astrophotography processing workflow, explaining how to integrate it effectively. Aimed at PixInsight users seeking a more user-friendly interface for image adjustments.",
+    "level": "PRINCIPIANTE",
+    "author": "View into Space",
+    "length": "8:13",
+    "published_relative": "hace 3 semanas",
+    "views": 2791,
+    "url": "https://www.youtube.com/watch?v=OY33zCDoGv4"
   },
   {
     "youtube_id": "I6GmgVpBek4",
@@ -1326,19 +1326,6 @@
     "url": "https://www.youtube.com/watch?v=I6GmgVpBek4"
   },
   {
-    "youtube_id": "OY33zCDoGv4",
-    "title_es": "Este script gratuito de PixInsight te da los controles deslizantes de Lightroom",
-    "title_en": "This Free PixInsight Script Gives You Lightroom's Sliders",
-    "summary_es": "El video presenta un script gratuito para PixInsight que emula los controles deslizantes de Lightroom, permitiendo ajustes intuitivos de exposición, contraste, luces y sombras. El autor demuestra su instalación y uso en un flujo de procesamiento de astrofotografía, explicando cómo integrarlo eficazmente. Dirigido a usuarios de PixInsight que buscan una interfaz más amigable para el ajuste de imágenes.",
-    "summary_en": "The video introduces a free PixInsight script that emulates Lightroom's sliders, allowing intuitive adjustments for exposure, contrast, highlights, and shadows. The author demonstrates its installation and use in an astrophotography processing workflow, explaining how to integrate it effectively. Aimed at PixInsight users seeking a more user-friendly interface for image adjustments.",
-    "level": "PRINCIPIANTE",
-    "author": "View into Space",
-    "length": "8:13",
-    "published_relative": "hace 3 semanas",
-    "views": 2782,
-    "url": "https://www.youtube.com/watch?v=OY33zCDoGv4"
-  },
-  {
     "youtube_id": "mQRsR7-cu6g",
     "title_es": "Este script gratuito de PixInsight convierte tu imagen en un mosaico anotado de objetos",
     "title_en": "This Free PixInsight Script Turns Your Image Into an Annotated Object Mosaic",
@@ -1348,60 +1335,21 @@
     "author": "View into Space",
     "length": "8:17",
     "published_relative": "hace 2 meses",
-    "views": 2958,
+    "views": 2963,
     "url": "https://www.youtube.com/watch?v=mQRsR7-cu6g"
   },
   {
-    "youtube_id": "9XgklwAICkM",
-    "title_es": "PIXINSIGHT - TAN FÁCIL COMO 1-2-3 - Parte 1 - Introducción y Apilado con WBPP",
-    "title_en": "PIXINSIGHT - AS EASY AS 1-2-3 - Part 1 - Introduction & Stacking with WBPP",
-    "summary_es": "Este video introduce el flujo de trabajo básico en PixInsight, comenzando con el proceso de apilado utilizando el script Weighted Batch Preprocessing (WBPP). Se cubre la configuración inicial y la carga de imágenes, explicando cómo WBPP automatiza la calibración y alineación, preparando los datos para su posterior procesamiento.",
-    "summary_en": "This video introduces the basic PixInsight workflow, starting with the stacking process using the Weighted Batch Preprocessing (WBPP) script. It covers initial setup and image loading, explaining how WBPP automates calibration and alignment, preparing data for further processing.",
+    "youtube_id": "mLmtVcgaQZo",
+    "title_es": "Tutorial de PixInsight: Selector de Subfotogramas",
+    "title_en": "PixInsight Process Tutorial: Subframe Selector",
+    "summary_es": "Este video explica en detalle el proceso de Subframe Selector en PixInsight, una herramienta vital para evaluar y clasificar subexposiciones. El tutorial cubre los parámetros de puntuación, la selección de criterios como FWHM y SNR, y cómo aplicar el proceso para optimizar la integración. Es ideal para principiantes que desean mejorar sus técnicas de preprocesamiento.",
+    "summary_en": "This video provides an in-depth explanation of the Subframe Selector process in PixInsight, a crucial tool for evaluating and grading sub-exposures. It covers scoring parameters, selection criteria like FWHM and SNR, and how to apply the process to optimize integration. Ideal for beginners looking to improve their preprocessing workflow.",
     "level": "PRINCIPIANTE",
     "author": "View into Space",
-    "length": "36:42",
+    "length": "11:34",
     "published_relative": "hace 3 años",
-    "views": 30433,
-    "url": "https://www.youtube.com/watch?v=9XgklwAICkM"
-  },
-  {
-    "youtube_id": "CTimPM7eCcA",
-    "title_es": "Tutorial Completo de Procesamiento RGB en PixInsight, incluyendo SPCC",
-    "title_en": "Comprehensive PixInsight RGB Processing Tutorial, including SPCC",
-    "summary_es": "Este tutorial detalla un flujo de trabajo completo para el procesamiento de datos de astrofotografía RGB en PixInsight. Cubre desde las etapas lineales hasta las no lineales, haciendo especial énfasis en la calibración de color precisa mediante el proceso de Calibración Colorimétrica Espectrofotométrico (SPCC).",
-    "summary_en": "This tutorial provides a comprehensive workflow for processing RGB astrophotography data in PixInsight. It covers essential steps from linear to non-linear stages, specifically highlighting accurate color calibration using the Spectrophotometric Color Calibration (SPCC) process.",
-    "level": "AVANZADO",
-    "author": "View into Space",
-    "length": "45:33",
-    "published_relative": "hace 3 años",
-    "views": 11188,
-    "url": "https://www.youtube.com/watch?v=CTimPM7eCcA"
-  },
-  {
-    "youtube_id": "-sFDh30YvwY",
-    "title_es": "Por qué PixelMath en PixInsight ignora silenciosamente tus máscaras (y cuándo no)",
-    "title_en": "Why PixInsight PixelMath Silently Ignores Your Masks (And When It Doesn't)",
-    "summary_es": "Este video explica un comportamiento confuso en PixelMath de PixInsight donde las máscaras aplicadas pueden no tener efecto. Se analizan las condiciones bajo las cuales PixelMath respeta las máscaras y cuándo las omite, proporcionando consejos para evitar errores en el procesamiento.",
-    "summary_en": "This video explains a confusing behavior in PixInsight's PixelMath where applied masks may have no effect. It analyzes the conditions under which PixelMath respects masks and when it ignores them, providing tips to avoid processing mistakes.",
-    "level": "MEDIO",
-    "author": "View into Space",
-    "length": "4:54",
-    "published_relative": "hace 3 años",
-    "views": 1446,
-    "url": "https://www.youtube.com/watch?v=-sFDh30YvwY"
-  },
-  {
-    "youtube_id": "0z_qY4rKLtM",
-    "title_es": "Tutorial de script en PixInsight: Image Solver",
-    "title_en": "PixInsight Script Tutorial: Image Solver",
-    "summary_es": "Este video explica cómo usar el script Image Solver en PixInsight para resolver astrométricamente tus imágenes, lo que es esencial para la calibración y la integración de datos. Aprenderás a configurar los parámetros clave y a interpretar los resultados para mejorar tus flujos de trabajo de astrofotografía.",
-    "summary_en": "This video explains how to use the Image Solver script in PixInsight to astrometrically solve your images, which is essential for calibration and data integration. You'll learn to configure key parameters and interpret the results to improve your astrophotography workflows.",
-    "level": "MEDIO",
-    "author": "View into Space",
-    "length": "10:07",
-    "published_relative": "hace 3 años",
-    "views": 10974,
-    "url": "https://www.youtube.com/watch?v=0z_qY4rKLtM"
+    "views": 9917,
+    "url": "https://www.youtube.com/watch?v=mLmtVcgaQZo"
   },
   {
     "youtube_id": "MU3oXOvmOE0",
@@ -1413,7 +1361,7 @@
     "author": "Astrobackyard",
     "length": "34:14",
     "published_relative": "hace 4 meses",
-    "views": 28011,
+    "views": 28110,
     "url": "https://www.youtube.com/watch?v=MU3oXOvmOE0"
   },
   {
@@ -1426,7 +1374,7 @@
     "author": "Nebula Photos",
     "length": "56:09",
     "published_relative": "hace 6 años",
-    "views": 4930,
+    "views": 4931,
     "url": "https://www.youtube.com/watch?v=g_uO_nUjfD0"
   },
   {
@@ -1439,7 +1387,7 @@
     "author": "Nebula Photos",
     "length": "1:22:07",
     "published_relative": "hace 6 años",
-    "views": 11272,
+    "views": 11274,
     "url": "https://www.youtube.com/watch?v=BxSNUNhYniI"
   },
   {
@@ -1452,7 +1400,7 @@
     "author": "Naztronomy",
     "length": "22:37",
     "published_relative": "hace 4 meses",
-    "views": 6695,
+    "views": 6720,
     "url": "https://www.youtube.com/watch?v=uuMITnhvSLQ"
   },
   {
@@ -1482,32 +1430,6 @@
     "url": "https://www.youtube.com/watch?v=jxN_F1rVBh8"
   },
   {
-    "youtube_id": "gpEPc6Nn0mM",
-    "title_es": "Astroacademy El podcast |Ep. 12| PixInsight: Técnicas Avanzadas",
-    "title_en": "Astroacademy Podcast |Ep. 12| PixInsight: Advanced Techniques",
-    "summary_es": "En este episodio del podcast de Astroacademy se exploran técnicas avanzadas de procesamiento en PixInsight, incluyendo el uso de máscaras, combinación de canales y mejora de detalles. Se discuten estrategias para optimizar el flujo de trabajo y obtener resultados profesionales en la astrofotografía.",
-    "summary_en": "In this episode of the Astroacademy podcast, advanced processing techniques in PixInsight are explored, including the use of masks, channel combination, and detail enhancement. Strategies to optimize workflow and achieve professional results in astrophotography are discussed.",
-    "level": "AVANZADO",
-    "author": "Astro Academy",
-    "length": "43:30",
-    "published_relative": "hace 1 año",
-    "views": 804,
-    "url": "https://www.youtube.com/watch?v=gpEPc6Nn0mM"
-  },
-  {
-    "youtube_id": "CuvLys50ESU",
-    "title_es": "Academia Natural Portraits: Aprende astrofotografía y PixInsight",
-    "title_en": "Natural Portraits Academy: Learn Astrophotography and PixInsight",
-    "summary_es": "Este video anuncia el lanzamiento de la Academia Natural Portraits, un curso enfocado en astrofotografía y el uso de PixInsight. Cubre desde conceptos básicos hasta técnicas avanzadas de procesamiento. Está dirigido a quienes desean profundizar en la captura y edición de imágenes astronómicas.",
-    "summary_en": "This video announces the launch of Natural Portraits Academy, a course focused on astrophotography and PixInsight usage. It covers from basic concepts to advanced processing techniques. It is aimed at those who wish to deepen their skills in astronomical image capture and editing.",
-    "level": "MEDIO",
-    "author": "Natural Portraits",
-    "length": "8:13",
-    "published_relative": "hace 6 años",
-    "views": 5519,
-    "url": "https://www.youtube.com/watch?v=CuvLys50ESU"
-  },
-  {
     "youtube_id": "Y9MdA_yA2QA",
     "title_es": "Cómo proceso mis astrofotos en PixInsight",
     "title_en": "How I process my astrophotography in PixInsight",
@@ -1517,7 +1439,7 @@
     "author": "Natural Portraits",
     "length": "26:30",
     "published_relative": "hace 6 años",
-    "views": 41798,
+    "views": 41800,
     "url": "https://www.youtube.com/watch?v=Y9MdA_yA2QA"
   },
   {
@@ -1543,47 +1465,21 @@
     "author": "Natural Portraits",
     "length": "19:54",
     "published_relative": "hace 1 año",
-    "views": 5587,
+    "views": 5589,
     "url": "https://www.youtube.com/watch?v=lABqV-_7du0"
   },
   {
-    "youtube_id": "WxTTVy9MKMI",
-    "title_es": "Cómo eliminar todas las estrellas con PixInsight",
-    "title_en": "How to Remove All Stars with PixInsight",
-    "summary_es": "Este tutorial enseña el proceso de eliminación de estrellas en imágenes astronómicas utilizando PixInsight. Se cubren herramientas como StarNet y procesos de máscara para separar estrellas del fondo nebuloso, logrando un resultado limpio para resaltar objetos de cielo profundo.",
-    "summary_en": "This tutorial covers the process of star removal in astrophotography images using PixInsight. It demonstrates tools like StarNet and masking techniques to separate stars from the nebula background, achieving a clean result for highlighting deep-sky objects.",
+    "youtube_id": "CuvLys50ESU",
+    "title_es": "Academia Natural Portraits: Aprende astrofotografía y PixInsight",
+    "title_en": "Natural Portraits Academy: Learn Astrophotography and PixInsight",
+    "summary_es": "Este video anuncia el lanzamiento de la Academia Natural Portraits, un curso enfocado en astrofotografía y el uso de PixInsight. Cubre desde conceptos básicos hasta técnicas avanzadas de procesamiento. Está dirigido a quienes desean profundizar en la captura y edición de imágenes astronómicas.",
+    "summary_en": "This video announces the launch of Natural Portraits Academy, a course focused on astrophotography and PixInsight usage. It covers from basic concepts to advanced processing techniques. It is aimed at those who wish to deepen their skills in astronomical image capture and editing.",
     "level": "MEDIO",
     "author": "Natural Portraits",
-    "length": "11:46",
-    "published_relative": "hace 5 años",
-    "views": 6366,
-    "url": "https://www.youtube.com/watch?v=WxTTVy9MKMI"
-  },
-  {
-    "youtube_id": "-uU2wuRosPM",
-    "title_es": "Procesamiento Astrofotográfico con PixInsight - En Vivo",
-    "title_en": "Astrophotographic Processing with PixInsight - Live Stream",
-    "summary_es": "Este video es una transmisión en vivo donde se procesa una imagen astronómica utilizando PixInsight. Se cubren técnicas como la calibración, alineación, integración y estiramiento de imágenes, así como el uso de herramientas de mejora de detalles y reducción de ruido.",
-    "summary_en": "This live stream demonstrates astrophotographic processing using PixInsight. It covers calibration, registration, integration, and stretching of images, along with tools for detail enhancement and noise reduction.",
-    "level": "MEDIO",
-    "author": "Natural Portraits",
-    "length": "1:57:08",
-    "published_relative": "Emitido hace 6 años",
-    "views": 35295,
-    "url": "https://www.youtube.com/watch?v=-uU2wuRosPM"
-  },
-  {
-    "youtube_id": "NeY6Jt_x-Jk",
-    "title_es": "Curso PixInsight: Técnicas Avanzadas",
-    "title_en": "PixInsight Course: Advanced Techniques",
-    "summary_es": "Este video presenta un curso avanzado de PixInsight, cubriendo técnicas complejas de procesamiento de imágenes astronómicas. Se enfoca en flujos de trabajo avanzados, herramientas y scripts para mejorar la calidad de las imágenes. Ideal para astrofotógrafos que buscan dominar PixInsight.",
-    "summary_en": "This video introduces an advanced PixInsight course, covering complex astronomical image processing techniques. It focuses on advanced workflows, tools, and scripts to enhance image quality. Ideal for astrophotographers looking to master PixInsight.",
-    "level": "AVANZADO",
-    "author": "Natural Portraits",
-    "length": "5:00",
-    "published_relative": "hace 1 año",
-    "views": 2821,
-    "url": "https://www.youtube.com/watch?v=NeY6Jt_x-Jk"
+    "length": "8:13",
+    "published_relative": "hace 6 años",
+    "views": 5519,
+    "url": "https://www.youtube.com/watch?v=CuvLys50ESU"
   },
   {
     "youtube_id": "mzgw3lBO_YA",
@@ -1599,6 +1495,32 @@
     "url": "https://www.youtube.com/watch?v=mzgw3lBO_YA"
   },
   {
+    "youtube_id": "WxTTVy9MKMI",
+    "title_es": "Cómo eliminar todas las estrellas con PixInsight",
+    "title_en": "How to Remove All Stars with PixInsight",
+    "summary_es": "Este tutorial enseña el proceso de eliminación de estrellas en imágenes astronómicas utilizando PixInsight. Se cubren herramientas como StarNet y procesos de máscara para separar estrellas del fondo nebuloso, logrando un resultado limpio para resaltar objetos de cielo profundo.",
+    "summary_en": "This tutorial covers the process of star removal in astrophotography images using PixInsight. It demonstrates tools like StarNet and masking techniques to separate stars from the nebula background, achieving a clean result for highlighting deep-sky objects.",
+    "level": "MEDIO",
+    "author": "Natural Portraits",
+    "length": "11:46",
+    "published_relative": "hace 5 años",
+    "views": 6366,
+    "url": "https://www.youtube.com/watch?v=WxTTVy9MKMI"
+  },
+  {
+    "youtube_id": "NeY6Jt_x-Jk",
+    "title_es": "Curso PixInsight: Técnicas Avanzadas",
+    "title_en": "PixInsight Course: Advanced Techniques",
+    "summary_es": "Este video presenta un curso avanzado de PixInsight, cubriendo técnicas complejas de procesamiento de imágenes astronómicas. Se enfoca en flujos de trabajo avanzados, herramientas y scripts para mejorar la calidad de las imágenes. Ideal para astrofotógrafos que buscan dominar PixInsight.",
+    "summary_en": "This video introduces an advanced PixInsight course, covering complex astronomical image processing techniques. It focuses on advanced workflows, tools, and scripts to enhance image quality. Ideal for astrophotographers looking to master PixInsight.",
+    "level": "AVANZADO",
+    "author": "Natural Portraits",
+    "length": "5:00",
+    "published_relative": "hace 1 año",
+    "views": 2821,
+    "url": "https://www.youtube.com/watch?v=NeY6Jt_x-Jk"
+  },
+  {
     "youtube_id": "oai1zGfZK2E",
     "title_es": "10 Cosas que AMO y ODIO de PixInsight",
     "title_en": "10 Things I LOVE & HATE About PixInsight",
@@ -1608,7 +1530,7 @@
     "author": "Dylan O'Donnell",
     "length": "14:02",
     "published_relative": "hace 2 años",
-    "views": 16873,
+    "views": 16875,
     "url": "https://www.youtube.com/watch?v=oai1zGfZK2E"
   },
   {
@@ -1620,9 +1542,22 @@
     "level": "MEDIO",
     "author": "Astrocitas",
     "length": "24:43",
-    "published_relative": "hace 8 días",
-    "views": 727,
+    "published_relative": "hace 9 días",
+    "views": 736,
     "url": "https://www.youtube.com/watch?v=F8kAp3xG3Fo"
+  },
+  {
+    "youtube_id": "pgMb9lmM34M",
+    "title_es": "Cómo explorar una astrofotografía en PixInsight para descubrir nuevos objetos",
+    "title_en": "Exploring an Astrophotography Image in PixInsight to Discover New Objects",
+    "summary_es": "En este vídeo, Astrocitas muestra cómo utilizar las herramientas de PixInsight para inspeccionar profundamente una imagen astronómica y revelar objetos débiles o desconocidos. Se explora el uso de técnicas de visualización, estiramientos y ajustes para detectar estructuras sutiles. Es una guía práctica para sacar el máximo partido a tus datos astrofotográficos.",
+    "summary_en": "In this video, Astrocitas demonstrates how to use PixInsight tools to thoroughly inspect an astronomical image and reveal faint or unknown objects. Techniques such as visualization, stretching, and adjustments are explored to detect subtle structures. It is a practical guide to get the most out of your astrophotography data.",
+    "level": "MEDIO",
+    "author": "Astrocitas",
+    "length": "1:24:34",
+    "published_relative": "Emitido hace 1 año",
+    "views": 1678,
+    "url": "https://www.youtube.com/watch?v=pgMb9lmM34M"
   },
   {
     "youtube_id": "kybXa7oYf3E",
@@ -1636,6 +1571,19 @@
     "published_relative": "hace 1 año",
     "views": 1129,
     "url": "https://www.youtube.com/watch?v=kybXa7oYf3E"
+  },
+  {
+    "youtube_id": "SULtytDIKoY",
+    "title_es": "Nuevos scripts para PixInsight",
+    "title_en": "New Scripts for PixInsight",
+    "summary_es": "En este video se presentan scripts recientemente añadidos a PixInsight, explicando su instalación y uso básico. Se demuestra cómo estos scripts automatizan tareas como la calibración, alineación y mejora de imágenes astronómicas.",
+    "summary_en": "This video introduces recently added scripts in PixInsight, covering their installation and basic usage. It demonstrates how these scripts automate tasks such as calibration, registration, and enhancement of astronomical images.",
+    "level": "MEDIO",
+    "author": "Astrocitas",
+    "length": "1:43:31",
+    "published_relative": "Emitido hace 2 años",
+    "views": 2683,
+    "url": "https://www.youtube.com/watch?v=SULtytDIKoY"
   },
   {
     "youtube_id": "rnkCRPuEgiI",
@@ -1660,34 +1608,21 @@
     "author": "Astrocitas",
     "length": "41:38",
     "published_relative": "hace 3 años",
-    "views": 1433,
+    "views": 1435,
     "url": "https://www.youtube.com/watch?v=YKbgAAj0P34"
   },
   {
-    "youtube_id": "HKS_jbdTOXQ",
-    "title_es": "Automatiza tu procesado en PixInsight con los iconos",
-    "title_en": "Automate Your PixInsight Processing with Icons",
-    "summary_es": "En este video, Astrocitas explica cómo utilizar los iconos en PixInsight para automatizar y agilizar el flujo de trabajo de procesamiento de imágenes astronómicas. Se muestran técnicas para guardar y reutilizar procesos, organizar iconos y crear secuencias automatizadas que permiten reproducir pasos complejos con un solo clic. El tutorial está orientado a mejorar la eficiencia y consistencia del procesado, evitando repetir manualmente cada paso.",
-    "summary_en": "In this video, Astrocitas explains how to use icons in PixInsight to automate and streamline astronomical image processing workflows. It demonstrates techniques for saving and reusing processes, organizing icons, and creating automated sequences that allow complex steps to be reproduced with a single click. The tutorial is aimed at improving efficiency and consistency in processing, avoiding manual repetition of each step.",
+    "youtube_id": "Ylxv-2-npLQ",
+    "title_es": "Taller práctico sobre el estiramiento hiperbólico generalizado (GHS) en PixInsight",
+    "title_en": "Practical Workshop on Generalized Hyperbolic Stretch (GHS) in PixInsight",
+    "summary_es": "Este video ofrece un taller práctico sobre el uso del script GHS (Generalised Hyperbolic Stretch) en PixInsight. Explica cómo mejorar la luminancia y el color de las imágenes astronómicas mediante técnicas de estiramiento no lineal, mostrando ejemplos reales y ajustes recomendados. Adecuado para astrofotógrafos que deseen dominar esta herramienta avanzada.",
+    "summary_en": "This video provides a practical workshop on using the Generalized Hyperbolic Stretch (GHS) script in PixInsight. It explains how to enhance luminance and color in astronomical images using non-linear stretching techniques, with real examples and recommended settings. Suitable for astrophotographers looking to master this advanced tool.",
     "level": "MEDIO",
     "author": "Astrocitas",
-    "length": "7:11",
-    "published_relative": "hace 2 años",
-    "views": 998,
-    "url": "https://www.youtube.com/watch?v=HKS_jbdTOXQ"
-  },
-  {
-    "youtube_id": "pgMb9lmM34M",
-    "title_es": "Cómo explorar una astrofotografía en PixInsight para descubrir nuevos objetos",
-    "title_en": "Exploring an Astrophotography Image in PixInsight to Discover New Objects",
-    "summary_es": "En este vídeo, Astrocitas muestra cómo utilizar las herramientas de PixInsight para inspeccionar profundamente una imagen astronómica y revelar objetos débiles o desconocidos. Se explora el uso de técnicas de visualización, estiramientos y ajustes para detectar estructuras sutiles. Es una guía práctica para sacar el máximo partido a tus datos astrofotográficos.",
-    "summary_en": "In this video, Astrocitas demonstrates how to use PixInsight tools to thoroughly inspect an astronomical image and reveal faint or unknown objects. Techniques such as visualization, stretching, and adjustments are explored to detect subtle structures. It is a practical guide to get the most out of your astrophotography data.",
-    "level": "MEDIO",
-    "author": "Astrocitas",
-    "length": "1:24:34",
-    "published_relative": "Emitido hace 1 año",
-    "views": 1678,
-    "url": "https://www.youtube.com/watch?v=pgMb9lmM34M"
+    "length": "1:37:45",
+    "published_relative": "hace 3 años",
+    "views": 3670,
+    "url": "https://www.youtube.com/watch?v=Ylxv-2-npLQ"
   },
   {
     "youtube_id": "IXi6AoBQTrM",
@@ -1703,32 +1638,6 @@
     "url": "https://www.youtube.com/watch?v=IXi6AoBQTrM"
   },
   {
-    "youtube_id": "Ylxv-2-npLQ",
-    "title_es": "Taller práctico sobre el estiramiento hiperbólico generalizado (GHS) en PixInsight",
-    "title_en": "Practical Workshop on Generalized Hyperbolic Stretch (GHS) in PixInsight",
-    "summary_es": "Este video ofrece un taller práctico sobre el uso del script GHS (Generalised Hyperbolic Stretch) en PixInsight. Explica cómo mejorar la luminancia y el color de las imágenes astronómicas mediante técnicas de estiramiento no lineal, mostrando ejemplos reales y ajustes recomendados. Adecuado para astrofotógrafos que deseen dominar esta herramienta avanzada.",
-    "summary_en": "This video provides a practical workshop on using the Generalized Hyperbolic Stretch (GHS) script in PixInsight. It explains how to enhance luminance and color in astronomical images using non-linear stretching techniques, with real examples and recommended settings. Suitable for astrophotographers looking to master this advanced tool.",
-    "level": "MEDIO",
-    "author": "Astrocitas",
-    "length": "1:37:45",
-    "published_relative": "hace 3 años",
-    "views": 3669,
-    "url": "https://www.youtube.com/watch?v=Ylxv-2-npLQ"
-  },
-  {
-    "youtube_id": "ytec5ZylgzY",
-    "title_es": "Procesa tus imágenes súper rápido con estas herramientas de PixInsight",
-    "title_en": "Process Your Images Super Fast with These PixInsight Tools",
-    "summary_es": "Este video muestra herramientas y flujos de trabajo dentro de PixInsight para acelerar el procesamiento de imágenes astronómicas. Se explican funciones como el uso de procesos por lotes, atajos de teclado y scripts que optimizan tareas comunes. Ideal para astrofotógrafos que buscan eficiencia en su flujo de trabajo.",
-    "summary_en": "This video demonstrates tools and workflows within PixInsight to speed up astronomical image processing. It covers batch processing, keyboard shortcuts, and scripts that optimize common tasks. Ideal for astrophotographers looking to increase efficiency in their workflow.",
-    "level": "MEDIO",
-    "author": "Astrocitas",
-    "length": "10:35",
-    "published_relative": "hace 2 años",
-    "views": 1879,
-    "url": "https://www.youtube.com/watch?v=ytec5ZylgzY"
-  },
-  {
     "youtube_id": "BrcsTmowvdg",
     "title_es": "Instalación, uso y novedades de DBXTRACT versión 1.5",
     "title_en": "Installation, Usage, and New Features of DBXTRACT Version 1.5",
@@ -1738,34 +1647,21 @@
     "author": "Astrocitas",
     "length": "35:08",
     "published_relative": "hace 7 meses",
-    "views": 1698,
+    "views": 1705,
     "url": "https://www.youtube.com/watch?v=BrcsTmowvdg"
   },
   {
-    "youtube_id": "75Rbp4sVr4s",
-    "title_es": "Configuración de color en PixInsight o Photoshop para compartir e imprimir astrofotografía",
-    "title_en": "Color Setup in PixInsight or Photoshop for Sharing and Printing Astrophotography",
-    "summary_es": "En este video se explica cómo configurar el espacio de color y la gestión del color en PixInsight o Photoshop para que las astrofotografías se vean correctamente al compartirlas o imprimirlas. Se abordan perfiles de color, calibración de pantalla y ajustes de exportación.",
-    "summary_en": "This video explains how to set up color space and color management in PixInsight or Photoshop so that astrophotographs display correctly when shared or printed. It covers color profiles, screen calibration, and export settings.",
+    "youtube_id": "HKS_jbdTOXQ",
+    "title_es": "Automatiza tu procesado en PixInsight con los iconos",
+    "title_en": "Automate Your PixInsight Processing with Icons",
+    "summary_es": "En este video, Astrocitas explica cómo utilizar los iconos en PixInsight para automatizar y agilizar el flujo de trabajo de procesamiento de imágenes astronómicas. Se muestran técnicas para guardar y reutilizar procesos, organizar iconos y crear secuencias automatizadas que permiten reproducir pasos complejos con un solo clic. El tutorial está orientado a mejorar la eficiencia y consistencia del procesado, evitando repetir manualmente cada paso.",
+    "summary_en": "In this video, Astrocitas explains how to use icons in PixInsight to automate and streamline astronomical image processing workflows. It demonstrates techniques for saving and reusing processes, organizing icons, and creating automated sequences that allow complex steps to be reproduced with a single click. The tutorial is aimed at improving efficiency and consistency in processing, avoiding manual repetition of each step.",
     "level": "MEDIO",
     "author": "Astrocitas",
-    "length": "1:41:38",
-    "published_relative": "hace 3 años",
-    "views": 1662,
-    "url": "https://www.youtube.com/watch?v=75Rbp4sVr4s"
-  },
-  {
-    "youtube_id": "SULtytDIKoY",
-    "title_es": "Nuevos scripts para PixInsight",
-    "title_en": "New Scripts for PixInsight",
-    "summary_es": "En este video se presentan scripts recientemente añadidos a PixInsight, explicando su instalación y uso básico. Se demuestra cómo estos scripts automatizan tareas como la calibración, alineación y mejora de imágenes astronómicas.",
-    "summary_en": "This video introduces recently added scripts in PixInsight, covering their installation and basic usage. It demonstrates how these scripts automate tasks such as calibration, registration, and enhancement of astronomical images.",
-    "level": "MEDIO",
-    "author": "Astrocitas",
-    "length": "1:43:31",
-    "published_relative": "Emitido hace 2 años",
-    "views": 2683,
-    "url": "https://www.youtube.com/watch?v=SULtytDIKoY"
+    "length": "7:11",
+    "published_relative": "hace 2 años",
+    "views": 998,
+    "url": "https://www.youtube.com/watch?v=HKS_jbdTOXQ"
   },
   {
     "youtube_id": "O_Tnl3hE0gk",
@@ -1794,6 +1690,19 @@
     "url": "https://www.youtube.com/watch?v=7p0dI5Iv6N8"
   },
   {
+    "youtube_id": "75Rbp4sVr4s",
+    "title_es": "Configuración de color en PixInsight o Photoshop para compartir e imprimir astrofotografía",
+    "title_en": "Color Setup in PixInsight or Photoshop for Sharing and Printing Astrophotography",
+    "summary_es": "En este video se explica cómo configurar el espacio de color y la gestión del color en PixInsight o Photoshop para que las astrofotografías se vean correctamente al compartirlas o imprimirlas. Se abordan perfiles de color, calibración de pantalla y ajustes de exportación.",
+    "summary_en": "This video explains how to set up color space and color management in PixInsight or Photoshop so that astrophotographs display correctly when shared or printed. It covers color profiles, screen calibration, and export settings.",
+    "level": "MEDIO",
+    "author": "Astrocitas",
+    "length": "1:41:38",
+    "published_relative": "hace 3 años",
+    "views": 1662,
+    "url": "https://www.youtube.com/watch?v=75Rbp4sVr4s"
+  },
+  {
     "youtube_id": "ifYdDXejy78",
     "title_es": "Teoría, configuración y ejemplos de uso de Spectrophotometric Color Calibration (SPCC) en PixInsight",
     "title_en": "Theory, Configuration, and Usage Examples of Spectrophotometric Color Calibration (SPCC) in PixInsight",
@@ -1807,30 +1716,17 @@
     "url": "https://www.youtube.com/watch?v=ifYdDXejy78"
   },
   {
-    "youtube_id": "YtdpyZlwj3o",
-    "title_es": "Técnicas de procesado rápido de astrofotografía de espacio profundo en PixInsight",
-    "title_en": "Fast Deep-Sky Astro-Processing Techniques in PixInsight",
-    "summary_es": "Este video tutorial enseña flujos de trabajo rápidos y eficientes para procesar imágenes de espacio profundo en PixInsight. Cubre técnicas esenciales como calibración, alineación, integración y mejora de imagen, enfocándose en reducir el tiempo de procesamiento sin sacrificar calidad. Ideal para astrofotógrafos que buscan optimizar su rutina de revelado.",
-    "summary_en": "This tutorial demonstrates fast and efficient workflows for processing deep-sky images in PixInsight. It covers essential techniques such as calibration, alignment, integration, and image enhancement, focusing on reducing processing time without sacrificing quality. Ideal for astrophotographers looking to streamline their post-processing routine.",
+    "youtube_id": "ytec5ZylgzY",
+    "title_es": "Procesa tus imágenes súper rápido con estas herramientas de PixInsight",
+    "title_en": "Process Your Images Super Fast with These PixInsight Tools",
+    "summary_es": "Este video muestra herramientas y flujos de trabajo dentro de PixInsight para acelerar el procesamiento de imágenes astronómicas. Se explican funciones como el uso de procesos por lotes, atajos de teclado y scripts que optimizan tareas comunes. Ideal para astrofotógrafos que buscan eficiencia en su flujo de trabajo.",
+    "summary_en": "This video demonstrates tools and workflows within PixInsight to speed up astronomical image processing. It covers batch processing, keyboard shortcuts, and scripts that optimize common tasks. Ideal for astrophotographers looking to increase efficiency in their workflow.",
     "level": "MEDIO",
     "author": "Astrocitas",
-    "length": "58:09",
-    "published_relative": "hace 3 años",
-    "views": 4768,
-    "url": "https://www.youtube.com/watch?v=YtdpyZlwj3o"
-  },
-  {
-    "youtube_id": "zs4-Xf_Ri94",
-    "title_es": "Descubre detalles clave en Planetaria y PixInsight que no te puedes perder",
-    "title_en": "Discover Key Details in Planetaria and PixInsight You Can't Miss",
-    "summary_es": "En este video se exploran funciones y detalles específicos de los scripts de Planetaria y su integración con PixInsight, mostrando cómo optimizar el procesamiento de imágenes astronómicas. Se presentan técnicas y ajustes que facilitan el flujo de trabajo, ideales para usuarios de nivel intermedio.",
-    "summary_en": "This video explores specific features of the Planetaria scripts and their integration with PixInsight, showing how to optimize astronomical image processing. It presents techniques and adjustments that streamline the workflow, ideal for intermediate users.",
-    "level": "MEDIO",
-    "author": "Astrocitas",
-    "length": "1:26:41",
-    "published_relative": "Emitido hace 2 años",
-    "views": 1858,
-    "url": "https://www.youtube.com/watch?v=zs4-Xf_Ri94"
+    "length": "10:35",
+    "published_relative": "hace 2 años",
+    "views": 1879,
+    "url": "https://www.youtube.com/watch?v=ytec5ZylgzY"
   },
   {
     "youtube_id": "VmM8R5phLNw",
@@ -1855,7 +1751,7 @@
     "author": "Astrotivissa",
     "length": "1:13:22",
     "published_relative": "hace 1 año",
-    "views": 3938,
+    "views": 3939,
     "url": "https://www.youtube.com/watch?v=9jnEzl7P_Ho"
   },
   {
@@ -1868,7 +1764,7 @@
     "author": "Astrotivissa",
     "length": "24:37",
     "published_relative": "hace 3 años",
-    "views": 9519,
+    "views": 9522,
     "url": "https://www.youtube.com/watch?v=nCotgssZ0Cs"
   },
   {
@@ -1881,7 +1777,7 @@
     "author": "Astrotivissa",
     "length": "1:35:41",
     "published_relative": "hace 1 mes",
-    "views": 1645,
+    "views": 1649,
     "url": "https://www.youtube.com/watch?v=D-GFvIQHCkg"
   },
   {
@@ -1907,7 +1803,7 @@
     "author": "Astrotivissa",
     "length": "15:02",
     "published_relative": "hace 1 año",
-    "views": 1670,
+    "views": 1671,
     "url": "https://www.youtube.com/watch?v=xJER1JYwqqY"
   },
   {
@@ -1920,7 +1816,7 @@
     "author": "Astrotivissa",
     "length": "25:48",
     "published_relative": "hace 2 años",
-    "views": 6153,
+    "views": 6155,
     "url": "https://www.youtube.com/watch?v=LhdpCucCWxw"
   },
   {
@@ -1933,8 +1829,21 @@
     "author": "Lukomatico",
     "length": "19:17",
     "published_relative": "hace 1 año",
-    "views": 10250,
+    "views": 10261,
     "url": "https://www.youtube.com/watch?v=X7UV7Ws2tHc"
+  },
+  {
+    "youtube_id": "bxoRaejN1g0",
+    "title_es": "Corrección de gradiente multiescala Vol.2 | Cámara a color y filtros multibanda | Mars 1.1.1",
+    "title_en": "Multiscale Gradient Correction Vol.2 | One-Shot Color Camera and Multiband Filters | Mars 1.1.1",
+    "summary_es": "Este video tutorial se centra en la aplicación de la corrección de gradiente multiescala (MGC) en PixInsight, específicamente para imágenes capturadas con cámaras a color y filtros multibanda. Se explica el uso de la herramienta Mars 1.1.1 y se ofrecen consejos prácticos para optimizar la corrección de gradientes en este tipo de datos, mejorando el fondo del cielo y reduciendo los gradientes de origen óptico o atmosférico.",
+    "summary_en": "This tutorial focuses on applying Multiscale Gradient Correction (MGC) in PixInsight, specifically for images taken with one-shot color cameras and multiband filters. It explains the use of the Mars 1.1.1 tool and provides practical tips to optimize gradient correction on such data, improving the sky background and reducing gradients from optical or atmospheric origin.",
+    "level": "MEDIO",
+    "author": "Astrotivissa",
+    "length": "51:35",
+    "published_relative": "hace 1 año",
+    "views": 1981,
+    "url": "https://www.youtube.com/watch?v=bxoRaejN1g0"
   },
   {
     "youtube_id": "7esLGDpLWDU",
@@ -1959,7 +1868,7 @@
     "author": "Naztronomy",
     "length": "18:24",
     "published_relative": "hace 2 años",
-    "views": 5004,
+    "views": 5027,
     "url": "https://www.youtube.com/watch?v=R10xgHrqDcg"
   },
   {
@@ -1972,7 +1881,7 @@
     "author": "Naztronomy",
     "length": "19:09",
     "published_relative": "hace 9 meses",
-    "views": 8181,
+    "views": 8192,
     "url": "https://www.youtube.com/watch?v=6OrQffaOkaM"
   },
   {
@@ -1985,7 +1894,7 @@
     "author": "Naztronomy",
     "length": "19:06",
     "published_relative": "hace 1 año",
-    "views": 6003,
+    "views": 6011,
     "url": "https://www.youtube.com/watch?v=1JV-UPuzZoY"
   },
   {
@@ -1998,7 +1907,7 @@
     "author": "Naztronomy",
     "length": "18:25",
     "published_relative": "hace 1 mes",
-    "views": 862,
+    "views": 867,
     "url": "https://www.youtube.com/watch?v=taRgTYEJ4DQ"
   },
   {
@@ -2011,7 +1920,7 @@
     "author": "Naztronomy",
     "length": "6:56",
     "published_relative": "hace 2 años",
-    "views": 3380,
+    "views": 3381,
     "url": "https://www.youtube.com/watch?v=OD2yj0GTBo8"
   },
   {
@@ -2024,7 +1933,7 @@
     "author": "Naztronomy",
     "length": "21:15",
     "published_relative": "hace 4 meses",
-    "views": 3474,
+    "views": 3485,
     "url": "https://www.youtube.com/watch?v=T9pdjjek5WE"
   },
   {
@@ -2037,7 +1946,7 @@
     "author": "Naztronomy",
     "length": "18:38",
     "published_relative": "hace 1 año",
-    "views": 6904,
+    "views": 6910,
     "url": "https://www.youtube.com/watch?v=E_LIjdVQdSg"
   },
   {
@@ -2050,7 +1959,7 @@
     "author": "Astrocity",
     "length": "8:54",
     "published_relative": "hace 3 años",
-    "views": 6916,
+    "views": 6919,
     "url": "https://www.youtube.com/watch?v=fQuc-Y1J994"
   },
   {
@@ -2063,7 +1972,7 @@
     "author": "Astrocity",
     "length": "8:45",
     "published_relative": "hace 3 años",
-    "views": 5094,
+    "views": 5101,
     "url": "https://www.youtube.com/watch?v=5BzIUEuBV2A"
   },
   {
@@ -2132,19 +2041,6 @@
     "url": "https://www.youtube.com/watch?v=GmEfgd0dGgw"
   },
   {
-    "youtube_id": "m9t3aj_PpiU",
-    "title_es": "M42 Detrás de la imagen: flujo de trabajo de PixInsight y Photoshop",
-    "title_en": "M42 Behind the Image: PixInsight and Photoshop Workflow",
-    "summary_es": "Este video muestra el proceso completo de procesamiento de la nebulosa M42 combinando PixInsight y Photoshop. Se cubren técnicas como apilado, calibración, estiramiento de histogramas y ajustes finales con capas.",
-    "summary_en": "This video demonstrates the complete processing workflow for the M42 nebula using both PixInsight and Photoshop. It covers stacking, calibration, histogram stretching, and final adjustments with layers.",
-    "level": "MEDIO",
-    "author": "Dylan O'Donnell",
-    "length": "35:25",
-    "published_relative": "hace 7 años",
-    "views": 38719,
-    "url": "https://www.youtube.com/watch?v=m9t3aj_PpiU"
-  },
-  {
     "youtube_id": "1qiYdwybEL4",
     "title_es": "Mi mejor y peor astrofotografía hasta la fecha",
     "title_en": "My Best and Worst Astrophotography to Date",
@@ -2171,6 +2067,19 @@
     "url": "https://www.youtube.com/watch?v=rpcC0mn3e1k"
   },
   {
+    "youtube_id": "m9t3aj_PpiU",
+    "title_es": "M42 Detrás de la imagen: flujo de trabajo de PixInsight y Photoshop",
+    "title_en": "M42 Behind the Image: PixInsight and Photoshop Workflow",
+    "summary_es": "Este video muestra el proceso completo de procesamiento de la nebulosa M42 combinando PixInsight y Photoshop. Se cubren técnicas como apilado, calibración, estiramiento de histogramas y ajustes finales con capas.",
+    "summary_en": "This video demonstrates the complete processing workflow for the M42 nebula using both PixInsight and Photoshop. It covers stacking, calibration, histogram stretching, and final adjustments with layers.",
+    "level": "MEDIO",
+    "author": "Dylan O'Donnell",
+    "length": "35:25",
+    "published_relative": "hace 7 años",
+    "views": 38720,
+    "url": "https://www.youtube.com/watch?v=m9t3aj_PpiU"
+  },
+  {
     "youtube_id": "peO2vGTHBwQ",
     "title_es": "Tutorial de astrofotografía LRGB en modo fácil",
     "title_en": "Easy LRGB Astrophotography Tutorial",
@@ -2180,7 +2089,7 @@
     "author": "Astrobackyard",
     "length": "16:37",
     "published_relative": "hace 1 año",
-    "views": 31765,
+    "views": 31786,
     "url": "https://www.youtube.com/watch?v=peO2vGTHBwQ"
   },
   {
@@ -2193,7 +2102,7 @@
     "author": "Astrobackyard",
     "length": "11:45",
     "published_relative": "hace 1 año",
-    "views": 97166,
+    "views": 97245,
     "url": "https://www.youtube.com/watch?v=V7YflDpAT8o"
   },
   {
@@ -2206,7 +2115,7 @@
     "author": "Astrobackyard",
     "length": "32:53",
     "published_relative": "hace 5 años",
-    "views": 103594,
+    "views": 103597,
     "url": "https://www.youtube.com/watch?v=ph-cpjqlv0Q"
   },
   {
@@ -2219,7 +2128,7 @@
     "author": "Astrobackyard",
     "length": "7:32",
     "published_relative": "hace 2 años",
-    "views": 41978,
+    "views": 41994,
     "url": "https://www.youtube.com/watch?v=ARayXDczxys"
   },
   {
@@ -2232,7 +2141,7 @@
     "author": "Astrobackyard",
     "length": "46:13",
     "published_relative": "hace 2 años",
-    "views": 182814,
+    "views": 182905,
     "url": "https://www.youtube.com/watch?v=Oj1lDHS6Qi0"
   },
   {
@@ -2245,7 +2154,7 @@
     "author": "Astrobackyard",
     "length": "16:11",
     "published_relative": "hace 2 años",
-    "views": 60466,
+    "views": 60488,
     "url": "https://www.youtube.com/watch?v=pf3PsOqpdhA"
   }
 ]
