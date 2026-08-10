@@ -281,6 +281,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV545**
   - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
   - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
+- **Modelo: summer deals**
+  - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
 
 ### CAMERAS
 - **Modelo: Astro Camera**
@@ -353,8 +355,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 - **Modelo: cámara astrofotografía**
   - [Cada fotograma cuenta una historia del universo 🌌 con cámaras ToupTek Astro](https://www.youtube.com/shorts/rf8yMq7JIT4) (2026-05-01)
-- **Modelo: cámara astronómica**
-  - [ToupTek lanza una cámara que acerca el espacio profundo como nunca antes](https://www.youtube.com/shorts/CqZ5UwR62JE) (2026-05-10)
 
 ### SOFTWARE
 - **Modelo: StellaVita**
