@@ -7,6 +7,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Askar
 
 ### ACCESSORIES
+- **Modelo: Autofocus**
+  - [Demostración de la Curva de Autenfoque de Askar con NINA](https://www.youtube.com/watch?v=zrXrnTt7EE0) (2026-08-10)
 - **Modelo: WAF**
   - [Video Demostrativo del Askar WAF: Cómo Instalar el WAF (Ejemplo con SQA106)](https://www.youtube.com/watch?v=7y95ZS5r9lU) (2026-08-07)
   - [Presentación del focuser automático WAF de Askar](https://www.youtube.com/watch?v=KKe6wz0bM9Y) (2026-08-05)
@@ -360,7 +362,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: StellaVita**
   - [Cómo Usar el Asistente de Campo Plano en ToupTek StellaVita](https://www.youtube.com/watch?v=ePd8uiMa8F4) (2026-07-13)
   - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
-  - [Tutorial de StellaVita App 2.0: Configuración de Plan de Captura](https://www.youtube.com/watch?v=2b8Obk4QVUw) (2026-05-12)
 
 ### TELESCOPES
 - **Modelo: HOPE D60**
