@@ -15,6 +15,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### TELESCOPES
 - **Actualizaciones Generales / Revisiones:**
+  - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
   - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
 - **Modelo: N160**
   - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
@@ -349,8 +350,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
   - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
-- **Modelo: ATR585M**
-  - [Desafiando el Sol con la cámara ToupTek ATR585M y un telescopio solar modificado](https://www.youtube.com/watch?v=uPhraUvZUOs) (2026-05-14)
 - **Modelo: CMOS**
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: Cámara CMOS**
