@@ -92,7 +92,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [FirstLight 80mm con montura Go-To: telescopio fácil de usar](https://www.youtube.com/shorts/5VPLpKqJ4S0) (2025-12-22)
 - **Actualizaciones Generales / Revisiones:**
   - [Cómo elegir el telescopio adecuado - Preguntas frecuentes](https://www.youtube.com/shorts/zAYh91ltVXE) (2025-12-22)
-  - [Telescopio Explore Scientific por menos de $200](https://www.youtube.com/shorts/CGYnoi082QE) (2025-12-22)
 
 ## INDI Library
 
@@ -412,6 +411,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
+  - [Novedades en ASIAIR V3.0 de ZWO](https://www.youtube.com/shorts/jHi-yW2CYWg) (2026-08-13)
   - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: communty**
