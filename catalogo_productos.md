@@ -176,8 +176,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Primalucelab
 
 ### ACCESSORIES
-- **Modelo: 2025**
-  - [2025 en Primalucelab: Un año de innovación en astronomía y espacio](https://www.youtube.com/watch?v=zWPa2Ch1NWY) (2025-12-30)
 - **Modelo: ASTRO-RES**
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
@@ -281,6 +279,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV545**
   - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
   - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
+- **Modelo: Star Fest 2026**
+  - [SVBONY en Star Fest 2026: noticias y novedades](https://www.youtube.com/shorts/Faw5jPxGfM8) (2026-08-14)
 - **Modelo: summer deals**
   - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
 
