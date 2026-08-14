@@ -73,10 +73,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Explore Scientific
 
-### ACCESSORIES
-- **Modelo: eyepieces**
-  - [Cómo limpiar y almacenar tus oculares: consejos de Explore Scientific](https://www.youtube.com/shorts/3d9hTWm_gl0) (2025-12-22)
-
 ### MOUNTS
 - **Modelo: Astronomical League**
   - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
@@ -353,6 +349,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
+- **Modelo: HOPE D60**
+  - [Viaje a los cielos Bortle 1 del Tíbet con ToupTek HOPE D60 y kit completo](https://www.youtube.com/shorts/_TQCezXdMuk) (2026-08-13)
 - **Modelo: astronomical camera**
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 - **Modelo: cámara astrofotografía**
