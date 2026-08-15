@@ -179,8 +179,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASTRO-RES**
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
-- **Modelo: ESATTO 3.5" LP**
-  - [Actualización del Takahashi Epsilon 160ED con el enfocador robótico ESATTO 3.5" LP](https://www.youtube.com/watch?v=xsQ3W9nTESk) (2026-01-07)
 - **Modelo: Eagle**
   - [Filippo y Zoltan discuten astrofotografía moderna y control remoto en AstroFest Europeo 2026](https://www.youtube.com/watch?v=0gWm3hn2HkU) (2026-02-09)
 - **Modelo: OUTPOST 3M**
@@ -412,6 +410,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Novedades en ASIAIR V3.0 de ZWO](https://www.youtube.com/shorts/jHi-yW2CYWg) (2026-08-13)
   - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
+- **Modelo: Death Valley Observatories**
+  - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
 - **Modelo: communty**
   - [Más allá de la astrofotografía. Un mensaje de ZWO](https://www.youtube.com/shorts/MdM5e4MdjKI) (2026-08-05)
 - **Modelo: planetary-imaging**
