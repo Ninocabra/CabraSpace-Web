@@ -126,6 +126,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: AI Denoise**
   - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
+- **Modelo: Apple Silicon**
+  - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
 - **Modelo: Autopalette**
   - [Actualización de Autopalette y Novedades en PixInsight](https://www.youtube.com/watch?v=F8kAp3xG3Fo) (2026-07-27)
 - **Modelo: BlurXTerminator**
@@ -193,8 +195,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Compatibilidad del SESTO SENSO 3 con enfocadores externos](https://www.youtube.com/watch?v=0j2lRn5deXo) (2025-11-27)
 - **Modelo: SESTO SENSO 3 SC**
   - [Compatibilidad del SESTO SENSO 3 SC con telescopios tipo SC](https://www.youtube.com/watch?v=dTPnHUXrmCY) (2025-12-05)
-- **Modelo: control system**
-  - [Automatización de telescopios: control más allá de la simplicidad](https://www.youtube.com/watch?v=SQRxVXkhavs) (2026-02-25)
 
 ### MOUNTS
 - **Modelo: ASTRO-RES**
