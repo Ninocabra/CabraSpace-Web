@@ -73,6 +73,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Explore Scientific
 
+### ACCESSORIES
+- **Modelo: ALCON**
+  - [Presentación de la Lente ALCON para 2026](https://www.youtube.com/watch?v=CGa_wxDKjvQ) (2026-08-15)
+
 ### MOUNTS
 - **Modelo: Astronomical League**
   - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
@@ -179,8 +183,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASTRO-RES**
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
-- **Modelo: Eagle**
-  - [Filippo y Zoltan discuten astrofotografía moderna y control remoto en AstroFest Europeo 2026](https://www.youtube.com/watch?v=0gWm3hn2HkU) (2026-02-09)
 - **Modelo: OUTPOST 3M**
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
