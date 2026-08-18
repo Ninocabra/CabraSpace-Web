@@ -189,8 +189,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
   - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
-- **Modelo: PL GSS**
-  - [PL GSS debuta en SATShow 2026, Washington DC](https://www.youtube.com/watch?v=T4mLiczmSJg) (2026-03-27)
 - **Modelo: SESTO SENSO 3**
   - [Compatibilidad del SESTO SENSO 3 con enfocadores externos](https://www.youtube.com/watch?v=0j2lRn5deXo) (2025-11-27)
 - **Modelo: SESTO SENSO 3 SC**
@@ -259,6 +257,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
 - **Modelo: OAG SV238**
   - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
+- **Modelo: Ofertas**
+  - [Ofertas de Verano Svbony: Hasta 50% de Descuento en Equipos de Astrofotografía](https://www.youtube.com/watch?v=wA0luIBeOvY) (2026-08-18)
 - **Modelo: Prime Day**
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
   - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
