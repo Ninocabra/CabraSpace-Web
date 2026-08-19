@@ -14,11 +14,15 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Presentación del focuser automático WAF de Askar](https://www.youtube.com/watch?v=KKe6wz0bM9Y) (2026-08-05)
 
 ### TELESCOPES
+- **Modelo: F3.4**
+  - [Análisis a fondo del Askar N160: ¿Un Newton de alto valor F3.4?](https://www.youtube.com/watch?v=vyTPlmoWHEk) (2026-08-19)
 - **Actualizaciones Generales / Revisiones:**
   - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
   - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
 - **Modelo: N160**
   - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
+- **Modelo: N210**
+  - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
 - **Modelo: SQA130**
   - [Análisis del Askar SQA130: El telescopio de astrofotografía de $5000](https://www.youtube.com/watch?v=dfo6W2LiXSo) (2026-06-05)
 
@@ -231,8 +235,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Evostar EDX**
   - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
-- **Modelo: NEAF**
-  - [Resumen de NEAIC/NEAF 2026: Novedades de Equipos de Astrofotografía](https://www.youtube.com/watch?v=LcyOOeVvOg4) (2026-04-18)
 
 ## Skywatcher
 
@@ -245,8 +247,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Planetario**
   - [Lanzamiento de Stellarium v26.2: Nuevas Culturas Celestes y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.2) (2026-06-24)
-- **Modelo: planetarium software**
-  - [Lanzamiento de Stellarium v26.1](https://github.com/Stellarium/stellarium/releases/tag/v26.1) (2026-04-05)
 
 ## Svbony
 
