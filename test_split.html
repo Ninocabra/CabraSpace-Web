@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Test Fase E — pipeline split</title>
+<style>body{background:#111;color:#ddd;font-family:monospace;padding:10px} canvas{border:1px solid #444;margin:4px} #log{white-space:pre-wrap}</style>
+</head><body>
+<h3>Test Fase E: nebulosa v7 (3→1 asimétrico) + estrellas v11 + guard + recombinar</h3>
+<div id="log">cargando ort...</div>
+<div><canvas id="cIn"></canvas><canvas id="cNeb"></canvas><canvas id="cStars"></canvas><canvas id="cOut"></canvas></div>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
+<script src="onnx-engine.js"></script>
+<script src="deconv-split.js"></script>
+<script>
+const log = (m) => { document.getElementById("log").textContent += "\n" + m; console.log(m); };
+const LUMA = [0.2126, 0.7152, 0.0722];
+
+function loadImg(url) {
+  return new Promise((res, rej) => {
+    const im = new Image(); im.crossOrigin = "anonymous";
+    im.onload = () => {
+      const cv = document.createElement("canvas"); cv.width = im.width; cv.height = im.height;
+      const cx = cv.getContext("2d"); cx.drawImage(im, 0, 0);
+      const d = cx.getImageData(0, 0, im.width, im.height).data;
+      const n = im.width * im.height, ch = [new Float32Array(n), new Float32Array(n), new Float32Array(n)];
+      for (let i = 0; i < n; i++) { ch[0][i] = d[i*4]/255; ch[1][i] = d[i*4+1]/255; ch[2][i] = d[i*4+2]/255; }
+      res({ ch, w: im.width, h: im.height, n });
+    };
+    im.onerror = () => rej(new Error("no carga " + url)); im.src = url;
+  });
+}
+function draw(id, ch, w, h) {
+  const cv = document.getElementById(id); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d"), im = cx.createImageData(w, h), d = im.data;
+  // stretch asinh suave para ver
+  for (let i = 0; i < w*h; i++) for (let c = 0; c < 3; c++) {
+    const v = Math.asinh((ch[c][i]||0) * 20) / Math.asinh(20);
+    d[i*4+c] = Math.max(0, Math.min(255, v*255));
+  }
+  for (let i = 0; i < w*h; i++) d[i*4+3] = 255;
+  cx.putImageData(im, 0, 0);
+}
+
+(async () => {
+  try {
+    if (typeof ort === "undefined") { log("ERROR: ort no cargó"); return; }
+    log("ort " + ort.env.versions.common + " OK. OnnxEngine=" + (typeof window.OnnxEngine));
+    const I = window.DeconvSplitAI._internals;
+    const starless = await loadImg("nebula_starless.png");
+    const stars = await loadImg("nebula_stars.png");
+    const w = starless.w, h = starless.h, n = w*h;
+    log(`imágenes ${w}x${h} cargadas`);
+    draw("cIn", starless.ch, w, h);
+
+    // --- NEBULOSA: modelo asimétrico 3→1 (el riesgo del port) ---
+    const Lsl = I.luminance(starless.ch, n);
+    const st = I.robustStats(Lsl), dsl = Math.max(st.hi - st.med, 1e-6);
+    const Ln = new Float32Array(n); for (let i=0;i<n;i++) Ln[i] = (Lsl[i]-st.med)/dsl;
+    const Lstar = I.luminance(stars.ch, n);
+    const fwhm = I.measureFWHM(Lstar, w, h), sigma = I.measureSigma(Ln, w, h);
+    log(`conditioning medido en JS: FWHM=${fwhm.toFixed(2)}px sigma=${sigma.toFixed(4)}`);
+    const fmap = new Float32Array(n).fill(Math.min(fwhm/I.FWHM_NORM,1));
+    const smap = new Float32Array(n).fill(Math.min(sigma*I.SIGMA_NORM,1));
+    const nbSess = await window.OnnxEngine.loadSession(I.URLS.neb, {}, (p)=>{});
+    log("neb_v7 sesión cargada. Corriendo tiler asimétrico (channels:3, outChannels:1)...");
+    const t0 = performance.now();
+    const nbOut = await window.OnnxEngine.runOnnxModelTiled(nbSess, { ch:[Ln,fmap,smap], w, h, nc:3, isColor:true }, {
+      tileSize:256, fixedTile:256, overlap:32, padMode:"reflect", layout:"NCHW", channels:3, outChannels:1 });
+    log(`nebulosa OK en ${Math.round(performance.now()-t0)}ms. salida canales=${nbOut.length}`);
+    const Lo = nbOut[0]; let nan=0, mn=1e9, mx=-1e9; for (const v of Lo){ if(!Number.isFinite(v))nan++; if(v<mn)mn=v; if(v>mx)mx=v; }
+    log(`nebulosa salida: min=${mn.toFixed(3)} max=${mx.toFixed(3)} NaN=${nan}`);
+    const slDec = [0,1,2].map(c => { const d=new Float32Array(n); for(let i=0;i<n;i++){ const Lout=Lo[i]*dsl+st.med; let r=Lout/Math.max(Lsl[i],1e-6); if(!Number.isFinite(r)||r<0)r=0; else if(r>4)r=4; d[i]=starless.ch[c][i]*0.5+starless.ch[c][i]*r*0.5; } return d; });
+    draw("cNeb", slDec, w, h);
+
+    // --- ESTRELLAS v11 + recombinar ---
+    const stSess = await window.OnnxEngine.loadSession(I.URLS.stars, {}, (p)=>{});
+    const stOut = await window.OnnxEngine.runOnnxModelTiled(stSess, { ch:stars.ch, w, h, nc:3, isColor:true }, {
+      tileSize:256, fixedTile:256, overlap:32, padMode:"reflect", layout:"NCHW", channels:3 });
+    draw("cStars", stOut, w, h);
+    log("estrellas v11 OK");
+    const out = [0,1,2].map(c => { const d=new Float32Array(n); for(let i=0;i<n;i++){ let v=slDec[c][i]+stOut[c][i]; d[i]=v<0?0:(v>1?1:v);} return d; });
+    draw("cOut", out, w, h);
+    let onan=0; for(const c of out) for(const v of c) if(!Number.isFinite(v))onan++;
+    log(`RECOMBINADO OK. NaN total=${onan}`);
+    log(onan===0 && nan===0 && nbOut.length===3 ? ">>> TEST PASA: pipeline split funciona end-to-end <<<" : ">>> REVISAR <<<");
+    document.title = "SPLIT_DONE";
+  } catch (e) { log("EXCEPCIÓN: " + e.message + "\n" + e.stack); document.title = "SPLIT_ERR"; }
+})();
+</script></body></html>

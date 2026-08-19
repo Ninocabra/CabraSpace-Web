@@ -87,13 +87,20 @@
       return;
     }
 
+    // Modelo elegido en el desplegable. CabraStars Web (propio) = default; StarNet2 = alternativa.
+    const selModel = el("selStarModel");
+    const useCabra = !selModel || selModel.value === "cabrastars";
+    const modelName = useCabra ? "CabraStars Web" : "StarNet2";
+
     const runExecution = () => {
       const lang = window.location.pathname.includes("-en.html") ? "en" : "es";
-      showLoader(lang === "es" ? "Cargando modelo StarNet2..." : "Loading StarNet2 model...");
+      showLoader(lang === "es" ? `Cargando modelo ${modelName}...` : `Loading ${modelName} model...`);
 
       setTimeout(async () => {
         try {
-          const isLinear = state.screenStretchMode === true;
+          // CabraStars quiere la imagen LINEAL cruda (hace su propia normalización interna y no debe
+          // invertirse un STF después). StarNet2 sí necesita el STF temporal si la imagen es lineal.
+          const isLinear = !useCabra && state.screenStretchMode === true;
           let inputImg = state.activeImage;
           let shadows = null;
           let midtones = null;
@@ -143,14 +150,14 @@
             };
           }
 
-          const runFn = window.StarRemoval.runStarNet2;
+          const runFn = useCabra ? window.StarRemoval.runCabraStars : window.StarRemoval.runStarNet2;
           const result = await runFn(
             inputImg,
             // Callback para progreso de descarga
             (p) => {
               showLoader(lang === "es"
-                ? `Descargando modelo StarNet2: ${(p * 100).toFixed(0)}%`
-                : `Downloading StarNet2 model: ${(p * 100).toFixed(0)}%`
+                ? `Descargando modelo ${modelName}: ${(p * 100).toFixed(0)}%`
+                : `Downloading ${modelName} model: ${(p * 100).toFixed(0)}%`
               );
             },
             // Callback para progreso de tiles
@@ -251,6 +258,24 @@
 
     runExecution();
   });
+
+  // Actualizar el crédito bajo el botón según el modelo elegido en el desplegable.
+  {
+    const selModel = el("selStarModel");
+    const credit = el("starModelCredit");
+    if (selModel && credit) {
+      const isEn = window.location.pathname.includes("-en.html");
+      const updateCredit = () => {
+        credit.innerHTML = selModel.value === "starnet2"
+          ? 'StarNet2 - <a href="https://www.starnetastro.com/" target="_blank" rel="noopener" style="color:var(--gold-primary);text-decoration:none;">Nikita Misiura</a>'
+          : (isEn
+            ? 'CabraStars Web - CabraSpace\'s own model, by <a href="https://www.cabraspace.com/" target="_blank" rel="noopener" style="color:var(--gold-primary);text-decoration:none;">CabraSpace</a>'
+            : 'CabraStars Web - modelo propio de <a href="https://www.cabraspace.com/" target="_blank" rel="noopener" style="color:var(--gold-primary);text-decoration:none;">CabraSpace</a>');
+      };
+      selModel.addEventListener("change", updateCredit);
+      updateCredit();
+    }
+  }
   // STAR-REMOVAL-INTEGRATION-END
 
   // Mostrar u ocultar controles dinámicos de estirado según algoritmo seleccionado

@@ -81,9 +81,38 @@ window.OnnxEngine = (function () {
     }
   }
 
-  async function fetchModelWithCache(url, onProgress) {
+  async function deleteCachedModel(url) {
+    try {
+      const db = await openModelDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const req = tx.objectStore(STORE_NAME).delete(url);
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => resolve(false);
+      });
+    } catch (err) {
+      console.warn("Cache delete error:", err);
+      return false;
+    }
+  }
+
+  // CACHE-INTEGRITY-BEGIN (bug 2026-07-25): la caché se indexaba SOLO por URL y se devolvía sin
+  // validar nada. Al reemplazar un modelo MANTENIENDO el nombre (p.ej. cabrastars_web.onnx pasó de
+  // FP16 a FP32), los navegadores que ya tenían el viejo se quedaban pegados a él PARA SIEMPRE ->
+  // el FP16 desborda en WebGPU, devuelve NaN y el resultado sale destrozado sin un solo error.
+  // Ahora el caller puede declarar `expectedBytes`: si la entrada cacheada no mide eso, se descarta
+  // y se vuelve a descargar. Si lo recién descargado tampoco cuadra, NO se cachea (evita el bucle
+  // descartar/redescargar) y se avisa fuerte: significa que hay que actualizar la constante.
+  async function fetchModelWithCache(url, onProgress, opts = {}) {
+    const expected = opts.expectedBytes || 0;
     const cached = await getCachedModel(url);
-    if (cached) return cached;
+    if (cached) {
+      if (!expected || cached.byteLength === expected) return cached;
+      console.warn(
+        `[OnnxEngine] caché DESCARTADA para ${url}: ${cached.byteLength} B, se esperaban ${expected} B. Redescargando…`
+      );
+      await deleteCachedModel(url);
+    }
 
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error ${response.status} fetching model`);
@@ -107,9 +136,17 @@ window.OnnxEngine = (function () {
 
     const blob = new Blob(chunks);
     const arrayBuffer = await blob.arrayBuffer();
+    if (expected && arrayBuffer.byteLength !== expected) {
+      console.error(
+        `[OnnxEngine] ${url} mide ${arrayBuffer.byteLength} B pero se esperaban ${expected} B. ` +
+        `NO se cachea (se redescargará cada vez). Si el modelo cambió a propósito, actualiza expectedBytes en el caller.`
+      );
+      return arrayBuffer;
+    }
     cacheModel(url, arrayBuffer).catch((e) => console.warn("Cache write failed:", e));
     return arrayBuffer;
   }
+  // CACHE-INTEGRITY-END
 
   async function createSession(modelData, options = {}) {
     const executionProviders = options.executionProviders ?? ["webgpu", "wasm"];
@@ -140,6 +177,12 @@ window.OnnxEngine = (function () {
     let offsetOut = 0.0;
     let onProgress = null;
     let modelChannels = 3;
+    let outChannels = null;
+    // clampOut (CabraStars 2026-07-24): por defecto la salida se recorta a [0,1] (todos los modelos
+    // previos entregan imagen en ese rango). CabraStars entrega la CAPA de estrellas en espacio
+    // normalizado (puede pasar de 1 en los nucleos); con clampOut:false se devuelve cruda y el
+    // post-proceso (des-normalizar + garantias) lo hace el llamador.
+    let clampOut = true;
 
     if (typeof tileSizeOrOptions === "object" && tileSizeOrOptions !== null) {
       const options = tileSizeOrOptions;
@@ -153,8 +196,14 @@ window.OnnxEngine = (function () {
       scaleOut = options.scaleOut ?? 1.0;
       offsetOut = options.offsetOut ?? 0.0;
       onProgress = options.onProgress ?? null;
+      clampOut = options.clampOut ?? true;
       modelChannels = options.channels ?? options.modelChannels ?? 3;
+      // Canales de SALIDA (por si el modelo es asimétrico: p.ej. nebulosa v7 = 3 entrada
+      // [L,FWHM,σ] -> 1 salida).
+      outChannels = options.outChannels ?? null;
     }
+    // Por defecto = entrada (todos los modelos previos son simétricos).
+    if (outChannels === null) outChannels = modelChannels;
 
     const W = imgData.w;
     const H = imgData.h;
@@ -287,7 +336,7 @@ window.OnnxEngine = (function () {
             const globalIdx = globalY * W + globalX;
             let outR, outG, outB;
 
-            if (modelChannels === 1) {
+            if (outChannels === 1) {
               let outVal;
               if (isNHWC) {
                 outVal = outData[r * pw * 1 + c * 1 + 0];
@@ -295,7 +344,7 @@ window.OnnxEngine = (function () {
                 outVal = outData[0 * ph * pw + r * pw + c];
               }
               outVal = outVal * scaleOut + offsetOut;
-              if (outVal < 0.0) outVal = 0.0; else if (outVal > 1.0) outVal = 1.0;
+              if (clampOut) { if (outVal < 0.0) outVal = 0.0; else if (outVal > 1.0) outVal = 1.0; }
 
               outR = outVal;
               outG = outVal;
@@ -316,10 +365,12 @@ window.OnnxEngine = (function () {
               outG = outG * scaleOut + offsetOut;
               outB = outB * scaleOut + offsetOut;
 
-              // Clamp values
-              if (outR < 0.0) outR = 0.0; else if (outR > 1.0) outR = 1.0;
-              if (outG < 0.0) outG = 0.0; else if (outG > 1.0) outG = 1.0;
-              if (outB < 0.0) outB = 0.0; else if (outB > 1.0) outB = 1.0;
+              // Clamp values (solo si clampOut; CabraStars devuelve la capa cruda sin recortar)
+              if (clampOut) {
+                if (outR < 0.0) outR = 0.0; else if (outR > 1.0) outR = 1.0;
+                if (outG < 0.0) outG = 0.0; else if (outG > 1.0) outG = 1.0;
+                if (outB < 0.0) outB = 0.0; else if (outB > 1.0) outB = 1.0;
+              }
             }
 
             if (nc === 3) {
@@ -364,7 +415,7 @@ window.OnnxEngine = (function () {
       console.info(`[OnnxEngine] sesión reutilizada (cache) para ${url}`);
       return cached;
     }
-    const data = await fetchModelWithCache(url, onProgress);
+    const data = await fetchModelWithCache(url, onProgress, { expectedBytes: options.expectedBytes });
     const session = await createSession(data, options);
     sessionCache.set(key, session);
     return session;

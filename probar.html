@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<title>CabraSpace — Probar pipeline split (estrellas v11 + nebulosa v7)</title>
+<style>
+  body{background:#0d0f14;color:#dde;font-family:system-ui,sans-serif;margin:0;padding:16px}
+  h2{margin:0 0 4px} .sub{color:#89a;font-size:13px;margin-bottom:14px}
+  #drop{border:2px dashed #46506a;border-radius:10px;padding:22px;text-align:center;color:#9ab;cursor:pointer;transition:.2s}
+  #drop.hi{border-color:#6cf;background:#141a26}
+  .row{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+  .col{flex:1;min-width:320px} .col h4{margin:0 0 6px;color:#9ab;font-weight:600}
+  canvas{width:100%;border:1px solid #2a3040;border-radius:6px;background:#000}
+  .ctrls{display:flex;gap:22px;align-items:center;margin:12px 0;flex-wrap:wrap}
+  label{font-size:13px;color:#bcd} input[type=range]{vertical-align:middle}
+  button{background:#2a6cf0;color:#fff;border:0;border-radius:6px;padding:9px 18px;font-size:14px;cursor:pointer}
+  button:disabled{background:#39435a;cursor:default}
+  #log{font-family:monospace;font-size:12px;color:#7f93b3;white-space:pre-wrap;margin-top:10px;max-height:120px;overflow:auto}
+  .tag{display:inline-block;background:#1a2740;color:#7cf;border-radius:4px;padding:1px 7px;font-size:11px;margin-left:6px}
+</style></head><body>
+<h2>Probar pipeline split <span class="tag">estrellas v11</span><span class="tag">nebulosa v7</span></h2>
+<div class="sub">Arrastra una imagen (<b>XISF, TIF, FITS</b> lineales, o PNG/JPG). Corre StarNet → estrellas v11 + nebulosa v7 → recombinar, en tu GPU vía WebGPU.
+La 1ª vez descarga StarNet (~130&nbsp;MB, se cachea). XISF/TIF lineal = el dominio en que se validaron los modelos (mejor resultado que PNG 8-bit).
+Imágenes grandes se reescalan a 1600&nbsp;px para la prueba.</div>
+
+<div id="drop">📂 Arrastra tu XISF/TIF/FITS/PNG aquí, o haz clic para elegir. <span style="color:#678">(o usa la muestra cargada)</span></div>
+<input id="file" type="file" accept=".xisf,.tif,.tiff,.fit,.fits,.png,.jpg,.jpeg,image/*" style="display:none">
+
+<div class="ctrls">
+  <label>Estrellas <input id="sStar" type="range" min="0" max="1" step="0.05" value="0.9"> <span id="vStar">0.90</span></label>
+  <label>Nebulosa <input id="sNeb" type="range" min="0" max="1" step="0.05" value="0.5"> <span id="vNeb">0.50</span></label>
+  <label><input id="stf" type="checkbox" checked> Auto STF <span style="color:#678">(ver lineal)</span></label>
+  <button id="go">Procesar</button>
+</div>
+
+<div class="row">
+  <div class="col"><h4>Original</h4><canvas id="cIn"></canvas></div>
+  <div class="col"><h4>CabraSpace (split)</h4><canvas id="cOut"></canvas></div>
+</div>
+<div id="log"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/ort.webgpu.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+<script src="io.js"></script>
+<script src="onnx-engine.js"></script>
+<script src="deconv-split.js"></script>
+<script>
+const log = (m) => { const l=document.getElementById("log"); l.textContent += m+"\n"; l.scrollTop=l.scrollHeight; };
+let img = null;   // {ch,w,h,nc,isColor}
+
+// AutoSTF estilo PixInsight: punto negro c0 = mediana + (-2.8)*1.4826*MAD; midtones m para
+// llevar el fondo a targetBg=0.25. Se calcula de la luminancia de la ENTRADA y se aplica IGUAL
+// a entrada y salida (comparables). MTF(m,x) = (m-1)x / ((2m-1)x - m).
+// AutoSTF UNLINKED (por canal, como PixInsight por defecto): cada canal RGB tiene su propio
+// punto negro y midtones -> el fondo queda NEUTRO y todo es visible aunque los canales tengan
+// pedestales muy distintos (aplicar UN STF de luminancia a los 3 rompía el color: rojo→negro,
+// azul→brillante). Punto negro por PERCENTIL 1% (el cielo astro es tan uniforme que MAD≈0).
+// AutoSTF UNLINKED POR IMAGEN (como PixInsight con STF por vista): cada panel (entrada/salida)
+// se estira con SUS propias estadísticas, y cada canal RGB por separado -> fondo neutro, ambos
+// bien expuestos para comparar DETALLE/color/estrellas (no un cambio de brillo global que el
+// deconv puede introducir). Punto negro por percentil 1% (el cielo astro es tan uniforme que
+// MAD≈0); fondo (mediana) -> 0.20.
+// PUNTO NEGRO POR CANAL (neutraliza el pedestal de cada canal → fondo gris) + MIDTONES
+// COMPARTIDO (una sola curva para R,G,B → PRESERVA el color real de estrellas y nebulosa).
+// (Un midtones por canal, como hacía antes, estiraba cada canal distinto e introducía un tinte
+// verde-magenta falso; el color lineal real NO cambia entre entrada y salida — verificado.)
+function computeSTF(d){
+  const n=d.w*d.h, step=Math.max(1,Math.floor(n/120000)), b=0.20, c0=[]; let x0=0;
+  for(let c=0;c<3;c++){
+    const s=[]; const src=d.ch[Math.min(c,d.ch.length-1)];
+    for(let i=0;i<n;i+=step) s.push(src[i]);
+    s.sort((a,b)=>a-b);
+    const q=p=>s[Math.min(s.length-1,Math.max(0,Math.floor(p*(s.length-1))))];
+    const black=q(0.01), med=q(0.5);
+    c0.push(black);
+    x0 += (med-black)/(1-black);           // posición del fondo tras restar el negro, promedio 3 canales
+  }
+  x0/=3; if(!(x0>1e-5)) x0=1e-5;
+  let m=(x0*(b-1))/(2*b*x0 - b - x0); if(!(m>1e-4&&m<0.9999)) m=0.5;  // UN midtones compartido
+  // CLAMP anti-ruido: un m diminuto (fondo≈punto negro en datos muy planos) mapea residuos
+  // minúsculos del modelo a niveles visibles = mar de motitas falsas. Tope 0.02 (sigue mostrando
+  // nebulosa débil sin amplificar el suelo de ruido a lo bestia).
+  if(m<0.02) m=0.02;
+  return {c0,m};
+}
+function mtf(m,x){ if(x<=0)return 0; if(x>=1)return 1; return ((m-1)*x)/(((2*m-1)*x)-m); }
+const _drawn={};   // recuerda los datos por canvas para redibujar al togglear STF
+let stfRef=null;   // STF de REFERENCIA (calculado de la ENTRADA) aplicado a AMBOS paneles: así
+//                    entrada y salida usan el MISMO estirado y son comparables (las estrellas se
+//                    ven iguales porque SON iguales — el FWHM no cambia; verificado).
+function drawImg(id, d){ _drawn[id]=d; const cv=document.getElementById(id); cv.width=d.w; cv.height=d.h;
+  const cx=cv.getContext("2d"), im=cx.createImageData(d.w,d.h), o=im.data, n=d.w*d.h;
+  const useStf=document.getElementById("stf").checked, P=useStf?(stfRef||computeSTF(d)):null, A=Math.asinh(24);
+  const tone=(v,c)=>{ if(!useStf) return Math.max(0,Math.min(255,Math.asinh((v||0)*24)/A*255));
+    let x=((v||0)-P.c0[c])/(1-P.c0[c]); if(x<0)x=0; else if(x>1)x=1; return Math.max(0,Math.min(255,mtf(P.m,x)*255)); };
+  for(let i=0;i<n;i++){ o[i*4]=tone(d.ch[0][i],0); o[i*4+1]=tone(d.ch[1][i],1); o[i*4+2]=tone(d.ch[2][i],2); o[i*4+3]=255; }
+  cx.putImageData(im,0,0);
+}
+const MAXSIDE = 1600;   // reescalado para que la prueba no tarde (la app real procesa a plena res)
+// reescala {ch,w,h,nc} por muestreo por área (box), preservando el rango LINEAL (sin estirar)
+function downscale(im){ const {w,h}=im; if(Math.max(w,h)<=MAXSIDE) return im;
+  const s=MAXSIDE/Math.max(w,h), nw=Math.round(w*s), nh=Math.round(h*s), nc=im.ch.length;
+  const out=[]; for(let c=0;c<nc;c++){ const o=new Float32Array(nw*nh), src=im.ch[c];
+    for(let y=0;y<nh;y++){ const y0=Math.floor(y/s), y1=Math.min(h,Math.floor((y+1)/s));
+      for(let x=0;x<nw;x++){ const x0=Math.floor(x/s), x1=Math.min(w,Math.floor((x+1)/s));
+        let sum=0,cnt=0; for(let yy=y0;yy<Math.max(y1,y0+1);yy++) for(let xx=x0;xx<Math.max(x1,x0+1);xx++){ sum+=src[yy*w+xx]; cnt++; }
+        o[y*nw+x]=sum/cnt; } } out.push(o); }
+  return {ch:out,w:nw,h:nh,nc,isColor:im.isColor};
+}
+function fromUrl(src){ return new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin="anonymous";
+  im.onload=()=>{ const cv=document.createElement("canvas"); cv.width=im.width; cv.height=im.height;
+    const cx=cv.getContext("2d"); cx.drawImage(im,0,0);
+    const d=cx.getImageData(0,0,im.width,im.height).data, n=im.width*im.height, ch=[new Float32Array(n),new Float32Array(n),new Float32Array(n)];
+    for(let i=0;i<n;i++){ ch[0][i]=d[i*4]/255; ch[1][i]=d[i*4+1]/255; ch[2][i]=d[i*4+2]/255; }
+    res({ch,w:im.width,h:im.height,nc:3,isColor:true}); };
+  im.onerror=()=>rej(new Error("no carga")); im.src=src; });
+}
+async function setFromFile(fileObj){
+  log(`cargando ${fileObj.name} ...`);
+  let d = await window.ImgIO.loadFromFile(fileObj);   // XISF/TIF/FITS/PNG -> {ch,w,h,nc,isColor}
+  if(d.nc<3){ d.ch=[d.ch[0],d.ch[0],d.ch[0]]; d.nc=3; d.isColor=true; log("(mono → replicado a 3 canales)"); }
+  img = downscale(d); stfRef=computeSTF(img); delete _drawn.cOut; drawImg("cIn",img);
+  document.getElementById("cOut").getContext("2d").clearRect(0,0,9999,9999);
+  log(`imagen ${d.w}x${d.h}${img.w!==d.w?` (→ ${img.w}x${img.h})`:""} lista. Pulsa Procesar.`);
+}
+async function setImage(src){ img=downscale(await fromUrl(src)); stfRef=computeSTF(img); delete _drawn.cOut; drawImg("cIn",img);
+  document.getElementById("cOut").getContext("2d").clearRect(0,0,9999,9999);
+  log(`muestra ${img.w}x${img.h} lista. Pulsa Procesar.`); }
+
+const drop=document.getElementById("drop"), file=document.getElementById("file");
+drop.onclick=()=>file.click();
+file.onchange=e=>{ if(e.target.files[0]) setFromFile(e.target.files[0]).catch(er=>log("ERROR carga: "+er.message)); };
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("hi");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("hi");}));
+drop.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) setFromFile(f).catch(er=>log("ERROR carga: "+er.message)); });
+sStar.oninput=()=>vStar.textContent=(+sStar.value).toFixed(2);
+sNeb.oninput=()=>vNeb.textContent=(+sNeb.value).toFixed(2);
+document.getElementById("stf").onchange=()=>{ for(const id in _drawn) drawImg(id,_drawn[id]); };
+
+document.getElementById("go").onclick=async()=>{
+  if(!img){ log("carga una imagen primero"); return; }
+  const btn=document.getElementById("go"); btn.disabled=true; btn.textContent="Procesando...";
+  try{
+    const t0=performance.now();
+    const out=await window.DeconvSplitAI.run(img, {sStar:+sStar.value, sNeb:+sNeb.value, onLog:log},
+      (idx,tot)=>{}, (p)=>{});
+    drawImg("cOut",out);
+    log(`LISTO en ${Math.round(performance.now()-t0)}ms`);
+  }catch(e){ log("ERROR: "+e.message); }
+  btn.disabled=false; btn.textContent="Procesar";
+};
+
+// muestra por defecto para que funcione al abrir
+setImage("nebula_original.png").catch(()=>log("(sin muestra; arrastra una imagen)"));
+</script></body></html>
