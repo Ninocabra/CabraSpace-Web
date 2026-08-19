@@ -316,6 +316,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV550**
   - [SVBONY SV550 80mm Triplet APO: Desempaquetado y Ensamblaje](https://www.youtube.com/watch?v=la9dpejHKxA) (2026-08-01)
 - **Modelo: SV555**
+  - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
   - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
@@ -400,8 +401,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [De Bortle 8 a las Estrellas - Andrea Arbizzi desafía la polución lumínica](https://www.zwoastro.com/2026/08/04/light-pollution-astrophotography-andrea-arbizzi/) (2026-08-04)
 
 ### CAMERAS
-- **Modelo: ATT 2026**
-  - [Resumen de ATT 2026 de ZWO](https://www.youtube.com/shorts/g91t3DjdgzM) (2026-05-12)
 - **Modelo: S50**
   - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 - **Modelo: Seestar S30 Pro**
