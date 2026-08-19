@@ -17,3 +17,14 @@ node_modules/
 
 # Suite de IA: repo propio anidado (Modelos IA/.git); la web solo consume los .onnx via Releases
 Modelos IA/
+
+# Datos pesados locales (59 GB): NUNCA a git; protegerlos con copia aparte
+Imagenes Prueba/
+train_reales/
+train_survey/
+
+# Documentacion interna de trabajo: el repo es PUBLICO, estos docs viajaran en CabraBase (privado)
+CONTINUAR_AQUI_CABRASTARS.md
+PI_Workflow_Web_*.md
+Rediseño análisis astronómico/
+.claude/
