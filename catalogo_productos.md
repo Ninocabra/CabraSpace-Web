@@ -20,6 +20,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
   - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
 - **Modelo: N160**
+  - [Video de demostración de los Askar N160 y N210: ¿Qué reflector Newton de gran apertura elegir?](https://www.youtube.com/watch?v=6ba0GKdDPeY) (2026-08-21)
   - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
 - **Modelo: N210**
   - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
@@ -273,7 +274,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SA207 Pro**
   - [Revisión de los Binoculares Svbony SA207 Pro](https://www.youtube.com/watch?v=Ds_KabHKoew) (2026-06-08)
   - [Nuevos prismáticos SA207 Pro: mejoras significativas en la experiencia del usuario](https://www.youtube.com/shorts/U8Emj1T0ecE) (2026-05-20)
-  - [Nuevos binoculares SA207 Pro 8x32 APO de Svbony](https://www.youtube.com/shorts/tTw5fCBwM8c) (2026-05-16)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV545**
