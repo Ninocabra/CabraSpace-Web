@@ -273,7 +273,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
 - **Modelo: SA207 Pro**
   - [Revisión de los Binoculares Svbony SA207 Pro](https://www.youtube.com/watch?v=Ds_KabHKoew) (2026-06-08)
-  - [Nuevos prismáticos SA207 Pro: mejoras significativas en la experiencia del usuario](https://www.youtube.com/shorts/U8Emj1T0ecE) (2026-05-20)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV545**
@@ -383,6 +382,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Benoit de Mulder**
   - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
+- **Modelo: Equipamiento**
+  - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
 - **Modelo: Rueda Portafiltros**
   - [Nuevas Ruedas Portafiltros ZWO P25 para Astrofotografía](https://www.youtube.com/watch?v=T1N8SeCWgO4) (2026-06-28)
 - **Modelo: S30 Pro**
