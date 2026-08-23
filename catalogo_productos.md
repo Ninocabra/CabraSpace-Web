@@ -203,10 +203,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASTRO-RES**
   - [Instalación del ASTRO-RES de la Estación Observacional en el ITS Academy G. Caboto](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-its-academy-g-caboto/) (2026-07-06)
 
-### SOFTWARE
-- **Modelo: Radio2Space**
-  - [Radio2Space presenta nuevas funciones de su software en Space Tech Expo Europe 2025](https://www.youtube.com/watch?v=7F1EZstEr1A) (2025-11-20)
-
 ## QHYCCD
 
 ### CAMERAS
@@ -380,6 +376,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## ZWO
 
 ### ACCESSORIES
+- **Modelo: ASI Week**
+  - [ZWO ASI Semana: De Cielos Bortle 9 a Mejores Cielos](https://www.youtube.com/shorts/WJ5NkC96prs) (2026-08-22)
 - **Modelo: Benoit de Mulder**
   - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
 - **Modelo: Equipamiento**
