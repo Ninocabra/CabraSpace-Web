@@ -141,8 +141,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
-- **Modelo: N.I.N.A.**
-  - [N.I.N.A. Versión 3.2: Nueva actualización del software de astrofotografía](https://github.com/isbeorn/nina/releases/tag/Version-3.2) (2025-11-27)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
@@ -360,6 +358,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: HOPE D60**
   - [ToupTek Astro Presenta el Dispositivo de Astrofotografía HOPE D60](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
+- **Modelo: comet**
+  - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
 
 ## Vaonis
 
