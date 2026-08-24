@@ -192,8 +192,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
   - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
-- **Modelo: SESTO SENSO 3**
-  - [Compatibilidad del SESTO SENSO 3 con enfocadores externos](https://www.youtube.com/watch?v=0j2lRn5deXo) (2025-11-27)
 - **Modelo: SESTO SENSO 3 SC**
   - [Compatibilidad del SESTO SENSO 3 SC con telescopios tipo SC](https://www.youtube.com/watch?v=dTPnHUXrmCY) (2025-12-05)
 
@@ -345,6 +343,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: HOPE D60**
   - [Viaje a los cielos Bortle 1 del Tíbet con ToupTek HOPE D60 y kit completo](https://www.youtube.com/shorts/_TQCezXdMuk) (2026-08-13)
+- **Modelo: ToupTek Astro**
+  - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
 - **Modelo: astronomical camera**
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 - **Modelo: cámara astrofotografía**
