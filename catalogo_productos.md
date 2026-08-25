@@ -9,6 +9,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Autofocus**
   - [Demostración de la Curva de Autenfoque de Askar con NINA](https://www.youtube.com/watch?v=zrXrnTt7EE0) (2026-08-10)
+- **Modelo: Sesto Senso**
+  - [Askar WAF vs ZWO EAF vs Sesto Senso 3: ¿Qué Autoc Closer Deberías Comprar?](https://www.youtube.com/watch?v=e451HuLv148) (2026-08-25)
 - **Modelo: WAF**
   - [Video Demostrativo del Askar WAF: Cómo Instalar el WAF (Ejemplo con SQA106)](https://www.youtube.com/watch?v=7y95ZS5r9lU) (2026-08-07)
   - [Presentación del focuser automático WAF de Askar](https://www.youtube.com/watch?v=KKe6wz0bM9Y) (2026-08-05)
@@ -93,8 +95,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: ED102**
   - [Opciones de telescopios de gama media](https://www.youtube.com/watch?v=GZyuFnfiYqU) (2025-12-22)
-- **Modelo: FirstLight 80mm**
-  - [FirstLight 80mm con montura Go-To: telescopio fácil de usar](https://www.youtube.com/shorts/5VPLpKqJ4S0) (2025-12-22)
 - **Actualizaciones Generales / Revisiones:**
   - [Cómo elegir el telescopio adecuado - Preguntas frecuentes](https://www.youtube.com/shorts/zAYh91ltVXE) (2025-12-22)
 
@@ -168,19 +168,11 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: sampling**
   - [¿Son los telescopios grandes peores para la astrofotografía?](https://www.youtube.com/watch?v=bOyjWlGmKoc) (2026-06-05)
 
-## PHD2 Guiding
-
-### SOFTWARE
-- **Modelo: Altair**
-  - [Nueva versión de PHD2 Guiding v2.6.14](https://github.com/OpenPHDGuiding/phd2/releases/tag/v2.6.14) (2025-12-10)
-
 ## Player One
 
 ### CAMERAS
 - **Modelo: Astrofotografía Solar**
   - [Manual del Observador Solar de Mark Johnston: Detalles ardientes con Cámaras Player One](https://player-one-astronomy.com/%e3%80%8anasa-solar-system-ambassador-mark-johnstons-solar-observers-handbook-the-fiery-details-through-player-one-cameras%e3%80%8b/) (2026-06-12)
-- **Modelo: Player One Astronomy**
-  - [Reseña de la cámara Player One Zeus: una opción destacada para astrofotógrafos](https://player-one-astronomy.com/player-one-astronomy-is-fast-becoming-a-top-choice-among-imagers-see-why-in-this-latest-review-featuring-our-zeus-mono-camera/) (2025-12-05)
 
 ## Primalucelab
 
@@ -192,8 +184,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
   - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
-- **Modelo: SESTO SENSO 3 SC**
-  - [Compatibilidad del SESTO SENSO 3 SC con telescopios tipo SC](https://www.youtube.com/watch?v=dTPnHUXrmCY) (2025-12-05)
 
 ### MOUNTS
 - **Modelo: ASTRO-RES**
@@ -220,10 +210,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Siril Versión 1.4.4: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.4) (2026-06-16)
 
 ## Sky-Watcher
-
-### MOUNTS
-- **Modelo: Wave 150i**
-  - [Sky-Watcher Wave 150i: Montura strainwave con sistema PrimaLuceLab](https://www.youtube.com/watch?v=W6--bNohEYw) (2025-12-12)
 
 ### TELESCOPES
 - **Modelo: Evostar EDX**
@@ -404,6 +390,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 - **Modelo: Seestar S30 Pro**
   - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
+- **Modelo: Seestar S50 Pro**
+  - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
@@ -420,3 +408,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: FF131**
   - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
+- **Modelo: S50 Pro**
+  - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
+- **Modelo: Seestar S50 Pro**
+  - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
+  - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
