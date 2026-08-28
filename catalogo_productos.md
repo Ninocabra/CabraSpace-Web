@@ -93,8 +93,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
 
 ### TELESCOPES
-- **Modelo: ED102**
-  - [Opciones de telescopios de gama media](https://www.youtube.com/watch?v=GZyuFnfiYqU) (2025-12-22)
 - **Actualizaciones Generales / Revisiones:**
   - [Cómo elegir el telescopio adecuado - Preguntas frecuentes](https://www.youtube.com/shorts/zAYh91ltVXE) (2025-12-22)
 
@@ -372,6 +370,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevas Ruedas Portafiltros ZWO P25 para Astrofotografía](https://www.youtube.com/watch?v=T1N8SeCWgO4) (2026-06-28)
 - **Modelo: S30 Pro**
   - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
+- **Modelo: S50 Pro**
+  - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
 - **Modelo: Willie Stickley**
   - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
 - **Modelo: espacio**
