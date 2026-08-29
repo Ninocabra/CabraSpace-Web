@@ -327,8 +327,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
 - **Modelo: astronomical camera**
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
-- **Modelo: cámara astrofotografía**
-  - [Cada fotograma cuenta una historia del universo 🌌 con cámaras ToupTek Astro](https://www.youtube.com/shorts/rf8yMq7JIT4) (2026-05-01)
 
 ### SOFTWARE
 - **Modelo: StellaVita**
@@ -405,6 +403,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: FF131**
   - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
 - **Modelo: S50 Pro**
+  - [Reseña del Seestar S50 Pro: ¿El Mejor Telescopio Inteligente Hasta la Fecha?](https://www.youtube.com/watch?v=ksk36W2vCoM) (2026-08-28)
   - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
 - **Modelo: Seestar S50 Pro**
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
