@@ -32,6 +32,10 @@
   var C_DUST = [0.93, 0.50, 0.22];
   var C_TWILIGHT = [0.99, 0.58, 0.26];
   var LAYER_RGB = { low: [107, 114, 128], mid: [156, 163, 175], high: [207, 212, 221] };
+  // Cuanto estorba cada capa de verdad. Una nube baja es opaca; un cirro alto
+  // resta contraste y deja pasar. No es una escala inventada: es el orden con
+  // el que las tres capas entran en el indice de nubes del sitio.
+  var LAYER_WEIGHT = { low: 1.0, mid: 0.78, high: 0.5 };
 
   // Parte del fondo natural que es airglow: la que obedece a van Rhijn en vez
   // de extinguirse. Sale de la literatura — el fotómetro solo mira arriba, así
@@ -145,18 +149,51 @@
       + Math.cos(a1 * D2R) * Math.cos(a2 * D2R) * Math.cos((z1 - z2) * D2R)))) / D2R;
   }
 
-  // Krisciunas & Schaefer: la dispersión lunar que usa el motor.
+  /* La dispersión lunar MEDIDA en este sitio (astroweather/moonscatter.py), no
+     la de Mauna Kea.
+   *
+   * Esto era un fallo de verdad, no un ajuste: el domo pintaba Krisciunas &
+   * Schaefer mientras el motor puntúa con la ley ajustada aquí sobre 18.834
+   * muestras de 1.246 noches. Y las dos no se parecen — la de aquí cae como
+   * 10^(−θ/48,55°), un factor 10 cada 48,5 grados, mientras la de K&S es casi
+   * plana con la Luna alta. Por eso el domo se volvía azul entero al salir la
+   * Luna: no era saturación de la paleta, era la función equivocada.
+   *
+   * Con la de aquí, a 10° de la Luna el fondo es ~57 veces el que hay a 130°,
+   * así que el halo sale intenso alrededor del disco y decae de verdad.
+   *
+   * La rama de aureola (ρ < 10°) sí se importa tal cual: un fotómetro cenital
+   * no puede medirla. Y el suelo por encima de ~83° también, porque este sitio
+   * tiene más aire y más polvo que Mauna Kea y no puede dispersar menos. */
+  var SCATTER_AMPLITUDE = 1.3612e7;
+  var SCATTER_SCALE_DEG = 48.55;
+  var SMALL_SEPARATION_DEG = 10.0;
+
+  function maunaKea(rho) {
+    return Math.pow(10, 5.36) * (1.06 + Math.pow(Math.cos(rho * D2R), 2))
+         + Math.pow(10, 6.15 - rho / 40);
+  }
+
+  function scattering(sep) {
+    if (sep < SMALL_SEPARATION_DEG) {
+      var union = SCATTER_AMPLITUDE * Math.pow(10, -SMALL_SEPARATION_DEG / SCATTER_SCALE_DEG);
+      return union * Math.pow(SMALL_SEPARATION_DEG / Math.max(sep, 0.25), 2);
+    }
+    return Math.max(SCATTER_AMPLITUDE * Math.pow(10, -sep / SCATTER_SCALE_DEG),
+                    maunaKea(sep));
+  }
+
   function moonNl(sep, moonAlt, targetAlt, phase, k) {
     if (moonAlt <= 0) { return 0; }
+    // El brillo del disco segun su fase: es lo que hace que una Luna al 30 %
+    // dibuje un halo mucho mas debil que una llena, con la misma geometria.
     var a = Math.abs(phase);
     var iStar = Math.pow(10, -0.4 * (3.84 + 0.026 * a + 4e-9 * Math.pow(a, 4)));
-    var rho = Math.max(sep, 0.5);
-    var fRho = Math.pow(10, 5.36) * (1.06 + Math.pow(Math.cos(rho * D2R), 2))
-             + Math.pow(10, 6.15 - rho / 40);
     var X = function (z) {
       return Math.min(5, 1 / Math.sqrt(1 - 0.96 * Math.pow(Math.sin((90 - z) * D2R), 2)));
     };
-    return fRho * iStar * Math.pow(10, -0.4 * k * X(moonAlt))
+    return scattering(Math.max(sep, 0.25)) * iStar
+         * Math.pow(10, -0.4 * k * X(moonAlt))
          * (1 - Math.pow(10, -0.4 * k * X(targetAlt)));
   }
 
@@ -363,7 +400,13 @@
       // dibujada y no se veia, que para un aviso de nubes es lo mismo que no
       // estar. El suelo de 0,10 hace que una nube tenue se note como tenue en
       // vez de desaparecer.
-      var a = Math.min(0.72, 0.10 + c.cover / 100 * 0.75);
+      // Opacidad por CAPA, no solo por cobertura. Un estrato bajo tapa el cielo
+      // entero; un cirro alto atenua y deja fotografiar a traves. Pintarlos
+      // igual decia que estorban igual, y no es verdad: la profundidad optica
+      // de una nube baja es de otro orden. Los pesos son la escala relativa
+      // con la que cada capa entra en el veredicto de nubes.
+      var peso = LAYER_WEIGHT[c.layer] || 0.8;
+      var a = Math.min(0.80, (0.06 + c.cover / 100 * 0.80) * peso);
       var grad = cc.createRadialGradient(xy[0], xy[1], 0, xy[0], xy[1], radius);
       grad.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a + ')');
       grad.addColorStop(0.5, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a * 0.45 + ')');
