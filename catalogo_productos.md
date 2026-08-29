@@ -149,8 +149,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
 - **Modelo: Ed Ting**
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
-- **Actualizaciones Generales / Revisiones:**
-  - [Mis 3 pequeños refractores](https://stargazerslounge.com/topic/445744-my-3-small-refractors%E2%80%A6%E2%80%A6/) (2026-06-05)
 - **Modelo: Marketing**
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
@@ -328,6 +326,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: HOPE D60**
   - [Viaje a los cielos Bortle 1 del Tíbet con ToupTek HOPE D60 y kit completo](https://www.youtube.com/shorts/_TQCezXdMuk) (2026-08-13)
 - **Modelo: ToupTek Astro**
+  - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
 - **Modelo: astronomical camera**
   - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
