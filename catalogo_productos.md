@@ -110,6 +110,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cómo añadir autoenfoque a tu telescopio](https://www.youtube.com/watch?v=5aFmfiffPVM) (2026-07-31)
 - **Modelo: Oberwerk**
   - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
+- **Modelo: ToupTek Astro**
+  - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
 - **Modelo: barn door tracker**
   - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
 
@@ -227,8 +229,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Francisco Perez**
   - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
-- **Modelo: OAG SV238**
-  - [Análisis del kit de guiado SVBONY: OAG SV238, guía SV226P y cámara SC905C](https://www.youtube.com/watch?v=7xQU8AzCeLs) (2026-06-02)
 - **Modelo: Ofertas**
   - [Ofertas de Verano Svbony: Hasta 50% de Descuento en Equipos de Astrofotografía](https://www.youtube.com/watch?v=wA0luIBeOvY) (2026-08-18)
 - **Modelo: Prime Day**
