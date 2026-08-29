@@ -217,47 +217,6 @@
 }
 
 /* ===================== Consejos de adquisición ====================== */
-.aw-tips { margin: 26px 0 0; }
-.aw-tips h3, .aw-sensors h3, .aw-pick h3 {
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted, #777);
-  margin: 0 0 12px;
-  font-weight: 600;
-}
-.aw-tip {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 14px;
-  padding: 14px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.aw-tip .badge {
-  grid-row: span 2;
-  align-self: start;
-  margin-top: 2px;
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 5px;
-  white-space: nowrap;
-}
-.aw-tip.evitar .badge { background: rgba(214, 92, 92, 0.16); color: #e08b8b; }
-.aw-tip.aprovecha .badge { background: rgba(127, 201, 138, 0.14); color: #8fd39c; }
-.aw-tip.cuidado .badge { background: rgba(207, 171, 74, 0.14); color: var(--gold-primary, #cfab4a); }
-.aw-tip .t {
-  font-weight: 600;
-  color: var(--text-primary, #eee);
-  font-size: 0.98rem;
-}
-.aw-tip .b {
-  font-size: 0.88rem;
-  line-height: 1.65;
-  color: var(--text-secondary, #aaa);
-}
 
 /* ========================= Sensores en vivo ========================= */
 .aw-sensors { margin-top: 28px; }
@@ -409,3 +368,100 @@
   font-variant-numeric: tabular-nums;
 }
 .aw-hint { font-size: 0.85rem; color: var(--text-muted, #777); margin-top: 14px; }
+
+/* ======================= Semáforo de la noche ======================= */
+.aw-plan { margin: 26px 0 0; }
+.aw-plan h3, .aw-sensors h3, .aw-pick h3 {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+.aw-headline-tip {
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--text-primary, #eee);
+  margin: 0 0 18px;
+}
+.aw-lane-row { margin-bottom: 16px; }
+.aw-lane-row > .lbl {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 8px;
+}
+.aw-lights { display: flex; flex-wrap: wrap; gap: 8px; }
+.aw-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 0.86rem;
+  color: var(--text-secondary, #bbb);
+  cursor: help;
+  position: relative;
+}
+.aw-light:hover, .aw-light.open { border-color: rgba(207, 171, 74, 0.4); }
+.aw-light .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.aw-light.verde .dot { background: #6ec177; box-shadow: 0 0 8px rgba(110, 193, 119, 0.5); }
+.aw-light.ambar .dot { background: #d8a53c; box-shadow: 0 0 8px rgba(216, 165, 60, 0.5); }
+.aw-light.rojo  .dot { background: #d15f5f; box-shadow: 0 0 8px rgba(209, 95, 95, 0.5); }
+.aw-light .name { font-weight: 600; color: var(--text-primary, #eee); }
+.aw-light .short { color: var(--text-muted, #888); }
+
+/* El detalle. Aparece al pasar el cursor y al tocar, que en movil no hay
+   cursor que pasar. */
+.aw-pop {
+  position: absolute;
+  z-index: 60;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: min(340px, 78vw);
+  padding: 12px 14px;
+  background: #121216;
+  border: 1px solid rgba(207, 171, 74, 0.3);
+  border-radius: 9px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.7);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #bbb);
+  cursor: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+.aw-light:hover .aw-pop, .aw-light.open .aw-pop { opacity: 1; pointer-events: auto; }
+.aw-pop b { color: var(--text-primary, #eee); display: block; margin-bottom: 4px; }
+
+/* ==================== Perfil de altura del objeto =================== */
+.aw-profile { margin-top: 16px; }
+.aw-profile svg { width: 100%; height: 140px; display: block; overflow: visible; }
+.aw-profile .axis { fill: var(--text-muted, #777); font-size: 9px; }
+.aw-profile .grid { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
+.aw-profile .min { stroke: rgba(209, 95, 95, 0.45); stroke-dasharray: 3 3; }
+.aw-profile .cursor { stroke: rgba(207, 171, 74, 0.75); stroke-width: 1.5; }
+.aw-profile rect.hit { fill: transparent; cursor: pointer; }
+.aw-profile rect.hit:hover { fill: rgba(255, 255, 255, 0.05); }
+.aw-detail {
+  margin-top: 10px;
+  min-height: 42px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #aaa);
+  border-left: 3px solid rgba(207, 171, 74, 0.4);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0 8px 8px 0;
+}
+.aw-detail b { color: var(--text-primary, #eee); }

@@ -35,7 +35,15 @@
       iluminada: 'iluminada', sinCalibrar: 'estimación sin calibrar',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'Qué hacer esta noche',
-      sinConsejos: 'Nada que objetar: la noche no tiene ningún problema declarado.',
+      adquisicion: 'Por filtro y técnica', familias: 'Por familia de objeto',
+      otros: 'Y además',
+      perfil: 'Altura sobre el horizonte durante la noche',
+      pulsaPerfil: 'Pulsa en el gráfico para ver qué pasa a esa hora.',
+      aEsaHora: 'A las', altura: 'altura', rinde: 'rendimiento',
+      limitaPor: 'limita', bajoHorizonte: 'bajo el horizonte',
+      bajoMinimo: 'demasiado bajo para observar', cieloAhora: 'cielo',
+      limita: { c: 'el cielo', l: 'la Luna', f: 'el fondo', a: 'la altura',
+                n: 'nada', '-': 'la altura' },
       sensores: 'Ahora mismo en Nerpio',
       sinSensores: 'Los sensores del sitio no responden en este momento.',
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
@@ -71,7 +79,15 @@
       iluminada: 'illuminated', sinCalibrar: 'uncalibrated estimate',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'What to do tonight',
-      sinConsejos: 'Nothing to flag: the night has no declared problem.',
+      adquisicion: 'By filter and technique', familias: 'By object family',
+      otros: 'And also',
+      perfil: 'Altitude above the horizon through the night',
+      pulsaPerfil: 'Click the chart to see what happens at that hour.',
+      aEsaHora: 'At', altura: 'altitude', rinde: 'yield',
+      limitaPor: 'limited by', bajoHorizonte: 'below the horizon',
+      bajoMinimo: 'too low to observe', cieloAhora: 'sky',
+      limita: { c: 'the sky', l: 'the Moon', f: 'the background', a: 'altitude',
+                n: 'nothing', '-': 'altitude' },
       sensores: 'Right now at Nerpio',
       sinSensores: 'The site sensors are not responding at the moment.',
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
@@ -229,32 +245,95 @@
       ctx.fillText(par[1], p[0], p[1]);
     });
 
-    // El recorrido del objeto, y dónde está en el instante elegido.
-    var traza = (objeto && objeto.traza) || [];
-    if (traza.length) {
-      ctx.strokeStyle = 'rgba(207,171,74,0.85)';
+    // El recorrido del objeto y donde esta AHORA. La traza viene alineada
+    // uno a uno con los marcos de la cupula, asi que el punto del instante es
+    // `alt[indice]` y no hay que buscarlo por tiempo: antes se buscaba el mas
+    // cercano dentro de una traza recortada, y el marcador se quedaba clavado
+    // media noche mientras solo se movia la Luna.
+    var alt = (objeto && objeto.alt) || [];
+    var az = (objeto && objeto.az) || [];
+    if (alt.length) {
+      ctx.strokeStyle = 'rgba(207,171,74,0.75)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      traza.forEach(function (paso, i) {
-        var p = punto(paso.alt, paso.az);
-        if (i === 0) { ctx.moveTo(p[0], p[1]); } else { ctx.lineTo(p[0], p[1]); }
-      });
+      var dibujando = false;
+      for (var i = 0; i < alt.length; i++) {
+        if (alt[i] < 0) { dibujando = false; continue; }   // bajo el horizonte
+        var p = punto(alt[i], az[i]);
+        if (!dibujando) { ctx.moveTo(p[0], p[1]); dibujando = true; }
+        else { ctx.lineTo(p[0], p[1]); }
+      }
       ctx.stroke();
 
-      var objetivo = new Date(marco ? marco.t : traza[0].t).getTime();
-      var mejor = traza[0], dist = Infinity;
-      traza.forEach(function (paso) {
-        var d = Math.abs(new Date(paso.t).getTime() - objetivo);
-        if (d < dist) { dist = d; mejor = paso; }
+      // Salida y puesta, que es lo que se quiere planificar.
+      var vivos = [];
+      for (var j = 0; j < alt.length; j++) { if (alt[j] >= 0) { vivos.push(j); } }
+      ctx.fillStyle = 'rgba(207,171,74,0.35)';
+      vivos.slice(0, 1).concat(vivos.slice(-1)).forEach(function (k) {
+        var q = punto(alt[k], az[k]);
+        ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 6.2832); ctx.fill();
       });
-      var pm = punto(mejor.alt, mejor.az);
-      ctx.fillStyle = '#cfab4a';
-      ctx.beginPath(); ctx.arc(pm[0], pm[1], 6, 0, 6.2832); ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      if (alt[indice] >= 0) {
+        var pm = punto(alt[indice], az[indice]);
+        ctx.fillStyle = '#cfab4a';
+        ctx.beginPath(); ctx.arc(pm[0], pm[1], 6.5, 0, 6.2832); ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+      } else {
+        // Decirlo, en vez de dejar el marcador en un sitio que es mentira.
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = '600 11px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.bajoHorizonte, cx, cy + R * 0.72);
+        ctx.textAlign = 'left';
+      }
     }
   }
 
-  // ------------------------------------------------------------ BLOQUES ----
+  // ------------------------------------------- PERFIL DE ALTURA -----------
+  // El grafico por objeto: la altura durante toda la noche, coloreada por lo
+  // que la limita en cada momento. Es la vista que responde "cuando lo
+  // apunto", que la cupula sola no contesta.
+  function perfilSvg(objeto, marcos) {
+    var alt = objeto.alt || [], n = alt.length;
+    if (!n) { return ''; }
+    var W = 100, H = 100, pad = 4;
+    var x = function (i) { return pad + i * (W - 2 * pad) / Math.max(1, n - 1); };
+    var y = function (a) { return H - pad - Math.max(0, Math.min(90, a)) / 90 * (H - 2 * pad); };
+    var color = { c: '#d15f5f', l: '#d8a53c', f: '#d8a53c', a: '#8a8a92',
+                  n: '#6ec177', '-': 'rgba(255,255,255,0.12)' };
+
+    var barras = '';
+    for (var i = 0; i < n; i++) {
+      var codigo = (objeto.limita || '').charAt(i) || '-';
+      var ancho = (W - 2 * pad) / n;
+      if (alt[i] > 0) {
+        barras += '<rect x="' + (x(i) - ancho / 2).toFixed(2) + '" y="' + y(alt[i]).toFixed(2) +
+          '" width="' + ancho.toFixed(2) + '" height="' + (H - pad - y(alt[i])).toFixed(2) +
+          '" fill="' + color[codigo] + '" opacity="' +
+          (codigo === 'n' ? 0.5 : 0.28) + '"/>';
+      }
+    }
+    var linea = alt.map(function (a, i) {
+      return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
+    }).join(' ');
+
+    return '<div class="aw-profile"><svg viewBox="0 0 ' + W + ' ' + H +
+      '" preserveAspectRatio="none" role="img">' +
+      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
+      '<line class="min" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(30) + '" y2="' + y(30) + '"/>' +
+      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
+      barras +
+      '<path d="' + linea + '" fill="none" stroke="#cfab4a" stroke-width="1.2" vector-effect="non-scaling-stroke"/>' +
+      '<line class="cursor" id="aw-p-cursor" x1="0" x2="0" y1="' + pad + '" y2="' + (H - pad) + '" vector-effect="non-scaling-stroke"/>' +
+      alt.map(function (a, i) {
+        return '<rect class="hit" data-i="' + i + '" x="' + (x(i) - (W - 2 * pad) / n / 2).toFixed(2) +
+          '" y="0" width="' + ((W - 2 * pad) / n).toFixed(2) + '" height="' + H + '"/>';
+      }).join('') +
+      '</svg></div>';
+  }
+
+  // ------------------------------------------------------------ BLOQUES ----  // ------------------------------------------------------------ BLOQUES ----
   function bloqueResumen(noche, t, lang) {
     var p = noche.probabilidad_de_abrir;
     var cielo = noche.cielo || {};
@@ -290,19 +369,29 @@
     return html + '</div>';
   }
 
+  function semaforo(fila) {
+    return '<span class="aw-light ' + esc(fila.luz) + '" tabindex="0">' +
+      '<span class="dot"></span>' +
+      '<span class="name">' + esc(fila.etiqueta) + '</span>' +
+      '<span class="short">' + esc(fila.resumen) + '</span>' +
+      '<span class="aw-pop"><b>' + esc(fila.etiqueta) + '</b>' +
+      esc(fila.detalle) + '</span></span>';
+  }
+
+  function filaSemaforos(etiqueta, filas) {
+    if (!filas || !filas.length) { return ''; }
+    return '<div class="aw-lane-row"><span class="lbl">' + esc(etiqueta) + '</span>' +
+      '<div class="aw-lights">' + filas.map(semaforo).join('') + '</div></div>';
+  }
+
   function bloqueConsejos(noche, t) {
-    var consejos = noche.consejos || [];
-    var html = '<div class="aw-tips"><h3>' + esc(t.consejos) + '</h3>';
-    if (!consejos.length) {
-      html += '<div class="aw-tip"><span class="b">' + esc(t.sinConsejos) + '</span></div>';
-    }
-    consejos.forEach(function (c) {
-      html += '<div class="aw-tip ' + esc(c.severidad) + '">' +
-        '<span class="badge">' + esc(t.severidad[c.severidad] || c.severidad) + '</span>' +
-        '<span class="t">' + esc(c.titulo) + '</span>' +
-        '<span class="b">' + esc(c.texto) + '</span></div>';
-    });
-    return html + '</div>';
+    var c = noche.consejos;
+    if (!c || !c.adquisicion) { return ''; }
+    return '<div class="aw-plan"><h3>' + esc(t.consejos) + '</h3>' +
+      (c.resumen ? '<p class="aw-headline-tip">' + esc(c.resumen) + '</p>' : '') +
+      filaSemaforos(t.adquisicion, c.adquisicion) +
+      filaSemaforos(t.familias, c.objetos) +
+      filaSemaforos(t.otros, c.avisos) + '</div>';
   }
 
   function bloqueSensores(datos, t) {
@@ -424,17 +513,65 @@
                 : '') +
             '</div>' +
           '</div>' +
-        '</div>';
+        '</div>' +
+        // El perfil va DEBAJO de la cúpula y a todo el ancho: la cúpula dice
+        // hacia dónde mirar y el perfil dice cuándo, y son dos preguntas.
+        '<div class="aw-profile-wrap"><span class="lbl" style="display:block;' +
+          'font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;' +
+          'color:var(--text-muted,#777);margin:18px 0 6px">' + esc(t.perfil) +
+          '</span>' + perfilSvg(objeto, marcos) +
+          '<div class="aw-detail" id="aw-det">' + esc(t.pulsaPerfil) + '</div></div>';
 
       var canvas = destino.querySelector('#aw-canvas');
       var deslizador = destino.querySelector('#aw-t');
       var etiqueta = destino.querySelector('#aw-t-lab');
+      var cursor = destino.querySelector('#aw-p-cursor');
+      var detalle = destino.querySelector('#aw-det');
+
+      function contar(i) {
+        var m = marcos[i];
+        if (!m) { return ''; }
+        var a = objeto.alt[i], codigo = (objeto.limita || '').charAt(i) || '-';
+        if (a === undefined) { return ''; }
+        // Ocho grados NO es "bajo el horizonte": es visible e inservible, y
+        // decirlo mal hace dudar de todo lo demas.
+        if (a < 0) {
+          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+            esc(t.bajoHorizonte) + ' (' + num(a, 0) + '°).';
+        }
+        if (codigo === '-') {
+          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+            num(a, 0) + '°: ' + esc(t.bajoMinimo) + '.';
+        }
+        return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+          esc(t.altura) + ' ' + num(a, 0) + '°, ' + esc(t.rinde) + ' ' +
+          num((objeto.rend[i] || 0) * 100, 0) + ' %, ' + esc(t.limitaPor) + ' ' +
+          esc((t.limita && t.limita[codigo]) || codigo) +
+          (m.cielo_mag !== undefined && m.cielo_mag !== null
+            ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.cielo_mag, 1)
+            : '') + '.';
+      }
+
       function repintar() {
         var i = deslizador ? parseInt(deslizador.value, 10) : indice;
         if (etiqueta && marcos[i]) { etiqueta.textContent = marcos[i].etiqueta; }
+        if (cursor) {
+          var xx = 4 + i * (100 - 8) / Math.max(1, (objeto.alt || []).length - 1);
+          cursor.setAttribute('x1', xx); cursor.setAttribute('x2', xx);
+        }
+        if (detalle) { detalle.innerHTML = contar(i); }
         dibujarCupula(canvas, datos.cupula, objeto, i, t);
       }
+
       if (deslizador) { deslizador.addEventListener('input', repintar); }
+      // Pinchar en el perfil mueve la cúpula: son la misma noche vista de dos
+      // maneras, y moverlas por separado seria mentir sobre eso.
+      destino.addEventListener('click', function (e) {
+        var celda = e.target.closest('rect.hit');
+        if (!celda) { return; }
+        if (deslizador) { deslizador.value = celda.getAttribute('data-i'); }
+        repintar();
+      });
       window.addEventListener('resize', repintar);
       repintar();
     }
@@ -456,9 +593,12 @@
 
     var html = '<div class="aw-head"><h2>' + t.titulo + '</h2>' +
       '<span class="aw-site">' + esc(t.sitio) + '</span></div><div class="aw-body">';
+    // El orden importa: primero como esta la noche, luego lo que dicen los
+    // sensores AHORA -- que es lo que confirma o desmiente la prevision -- y
+    // solo despues el plan, que se decide con las dos cosas delante.
     html += bloqueResumen(noche, t, lang);
-    html += bloqueConsejos(noche, t);
     html += bloqueSensores(datos, t);
+    html += bloqueConsejos(noche, t);
     html += bloqueElegir(t);
 
     var siguiente = datos.noches[1];
