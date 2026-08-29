@@ -11,10 +11,22 @@
  * JSON — extinción, aerosol, fase, altura del Sol y de la Luna, cobertura por
  * capa. Ninguna previsión se recalcula en el navegador.
  *
- * Cada contribución se acumula como luminancia en nanolambert con su propio
- * tono, la suma se comprime logarítmicamente como hace el ojo, y el tono que
- * sobrevive es el del proceso que domina. Por eso una noche con calima y Luna
- * sale naranja y una limpia sale azul: no es una paleta, es el resultado.
+ * Cada contribución se calcula como luminancia en nanolambert, igual que en el
+ * motor, pero se pinta como EXCESO SOBRE EL SUELO NATURAL: la noche más oscura
+ * posible — sin Luna, sin nubes, sin calima — es NEGRA, y en ella solo se ve la
+ * Vía Láctea. Todo lo demás se dibuja encima con su color, y su color dice qué
+ * lo está estropeando:
+ *
+ *     azul   la Luna       gris   las nubes
+ *     rojo   la calima     amarillo  el día
+ *
+ * Ese es el cambio respecto a la primera versión, y no es cosmético. Antes se
+ * sumaba todo junto y se comprimía el total, lo cual era fiel y era ilegible:
+ * el suelo natural son 70 nL y la compresión los dejaba en RGB 110, así que el
+ * cielo MÁS OSCURO POSIBLE ya salía azul medio. Sobre ese suelo azul cualquier
+ * Luna lo teñía todo por igual y dos noches distintas salían del mismo color.
+ * Midiendo contra el suelo en vez de sumar sobre él, lo que se ve es solo lo
+ * que sobra — que es a lo que se viene a mirar esta página.
  */
 (function (global) {
   'use strict';
@@ -23,15 +35,45 @@
   var NGP_RA = 192.859, NGP_DEC = 27.128;      // polo norte galáctico
   var GC_RA = 266.405, GC_DEC = -28.936;       // centro galáctico, l = 0, b = 0
 
-  // Tonos de cada proceso. No son decorativos: deciden de qué color sale el
-  // cielo cuando ese proceso manda.
-  var C_NATURAL = [0.09, 0.12, 0.25];
-  var C_GALAXY = [0.93, 0.89, 0.76];
-  var C_MOON = [0.34, 0.52, 0.98];
-  var C_HAZE = [0.30, 0.44, 0.80];
-  var C_DUST = [0.93, 0.50, 0.22];
-  var C_TWILIGHT = [0.99, 0.58, 0.26];
-  var LAYER_RGB = { low: [107, 114, 128], mid: [156, 163, 175], high: [207, 212, 221] };
+  // Una tinta por estorbo, y solo cuatro. El suelo natural NO tiene tinta: es
+  // el negro del que se parte, y por eso no aparece en esta lista.
+  var C_GALAXY = [0.88, 0.86, 0.80];   // lo unico que se ve en la noche perfecta
+  var C_MOON = [0.32, 0.55, 1.00];     // azul
+  var C_DUST = [1.00, 0.30, 0.18];     // rojo
+  var C_DAY = [1.00, 0.80, 0.22];      // amarillo
+  var C_CLOUD = [0.86, 0.88, 0.92];    // gris, casi neutro: lo que habla es cuanto
+
+  // Cuanto exceso sobre el suelo satura una tinta. 1.400 veces el suelo es una
+  // Luna llena a diez grados: el cielo mas brillante que da este sitio de
+  // noche. Fijar el techo en el maximo real y no en el de cada noche es lo que
+  // hace COMPARABLES dos noches distintas -- si la escala se reajustara sola,
+  // una noche mala y una buena saldrian del mismo azul, que es exactamente el
+  // defecto que se viene a corregir.
+  var EXCESO_MAX = 1400;
+  var LOG_EXCESO = Math.log10(1 + EXCESO_MAX);
+
+  // La Via Lactea no puede compartir esa escala. Su exceso sobre el suelo son
+  // 0,43 veces -- las 0,39 mag medidas aqui en el plano -- y en la escala de la
+  // Luna eso son cuatro niveles de gris sobre negro, o sea nada. Lleva la suya,
+  // ajustada para que el plano galactico se lea sin competir con un estorbo.
+  var GANANCIA_VIA = 0.30;
+  var VIA_MAX = 0.20;
+
+  // La calima tambien lleva la suya, y esto conviene decirlo claro: el aerosol
+  // aporta MUY POCO brillo de fondo, asi que pintado a tamaño real no se ve. Es
+  // una ganancia de legibilidad sobre una cantidad real y pequeña, del mismo
+  // tipo que el suelo de opacidad de las nubes. El numero que manda en el
+  // veredicto sigue siendo el AOD publicado, no este pixel.
+  var GANANCIA_CALIMA = 3.5;
+
+  // Y la tinta roja mide la ANOMALIA de aerosol, no el aerosol. Siempre hay
+  // algo -- este sitio esta en 0,064 en una noche transparente -- y pintar eso
+  // de rojo dejaba la muestra "noche mas oscura" en un marron flojo en vez de
+  // en negro. El rojo tiene que querer decir "hay calima", no "hay atmosfera".
+  // La LUMINANCIA sigue llevando el aerosol entero: es luz real y cuenta para
+  // la magnitud. Lo que mide la anomalia es solo el color.
+  var AOD_LIMPIO = 0.07;
+
   // Cuanto estorba cada capa de verdad. Una nube baja es opaca; un cirro alto
   // resta contraste y deja pasar. No es una escala inventada: es el orden con
   // el que las tres capas entran en el indice de nubes del sitio.
@@ -44,20 +86,17 @@
   var NATURAL_FLOOR_MAG = 21.71;
 
   var nl = function (m) { return 34.08 * Math.exp(20.7233 - 0.92104 * m); };
-  var LOG_LO = Math.log10(10), LOG_SPAN = Math.log10(260000) - LOG_LO;
 
-  /* Los dos mandos del color, separados del calculo y con nombre propio.
+  /* El unico mando del color que queda.
    *
-   * La FISICA de arriba no se toca: las luminancias, sus tonos y la compresion
-   * logaritmica son las medidas. Estos dos solo deciden como se traduce el
-   * resultado a pantalla, y estan subidos a proposito respecto al mockup
-   * interno (SAT 1.18, GAMMA 0.60). Alli el domo se mira sabiendo lo que se
-   * busca; aqui lo abre alguien que quiere ver DE UN VISTAZO si esta noche se
-   * parece a la de ayer, y con la version fiel casi todas salian del mismo
-   * azul. Estirar el contraste no cambia ningun numero -- la magnitud que
-   * acompana a cada muestra de la clave se sigue reconstruyendo de la
-   * luminancia, no del pixel -- pero hace legible la diferencia. */
-  var SAT = 2.05;      // separacion de tono entre procesos
+   * Antes habia dos, y el otro era un estirador de saturacion (SAT 2,05) que
+   * hacia falta para separar tonos dentro de una mezcla. Ya no hay mezcla que
+   * separar: cada estorbo entra con su tinta y se suma, asi que la saturacion
+   * sale sola de que haya un estorbo o dos. Fuera.
+   *
+   * GAMMA solo reparte el brillo por la rampa. No toca ningun numero: la
+   * magnitud que acompana a cada muestra de la clave se reconstruye de la
+   * luminancia, no del pixel. */
   var GAMMA = 0.52;    // pendiente de la rampa de brillo
 
   // El búfer del cielo. Lo bastante grande para que salga liso; el borde
@@ -198,16 +237,36 @@
   }
 
   // ------------------------------------------------- COLOR DEL CIELO ------
+  // De exceso sobre el suelo a intensidad de tinta. Cero exceso, cero tinta:
+  // eso es lo que pone el fondo en negro.
+  function tinta(exceso) {
+    if (!(exceso > 0)) { return 0; }
+    return Math.min(1, Math.log10(1 + exceso) / LOG_EXCESO);
+  }
+
+  /* Devuelve el color en `out` y la luminancia TOTAL en nanolambert.
+   *
+   * Las dos cosas a la vez y a proposito: el color es para mirarlo y la
+   * luminancia es para la magnitud que acompana a cada muestra de la clave.
+   * Reconstruir la segunda a partir del primero -- que es lo que se hacia --
+   * ata el numero publicado a la rampa de pantalla, y entonces cualquier
+   * retoque de GAMMA mueve una magnitud. */
   function skyAt(alt, az, env, out) {
     var airmass = Math.min(5, 1 / Math.max(Math.sin(Math.max(alt, 2) * D2R), 0.05));
     var ext = Math.pow(10, -0.4 * env.k * airmass);
     var vanRhijn = 1 / Math.sqrt(Math.max(0.02,
         1 - Math.pow(6378 / 6468, 2) * Math.pow(Math.cos(alt * D2R), 2)));
-    var r = 0, g = 0, b = 0, total = 0;
-    function add(L, c) { total += L; r += L * c[0]; g += L * c[1]; b += L * c[2]; }
 
-    add(env.floor * AIRGLOW_FRACTION * vanRhijn, C_NATURAL);
-    add(env.floor * (1 - AIRGLOW_FRACTION) * ext, C_NATURAL);
+    // El suelo natural: se calcula porque es la VARA DE MEDIR de todo lo demas
+    // y porque entra en la luminancia total, pero no pinta. Su color es el
+    // negro del lienzo.
+    var suelo = env.floor * (AIRGLOW_FRACTION * vanRhijn + (1 - AIRGLOW_FRACTION) * ext);
+    var total = suelo;
+    var col = [0, 0, 0];
+    function echar(u, c) {
+      if (u <= 0) { return; }
+      col[0] += u * c[0]; col[1] += u * c[1]; col[2] += u * c[2];
+    }
 
     // La Vía Láctea: NUESTRO nivel, la forma de ESO. La amplitud y su caída con
     // la latitud galáctica son las medidas aquí (0,39 mag en el plano sobre
@@ -221,55 +280,75 @@
       var galL = ((Math.atan2(v[0] * G.e2[0] + v[1] * G.e2[1] + v[2] * G.e2[2],
                               v[0] * G.e1[0] + v[1] * G.e1[1] + v[2] * G.e1[2])
                    / D2R) % 360 + 360) % 360;
-      add(env.floor * (Math.pow(10, 0.4 * 0.39 * Math.exp(-Math.abs(galB) / 26.5)) - 1)
-          * mwShape(galL, galB) * ext, C_GALAXY);
-    }
-    add(env.floor * (airmass - 1) * env.aod * 1.2, env.dusty ? C_DUST : C_HAZE);
-    if (env.moonAlt > 0) {
-      add(moonNl(separation(alt, az, env.moonAlt, env.moonAz), env.moonAlt, alt,
-                 env.phase, env.k), C_MOON);
-    }
-    if (env.sunAlt > -18) {
-      var t = Math.min(1, Math.max(0, (env.sunAlt + 18) / 18));
-      add(nl(13.5) * Math.pow(t, 2.2) * (0.25 + Math.max(0, 1 - alt / 50)), C_TWILIGHT);
-    }
-    // Cubierto: el manto tapa el cielo y, bajo la Luna, brilla el solo. Sin
-    // ciudad debajo la nube OSCURECE -- se traga el airglow en vez de reflejar
-    // farolas -- y eso esta medido aqui sobre 4.690 horas.
-    if (env.cloud > 0) {
-      var cover = env.cloud / 100;
-      total *= (1 - cover * 0.75); r *= (1 - cover * 0.75);
-      g *= (1 - cover * 0.75); b *= (1 - cover * 0.75);
-      add(env.floor * cover * (0.05 + (env.moonGlow || 0) * 9), [0.62, 0.65, 0.70]);
+      var via = env.floor * (Math.pow(10, 0.4 * 0.39 * Math.exp(-Math.abs(galB) / 26.5)) - 1)
+              * mwShape(galL, galB) * ext;
+      total += via;
+      echar(Math.min(VIA_MAX, via / env.floor * GANANCIA_VIA), C_GALAXY);
     }
 
-    var v2 = (Math.log10(Math.max(total, 1)) - LOG_LO) / LOG_SPAN;
-    v2 = Math.max(0.02, Math.min(1, v2));
-    var mean = (r + g + b) / 3 || 1, scale = v2 / total;
-    // El recorte por ABAJO no es cosmetico: con SAT alto, el canal mas debil de
-    // una mezcla muy saturada -- el azul del crepusculo -- se va negativo, y
-    // `Math.pow(negativo, 0.52)` es NaN. En el canvas un NaN se escribe como
-    // cero sin avisar, asi que el fallo no aparece como error: aparece como un
-    // color raro que nadie sabe de donde sale.
-    function canal(x) {
-      return Math.min(255, Math.pow(Math.max(0, Math.min(1, x * scale)), GAMMA) * 255);
+    // La calima. Es direccional de verdad, aunque no en el sentido que parece:
+    // crece con la masa de aire, o sea con lo BAJO que mires, y en el cenit
+    // vale cero. Lo que no tiene es estructura por acimut ni cambio a lo largo
+    // de la noche, porque el JSON trae un solo AOD para el sitio -- si algun
+    // dia CAMS da el campo, entra aqui sin tocar nada mas.
+    var polvo = env.floor * (airmass - 1) * env.aod * 1.2;
+    total += polvo;
+    var anomalia = env.floor * (airmass - 1) * Math.max(0, env.aod - AOD_LIMPIO) * 1.2;
+    echar(tinta(anomalia / env.floor) * GANANCIA_CALIMA, C_DUST);
+
+    // La Luna. El halo intenso pegado al disco que decae hacia fuera, y su
+    // intensidad de la fase: las dos cosas salen de moonNl, que es la ley
+    // medida en este sitio.
+    if (env.moonAlt > 0) {
+      var luna = moonNl(separation(alt, az, env.moonAlt, env.moonAz), env.moonAlt, alt,
+                        env.phase, env.k);
+      total += luna;
+      echar(tinta(luna / env.floor), C_MOON);
     }
-    out[0] = canal(mean + (r - mean) * SAT);
-    out[1] = canal(mean + (g - mean) * SAT);
-    out[2] = canal(mean + (b - mean) * SAT);
-    return out;
+
+    // El día, entrando por el borde. Amarillo: es la unica tinta que no avisa
+    // de un estorbo del cielo sino de que todavia no es de noche.
+    if (env.sunAlt > -18) {
+      var t = Math.min(1, Math.max(0, (env.sunAlt + 18) / 18));
+      var dia = nl(13.5) * Math.pow(t, 2.2) * (0.25 + Math.max(0, 1 - alt / 50));
+      total += dia;
+      echar(tinta(dia / env.floor), C_DAY);
+    }
+
+    // Las nubes. Aqui solo para las muestras de la clave: en la boveda se
+    // pintan encima, una a una y en su sitio, porque son direccionales.
+    //
+    // Gris, y cuanto MAS estorban mas claras. Es al reves de como estaba -- las
+    // bajas salian gris oscuro y los cirros casi blancos -- y la version de
+    // antes decia justo lo contrario de lo que pasa: un circulo oscuro tiene
+    // que ser un cielo que se deja ver.
+    if (env.cloud > 0) {
+      var estorbo = env.cloud / 100 * (LAYER_WEIGHT[env.layer] || 1);
+      var tapa = Math.min(0.92, estorbo);
+      total = total * (1 - tapa * 0.75) + env.floor * estorbo * 0.05;
+      col[0] = col[0] * (1 - tapa); col[1] = col[1] * (1 - tapa); col[2] = col[2] * (1 - tapa);
+      echar(tapa * (0.18 + estorbo * 0.82), C_CLOUD);
+    }
+
+    // El recorte por ABAJO no es cosmetico: un canal negativo entra en
+    // `Math.pow` y sale NaN, y en el canvas un NaN se escribe como cero sin
+    // avisar. El fallo no aparece como error: aparece como un color raro que
+    // nadie sabe de donde sale.
+    out[0] = Math.pow(Math.max(0, Math.min(1, col[0])), GAMMA) * 255;
+    out[1] = Math.pow(Math.max(0, Math.min(1, col[1])), GAMMA) * 255;
+    out[2] = Math.pow(Math.max(0, Math.min(1, col[2])), GAMMA) * 255;
+    return total;
   }
 
   function frameEnv(cupula, f, indice) {
     return {
       k: cupula.transparency.k, aod: cupula.transparency.aod_site,
-      dusty: cupula.transparency.dust_alert, floor: nl(NATURAL_FLOOR_MAG),
+      floor: nl(NATURAL_FLOOR_MAG),
       gal: galacticFrame(cupula.lst[indice], cupula.site.lat),
       moonAlt: f.moon_alt, moonAz: f.moon_az,
       phase: cupula.moon.phase_angle,
       sunAlt: f.sun_alt,
-      moonGlow: f.moon_alt > 0 ? cupula.moon.illumination : 0,
-      cloud: 0
+      cloud: 0, layer: 'mid'
     };
   }
 
@@ -382,31 +461,27 @@
     capaNube.width = capaNube.height = size;
     var cc = capaNube.getContext('2d');
     cc.clearRect(0, 0, size, size);
-    var lit = f.moon_alt > 0 ? cupula.moon.illumination : 0;
     var ox = size / 2, oy = size / 2;
     f.clouds.forEach(function (c) {
       if (c.alt <= 0) { return; }
       var xy = project(c.alt, c.az, ox, oy, R);
       var radius = Math.max(20, c.span / 90 * R * (c.overhead ? 0.85 : 1.0));
-      var base = LAYER_RGB[c.layer] || LAYER_RGB.mid;
-      var w = 0.30 + lit * 0.55;
-      var rr = Math.round(base[0] + (255 - base[0]) * w);
-      var gg = Math.round(base[1] + (255 - base[1]) * w);
-      var bb = Math.round(base[2] + (250 - base[2]) * w * 0.9);
-      // Opacidad: mismo criterio que SAT y GAMMA. La cobertura sigue siendo el
-      // numero -- se publica en el JSON y se lee en el panel por horas -- y esto
-      // solo decide como de visible sale en pantalla. Con el 0,42 del mockup, un
-      // 46 % de nube alta quedaba en alfa 0,14 sobre fondo oscuro: estaba
-      // dibujada y no se veia, que para un aviso de nubes es lo mismo que no
-      // estar. El suelo de 0,10 hace que una nube tenue se note como tenue en
-      // vez de desaparecer.
-      // Opacidad por CAPA, no solo por cobertura. Un estrato bajo tapa el cielo
-      // entero; un cirro alto atenua y deja fotografiar a traves. Pintarlos
-      // igual decia que estorban igual, y no es verdad: la profundidad optica
-      // de una nube baja es de otro orden. Los pesos son la escala relativa
-      // con la que cada capa entra en el veredicto de nubes.
-      var peso = LAYER_WEIGHT[c.layer] || 0.8;
-      var a = Math.min(0.80, (0.06 + c.cover / 100 * 0.80) * peso);
+      // Cuanto tapa DE VERDAD: la cobertura por el peso de su capa. Un
+      // estrato bajo al 90 % y un cirro al 90 % no estorban igual.
+      var estorbo = Math.min(1, c.cover / 100 * (LAYER_WEIGHT[c.layer] || 0.8));
+      // Y el gris sale de ahi: oscuro lo que deja ver, blanco lo que tapa.
+      // Estaba justo al reves -- las nubes bajas se pintaban gris oscuro (107)
+      // y los cirros casi blancos (207), porque el color venia de la ALTURA de
+      // la capa y no de lo que estorba. Se leia como que un cirro es peor que
+      // un estrato, que es lo contrario de lo que pasa.
+      var tono = Math.round(58 + estorbo * 197);
+      var rr = tono, gg = tono, bb = tono;
+      // La opacidad acompana al tono pero con SUELO: la cobertura sigue siendo
+      // el numero -- se publica en el JSON y se lee en el panel por horas -- y
+      // esto solo decide como de visible sale en pantalla. Sin ese suelo, una
+      // nube tenue queda a la vez oscura y transparente y desaparece, que para
+      // un aviso de nubes es lo mismo que no estar.
+      var a = Math.min(0.90, 0.20 + estorbo * 0.70);
       var grad = cc.createRadialGradient(xy[0], xy[1], 0, xy[0], xy[1], radius);
       grad.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a + ')');
       grad.addColorStop(0.5, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a * 0.45 + ')');
@@ -414,9 +489,13 @@
       cc.fillStyle = grad;
       cc.beginPath(); cc.arc(xy[0], xy[1], radius, 0, 6.2832); cc.fill();
     });
+    // Se dibuja ENCIMA, no se suma. Una nube tapa lo que hay detras: ese es su
+    // efecto y ese tiene que ser su dibujo. Con 'lighter' la nube ACLARABA el
+    // cielo, asi que sobre un cielo con Luna sumaba brillo en vez de comerse la
+    // vista, y era imposible distinguir una noche cubierta de una despejada con
+    // Luna: las dos salian claras.
     o.save();
-    o.globalCompositeOperation = 'lighter';
-    o.globalAlpha = 0.88;
+    o.globalAlpha = 0.95;
     o.drawImage(capaNube, cx - ox, cy - oy);
     o.restore();
   }
@@ -548,25 +627,32 @@
   }
 
   /* Cielos reales, pintados por el codigo de arriba. Una clave dibujada por
-     una segunda rutina "parecida" acaba discrepando del dibujo que explica. */
+     una segunda rutina "parecida" acaba discrepando del dibujo que explica.
+
+     La lista es la escala entera y por eso empieza por el negro: si la primera
+     muestra no es la noche perfecta, no se ve contra QUE se estan midiendo las
+     demas. */
   var MUESTRAS = [
-    ['sinLunaDespejado', { moonAlt: -20, cloud: 0 }],
-    ['sinLunaMedia', { moonAlt: -20, cloud: 50 }],
-    ['sinLunaCubierto', { moonAlt: -20, cloud: 100 }],
-    ['llenaDespejado', { moonAlt: 55, cloud: 0, illum: 1 }],
-    ['llenaMedia', { moonAlt: 55, cloud: 50, illum: 1 }],
-    ['llenaCubierto', { moonAlt: 55, cloud: 100, illum: 1 }],
+    // El punto de partida: sin Luna, sin nubes, sin calima. Negro.
+    ['oscura', {}],
+    // La Luna, cerca y lejos. Son la MISMA Luna llena: lo unico que cambia es
+    // la separacion, y ese es justo el efecto que antes no se veia.
+    ['lunaCerca', { moonAlt: 40, moonAz: 180, phase: 0 }],
+    ['lunaLejos', { moonAlt: 30, moonAz: 300, phase: 0 }],
+    // Las nubes, por lo que tapan. La fina es un cirro; la espesa, un estrato.
+    ['nubeFina', { cloud: 30, layer: 'high' }],
+    ['nubeEspesa', { cloud: 90, layer: 'low' }],
     // La calima, SIN Luna. Con Luna llena la muestra salia identica a la de
     // cielo limpio -- y no por un fallo: a 30 grados el termino de aerosol vale
     // 0,42 veces el suelo natural y la Luna aporta mil veces mas, asi que se lo
     // traga. Cierto, y por eso mismo inutil como muestra: lo que la calima le
     // hace al color solo se ve cuando no hay algo mas grande encima.
-    ['calima', { moonAlt: -20, cloud: 0, dusty: true, aod: 0.35, k: 0.35 }],
+    ['calima', { aod: 0.35, k: 0.35 }],
     // Etiquetada 'Dia' porque es el color de los dos extremos de la linea de
     // tiempo, que es donde la gente la va a reconocer. Se calcula a -10 grados
     // de altura solar, que es crepusculo nautico: mas arriba el ajuste de
     // crepusculo del motor ya no llega y el domo lo dice en vez de pintarlo.
-    ['dia', { moonAlt: -20, cloud: 0, sunAlt: -10 }]
+    ['dia', { sunAlt: -10 }]
   ];
 
   // A 70 grados la masa de aire es 1,06 y el termino de aerosol vale casi
@@ -576,25 +662,21 @@
 
   function muestras(cupula) {
     var base = { k: cupula.transparency.k, aod: cupula.transparency.aod_site,
-                 dusty: false, floor: nl(NATURAL_FLOOR_MAG), gal: null,
-                 moonAz: 180, phase: 0, sunAlt: -40, cloud: 0 };
+                 floor: nl(NATURAL_FLOOR_MAG), gal: null, moonAlt: -20,
+                 moonAz: 180, phase: 0, sunAlt: -40, cloud: 0, layer: 'mid' };
     var rgb = [0, 0, 0];
     return MUESTRAS.map(function (par) {
       var env = {};
       Object.keys(base).forEach(function (k) { env[k] = base[k]; });
       Object.keys(par[1]).forEach(function (k) { env[k] = par[1][k]; });
-      env.moonGlow = par[1].moonAlt > 0 ? (par[1].illum || 0) : 0;
-      skyAt(MUESTRA_ALT, 180, env, rgb);
-      // Se reconstruye la magnitud que representa la muestra, para que la clave
-      // lleve un NUMERO y no solo un color -- y se reconstruye de la
-      // luminancia, no del pixel, asi que el estiramiento de contraste no la
-      // toca.
-      var v = (Math.pow(rgb[0] / 255, 1 / GAMMA) + Math.pow(rgb[1] / 255, 1 / GAMMA)
-             + Math.pow(rgb[2] / 255, 1 / GAMMA)) / 3;
-      var nlv = Math.pow(10, v * LOG_SPAN + LOG_LO);
+      // La magnitud sale de la LUMINANCIA que devuelve skyAt, no del pixel.
+      // Reconstruirla del pixel ataba el numero publicado a la rampa de
+      // pantalla: cualquier retoque de GAMMA movia una magnitud, que es lo
+      // ultimo que se quiere que dependa de una decision de color.
+      var nlv = skyAt(MUESTRA_ALT, 180, env, rgb);
       return { clave: par[0],
                rgb: [Math.round(rgb[0]), Math.round(rgb[1]), Math.round(rgb[2])],
-               mag: 22.4 - Math.log(nlv / 34.08) / 0.92104 };
+               mag: (20.7233 - Math.log(nlv / 34.08)) / 0.92104 };
     });
   }
 

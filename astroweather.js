@@ -94,12 +94,11 @@
       sinPuntuar: 'Objeto externo: la altura es geometría y sale del mismo tiempo sidéreo que la cúpula, pero el motor NO lo ha puntuado — no hay horas de SNR ni veredicto para él.',
       coordenadas: 'coordenadas',
       clave: 'Qué color es qué cielo',
-      claveNota: 'Sin ciudad debajo, la nube OSCURECE: se traga el airglow en vez de reflejar farolas. Por eso las tres muestras sin Luna se parecen tanto — medido aquí sobre 4.690 horas. El número es la magnitud por segundo de arco al cuadrado.',
+      claveNota: 'El negro es el cielo más oscuro que da este sitio; encima solo se pinta lo que estorba, y su color dice qué es: azul la Luna, gris las nubes, rojo la calima, amarillo el día. En las nubes, cuanto más claras más tapan. El número es la magnitud por segundo de arco al cuadrado, y en la nube espesa engaña a propósito: sin ciudad debajo la nube OSCURECE el cielo — se traga el airglow en vez de reflejar farolas, medido aquí sobre 4.690 horas — así que sale oscurísimo y a la vez inservible.',
       muestras: {
-        sinLunaDespejado: 'Sin Luna, despejado', sinLunaMedia: 'Sin Luna, media nube',
-        sinLunaCubierto: 'Sin Luna, cubierto', llenaDespejado: 'Luna llena, despejado',
-        llenaMedia: 'Luna llena, media nube', llenaCubierto: 'Luna llena, cubierto',
-        calima: 'Calima, sin Luna', dia: 'Día'
+        oscura: 'Lo más oscuro que da', lunaCerca: 'Luna llena, a 10°',
+        lunaLejos: 'Luna llena, a 97°', nubeFina: 'Cirro fino (30 %)',
+        nubeEspesa: 'Estrato espeso (90 %)', calima: 'Calima', dia: 'Día'
       },
       cupula: {
         luna: 'Luna',
@@ -179,12 +178,11 @@
       sinPuntuar: 'External target: the altitude is geometry, from the same sidereal time as the dome, but the engine has NOT scored it — no SNR hours and no verdict.',
       coordenadas: 'coordinates',
       clave: 'Which colour is which sky',
-      claveNota: 'With no city below, cloud DARKENS the sky: it swallows the airglow instead of reflecting streetlights. That is why the three moonless swatches look so alike — measured here over 4,690 hours. The number is the magnitude per square arcsecond.',
+      claveNota: 'Black is the darkest sky this site gives; on top of it only what gets in the way is painted, and its colour says which: blue the Moon, grey the cloud, red the dust haze, yellow the daylight. For cloud, the paler the more it blocks. The number is the magnitude per square arcsecond, and on thick cloud it misleads on purpose: with no city below, cloud DARKENS the sky — it swallows the airglow instead of reflecting streetlights, measured here over 4,690 hours — so it reads very dark and is useless all the same.',
       muestras: {
-        sinLunaDespejado: 'No Moon, clear', sinLunaMedia: 'No Moon, half cloud',
-        sinLunaCubierto: 'No Moon, overcast', llenaDespejado: 'Full Moon, clear',
-        llenaMedia: 'Full Moon, half cloud', llenaCubierto: 'Full Moon, overcast',
-        calima: 'Dust haze, no Moon', dia: 'Daytime'
+        oscura: 'The darkest it gets', lunaCerca: 'Full Moon, 10° away',
+        lunaLejos: 'Full Moon, 97° away', nubeFina: 'Thin cirrus (30%)',
+        nubeEspesa: 'Thick stratus (90%)', calima: 'Dust haze', dia: 'Daytime'
       },
       cupula: {
         luna: 'Moon',
@@ -636,6 +634,31 @@
       num(objeto.alt[i], 0) + '° · ' + esc(marcos[i].label) + '</span></div>';
   }
 
+  /* Ascension recta y declinacion en el formato que se teclea en una montura:
+     horas la primera, grados la segunda. Los decimales van en el `title`, que
+     es lo que hace falta para pegar en un plate solve. */
+  function sexagesimal(grados, esHora) {
+    if (typeof grados !== 'number' || !isFinite(grados)) { return ''; }
+    var v = esHora ? ((grados % 360) + 360) % 360 / 15 : Math.abs(grados);
+    var a = Math.floor(v);
+    var m = Math.floor((v - a) * 60);
+    var sg = Math.round((((v - a) * 60) - m) * 60);
+    if (sg === 60) { sg = 0; m += 1; }
+    if (m === 60) { m = 0; a += 1; }
+    var dd = function (x) { return (x < 10 ? '0' : '') + x; };
+    return esHora
+      ? a + 'h ' + dd(m) + 'm ' + dd(sg) + 's'
+      : (grados < 0 ? '−' : '+') + a + '° ' + dd(m) + '′ ' + dd(sg) + '″';
+  }
+
+  function coordenadasHtml(objeto, t) {
+    if (typeof objeto.ra !== 'number' || typeof objeto.dec !== 'number') { return ''; }
+    return '<span class="q coord" title="' + esc(t.coordenadas) + ': ' +
+      num(objeto.ra, 4) + '° / ' + num(objeto.dec, 4) + '° (J2000)">' +
+      esc(sexagesimal(objeto.ra, true)) + ' · ' +
+      esc(sexagesimal(objeto.dec, false)) + '</span>';
+  }
+
   function minimoLuna(objeto) {
     var serie = objeto.sep_luna || [];
     var vivos = serie.filter(function (v) { return typeof v === 'number'; });
@@ -650,9 +673,11 @@
       '<div class="head">' +
         '<i class="dot" style="background:' + color + '"></i>' +
         '<span class="n">' + esc(objeto.nombre) + '</span>' +
-        (objeto.externo
-          ? '<span class="q externo">' + esc(t.coordenadas) + ' · ' +
-              num(objeto.ra, 3) + '° ' + num(objeto.dec, 3) + '°</span>'
+        // Las coordenadas, para TODOS y no solo para los de fuera: es lo
+        // primero que hace falta para apuntar, y tenerlas solo en los que el
+        // motor no conoce era justo al reves de lo util.
+        coordenadasHtml(objeto, t) +
+        (objeto.externo ? ''
           : '<span class="q">' + num(objeto.horas_si_despeja) + ' ' + t.horas + ' ' +
               esc(t.siDespejaCorto) + '</span>' +
             '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +

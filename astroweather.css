@@ -675,6 +675,13 @@
 
 /* ---- Objetos que el motor no ha puntuado ---- */
 .aw-lane .head .q.externo { font-variant-numeric: tabular-nums; color: var(--text-muted, #888); }
+/* Las coordenadas en monoespaciada: se leen para copiarlas, no para leerlas. */
+.aw-lane .head .q.coord {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #888);
+  letter-spacing: -.01em;
+}
 .aw-externo {
   margin: 8px 0 0;
   font-size: 0.76rem;
