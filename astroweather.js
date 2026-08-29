@@ -65,6 +65,15 @@
                    'poco rentable': 'poco rentable', 'no observable': 'no observable' },
       severidad: { evitar: 'evitar', aprovecha: 'aprovecha', cuidado: 'cuidado' },
       reproducir: 'Reproducir la noche', pausar: 'Pausar',
+      quitar: 'Quitar', siDespejaCorto: 'si despeja',
+      clave: 'Qué color es qué cielo',
+      claveNota: 'Sin ciudad debajo, la nube OSCURECE: se traga el airglow en vez de reflejar farolas. Por eso las tres muestras sin Luna se parecen tanto — medido aquí sobre 4.690 horas. El número es la magnitud por segundo de arco al cuadrado.',
+      muestras: {
+        sinLunaDespejado: 'Sin Luna, despejado', sinLunaMedia: 'Sin Luna, media nube',
+        sinLunaCubierto: 'Sin Luna, cubierto', llenaDespejado: 'Luna llena, despejado',
+        llenaMedia: 'Luna llena, media nube', llenaCubierto: 'Luna llena, cubierto',
+        calima: 'Calima, sin Luna', crepusculo: 'Crepúsculo náutico'
+      },
       cupula: {
         luna: 'Luna',
         fueraModelo: 'DE DÍA — FUERA DEL MODELO',
@@ -116,6 +125,15 @@
                    'poco rentable': 'low yield', 'no observable': 'not observable' },
       severidad: { evitar: 'avoid', aprovecha: 'make the most of it', cuidado: 'watch out' },
       reproducir: 'Play the night', pausar: 'Pause',
+      quitar: 'Remove', siDespejaCorto: 'if it clears',
+      clave: 'Which colour is which sky',
+      claveNota: 'With no city below, cloud DARKENS the sky: it swallows the airglow instead of reflecting streetlights. That is why the three moonless swatches look so alike — measured here over 4,690 hours. The number is the magnitude per square arcsecond.',
+      muestras: {
+        sinLunaDespejado: 'No Moon, clear', sinLunaMedia: 'No Moon, half cloud',
+        sinLunaCubierto: 'No Moon, overcast', llenaDespejado: 'Full Moon, clear',
+        llenaMedia: 'Full Moon, half cloud', llenaCubierto: 'Full Moon, overcast',
+        calima: 'Dust haze, no Moon', crepusculo: 'Nautical twilight'
+      },
       cupula: {
         luna: 'Moon',
         fueraModelo: 'DAYTIME — OUTSIDE THE MODEL',
@@ -185,11 +203,11 @@
   // -------------------------------------------------------- LA CÚPULA ------
   // El render vive en astroweather-dome.js: es el port del mockup del motor,
   // con su física. Aquí solo se le dan los datos y los textos.
-  function pintarCupula(destino, datos, objeto, indice, t) {
+  function pintarCupula(destino, datos, objetos, indice, t) {
     var cielo = destino.querySelector('#aw-sky');
     var encima = destino.querySelector('#aw-over');
     if (!cielo || !encima || !window.AWDome) { return; }
-    window.AWDome.pintar(cielo, encima, datos.cupula, objeto, indice, t.cupula);
+    window.AWDome.pintar(cielo, encima, datos.cupula, objetos, indice, t.cupula);
   }
 
   // ------------------------------------------- PERFIL DE ALTURA -----------
@@ -329,6 +347,13 @@
     return html + '</div>';
   }
 
+  // Los colores de las trazas. Son los del mockup del motor: elegidos para
+  // distinguirse entre sí sobre un cielo azul o naranja, que es lo que hay
+  // debajo.
+  var COLORES = ['#5fcf95', '#e8ad52', '#7fb0ef', '#c79ada', '#f0705a',
+                 '#79cfc2', '#b9c473', '#e08aa6', '#6fc3dd', '#d0a86b'];
+  var MAX_OBJETOS = 6;
+
   function bloqueElegir(t) {
     return '<div class="aw-pick"><h3>' + esc(t.elegir) + '</h3>' +
       '<div class="aw-search">' +
@@ -337,29 +362,140 @@
       '<div id="aw-chosen"><div class="aw-hint">' + esc(t.pista) + '</div></div></div>';
   }
 
-  // ------------------------------------------------------------ MONTAJE ----
+  // ------------------------------------------------ CLAVE DE COLOR --------
+  function bloqueClave(cupula, t) {
+    if (!window.AWDome || !window.AWDome.muestras) { return ''; }
+    var filas;
+    try { filas = window.AWDome.muestras(cupula); } catch (e) { return ''; }
+    return '<div class="aw-key"><span class="lbl">' + esc(t.clave) +
+      ' · ' + window.AWDome.muestraAltitud + '°</span>' +
+      filas.map(function (f) {
+        return '<div class="sw">' +
+          '<i style="background:rgb(' + f.rgb.join(',') + ')"></i>' +
+          '<span>' + esc(t.muestras[f.clave] || f.clave) + '</span>' +
+          '<b>' + f.mag.toFixed(1) + '</b></div>';
+      }).join('') +
+      '<p class="nota">' + esc(t.claveNota) + '</p></div>';
+  }
+
+  // -------------------------------------------------- LÍNEA DE TIEMPO -----
+  // Una barra con la oscuridad astronómica marcada, no un control deslizante
+  // pelado: lo que se quiere ver de un vistazo es CUÁNTO de la noche es noche
+  // de verdad y dónde estás dentro de ella.
+  function bloqueTiempo(marcos, indice, t) {
+    var n = marcos.length;
+    if (!n) { return ''; }
+    var partes = [], inicio = null;
+    marcos.forEach(function (f, i) {
+      if (f.dark && inicio === null) { inicio = i; }
+      if ((!f.dark || i === n - 1) && inicio !== null) {
+        var fin = f.dark ? i : i - 1;
+        partes.push('<div class="dark" style="left:' + (inicio / (n - 1) * 100) +
+          '%;width:' + ((fin - inicio) / (n - 1) * 100) + '%"></div>');
+        inicio = null;
+      }
+    });
+    marcos.forEach(function (f, i) {
+      if (i % 6) { return; }
+      partes.push('<div class="tick" style="left:' + (i / (n - 1) * 100) + '%"></div>');
+      partes.push('<span class="lbl" style="left:' + (i / (n - 1) * 100) + '%">' +
+        esc(f.label) + '</span>');
+    });
+    partes.push('<div class="cur" id="aw-cur" style="left:' +
+      (indice / (n - 1) * 100) + '%"></div>');
+    return '<div class="aw-timeline">' +
+      '<button type="button" class="aw-play" id="aw-play" aria-label="' +
+        esc(t.reproducir) + '" title="' + esc(t.reproducir) + '">▶</button>' +
+      '<div class="track" id="aw-track" role="slider" tabindex="0" ' +
+        'aria-valuemin="0" aria-valuemax="' + (n - 1) + '" aria-valuenow="' + indice +
+        '" aria-label="' + esc(t.horaCupula) + '">' + partes.join('') + '</div>' +
+      '<span class="now" id="aw-t-lab">' + esc(marcos[indice].label) + '</span></div>';
+  }
+
+  // ------------------------------------------------- PERFIL POR OBJETO ----
+  function perfilSvg(objeto, color) {
+    var alt = objeto.alt || [], n = alt.length;
+    if (!n) { return ''; }
+    var W = 100, H = 100, pad = 4;
+    var x = function (i) { return pad + i * (W - 2 * pad) / Math.max(1, n - 1); };
+    var y = function (a) { return H - pad - Math.max(0, Math.min(90, a)) / 90 * (H - 2 * pad); };
+    var tinte = { c: '#d15f5f', l: '#d8a53c', f: '#d8a53c', a: '#8a8a92',
+                  n: '#6ec177', '-': 'rgba(255,255,255,0.10)' };
+    var barras = '', ancho = (W - 2 * pad) / n;
+    for (var i = 0; i < n; i++) {
+      var codigo = (objeto.limita || '').charAt(i) || '-';
+      if (alt[i] > 0) {
+        barras += '<rect x="' + (x(i) - ancho / 2).toFixed(2) + '" y="' + y(alt[i]).toFixed(2) +
+          '" width="' + ancho.toFixed(2) + '" height="' + (H - pad - y(alt[i])).toFixed(2) +
+          '" fill="' + tinte[codigo] + '" opacity="' + (codigo === 'n' ? 0.5 : 0.26) + '"/>';
+      }
+    }
+    var linea = alt.map(function (a, i) {
+      return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
+    }).join(' ');
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img">' +
+      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
+      '<line class="min" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(25) + '" y2="' + y(25) + '"/>' +
+      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
+      barras +
+      '<path d="' + linea + '" fill="none" stroke="' + color +
+        '" stroke-width="1.4" vector-effect="non-scaling-stroke"/>' +
+      '<line class="cursor" x1="0" x2="0" y1="' + pad + '" y2="' + (H - pad) +
+        '" vector-effect="non-scaling-stroke"/>' +
+      alt.map(function (a, i) {
+        return '<rect class="hit" data-i="' + i + '" x="' + (x(i) - ancho / 2).toFixed(2) +
+          '" y="0" width="' + ancho.toFixed(2) + '" height="' + H + '"/>';
+      }).join('') + '</svg>';
+  }
+
+  function carril(objeto, color, t) {
+    return '<div class="aw-lane" data-obj="' + esc(objeto.nombre) + '">' +
+      '<div class="head">' +
+        '<i class="dot" style="background:' + color + '"></i>' +
+        '<span class="n">' + esc(objeto.nombre) + '</span>' +
+        '<span class="q">' + num(objeto.horas_si_despeja) + ' ' + t.horas + ' ' +
+          esc(t.siDespejaCorto) + '</span>' +
+        '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +
+          esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span>' +
+        '<button type="button" class="quitar" data-quitar="' + esc(objeto.nombre) +
+          '" aria-label="' + esc(t.quitar) + ' ' + esc(objeto.nombre) + '" title="' +
+          esc(t.quitar) + '">×</button>' +
+      '</div>' +
+      '<div class="aw-profile">' + perfilSvg(objeto, color) + '</div>' +
+      '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
+    '</div>';
+  }
+
+  // ------------------------------------------------------------ MONTAJE ---
   function montarBuscador(caja, datos, t, lang) {
     var noche = datos.noches[0];
-    var objetos = noche.objetos || [];
+    var catalogo = noche.objetos || [];
+    var marcos = (datos.cupula && datos.cupula.frames) || [];
     var entrada = caja.querySelector('#aw-q');
     var lista = caja.querySelector('#aw-res');
     var destino = caja.querySelector('#aw-chosen');
     if (!entrada) { return; }
 
+    var elegidos = [];          // los objetos en pantalla, en orden de llegada
+    var indice = 0;             // el instante que mira la cúpula
+    var reproduciendo = null;
+
+    function color(i) { return COLORES[i % COLORES.length]; }
+
     function pintarResultados() {
       var q = entrada.value.trim().toLowerCase();
       if (!q) { lista.hidden = true; return; }
-      // Se busca por el nombre Y por los alias: el catálogo está en
-      // castellano y quien lee la página en inglés escribe "Veil", no "Velo".
-      var hits = objetos.filter(function (o) {
+      var puestos = elegidos.map(function (o) { return o.nombre; });
+      var hits = catalogo.filter(function (o) {
+        if (puestos.indexOf(o.nombre) !== -1) { return false; }
         if (o.nombre.toLowerCase().indexOf(q) !== -1) { return true; }
         return (o.alias || []).some(function (a) {
           return a.toLowerCase().indexOf(q) !== -1;
         });
       }).slice(0, 12);
       lista.innerHTML = hits.length
-        ? hits.map(function (o, i) {
-            return '<button type="button" data-i="' + objetos.indexOf(o) + '">' +
+        ? hits.map(function (o) {
+            return '<button type="button" data-i="' + catalogo.indexOf(o) + '">' +
               '<span class="n">' + esc(o.nombre) + '</span>' +
               '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas + '</span></button>';
           }).join('')
@@ -367,173 +503,140 @@
       lista.hidden = false;
     }
 
-    function elegir(objeto) {
-      lista.hidden = true;
-      entrada.value = objeto.nombre;
-      var marcos = (datos.cupula && datos.cupula.frames) || [];
-      // Se abre en el mejor momento del objeto, que es lo que se quiere ver.
-      var indice = 0;
-      if (objeto.mejor_hora && marcos.length) {
+    function detalleDe(objeto, i) {
+      var m = marcos[i];
+      if (!m) { return ''; }
+      var a = (objeto.alt || [])[i], codigo = (objeto.limita || '').charAt(i) || '-';
+      if (a === undefined) { return ''; }
+      if (a < 0) {
+        return '<b>' + esc(m.label) + '</b> ' + esc(t.bajoHorizonte) +
+          ' (' + num(a, 0) + '°).';
+      }
+      if (codigo === '-') {
+        return '<b>' + esc(m.label) + '</b> ' + num(a, 0) + '°: ' +
+          esc(t.bajoMinimo) + '.';
+      }
+      return '<b>' + esc(m.label) + '</b> ' + esc(t.altura) + ' ' + num(a, 0) + '°, ' +
+        esc(t.rinde) + ' ' + num(((objeto.rend || [])[i] || 0) * 100, 0) + ' %, ' +
+        esc(t.limitaPor) + ' ' + esc((t.limita && t.limita[codigo]) || codigo) +
+        (m.sky_mag !== undefined && m.sky_mag !== null
+          ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1) : '') + '.';
+    }
+
+    // Solo mueve el cursor y repinta: no reconstruye el HTML, que es lo que
+    // haría perder el foco y el scroll cada vez que corre la animación.
+    function irA(i) {
+      indice = Math.max(0, Math.min(marcos.length - 1, i));
+      var etiqueta = destino.querySelector('#aw-t-lab');
+      var cursor = destino.querySelector('#aw-cur');
+      var pista = destino.querySelector('#aw-track');
+      if (etiqueta && marcos[indice]) { etiqueta.textContent = marcos[indice].label; }
+      var pct = indice / Math.max(1, marcos.length - 1) * 100;
+      if (cursor) { cursor.style.left = pct + '%'; }
+      if (pista) { pista.setAttribute('aria-valuenow', indice); }
+      destino.querySelectorAll('.aw-profile .cursor').forEach(function (linea) {
+        var xx = 4 + indice * (100 - 8) / Math.max(1, marcos.length - 1);
+        linea.setAttribute('x1', xx); linea.setAttribute('x2', xx);
+      });
+      elegidos.forEach(function (o) {
+        var caja2 = destino.querySelector('[data-detalle="' + o.nombre.replace(/"/g, '') + '"]');
+        if (caja2) { caja2.innerHTML = detalleDe(o, indice); }
+      });
+      pintarCupula(destino, datos, elegidos, indice, t);
+    }
+
+    function repintarTodo() {
+      if (!elegidos.length) {
+        destino.innerHTML = '<div class="aw-hint">' + esc(t.pista) + '</div>';
+        return;
+      }
+      destino.innerHTML =
+        '<div class="aw-chosen">' +
+          '<div class="aw-dome-wrap">' +
+            '<div class="aw-dome-stack">' +
+              '<canvas class="aw-dome" id="aw-sky"></canvas>' +
+              '<canvas class="aw-dome" id="aw-over"></canvas>' +
+            '</div>' +
+            bloqueTiempo(marcos, indice, t) +
+          '</div>' +
+          '<div class="aw-side">' + bloqueClave(datos.cupula, t) + '</div>' +
+        '</div>' +
+        '<div class="aw-lanes">' +
+          elegidos.map(function (o, i) { return carril(o, color(i), t); }).join('') +
+        '</div>';
+
+      var pila = destino.querySelector('.aw-dome-stack');
+      if (window.ResizeObserver && pila) {
+        new ResizeObserver(function () {
+          if (pila.clientWidth > 0) { irA(indice); }
+        }).observe(pila);
+      }
+      setTimeout(function () { irA(indice); }, 60);
+      if (window.AWDome && !window.AWDome.listaViaLactea()) {
+        window.AWDome.pendiente.push(function () { irA(indice); });
+      }
+    }
+
+    function anadir(objeto) {
+      if (elegidos.length >= MAX_OBJETOS) { elegidos.shift(); }
+      elegidos.push(objeto);
+      // Se abre en el mejor momento del PRIMER objeto que entra; después no se
+      // mueve solo, que sería quitarle el sitio a quien estaba mirando algo.
+      if (elegidos.length === 1 && objeto.mejor_hora && marcos.length) {
         var objetivo = new Date(objeto.mejor_hora).getTime(), dist = Infinity;
         marcos.forEach(function (m, i) {
           var d = Math.abs(new Date(m.t).getTime() - objetivo);
           if (d < dist) { dist = d; indice = i; }
         });
       }
-      destino.innerHTML =
-        '<div class="aw-chosen">' +
-          '<div class="aw-dome-wrap">' +
-            // Dos lienzos apilados: el cielo se pinta píxel a píxel y es caro,
-            // y lo de encima cambia con cada cuadro. Separarlos evita repintar
-            // el cielo entero para mover un punto.
-            '<div class="aw-dome-stack">' +
-              '<canvas class="aw-dome" id="aw-sky"></canvas>' +
-              '<canvas class="aw-dome" id="aw-over"></canvas>' +
-            '</div>' +
-            (marcos.length
-              ? '<div class="aw-time">' +
-                '<button type="button" class="aw-play" id="aw-play" ' +
-                'aria-label="' + esc(t.reproducir) + '" title="' + esc(t.reproducir) + '">▶</button>' +
-                '<input type="range" id="aw-t" min="0" max="' + (marcos.length - 1) +
-                '" value="' + indice + '">' +
-                '<span class="now" id="aw-t-lab">' + esc(marcos[indice].label) + '</span></div>'
-              : '') +
-          '</div>' +
-          '<div class="aw-obj">' +
-            '<h4>' + esc(objeto.nombre) + '</h4>' +
-            '<div class="sub">' + esc(objeto.tipo) + ' · ' + esc(objeto.clase) +
-              ' · <span class="aw-tag ' + clase(objeto.veredicto) + '">' +
-              esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span></div>' +
-            '<p class="why">' + esc(objeto.porque) +
-              (objeto.nota ? ' — ' + esc(objeto.nota) : '') + '</p>' +
-            '<div class="aw-obj-facts">' +
-              '<div class="f"><span class="k">' + esc(t.siDespeja) + '</span>' +
-                '<span class="v">' + num(objeto.horas_si_despeja) + '</span></div>' +
-              '<div class="f"><span class="k">' + esc(t.esperadas) + '</span>' +
-                '<span class="v">' + num(objeto.horas_esperadas) + '</span></div>' +
-              '<div class="f"><span class="k">' + esc(t.maxAlt) + '</span>' +
-                '<span class="v">' + num(objeto.altura_maxima, 0) + '°</span></div>' +
-              '<div class="f"><span class="k">' + esc(t.sepLuna) + '</span>' +
-                '<span class="v">' + num(objeto.separacion_luna, 0) + '°</span></div>' +
-              '<div class="f"><span class="k">' + esc(t.sobreMin) + '</span>' +
-                '<span class="v">' + num(objeto.horas_sobre_minimo) + '</span></div>' +
-              (objeto.mejor_hora
-                ? '<div class="f"><span class="k">' + esc(t.mejorHora) + '</span>' +
-                  '<span class="v">' + esc(hora(objeto.mejor_hora)) + '</span></div>'
-                : '') +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        // El perfil va DEBAJO de la cúpula y a todo el ancho: la cúpula dice
-        // hacia dónde mirar y el perfil dice cuándo, y son dos preguntas.
-        '<div class="aw-profile-wrap"><span class="lbl" style="display:block;' +
-          'font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;' +
-          'color:var(--text-muted,#777);margin:18px 0 6px">' + esc(t.perfil) +
-          '</span>' + perfilSvg(objeto, marcos) +
-          '<div class="aw-detail" id="aw-det">' + esc(t.pulsaPerfil) + '</div></div>';
+      entrada.value = '';
+      lista.hidden = true;
+      repintarTodo();
+    }
 
-      var deslizador = destino.querySelector('#aw-t');
-      var etiqueta = destino.querySelector('#aw-t-lab');
-      var cursor = destino.querySelector('#aw-p-cursor');
-      var detalle = destino.querySelector('#aw-det');
-
-      function contar(i) {
-        var m = marcos[i];
-        if (!m) { return ''; }
-        var a = objeto.alt[i], codigo = (objeto.limita || '').charAt(i) || '-';
-        if (a === undefined) { return ''; }
-        // Ocho grados NO es "bajo el horizonte": es visible e inservible, y
-        // decirlo mal hace dudar de todo lo demas.
-        if (a < 0) {
-          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
-            esc(t.bajoHorizonte) + ' (' + num(a, 0) + '°).';
-        }
-        if (codigo === '-') {
-          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
-            num(a, 0) + '°: ' + esc(t.bajoMinimo) + '.';
-        }
-        return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
-          esc(t.altura) + ' ' + num(a, 0) + '°, ' + esc(t.rinde) + ' ' +
-          num((objeto.rend[i] || 0) * 100, 0) + ' %, ' + esc(t.limitaPor) + ' ' +
-          esc((t.limita && t.limita[codigo]) || codigo) +
-          (m.sky_mag !== undefined && m.sky_mag !== null
-            ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1)
-            : '') + '.';
-      }
-
-      function repintar() {
-        var i = deslizador ? parseInt(deslizador.value, 10) : indice;
-        if (etiqueta && marcos[i]) { etiqueta.textContent = marcos[i].label; }
-        if (cursor) {
-          var xx = 4 + i * (100 - 8) / Math.max(1, (objeto.alt || []).length - 1);
-          cursor.setAttribute('x1', xx); cursor.setAttribute('x2', xx);
-        }
-        if (detalle) { detalle.innerHTML = contar(i); }
-        pintarCupula(destino, datos, objeto, i, t);
-      }
-
-      // Reproducir la noche. Es la forma natural de leer una cúpula: lo que
-      // cuenta es CÓMO se mueve todo junto, no una foto de las 22:00.
-      var reproduciendo = null;
-      var boton = destino.querySelector('#aw-play');
-      if (boton && deslizador) {
-        boton.addEventListener('click', function () {
-          if (reproduciendo) {
-            clearInterval(reproduciendo); reproduciendo = null;
-            boton.textContent = '▶'; boton.title = t.reproducir;
-            return;
-          }
-          boton.textContent = '❚❚'; boton.title = t.pausar;
-          reproduciendo = setInterval(function () {
-            var siguiente = (parseInt(deslizador.value, 10) + 1) % marcos.length;
-            deslizador.value = siguiente;
-            repintar();
-          }, 550);
-        });
-      }
-
-      if (deslizador) { deslizador.addEventListener('input', repintar); }
-      // Pinchar en el perfil mueve la cúpula: son la misma noche vista de dos
-      // maneras, y moverlas por separado seria mentir sobre eso.
-      destino.addEventListener('click', function (e) {
-        var celda = e.target.closest('rect.hit');
-        if (!celda) { return; }
-        if (deslizador) { deslizador.value = celda.getAttribute('data-i'); }
-        repintar();
-      });
-      // El primer pintado no puede lanzarse "cuando toque": justo despues de
-      // escribir el HTML el navegador todavia no ha resuelto el ancho, y un
-      // lienzo de ancho cero se pinta a la nada sin quejarse. Se pinta cuando
-      // la caja TIENE tamano, y se repinta si cambia -- que cubre ademas el
-      // giro del movil y el resize de la ventana.
-      var pila = destino.querySelector('.aw-dome-stack');
-      if (window.ResizeObserver && pila) {
-        var observador = new ResizeObserver(function () {
-          if (pila.clientWidth > 0) { repintar(); }
-        });
-        observador.observe(pila);
-      } else {
-        window.addEventListener('resize', repintar);
-      }
-      // Y un repintado de respaldo pase lo que pase. Cuesta un pintado de mas y
-      // quita de encima toda una familia de problemas: navegador sin
-      // ResizeObserver, caja que ya tenia tamano antes de observarla, o una
-      // fuente que llega tarde y recoloca.
-      setTimeout(repintar, 60);
-      // Y otra vez cuando la panoramica de la Via Lactea acabe de decodificarse.
-      if (window.AWDome && !window.AWDome.listaViaLactea()) {
-        window.AWDome.pendiente.push(repintar);
-      }
+    function quitar(nombre) {
+      elegidos = elegidos.filter(function (o) { return o.nombre !== nombre; });
+      repintarTodo();
     }
 
     entrada.addEventListener('input', pintarResultados);
     entrada.addEventListener('focus', pintarResultados);
     lista.addEventListener('click', function (e) {
       var boton = e.target.closest('button[data-i]');
-      if (boton) { elegir(objetos[parseInt(boton.getAttribute('data-i'), 10)]); }
+      if (boton) { anadir(catalogo[parseInt(boton.getAttribute('data-i'), 10)]); }
     });
     document.addEventListener('click', function (e) {
       if (!caja.querySelector('.aw-search').contains(e.target)) { lista.hidden = true; }
+    });
+
+    destino.addEventListener('click', function (e) {
+      var fuera = e.target.closest('button[data-quitar]');
+      if (fuera) { return quitar(fuera.getAttribute('data-quitar')); }
+      var celda = e.target.closest('rect.hit');
+      if (celda) { return irA(parseInt(celda.getAttribute('data-i'), 10)); }
+      var boton = e.target.closest('#aw-play');
+      if (boton) {
+        if (reproduciendo) {
+          clearInterval(reproduciendo); reproduciendo = null;
+          boton.textContent = '▶'; boton.title = t.reproducir;
+        } else {
+          boton.textContent = '❚❚'; boton.title = t.pausar;
+          reproduciendo = setInterval(function () {
+            irA((indice + 1) % marcos.length);
+          }, 550);
+        }
+        return;
+      }
+      var pista = e.target.closest('#aw-track');
+      if (pista) {
+        var caja2 = pista.getBoundingClientRect();
+        irA(Math.round((e.clientX - caja2.left) / caja2.width * (marcos.length - 1)));
+      }
+    });
+    destino.addEventListener('keydown', function (e) {
+      if (!e.target.closest('#aw-track')) { return; }
+      if (e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault(); }
     });
   }
 

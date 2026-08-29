@@ -341,16 +341,6 @@
   justify-content: center;
 }
 .aw-play:hover { background: rgba(207, 171, 74, 0.18); }
-.aw-time {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  font-size: 0.8rem;
-  color: var(--text-muted, #777);
-}
-.aw-time input { flex: 1; accent-color: var(--gold-primary, #cfab4a); }
-.aw-time .now { color: var(--text-secondary, #bbb); font-variant-numeric: tabular-nums; }
 
 .aw-obj h4 {
   margin: 0 0 4px;
@@ -466,24 +456,148 @@
 .aw-light:hover .aw-pop, .aw-light.open .aw-pop { opacity: 1; pointer-events: auto; }
 .aw-pop b { color: var(--text-primary, #eee); display: block; margin-bottom: 4px; }
 
-/* ==================== Perfil de altura del objeto =================== */
-.aw-profile { margin-top: 16px; }
-.aw-profile svg { width: 100%; height: 140px; display: block; overflow: visible; }
-.aw-profile .axis { fill: var(--text-muted, #777); font-size: 9px; }
+
+/* ======================= Línea de tiempo ============================ */
+.aw-timeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.aw-timeline .track {
+  position: relative;
+  flex: 1;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.aw-timeline .track:focus-visible { outline: 2px solid rgba(207, 171, 74, 0.6); }
+/* La oscuridad astronómica: lo que de verdad es noche. */
+.aw-timeline .dark {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(90, 120, 200, 0.22), rgba(40, 60, 120, 0.28));
+  border-left: 1px solid rgba(140, 170, 240, 0.35);
+  border-right: 1px solid rgba(140, 170, 240, 0.35);
+}
+.aw-timeline .tick {
+  position: absolute; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.10);
+}
+.aw-timeline .lbl {
+  position: absolute;
+  bottom: 1px;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--text-muted, #777);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.aw-timeline .cur {
+  position: absolute; top: -2px; bottom: -2px;
+  width: 2px;
+  background: var(--gold-primary, #cfab4a);
+  box-shadow: 0 0 8px rgba(207, 171, 74, 0.8);
+}
+.aw-timeline .now {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #bbb);
+  font-size: 0.85rem;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ======================== Clave de color ============================ */
+.aw-side { min-width: 0; }
+.aw-key .lbl {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 8px;
+}
+.aw-key .sw {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 3px 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #aaa);
+}
+.aw-key .sw i {
+  width: 26px; height: 15px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  flex: 0 0 auto;
+}
+.aw-key .sw b {
+  margin-left: auto;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.76rem;
+  color: var(--text-muted, #777);
+}
+.aw-key .nota {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: var(--text-muted, #777);
+}
+
+/* ===================== Carriles por objeto ========================== */
+.aw-lanes { margin-top: 20px; }
+.aw-lane {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px 0 6px;
+}
+.aw-lane .head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.aw-lane .head .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.aw-lane .head .n { font-weight: 600; color: var(--text-primary, #eee); }
+.aw-lane .head .q {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #aaa);
+  font-variant-numeric: tabular-nums;
+}
+.aw-lane .head .quitar {
+  margin-left: auto;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: none;
+  color: var(--text-muted, #888);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.aw-lane .head .quitar:hover {
+  border-color: rgba(209, 95, 95, 0.6);
+  color: #e08b8b;
+}
+.aw-profile { margin-top: 8px; }
+.aw-profile svg { width: 100%; height: 92px; display: block; overflow: visible; }
 .aw-profile .grid { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
-.aw-profile .min { stroke: rgba(209, 95, 95, 0.45); stroke-dasharray: 3 3; }
+.aw-profile .min { stroke: rgba(209, 95, 95, 0.4); stroke-dasharray: 3 3; }
 .aw-profile .cursor { stroke: rgba(207, 171, 74, 0.75); stroke-width: 1.5; }
 .aw-profile rect.hit { fill: transparent; cursor: pointer; }
 .aw-profile rect.hit:hover { fill: rgba(255, 255, 255, 0.05); }
 .aw-detail {
-  margin-top: 10px;
-  min-height: 42px;
-  font-size: 0.85rem;
-  line-height: 1.6;
+  margin-top: 8px;
+  min-height: 20px;
+  font-size: 0.83rem;
+  line-height: 1.55;
   color: var(--text-secondary, #aaa);
-  border-left: 3px solid rgba(207, 171, 74, 0.4);
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 0 8px 8px 0;
 }
 .aw-detail b { color: var(--text-primary, #eee); }

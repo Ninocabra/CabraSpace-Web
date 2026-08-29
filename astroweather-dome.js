@@ -42,6 +42,20 @@
   var nl = function (m) { return 34.08 * Math.exp(20.7233 - 0.92104 * m); };
   var LOG_LO = Math.log10(10), LOG_SPAN = Math.log10(260000) - LOG_LO;
 
+  /* Los dos mandos del color, separados del calculo y con nombre propio.
+   *
+   * La FISICA de arriba no se toca: las luminancias, sus tonos y la compresion
+   * logaritmica son las medidas. Estos dos solo deciden como se traduce el
+   * resultado a pantalla, y estan subidos a proposito respecto al mockup
+   * interno (SAT 1.18, GAMMA 0.60). Alli el domo se mira sabiendo lo que se
+   * busca; aqui lo abre alguien que quiere ver DE UN VISTAZO si esta noche se
+   * parece a la de ayer, y con la version fiel casi todas salian del mismo
+   * azul. Estirar el contraste no cambia ningun numero -- la magnitud que
+   * acompana a cada muestra de la clave se sigue reconstruyendo de la
+   * luminancia, no del pixel -- pero hace legible la diferencia. */
+  var SAT = 2.05;      // separacion de tono entre procesos
+  var GAMMA = 0.52;    // pendiente de la rampa de brillo
+
   // El búfer del cielo. Lo bastante grande para que salga liso; el borde
   // circular se recorta aparte a resolución de pantalla, así que el círculo es
   // un círculo de verdad y no una escalera.
@@ -182,13 +196,30 @@
       var t = Math.min(1, Math.max(0, (env.sunAlt + 18) / 18));
       add(nl(13.5) * Math.pow(t, 2.2) * (0.25 + Math.max(0, 1 - alt / 50)), C_TWILIGHT);
     }
+    // Cubierto: el manto tapa el cielo y, bajo la Luna, brilla el solo. Sin
+    // ciudad debajo la nube OSCURECE -- se traga el airglow en vez de reflejar
+    // farolas -- y eso esta medido aqui sobre 4.690 horas.
+    if (env.cloud > 0) {
+      var cover = env.cloud / 100;
+      total *= (1 - cover * 0.75); r *= (1 - cover * 0.75);
+      g *= (1 - cover * 0.75); b *= (1 - cover * 0.75);
+      add(env.floor * cover * (0.05 + (env.moonGlow || 0) * 9), [0.62, 0.65, 0.70]);
+    }
 
     var v2 = (Math.log10(Math.max(total, 1)) - LOG_LO) / LOG_SPAN;
     v2 = Math.max(0.02, Math.min(1, v2));
-    var mean = (r + g + b) / 3 || 1, sat = 1.18, scale = v2 / total;
-    out[0] = Math.min(255, Math.pow(Math.min(1, (mean + (r - mean) * sat) * scale), 0.60) * 255);
-    out[1] = Math.min(255, Math.pow(Math.min(1, (mean + (g - mean) * sat) * scale), 0.60) * 255);
-    out[2] = Math.min(255, Math.pow(Math.min(1, (mean + (b - mean) * sat) * scale), 0.60) * 255);
+    var mean = (r + g + b) / 3 || 1, scale = v2 / total;
+    // El recorte por ABAJO no es cosmetico: con SAT alto, el canal mas debil de
+    // una mezcla muy saturada -- el azul del crepusculo -- se va negativo, y
+    // `Math.pow(negativo, 0.52)` es NaN. En el canvas un NaN se escribe como
+    // cero sin avisar, asi que el fallo no aparece como error: aparece como un
+    // color raro que nadie sabe de donde sale.
+    function canal(x) {
+      return Math.min(255, Math.pow(Math.max(0, Math.min(1, x * scale)), GAMMA) * 255);
+    }
+    out[0] = canal(mean + (r - mean) * SAT);
+    out[1] = canal(mean + (g - mean) * SAT);
+    out[2] = canal(mean + (b - mean) * SAT);
     return out;
   }
 
@@ -199,7 +230,9 @@
       gal: galacticFrame(cupula.lst[indice], cupula.site.lat),
       moonAlt: f.moon_alt, moonAz: f.moon_az,
       phase: cupula.moon.phase_angle,
-      sunAlt: f.sun_alt
+      sunAlt: f.sun_alt,
+      moonGlow: f.moon_alt > 0 ? cupula.moon.illumination : 0,
+      cloud: 0
     };
   }
 
@@ -352,11 +385,11 @@
     o.stroke(); o.setLineDash([]);
   }
 
-  function dibujarTraza(o, objeto, indice, cx, cy, R, textos) {
+  function dibujarTraza(o, objeto, color, indice, cx, cy, R, textos) {
     var alt = objeto.alt || [], az = objeto.az || [];
     if (!alt.length) { return; }
     var vivo = (objeto.horas_si_despeja || 0) > 0.05;
-    o.strokeStyle = vivo ? 'rgba(207,171,74,.85)' : 'rgba(207,171,74,.35)';
+    o.strokeStyle = color + (vivo ? 'd0' : '55');
     o.lineWidth = vivo ? 2 : 1.2;
     o.setLineDash(vivo ? [] : [4, 4]);
     o.beginPath();
@@ -373,15 +406,15 @@
     var abierto = (objeto.limita || '').charAt(indice) !== '-'
                   && (objeto.rend || [])[indice] > 0;
     var p = project(alt[indice], az[indice], cx, cy, R);
-    o.fillStyle = '#cfab4a';
+    o.fillStyle = color;
     o.beginPath(); o.arc(p[0], p[1], abierto ? 5.5 : 3.4, 0, 6.2832); o.fill();
     if (!abierto) {
-      o.strokeStyle = '#cfab4a'; o.lineWidth = 1.2;
+      o.strokeStyle = color; o.lineWidth = 1.2;
       o.beginPath(); o.arc(p[0], p[1], 8.5, 0, 6.2832); o.stroke();
     }
     o.font = '600 12px Sora, Inter, sans-serif'; o.textAlign = 'left';
     o.fillStyle = 'rgba(0,0,0,.75)'; o.fillText(objeto.nombre, p[0] + 10, p[1] - 6);
-    o.fillStyle = '#cfab4a'; o.fillText(objeto.nombre, p[0] + 9, p[1] - 7);
+    o.fillStyle = color; o.fillText(objeto.nombre, p[0] + 9, p[1] - 7);
   }
 
   function dibujarLuna(o, cupula, f, cx, cy, R, textos) {
@@ -424,7 +457,17 @@
     o.restore();
   }
 
-  function pintarEncima(canvas, cupula, objeto, indice, lado, dpr, textos) {
+  // Los mismos colores que los carriles de abajo: si la traza verde de arriba
+  // no es el carril verde de abajo, la vista no vale para nada.
+  var TRAZAS = ['#5fcf95', '#e8ad52', '#7fb0ef', '#c79ada', '#f0705a',
+                '#79cfc2', '#b9c473', '#e08aa6', '#6fc3dd', '#d0a86b'];
+
+  function pintarEncima(canvas, cupula, objetos, indice, lado, dpr, textos) {
+    // Acepta uno o varios. La firma cambio a lista el 29-08-2026 y un temporizador
+    // que hubiera quedado vivo de la version anterior seguiria llamando con un
+    // objeto suelto: normalizar aqui cuesta una linea y evita que la cupula se
+    // caiga por un resto de la pagina anterior.
+    if (objetos && !Array.isArray(objetos)) { objetos = [objetos]; }
     canvas.width = canvas.height = lado * dpr;
     var o = canvas.getContext('2d');
     o.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -446,22 +489,73 @@
     }
     dibujarNubes(o, cupula, f, cx, cy, R);
     dibujarRejilla(o, cupula, cx, cy, R);
-    if (objeto) { dibujarTraza(o, objeto, indice, cx, cy, R, textos); }
+    (objetos || []).forEach(function (obj, i) {
+      dibujarTraza(o, obj, TRAZAS[i % TRAZAS.length], indice, cx, cy, R, textos);
+    });
     if (!dia) { dibujarLuna(o, cupula, f, cx, cy, R, textos); }
     o.restore();
     dibujarRosa(o, cx, cy, R, textos.cardinales);
   }
 
+  /* Cielos reales, pintados por el codigo de arriba. Una clave dibujada por
+     una segunda rutina "parecida" acaba discrepando del dibujo que explica. */
+  var MUESTRAS = [
+    ['sinLunaDespejado', { moonAlt: -20, cloud: 0 }],
+    ['sinLunaMedia', { moonAlt: -20, cloud: 50 }],
+    ['sinLunaCubierto', { moonAlt: -20, cloud: 100 }],
+    ['llenaDespejado', { moonAlt: 55, cloud: 0, illum: 1 }],
+    ['llenaMedia', { moonAlt: 55, cloud: 50, illum: 1 }],
+    ['llenaCubierto', { moonAlt: 55, cloud: 100, illum: 1 }],
+    // La calima, SIN Luna. Con Luna llena la muestra salia identica a la de
+    // cielo limpio -- y no por un fallo: a 30 grados el termino de aerosol vale
+    // 0,42 veces el suelo natural y la Luna aporta mil veces mas, asi que se lo
+    // traga. Cierto, y por eso mismo inutil como muestra: lo que la calima le
+    // hace al color solo se ve cuando no hay algo mas grande encima.
+    ['calima', { moonAlt: -20, cloud: 0, dusty: true, aod: 0.35, k: 0.35 }],
+    ['crepusculo', { moonAlt: -20, cloud: 0, sunAlt: -10 }]
+  ];
+
+  // A 70 grados la masa de aire es 1,06 y el termino de aerosol vale casi
+  // cero: la muestra de calima salia identica a la de Luna llena limpia. A 30
+  // la masa de aire es 2 y la calima se ve, que es de lo que va la muestra.
+  var MUESTRA_ALT = 30;
+
+  function muestras(cupula) {
+    var base = { k: cupula.transparency.k, aod: cupula.transparency.aod_site,
+                 dusty: false, floor: nl(NATURAL_FLOOR_MAG), gal: null,
+                 moonAz: 180, phase: 0, sunAlt: -40, cloud: 0 };
+    var rgb = [0, 0, 0];
+    return MUESTRAS.map(function (par) {
+      var env = {};
+      Object.keys(base).forEach(function (k) { env[k] = base[k]; });
+      Object.keys(par[1]).forEach(function (k) { env[k] = par[1][k]; });
+      env.moonGlow = par[1].moonAlt > 0 ? (par[1].illum || 0) : 0;
+      skyAt(MUESTRA_ALT, 180, env, rgb);
+      // Se reconstruye la magnitud que representa la muestra, para que la clave
+      // lleve un NUMERO y no solo un color -- y se reconstruye de la
+      // luminancia, no del pixel, asi que el estiramiento de contraste no la
+      // toca.
+      var v = (Math.pow(rgb[0] / 255, 1 / GAMMA) + Math.pow(rgb[1] / 255, 1 / GAMMA)
+             + Math.pow(rgb[2] / 255, 1 / GAMMA)) / 3;
+      var nlv = Math.pow(10, v * LOG_SPAN + LOG_LO);
+      return { clave: par[0],
+               rgb: [Math.round(rgb[0]), Math.round(rgb[1]), Math.round(rgb[2])],
+               mag: 22.4 - Math.log(nlv / 34.08) / 0.92104 };
+    });
+  }
+
   global.AWDome = {
+    muestras: muestras,
+    muestraAltitud: MUESTRA_ALT,
     cargarViaLactea: cargarViaLactea,
     pendiente: MW_PENDIENTE,
     listaViaLactea: function () { return MW_SHAPE !== null; },
-    pintar: function (skyCanvas, overCanvas, cupula, objeto, indice, textos) {
+    pintar: function (skyCanvas, overCanvas, cupula, objetos, indice, textos) {
       if (!cupula || !cupula.frames || !cupula.frames[indice]) { return; }
       var lado = skyCanvas.clientWidth || 320;
       var dpr = Math.min(global.devicePixelRatio || 1, 2);
       pintarCielo(skyCanvas, cupula, indice, lado, dpr, textos);
-      pintarEncima(overCanvas, cupula, objeto, indice, lado, dpr, textos);
+      pintarEncima(overCanvas, cupula, objetos, indice, lado, dpr, textos);
     }
   };
 })(window);
