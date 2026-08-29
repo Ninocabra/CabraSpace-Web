@@ -356,7 +356,14 @@
       var rr = Math.round(base[0] + (255 - base[0]) * w);
       var gg = Math.round(base[1] + (255 - base[1]) * w);
       var bb = Math.round(base[2] + (250 - base[2]) * w * 0.9);
-      var a = Math.min(0.42, c.cover / 100 * 0.5);
+      // Opacidad: mismo criterio que SAT y GAMMA. La cobertura sigue siendo el
+      // numero -- se publica en el JSON y se lee en el panel por horas -- y esto
+      // solo decide como de visible sale en pantalla. Con el 0,42 del mockup, un
+      // 46 % de nube alta quedaba en alfa 0,14 sobre fondo oscuro: estaba
+      // dibujada y no se veia, que para un aviso de nubes es lo mismo que no
+      // estar. El suelo de 0,10 hace que una nube tenue se note como tenue en
+      // vez de desaparecer.
+      var a = Math.min(0.72, 0.10 + c.cover / 100 * 0.75);
       var grad = cc.createRadialGradient(xy[0], xy[1], 0, xy[0], xy[1], radius);
       grad.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a + ')');
       grad.addColorStop(0.5, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a * 0.45 + ')');
@@ -366,7 +373,7 @@
     });
     o.save();
     o.globalCompositeOperation = 'lighter';
-    o.globalAlpha = 0.62;
+    o.globalAlpha = 0.88;
     o.drawImage(capaNube, cx - ox, cy - oy);
     o.restore();
   }
