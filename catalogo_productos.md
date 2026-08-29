@@ -310,10 +310,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Touptek
 
-### ACCESSORIES
-- **Actualizaciones Generales / Revisiones:**
-  - [ToupTek Anuncia Nuevo Telescopio Guía de la Serie GS](https://www.youtube.com/shorts/CCX-ewrNMAY) (2026-06-05)
-
 ### CAMERAS
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
@@ -389,6 +385,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
 - **Modelo: Seestar S50 Pro**
   - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
+- **Modelo: cámara astrofotografía**
+  - [ZWO: Del Bortle 8 al APOD de la NASA](https://www.youtube.com/shorts/CvIf-bXCXuM) (2026-08-28)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
