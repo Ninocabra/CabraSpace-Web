@@ -57,6 +57,10 @@
       viento: 'Viento', presion: 'Presión', cieloIR: 'Cielo (IR)',
       indice: 'Índice de nubes', techos: 'Techos abiertos', seguridad: 'Estado',
       medidoHace: 'Medido hace', minutos: 'min', viejo: 'lectura antigua',
+      delArchivo: 'Completado desde nuestro archivo:',
+      campos: { temperatura: 'temperatura', humedad: 'humedad', viento_ms: 'viento',
+                presion: 'presión', punto_rocio: 'punto de rocío',
+                cielo_ir: 'cielo IR', cielo_indice: 'índice de nubes' },
       elegir: 'Qué quieres apuntar',
       buscar: 'Busca un objeto: M31, Velo, NGC 7000…',
       sinResultados: 'Ningún objeto del catálogo coincide.',
@@ -133,6 +137,10 @@
       viento: 'Wind', presion: 'Pressure', cieloIR: 'Sky (IR)',
       indice: 'Cloud index', techos: 'Roofs open', seguridad: 'Status',
       medidoHace: 'Measured', minutos: 'min ago', viejo: 'stale reading',
+      delArchivo: 'Filled in from our archive:',
+      campos: { temperatura: 'temperature', humedad: 'humidity', viento_ms: 'wind',
+                presion: 'pressure', punto_rocio: 'dew point',
+                cielo_ir: 'sky IR', cielo_indice: 'cloud index' },
       elegir: 'What do you want to shoot',
       buscar: 'Search an object: M31, Veil, NGC 7000…',
       sinResultados: 'No catalogue object matches.',
@@ -417,17 +425,34 @@
     // necesita una escala que la página no da.
     html += sensor(t.indice, num(s.cielo_indice), '',
       s.cielo_despejado === true ? 'good' : '');
+    // 0/0 no es "ningún techo abierto", es "no vino el bloque". El motor
+    // publica null para los dos casos distintos y aquí simplemente no se pinta.
     if (s.techos_total) {
       html += sensor(t.techos, s.techos_abiertos + '/' + s.techos_total, '',
         s.techos_abiertos > 0 ? 'good' : '');
     }
-    html += sensor(t.seguridad, s.estado_seguridad, '', s.estado_seguridad === 'Safe' ? 'good' : 'alert');
+    if (s.estado_seguridad) {
+      html += sensor(t.seguridad, s.estado_seguridad, '',
+        s.estado_seguridad === 'Safe' ? 'good' : 'alert');
+    }
     html += '</div>';
 
     if (s.antiguedad_min !== null && s.antiguedad_min !== undefined) {
       html += '<div class="aw-stale">' + esc(t.medidoHace) + ' ' +
         num(s.antiguedad_min, 0) + ' ' + esc(t.minutos) +
         (s.fresco === false ? ' · ' + esc(t.viejo) : '') + '.</div>';
+    }
+    // La página de AstroCamp vuelve incompleta a ratos, y callarlo era lo peor
+    // que se podía hacer: el panel se quedaba en dos casillas y quien lo miraba
+    // no tenía forma de saber si eso era el sitio o era la descarga.
+    var completados = Object.keys(s.del_archivo || {});
+    if (completados.length) {
+      html += '<div class="aw-stale">' + esc(t.delArchivo) + ' ' +
+        completados.map(function (k) { return esc(t.campos[k] || k); }).join(', ') +
+        '.</div>';
+    }
+    if (s.incompleto) {
+      html += '<div class="aw-stale incompleta">' + esc(s.incompleto) + '.</div>';
     }
     // La puerta de viento se ha medido optimista y eso alimenta una decisión
     // de seguridad: baja aquí, junto al viento, en vez de desaparecer.

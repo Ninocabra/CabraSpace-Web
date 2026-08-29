@@ -762,3 +762,7 @@
 /* ---- Separación a la Luna en la cabecera del carril ---- */
 .aw-lane .head .q.luna { color: var(--text-secondary, #aaa); }
 .aw-lane .head .q.luna.cerca { color: #e0a06b; }
+
+/* La descarga del sitio vuelve incompleta a ratos. Decirlo es obligatorio:
+   un panel de dos casillas sin explicacion se lee como "el sitio esta asi". */
+.aw-stale.incompleta { color: #d8a53c; }
