@@ -42,7 +42,7 @@ ES_TEMPLATE = '''<header id="navbar">
         <li class="dropdown">
           <a href="#" class="nav-link dropdown-toggle">Astrofotografía <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="astroforecast.html" class="dropdown-item">Astro Forecast</a></li>
+            <li><a href="astroforecast.html" class="dropdown-item">Astro Forecast AstroCamp</a></li>
             <li class="dropdown-submenu">
               <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">
@@ -108,7 +108,7 @@ EN_TEMPLATE = '''<header id="navbar">
         <li class="dropdown">
           <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
           <ul class="dropdown-menu">
-            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast</a></li>
+            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast AstroCamp</a></li>
             <li class="dropdown-submenu">
               <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
               <ul class="dropdown-menu">

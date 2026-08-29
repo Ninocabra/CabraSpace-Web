@@ -142,7 +142,8 @@
 .aw-tag.mid { color: #cfab4a; }
 .aw-tag.low { color: #8a8a92; }
 
-/* -- Lo que no cuadra. Esto NUNCA se oculta. -- */
+/* -- Nota lateral. Antes era el bloque "lo que no cuadra"; ahora solo la
+   usa la advertencia de la puerta de viento, que es de seguridad. -- */
 .aw-warnings {
   margin-top: 26px;
   border-left: 3px solid rgba(207, 171, 74, 0.55);
@@ -214,3 +215,197 @@
 @media (max-width: 600px) {
   .aw-section { padding: 100px 16px 0; }
 }
+
+/* ===================== Consejos de adquisición ====================== */
+.aw-tips { margin: 26px 0 0; }
+.aw-tips h3, .aw-sensors h3, .aw-pick h3 {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+.aw-tip {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.aw-tip .badge {
+  grid-row: span 2;
+  align-self: start;
+  margin-top: 2px;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+.aw-tip.evitar .badge { background: rgba(214, 92, 92, 0.16); color: #e08b8b; }
+.aw-tip.aprovecha .badge { background: rgba(127, 201, 138, 0.14); color: #8fd39c; }
+.aw-tip.cuidado .badge { background: rgba(207, 171, 74, 0.14); color: var(--gold-primary, #cfab4a); }
+.aw-tip .t {
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+  font-size: 0.98rem;
+}
+.aw-tip .b {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #aaa);
+}
+
+/* ========================= Sensores en vivo ========================= */
+.aw-sensors { margin-top: 28px; }
+.aw-sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 10px;
+}
+.aw-sensor {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.aw-sensor .k {
+  display: block;
+  font-size: 0.63rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 3px;
+}
+.aw-sensor .v {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary, #bbb);
+  font-variant-numeric: tabular-nums;
+}
+.aw-sensor.alert .v { color: #e08b8b; }
+.aw-sensor.good .v { color: #8fd39c; }
+.aw-stale {
+  margin-top: 9px;
+  font-size: 0.74rem;
+  color: var(--text-muted, #777);
+}
+
+/* ==================== Qué quieres apuntar =========================== */
+.aw-pick { margin-top: 30px; }
+.aw-search { position: relative; max-width: 420px; }
+.aw-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary, #eee);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(207, 171, 74, 0.22);
+  border-radius: 9px;
+  outline: none;
+}
+.aw-search input:focus { border-color: rgba(207, 171, 74, 0.55); }
+.aw-search input::placeholder { color: var(--text-muted, #777); }
+.aw-results {
+  position: absolute;
+  z-index: 40;
+  left: 0; right: 0;
+  top: calc(100% + 6px);
+  max-height: 280px;
+  overflow-y: auto;
+  background: #101013;
+  border: 1px solid rgba(207, 171, 74, 0.22);
+  border-radius: 9px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+.aw-results button {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 13px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #aaa);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.aw-results button:hover, .aw-results button:focus { background: rgba(207, 171, 74, 0.09); }
+.aw-results button .n { color: var(--text-primary, #eee); font-weight: 600; }
+.aw-results button .h { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.aw-results .none { padding: 12px 13px; color: var(--text-muted, #777); font-size: 0.88rem; }
+
+.aw-chosen {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(260px, 380px) 1fr;
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 720px) { .aw-chosen { grid-template-columns: 1fr; } }
+
+.aw-dome-wrap { position: relative; }
+.aw-dome {
+  width: 100%;
+  aspect-ratio: 1;
+  display: block;
+  border-radius: 50%;
+  background: #08080b;
+}
+.aw-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+.aw-time input { flex: 1; accent-color: var(--gold-primary, #cfab4a); }
+.aw-time .now { color: var(--text-secondary, #bbb); font-variant-numeric: tabular-nums; }
+
+.aw-obj h4 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  color: var(--text-primary, #eee);
+}
+.aw-obj .sub { font-size: 0.8rem; color: var(--text-muted, #777); margin-bottom: 14px; }
+.aw-obj .why {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #aaa);
+  margin: 0 0 14px;
+}
+.aw-obj-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.aw-obj-facts .f {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.aw-obj-facts .k {
+  display: block;
+  font-size: 0.63rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 3px;
+}
+.aw-obj-facts .v {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+  font-variant-numeric: tabular-nums;
+}
+.aw-hint { font-size: 0.85rem; color: var(--text-muted, #777); margin-top: 14px; }
