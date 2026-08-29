@@ -15,12 +15,14 @@
   var PIE_ES = 'Previsión del motor propio de CabraSpace, calculada para AstroCamp (Nerpio). Cada número viaja con su procedencia dentro del ' +
     '<a href="' + URL_NOCHE + '" target="_blank" rel="noopener">JSON público</a> (' +
     '<a href="' + REPO + '" target="_blank" rel="noopener">repositorio</a>), que se reescribe cada 6 h. ' +
-    'Proyecto personal en desarrollo, no un servicio meteorológico: <strong>no lo uses para decisiones de seguridad</strong>.';
+    'Proyecto personal en desarrollo, no un servicio meteorológico: <strong>no lo uses para decisiones de seguridad</strong>. ' +
+    'Catálogo de objetos derivado de <a href="https://github.com/mattiaverga/OpenNGC" target="_blank" rel="noopener">OpenNGC</a> (Mattia Verga), CC BY-SA 4.0.';
 
   var PIE_EN = 'Forecast from the CabraSpace engine, computed for AstroCamp (Nerpio, Spain). Every number carries its provenance inside the ' +
     '<a href="' + URL_NOCHE + '" target="_blank" rel="noopener">public JSON</a> (' +
     '<a href="' + REPO + '" target="_blank" rel="noopener">repository</a>), rewritten every 6 h. ' +
-    'A personal project under development, not a weather service: <strong>do not use it for safety decisions</strong>.';
+    'A personal project under development, not a weather service: <strong>do not use it for safety decisions</strong>. ' +
+    'Object catalogue derived from <a href="https://github.com/mattiaverga/OpenNGC" target="_blank" rel="noopener">OpenNGC</a> (Mattia Verga), CC BY-SA 4.0.';
 
   var T = {
     es: {
@@ -62,6 +64,10 @@
                 presion: 'presión', punto_rocio: 'punto de rocío',
                 cielo_ir: 'cielo IR', cielo_indice: 'índice de nubes' },
       elegir: 'Qué quieres apuntar',
+      recoTitulo: 'Recomendados para esta noche', evaluados: 'evaluados', alt: 'alt',
+      clases: { narrowband: 'Banda estrecha', normal: 'Banda ancha normal',
+                bajo_contraste: 'Bajo contraste', extremo_contraste: 'Contraste extremo',
+                compacto_resolucion: 'Compactos, manda el seeing' },
       buscar: 'Busca un objeto: M31, Velo, NGC 7000…',
       sinResultados: 'Ningún objeto del catálogo coincide.',
       pista: 'Escribe el nombre de un objeto para ver su recorrido sobre la cúpula de esta noche y qué condiciones le tocan.',
@@ -142,6 +148,10 @@
                 presion: 'pressure', punto_rocio: 'dew point',
                 cielo_ir: 'sky IR', cielo_indice: 'cloud index' },
       elegir: 'What do you want to shoot',
+      recoTitulo: 'Recommended for tonight', evaluados: 'scored', alt: 'alt',
+      clases: { narrowband: 'Narrowband', normal: 'Plain broadband',
+                bajo_contraste: 'Low contrast', extremo_contraste: 'Extreme contrast',
+                compacto_resolucion: 'Compact, seeing rules' },
       buscar: 'Search an object: M31, Veil, NGC 7000…',
       sinResultados: 'No catalogue object matches.',
       pista: 'Type an object name to see its path across tonight’s dome and the conditions it gets.',
@@ -470,9 +480,12 @@
 
   function bloqueElegir(t) {
     return '<div class="aw-pick"><h3>' + esc(t.elegir) + '</h3>' +
-      '<div class="aw-search">' +
-      '<input type="search" id="aw-q" autocomplete="off" placeholder="' + esc(t.buscar) + '">' +
-      '<div class="aw-results" id="aw-res" hidden></div></div>' +
+      '<div class="aw-buscador">' +
+        '<div class="aw-search">' +
+        '<input type="search" id="aw-q" autocomplete="off" placeholder="' + esc(t.buscar) + '">' +
+        '<div class="aw-results" id="aw-res" hidden></div></div>' +
+        '<select id="aw-reco" class="aw-reco"></select>' +
+      '</div>' +
       '<div id="aw-chosen"><div class="aw-hint">' + esc(t.pista) + '</div></div></div>';
   }
 
@@ -751,15 +764,22 @@
       var q = entrada.value.trim().toLowerCase();
       if (!q) { lista.hidden = true; return; }
       var puestos = elegidos.map(function (o) { return o.nombre; });
-      var hits = catalogo.filter(function (o) {
+      function coincide(o) {
         if (puestos.indexOf(o.nombre) !== -1) { return false; }
         if (o.nombre.toLowerCase().indexOf(q) !== -1) { return true; }
         return (o.alias || []).some(function (a) {
           return a.toLowerCase().indexOf(q) !== -1;
         });
-      }).slice(0, 12);
+      }
+      // Primero los que llevan traza; detras, el resto del ranking de la noche.
+      var hits = catalogo.filter(coincide);
+      var vistos = hits.map(function (o) { return o.nombre; });
+      (noche.ranking || []).forEach(function (r) {
+        if (vistos.indexOf(r.nombre) === -1 && coincide(r)) { hits.push(r); }
+      });
+      hits = hits.slice(0, 12);
       var html = hits.map(function (o) {
-        return '<button type="button" data-i="' + catalogo.indexOf(o) + '">' +
+        return '<button type="button" data-n="' + esc(o.nombre) + '">' +
           '<span class="n">' + esc(o.nombre) + '</span>' +
           '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas + '</span></button>';
       }).join('');
@@ -878,6 +898,21 @@
       }
     }
 
+    // Un nombre puede venir de tres sitios: de los 40 con traza, del ranking de
+    // la noche (que lleva coordenadas pero no traza) o de fuera. Se resuelve
+    // aqui una vez en vez de en cada sitio que anade.
+    function anadirPorNombre(nombre) {
+      var conTraza = catalogo.filter(function (o) { return o.nombre === nombre; })[0];
+      if (conTraza) { return anadir(conTraza); }
+      var delRanking = (noche.ranking || []).filter(function (r) {
+        return r.nombre === nombre;
+      })[0];
+      if (delRanking) {
+        return anadir(objetoExterno(delRanking.nombre, delRanking.ra,
+                                    delRanking.dec, datos.cupula));
+      }
+    }
+
     function anadir(objeto) {
       if (elegidos.length >= MAX_OBJETOS) { elegidos.shift(); }
       elegidos.push(objeto);
@@ -898,6 +933,36 @@
     function quitar(nombre) {
       elegidos = elegidos.filter(function (o) { return o.nombre !== nombre; });
       repintarTodo();
+    }
+
+    // El desplegable: lo que el motor ha puntuado como mejor ESTA NOCHE sobre el
+    // catalogo entero, no una lista de favoritos. Agrupado por clase, que es lo
+    // que decide con que se saca.
+    var ranking = noche.ranking || [];
+    var reco = caja.querySelector('#aw-reco');
+    if (reco) {
+      var grupos = {};
+      ranking.forEach(function (r) { (grupos[r.clase] = grupos[r.clase] || []).push(r); });
+      var html = '<option value="">' + esc(t.recoTitulo) +
+        (noche.catalogo_evaluado
+          ? ' (' + noche.catalogo_evaluado + ' ' + esc(t.evaluados) + ')' : '') +
+        '</option>';
+      Object.keys(grupos).forEach(function (clase) {
+        html += '<optgroup label="' + esc(t.clases[clase] || clase) + '">';
+        grupos[clase].forEach(function (r) {
+          html += '<option value="' + esc(r.nombre) + '">' + esc(r.nombre) +
+            ' \u2014 ' + num(r.horas_si_despeja) + ' ' + t.horas + ' \u00b7 ' +
+            esc(t.alt) + ' ' + num(r.altura_maxima, 0) + '\u00b0 \u00b7 \u263e ' +
+            num(r.separacion_luna, 0) + '\u00b0</option>';
+        });
+        html += '</optgroup>';
+      });
+      reco.innerHTML = html;
+      reco.addEventListener('change', function () {
+        var elegido = ranking.filter(function (r) { return r.nombre === reco.value; })[0];
+        reco.value = '';
+        if (elegido) { anadirPorNombre(elegido.nombre); }
+      });
     }
 
     entrada.addEventListener('input', pintarResultados);
@@ -924,15 +989,15 @@
     }
 
     lista.addEventListener('click', function (e) {
-      var boton = e.target.closest('button[data-i]');
-      if (boton) { return anadir(catalogo[parseInt(boton.getAttribute('data-i'), 10)]); }
+      var boton = e.target.closest('button[data-n]');
+      if (boton) { return anadirPorNombre(boton.getAttribute('data-n')); }
       if (e.target.closest('button[data-fuera]')) { buscarFuera(); }
     });
     entrada.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter') { return; }
       e.preventDefault();
-      var primero = lista.querySelector('button[data-i]');
-      if (primero) { anadir(catalogo[parseInt(primero.getAttribute('data-i'), 10)]); }
+      var primero = lista.querySelector('button[data-n]');
+      if (primero) { anadirPorNombre(primero.getAttribute('data-n')); }
       else { buscarFuera(); }
     });
     document.addEventListener('click', function (e) {

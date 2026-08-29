@@ -766,3 +766,23 @@
 /* La descarga del sitio vuelve incompleta a ratos. Decirlo es obligatorio:
    un panel de dos casillas sin explicacion se lee como "el sitio esta asi". */
 .aw-stale.incompleta { color: #d8a53c; }
+
+/* ---- Buscador + desplegable de recomendados ---- */
+.aw-buscador { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+.aw-buscador .aw-search { flex: 1 1 260px; max-width: 400px; }
+.aw-reco {
+  flex: 1 1 320px;
+  max-width: 540px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #bbb);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(207, 171, 74, 0.22);
+  border-radius: 9px;
+  outline: none;
+  cursor: pointer;
+}
+.aw-reco:focus { border-color: rgba(207, 171, 74, 0.55); }
+.aw-reco optgroup { background: #101013; color: var(--gold-primary, #cfab4a); }
+.aw-reco option { background: #101013; color: var(--text-secondary, #bbb); }
