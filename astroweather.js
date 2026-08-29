@@ -43,7 +43,7 @@
       limitaPor: 'limita', bajoHorizonte: 'bajo el horizonte',
       bajoMinimo: 'demasiado bajo para observar', cieloAhora: 'cielo',
       limita: { c: 'el cielo', l: 'la Luna', f: 'el fondo', a: 'la altura',
-                n: 'nada', '-': 'la altura' },
+                n: 'nada', '-': 'la altura', x: 'sin puntuar' },
       sensores: 'Ahora mismo en Nerpio',
       sinSensores: 'Los sensores del sitio no responden en este momento.',
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
@@ -66,6 +66,13 @@
       severidad: { evitar: 'evitar', aprovecha: 'aprovecha', cuidado: 'cuidado' },
       reproducir: 'Reproducir la noche', pausar: 'Pausar',
       quitar: 'Quitar', siDespejaCorto: 'si despeja',
+      meridiano: 'meridiano', maxCorto: 'máx', minCorto: 'mín',
+      buscarFuera: 'Buscar «%s» en SIMBAD', resolviendo: 'Resolviendo…',
+      noResuelto: 'SIMBAD no conoce ese nombre.',
+      porCoordenadas: 'O escribe coordenadas: «10 45 03 -59 41 04» o «161.26 -59.68»',
+      coordsMal: 'No entiendo esas coordenadas.',
+      sinPuntuar: 'Objeto externo: la altura es geometría y sale del mismo tiempo sidéreo que la cúpula, pero el motor NO lo ha puntuado — no hay horas de SNR ni veredicto para él.',
+      coordenadas: 'coordenadas',
       clave: 'Qué color es qué cielo',
       claveNota: 'Sin ciudad debajo, la nube OSCURECE: se traga el airglow en vez de reflejar farolas. Por eso las tres muestras sin Luna se parecen tanto — medido aquí sobre 4.690 horas. El número es la magnitud por segundo de arco al cuadrado.',
       muestras: {
@@ -103,7 +110,7 @@
       limitaPor: 'limited by', bajoHorizonte: 'below the horizon',
       bajoMinimo: 'too low to observe', cieloAhora: 'sky',
       limita: { c: 'the sky', l: 'the Moon', f: 'the background', a: 'altitude',
-                n: 'nothing', '-': 'altitude' },
+                n: 'nothing', '-': 'altitude', x: 'not scored' },
       sensores: 'Right now at Nerpio',
       sinSensores: 'The site sensors are not responding at the moment.',
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
@@ -126,6 +133,13 @@
       severidad: { evitar: 'avoid', aprovecha: 'make the most of it', cuidado: 'watch out' },
       reproducir: 'Play the night', pausar: 'Pause',
       quitar: 'Remove', siDespejaCorto: 'if it clears',
+      meridiano: 'meridian', maxCorto: 'max', minCorto: 'min',
+      buscarFuera: 'Look up “%s” in SIMBAD', resolviendo: 'Resolving…',
+      noResuelto: 'SIMBAD does not know that name.',
+      porCoordenadas: 'Or type coordinates: “10 45 03 -59 41 04” or “161.26 -59.68”',
+      coordsMal: 'I cannot read those coordinates.',
+      sinPuntuar: 'External target: the altitude is geometry, from the same sidereal time as the dome, but the engine has NOT scored it — no SNR hours and no verdict.',
+      coordenadas: 'coordinates',
       clave: 'Which colour is which sky',
       claveNota: 'With no city below, cloud DARKENS the sky: it swallows the airglow instead of reflecting streetlights. That is why the three moonless swatches look so alike — measured here over 4,690 hours. The number is the magnitude per square arcsecond.',
       muestras: {
@@ -187,9 +201,10 @@
     return 'low';
   }
 
-  function celda(clave, valor, nota) {
+  function celda(clave, valor, nota, limitante) {
     if (valor === null || valor === undefined) { return ''; }
-    return '<div class="aw-cell"><span class="k">' + esc(clave) + '</span>' +
+    return '<div class="aw-cell' + (limitante ? ' limita' : '') + '">' +
+      '<span class="k">' + esc(clave) + '</span>' +
       '<span class="v">' + valor + '</span>' +
       (nota ? '<span class="n">' + esc(nota) + '</span>' : '') + '</div>';
   }
@@ -255,6 +270,10 @@
 
   // ------------------------------------------------------------ BLOQUES ----  // ------------------------------------------------------------ BLOQUES ----
   function bloqueResumen(noche, t, lang) {
+    // Cual de las casillas es la que hoy estropea la noche. Lo decide el motor
+    // -- la misma funcion que pinta los semaforos -- para que la casilla roja y
+    // el semaforo rojo no puedan discrepar.
+    var limita = (noche.consejos && noche.consejos.limitante) || null;
     var p = noche.probabilidad_de_abrir;
     var cielo = noche.cielo || {};
     var seeing = cielo.seeing || {};
@@ -270,21 +289,31 @@
     }
     html += '</div></div><div class="aw-grid">';
     if (typeof noche.luna_iluminacion === 'number') {
-      html += celda(t.luna, Math.round(noche.luna_iluminacion * 100) + '%', t.iluminada);
+      html += celda(t.luna, Math.round(noche.luna_iluminacion * 100) + '%',
+        t.iluminada, limita === 'luna');
     }
     if (num(noche.oscuridad_astronomica_h) !== null) {
-      html += celda(t.oscuridad, num(noche.oscuridad_astronomica_h) + ' ' + t.horas);
+      // La duración sola no sirve para planificar: lo que se planifica es a
+      // qué hora empieza y a qué hora se acaba.
+      var cr = noche.crepusculo || {};
+      var ventana = (cr.astronomico_desde && cr.astronomico_hasta)
+        ? hora(cr.astronomico_desde) + ' – ' + hora(cr.astronomico_hasta)
+        : null;
+      html += celda(t.oscuridad, num(noche.oscuridad_astronomica_h) + ' ' + t.horas,
+        ventana, limita === 'oscuridad');
     }
     if (num(cielo.mag_cenit_mas_oscuro, 2) !== null) {
-      html += celda(t.cielo, num(cielo.mag_cenit_mas_oscuro, 2), t.magArc);
+      html += celda(t.cielo, num(cielo.mag_cenit_mas_oscuro, 2), t.magArc,
+        limita === 'cielo');
     }
     if (seeing.tercil) {
       html += celda(t.seeing, esc(t.tercil[seeing.tercil] || seeing.tercil),
-        seeing.calibrado === false ? t.sinCalibrar : null);
+        seeing.calibrado === false ? t.sinCalibrar : null, limita === 'seeing');
     }
     if (transp.veredicto) {
       html += celda(t.transparencia, esc(traducirTransparencia(transp.veredicto, t)),
-        transp.origen ? 'AOD ' + num(transp.aod, 3) + ' · ' + transp.origen : null);
+        transp.origen ? 'AOD ' + num(transp.aod, 3) + ' · ' + transp.origen : null,
+        limita === 'transparencia');
     }
     return html + '</div>';
   }
@@ -298,10 +327,24 @@
       esc(fila.detalle) + '</span></span>';
   }
 
-  function filaSemaforos(etiqueta, filas) {
+  function filaSemaforos(etiqueta, filas, plegable) {
     if (!filas || !filas.length) { return ''; }
-    return '<div class="aw-lane-row"><span class="lbl">' + esc(etiqueta) + '</span>' +
-      '<div class="aw-lights">' + filas.map(semaforo).join('') + '</div></div>';
+    var cuenta = { verde: 0, ambar: 0, rojo: 0 };
+    filas.forEach(function (f) { cuenta[f.luz] = (cuenta[f.luz] || 0) + 1; });
+    var luces = '<div class="aw-lights">' + filas.map(semaforo).join('') + '</div>';
+    if (!plegable) {
+      return '<div class="aw-lane-row"><span class="lbl">' + esc(etiqueta) +
+        '</span>' + luces + '</div>';
+    }
+    // Plegada de entrada. El titular de arriba ya dice lo que se puede hacer;
+    // esto es el detalle, y el detalle se abre cuando se quiere.
+    return '<details class="aw-lane-row fold"><summary>' +
+      '<span class="lbl">' + esc(etiqueta) + '</span>' +
+      '<span class="cuenta">' +
+        '<i class="verde"></i>' + cuenta.verde +
+        '<i class="ambar"></i>' + cuenta.ambar +
+        '<i class="rojo"></i>' + cuenta.rojo +
+      '</span></summary>' + luces + '</details>';
   }
 
   function bloqueConsejos(noche, t) {
@@ -309,9 +352,9 @@
     if (!c || !c.adquisicion) { return ''; }
     return '<div class="aw-plan"><h3>' + esc(t.consejos) + '</h3>' +
       (c.resumen ? '<p class="aw-headline-tip">' + esc(c.resumen) + '</p>' : '') +
-      filaSemaforos(t.adquisicion, c.adquisicion) +
-      filaSemaforos(t.familias, c.objetos) +
-      filaSemaforos(t.otros, c.avisos) + '</div>';
+      filaSemaforos(t.adquisicion, c.adquisicion, true) +
+      filaSemaforos(t.familias, c.objetos, true) +
+      filaSemaforos(t.otros, c.avisos, false) + '</div>';
   }
 
   function bloqueSensores(datos, t) {
@@ -326,8 +369,12 @@
       s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''));
     html += sensor(t.viento, num(s.viento_ms * 3.6, 0), 'km/h', s.viento_ms >= 5.5 ? 'alert' : '');
     html += sensor(t.presion, num(s.presion, 0), 'hPa');
-    html += sensor(t.cieloIR, num(s.cielo_ir), '°C', s.cielo_despejado === true ? 'good' : '');
-    html += sensor(t.indice, num(s.cielo_indice));
+    // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
+    // fabricante deriva el índice de nubes que va al lado, y el índice es
+    // además el que consume el motor. Dos números para lo mismo, y el crudo
+    // necesita una escala que la página no da.
+    html += sensor(t.indice, num(s.cielo_indice), '',
+      s.cielo_despejado === true ? 'good' : '');
     if (s.techos_total) {
       html += sensor(t.techos, s.techos_abiertos + '/' + s.techos_total, '',
         s.techos_abiertos > 0 ? 'good' : '');
@@ -413,34 +460,52 @@
   }
 
   // ------------------------------------------------- PERFIL POR OBJETO ----
-  function perfilSvg(objeto, color) {
+  function perfilSvg(objeto, color, t) {
     var alt = objeto.alt || [], n = alt.length;
     if (!n) { return ''; }
-    var W = 100, H = 100, pad = 4;
-    var x = function (i) { return pad + i * (W - 2 * pad) / Math.max(1, n - 1); };
-    var y = function (a) { return H - pad - Math.max(0, Math.min(90, a)) / 90 * (H - 2 * pad); };
+    // SIN margen lateral: la x del punto `i` es la misma fraccion que la del
+    // cursor de la linea de tiempo, asi que los dos cursores caen en la misma
+    // vertical. Con padding no coincidian y la vista mentia sobre el instante.
+    var W = 100, H = 100, top = 6, bot = 4;
+    var x = function (i) { return i * W / Math.max(1, n - 1); };
+    var y = function (a) {
+      return H - bot - Math.max(0, Math.min(90, a)) / 90 * (H - top - bot);
+    };
     var tinte = { c: '#d15f5f', l: '#d8a53c', f: '#d8a53c', a: '#8a8a92',
                   n: '#6ec177', '-': 'rgba(255,255,255,0.10)' };
-    var barras = '', ancho = (W - 2 * pad) / n;
+    var barras = '', ancho = W / n;
     for (var i = 0; i < n; i++) {
       var codigo = (objeto.limita || '').charAt(i) || '-';
       if (alt[i] > 0) {
         barras += '<rect x="' + (x(i) - ancho / 2).toFixed(2) + '" y="' + y(alt[i]).toFixed(2) +
-          '" width="' + ancho.toFixed(2) + '" height="' + (H - pad - y(alt[i])).toFixed(2) +
+          '" width="' + ancho.toFixed(2) + '" height="' + (H - bot - y(alt[i])).toFixed(2) +
           '" fill="' + tinte[codigo] + '" opacity="' + (codigo === 'n' ? 0.5 : 0.26) + '"/>';
       }
     }
     var linea = alt.map(function (a, i) {
       return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
     }).join(' ');
+
+    // Los tres instantes que se planifican. El paso por el meridiano NO es
+    // siempre el maximo: un objeto puede culminar fuera de la ventana de la
+    // noche, y entonces son dos momentos distintos.
+    function hito(i, clase2) {
+      if (i === null || i === undefined || alt[i] === undefined) { return ''; }
+      return '<line class="hito ' + clase2 + '" x1="' + x(i).toFixed(2) + '" x2="' +
+        x(i).toFixed(2) + '" y1="' + top + '" y2="' + (H - bot) +
+        '" vector-effect="non-scaling-stroke"/>';
+    }
+    var marcas = hito(objeto.i_meridiano, 'meridiano') +
+                 hito(objeto.i_max, 'max') + hito(objeto.i_min, 'min');
+
     return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img">' +
-      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
-      '<line class="min" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(25) + '" y2="' + y(25) + '"/>' +
-      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
-      barras +
+      '<line class="grid" x1="0" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
+      '<line class="min" x1="0" x2="' + W + '" y1="' + y(25) + '" y2="' + y(25) + '"/>' +
+      '<line class="grid" x1="0" x2="' + W + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
+      barras + marcas +
       '<path d="' + linea + '" fill="none" stroke="' + color +
         '" stroke-width="1.4" vector-effect="non-scaling-stroke"/>' +
-      '<line class="cursor" x1="0" x2="0" y1="' + pad + '" y2="' + (H - pad) +
+      '<line class="cursor" x1="0" x2="0" y1="' + top + '" y2="' + (H - bot) +
         '" vector-effect="non-scaling-stroke"/>' +
       alt.map(function (a, i) {
         return '<rect class="hit" data-i="' + i + '" x="' + (x(i) - ancho / 2).toFixed(2) +
@@ -448,22 +513,127 @@
       }).join('') + '</svg>';
   }
 
-  function carril(objeto, color, t) {
+  // Las etiquetas de los hitos van FUERA del SVG, en HTML: dentro se estiran
+  // con `preserveAspectRatio="none"` y el texto sale deformado.
+  function hitosHtml(objeto, marcos, t) {
+    var n = (objeto.alt || []).length;
+    if (!n) { return ''; }
+    function marca(i, clase2, etiqueta, valor) {
+      if (i === null || i === undefined || !marcos[i]) { return ''; }
+      return '<span class="hito ' + clase2 + '" style="left:' +
+        (i / Math.max(1, n - 1) * 100).toFixed(2) + '%">' +
+        esc(etiqueta) + ' ' + esc(marcos[i].label) +
+        (valor !== null && valor !== undefined ? ' · ' + num(valor, 0) + '°' : '') +
+        '</span>';
+    }
+    return '<div class="aw-hitos">' +
+      marca(objeto.i_meridiano, 'meridiano', t.meridiano, null) +
+      marca(objeto.i_max, 'max', t.maxCorto, objeto.alt[objeto.i_max]) +
+      marca(objeto.i_min, 'min', t.minCorto, objeto.alt[objeto.i_min]) +
+      '</div>';
+  }
+
+  function carril(objeto, color, t, marcos) {
     return '<div class="aw-lane" data-obj="' + esc(objeto.nombre) + '">' +
       '<div class="head">' +
         '<i class="dot" style="background:' + color + '"></i>' +
         '<span class="n">' + esc(objeto.nombre) + '</span>' +
-        '<span class="q">' + num(objeto.horas_si_despeja) + ' ' + t.horas + ' ' +
-          esc(t.siDespejaCorto) + '</span>' +
-        '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +
-          esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span>' +
+        (objeto.externo
+          ? '<span class="q externo">' + esc(t.coordenadas) + ' · ' +
+              num(objeto.ra, 3) + '° ' + num(objeto.dec, 3) + '°</span>'
+          : '<span class="q">' + num(objeto.horas_si_despeja) + ' ' + t.horas + ' ' +
+              esc(t.siDespejaCorto) + '</span>' +
+            '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +
+              esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span>') +
         '<button type="button" class="quitar" data-quitar="' + esc(objeto.nombre) +
           '" aria-label="' + esc(t.quitar) + ' ' + esc(objeto.nombre) + '" title="' +
           esc(t.quitar) + '">×</button>' +
       '</div>' +
-      '<div class="aw-profile">' + perfilSvg(objeto, color) + '</div>' +
+      '<div class="aw-profile">' + perfilSvg(objeto, color, t) + '</div>' +
+      hitosHtml(objeto, marcos, t) +
+      (objeto.externo
+        ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
       '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
     '</div>';
+  }
+
+  // ------------------------------------------- OBJETOS DE FUERA -----------
+  // El catálogo del motor son 44 objetos curados. Para todo lo demás se
+  // resuelve el nombre contra SIMBAD (servicio Sesame del CDS, que admite CORS)
+  // o se aceptan coordenadas a mano.
+  var SESAME = 'https://cds.unistra.fr/cgi-bin/nph-sesame/-oI/SNV?';
+
+  function resolverNombre(nombre) {
+    return fetch(SESAME + encodeURIComponent(nombre))
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+      .then(function (txt) {
+        // Sesame devuelve texto con una linea "%J <ra> <dec> ..." en grados.
+        var m = txt.match(/%J\s+([-+]?\d+\.?\d*)\s+([-+]?\d+\.?\d*)/);
+        if (!m) { return null; }
+        var oficial = txt.match(/%I\.0\s+(.+)/);
+        return { ra: parseFloat(m[1]), dec: parseFloat(m[2]),
+                 nombre: (oficial ? oficial[1].trim() : nombre) };
+      });
+  }
+
+  function leerCoordenadas(texto) {
+    var limpio = texto.replace(/[,;]/g, ' ').replace(/[hdms'"°]/gi, ' ').trim();
+    var n = limpio.split(/\s+/).map(parseFloat);
+    if (n.some(isNaN)) { return null; }
+    if (n.length === 2) {                       // grados decimales
+      return dentro(n[0], n[1]);
+    }
+    if (n.length === 6) {                       // sexagesimal: h m s  g m s
+      var ra = (Math.abs(n[0]) + n[1] / 60 + n[2] / 3600) * 15;
+      var signo = (texto.trim().split(/\s+/)[3] || '').indexOf('-') === 0 ? -1 : 1;
+      var dec = signo * (Math.abs(n[3]) + n[4] / 60 + n[5] / 3600);
+      return dentro(ra, dec);
+    }
+    return null;
+  }
+
+  function dentro(ra, dec) {
+    if (!isFinite(ra) || !isFinite(dec)) { return null; }
+    if (dec < -90 || dec > 90) { return null; }
+    return { ra: ((ra % 360) + 360) % 360, dec: dec };
+  }
+
+  /* Un objeto que el motor no ha puntuado: se le calcula DÓNDE está, que es
+     geometría del mismo tiempo sidéreo que ya viaja en el JSON, y nada más. No
+     hay horas de SNR ni veredicto, y la ficha lo dice: inventarlos aquí sería
+     exactamente lo que esta página no hace. */
+  function objetoExterno(nombre, ra, dec, cupula) {
+    var alt = [], az = [];
+    (cupula.lst || []).forEach(function (lst) {
+      var h = window.AWDome.aHorizonte(ra, dec, lst, cupula.site.lat);
+      alt.push(Math.round(h[0] * 10) / 10);
+      az.push(Math.round(h[1] * 10) / 10);
+    });
+    var iMax = 0, iMin = null;
+    alt.forEach(function (a, i) {
+      if (a > alt[iMax]) { iMax = i; }
+      // El minimo util es el mas BAJO estando arriba: marcar -4 grados no
+      // ayuda a planificar nada, solo dice que el objeto se ha puesto.
+      if (a > 0 && (iMin === null || a < alt[iMin])) { iMin = i; }
+    });
+    var iMer = iMax;
+    for (var j = 1; j < az.length; j++) {
+      var antes = (az[j - 1] - 180 + 180) % 360 - 180;
+      var ahora = (az[j] - 180 + 180) % 360 - 180;
+      if (((antes <= 0 && ahora > 0) || (ahora <= 0 && antes > 0))
+          && Math.abs(antes) < 90 && Math.abs(ahora) < 90) {
+        iMer = Math.abs(ahora) < Math.abs(antes) ? j : j - 1;
+        break;
+      }
+    }
+    return { nombre: nombre, ra: ra, dec: dec, externo: true,
+             tipo: 'externo', clase: 'sin puntuar', alias: [], nota: '',
+             alt: alt, az: az, rend: alt.map(function () { return 0; }),
+             limita: alt.map(function () { return 'x'; }).join(''),
+             horas_si_despeja: null, horas_esperadas: null,
+             altura_maxima: alt[iMax], separacion_luna: null,
+             mejor_hora: null, veredicto: null, porque: '',
+             i_max: iMax, i_min: iMin, i_meridiano: iMer };
   }
 
   // ------------------------------------------------------------ MONTAJE ---
@@ -493,13 +663,19 @@
           return a.toLowerCase().indexOf(q) !== -1;
         });
       }).slice(0, 12);
-      lista.innerHTML = hits.length
-        ? hits.map(function (o) {
-            return '<button type="button" data-i="' + catalogo.indexOf(o) + '">' +
-              '<span class="n">' + esc(o.nombre) + '</span>' +
-              '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas + '</span></button>';
-          }).join('')
-        : '<div class="none">' + esc(t.sinResultados) + '</div>';
+      var html = hits.map(function (o) {
+        return '<button type="button" data-i="' + catalogo.indexOf(o) + '">' +
+          '<span class="n">' + esc(o.nombre) + '</span>' +
+          '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas + '</span></button>';
+      }).join('');
+      if (!hits.length) { html += '<div class="none">' + esc(t.sinResultados) + '</div>'; }
+      // Siempre, no solo cuando no hay resultados: el catálogo son 44 objetos
+      // curados y quien busca «Barnard 33» o una supernova de ayer tiene que
+      // poder salir fuera sin adivinar que existe la opción.
+      html += '<button type="button" class="fuera" data-fuera="1">' +
+        esc(t.buscarFuera.replace('%s', entrada.value.trim())) + '</button>' +
+        '<div class="pista">' + esc(t.porCoordenadas) + '</div>';
+      lista.innerHTML = html;
       lista.hidden = false;
     }
 
@@ -557,12 +733,12 @@
               '<canvas class="aw-dome" id="aw-sky"></canvas>' +
               '<canvas class="aw-dome" id="aw-over"></canvas>' +
             '</div>' +
-            bloqueTiempo(marcos, indice, t) +
           '</div>' +
           '<div class="aw-side">' + bloqueClave(datos.cupula, t) + '</div>' +
         '</div>' +
+        bloqueTiempo(marcos, indice, t) +
         '<div class="aw-lanes">' +
-          elegidos.map(function (o, i) { return carril(o, color(i), t); }).join('') +
+          elegidos.map(function (o, i) { return carril(o, color(i), t, marcos); }).join('') +
         '</div>';
 
       var pila = destino.querySelector('.aw-dome-stack');
@@ -601,9 +777,38 @@
 
     entrada.addEventListener('input', pintarResultados);
     entrada.addEventListener('focus', pintarResultados);
+    function avisoEnLista(texto) {
+      lista.innerHTML = '<div class="none">' + esc(texto) + '</div>';
+      lista.hidden = false;
+    }
+
+    function buscarFuera() {
+      var texto = entrada.value.trim();
+      if (!texto) { return; }
+      // Primero coordenadas: si lo que hay escrito ya ES una posición, no hace
+      // falta molestar a SIMBAD ni depender de que responda.
+      var coords = leerCoordenadas(texto);
+      if (coords) {
+        return anadir(objetoExterno(texto, coords.ra, coords.dec, datos.cupula));
+      }
+      avisoEnLista(t.resolviendo);
+      resolverNombre(texto).then(function (r) {
+        if (!r) { return avisoEnLista(t.noResuelto); }
+        anadir(objetoExterno(r.nombre, r.ra, r.dec, datos.cupula));
+      }).catch(function () { avisoEnLista(t.noResuelto); });
+    }
+
     lista.addEventListener('click', function (e) {
       var boton = e.target.closest('button[data-i]');
-      if (boton) { anadir(catalogo[parseInt(boton.getAttribute('data-i'), 10)]); }
+      if (boton) { return anadir(catalogo[parseInt(boton.getAttribute('data-i'), 10)]); }
+      if (e.target.closest('button[data-fuera]')) { buscarFuera(); }
+    });
+    entrada.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') { return; }
+      e.preventDefault();
+      var primero = lista.querySelector('button[data-i]');
+      if (primero) { anadir(catalogo[parseInt(primero.getAttribute('data-i'), 10)]); }
+      else { buscarFuera(); }
     });
     document.addEventListener('click', function (e) {
       if (!caja.querySelector('.aw-search').contains(e.target)) { lista.hidden = true; }
@@ -682,7 +887,12 @@
     var t = T[lang];
     caja.innerHTML = '<div class="aw-state">' + esc(t.cargando) + '</div>';
 
-    fetch(URL_NOCHE, { cache: 'no-cache' })
+    // Marca de tiempo redondeada a cinco minutos: la URL se mantiene estable
+    // dentro de esa ventana -- así sigue siendo cacheable y no se castiga al
+    // CDN -- y pasada la ventana el visitante no puede quedarse con una
+    // previsión vieja pegada en su navegador. `cache: 'no-cache'` solo no
+    // bastaba: revalida contra un borde que a su vez tiene su propia copia.
+    fetch(URL_NOCHE + '?t=' + Math.floor(Date.now() / 300000), { cache: 'no-cache' })
       .then(function (r) {
         if (!r.ok) { throw new Error('HTTP ' + r.status); }
         return r.json();

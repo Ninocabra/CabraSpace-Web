@@ -545,6 +545,11 @@
   }
 
   global.AWDome = {
+    // Se expone porque la pagina la necesita para situar un objeto que el motor
+    // no conoce. Es GEOMETRIA -- el mismo tiempo sidereo que ya viaja en el
+    // JSON -- y no una prevision: nada de lo que decide el producto se
+    // recalcula aqui.
+    aHorizonte: toHorizon,
     muestras: muestras,
     muestraAltitud: MUESTRA_ALT,
     cargarViaLactea: cargarViaLactea,
