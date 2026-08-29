@@ -55,6 +55,7 @@
                 n: 'nada', '-': 'la altura', x: 'sin puntuar' },
       sensores: 'Ahora mismo en Nerpio',
       sinSensores: 'Los sensores del sitio no responden en este momento.',
+      fotometro: 'Cielo medido', calibrado: 'calibrado',
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
       viento: 'Viento', presion: 'Presión', cieloIR: 'Cielo (IR)',
       indice: 'Índice de nubes', techos: 'Techos abiertos', seguridad: 'Estado',
@@ -139,6 +140,7 @@
                 n: 'nothing', '-': 'altitude', x: 'not scored' },
       sensores: 'Right now at Nerpio',
       sinSensores: 'The site sensors are not responding at the moment.',
+      fotometro: 'Measured sky', calibrado: 'calibrated',
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
       viento: 'Wind', presion: 'Pressure', cieloIR: 'Sky (IR)',
       indice: 'Cloud index', techos: 'Roofs open', seguridad: 'Status',
@@ -245,10 +247,16 @@
       (nota ? '<span class="n">' + esc(nota) + '</span>' : '') + '</div>';
   }
 
-  function sensor(clave, valor, unidad, estado) {
+  function sensor(clave, valor, unidad, estado, cuando) {
     if (valor === null || valor === undefined) { return ''; }
-    return '<div class="aw-sensor ' + (estado || '') + '"><span class="k">' + esc(clave) +
-      '</span><span class="v">' + esc(valor) + (unidad ? ' ' + esc(unidad) : '') + '</span></div>';
+    // La hora va en la casilla y entera en el title: quien quiera saber de
+    // cuando es la medida la ve, y quien no, no se come una fecha completa.
+    return '<div class="aw-sensor ' + (estado || '') + '"' +
+      (cuando ? ' title="' + esc(String(cuando).replace('T', ' ').slice(0, 16)) + ' UTC"' : '') +
+      '><span class="k">' + esc(clave) + '</span>' +
+      '<span class="v">' + esc(valor) + (unidad ? ' ' + esc(unidad) : '') + '</span>' +
+      (cuando ? '<span class="cuando">' + esc(String(cuando).slice(11, 16)) + '</span>' : '') +
+      '</div>';
   }
 
   // -------------------------------------------------------- LA CÚPULA ------
@@ -351,8 +359,14 @@
         ventana, limita === 'oscuridad');
     }
     if (num(cielo.mag_cenit_mas_oscuro, 2) !== null) {
-      html += celda(t.cielo, num(cielo.mag_cenit_mas_oscuro, 2), t.magArc,
-        limita === 'cielo');
+      // Se ensena el CORREGIDO contra el fotometro, con el crudo detras: el
+      // fotometro es medida y el modelo es estimacion, asi que manda el primero.
+      var corregido = num(cielo.mag_cenit_corregido, 2);
+      var cal = cielo.calibracion_fotometro || {};
+      var nota = t.magArc + (corregido !== null ? ' · ' + t.calibrado : '');
+      html += celda(t.cielo, corregido !== null ? corregido
+                                                : num(cielo.mag_cenit_mas_oscuro, 2),
+        nota, limita === 'cielo');
     }
     if (seeing.tercil) {
       html += celda(t.seeing, esc(t.tercil[seeing.tercil] || seeing.tercil),
@@ -423,18 +437,22 @@
     if (!s) { return html + '<div class="aw-stale">' + esc(t.sinSensores) + '</div></div>'; }
 
     html += '<div class="aw-sensor-grid">';
-    html += sensor(t.temp, num(s.temperatura), '°C');
-    html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '');
+    // El fotometro primero: es la unica medida DIRECTA del fondo de cielo que
+    // hay en esta pagina, y todo lo demas del cielo es estimacion.
+    html += sensor(t.fotometro, num(s.cielo_mag_medido, 2), t.magArc, 'good',
+      s.cielo_mag_medido_utc);
+    html += sensor(t.temp, num(s.temperatura), '°C', '', s.medido_utc);
+    html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '', s.medido_utc);
     html += sensor(t.rocio, num(s.margen_rocio), '°C',
       s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''));
-    html += sensor(t.viento, num(s.viento_ms * 3.6, 0), 'km/h', s.viento_ms >= 5.5 ? 'alert' : '');
-    html += sensor(t.presion, num(s.presion, 0), 'hPa');
+    html += sensor(t.viento, num(s.viento_ms * 3.6, 0), 'km/h', s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc);
+    html += sensor(t.presion, num(s.presion, 0), 'hPa', s.medido_utc);
     // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
     // fabricante deriva el índice de nubes que va al lado, y el índice es
     // además el que consume el motor. Dos números para lo mismo, y el crudo
     // necesita una escala que la página no da.
     html += sensor(t.indice, num(s.cielo_indice), '',
-      s.cielo_despejado === true ? 'good' : '');
+      s.cielo_despejado === true ? 'good' : '', s.medido_utc);
     // 0/0 no es "ningún techo abierto", es "no vino el bloque". El motor
     // publica null para los dos casos distintos y aquí simplemente no se pinta.
     if (s.techos_total) {
