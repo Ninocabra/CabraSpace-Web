@@ -512,7 +512,11 @@
     // traga. Cierto, y por eso mismo inutil como muestra: lo que la calima le
     // hace al color solo se ve cuando no hay algo mas grande encima.
     ['calima', { moonAlt: -20, cloud: 0, dusty: true, aod: 0.35, k: 0.35 }],
-    ['crepusculo', { moonAlt: -20, cloud: 0, sunAlt: -10 }]
+    // Etiquetada 'Dia' porque es el color de los dos extremos de la linea de
+    // tiempo, que es donde la gente la va a reconocer. Se calcula a -10 grados
+    // de altura solar, que es crepusculo nautico: mas arriba el ajuste de
+    // crepusculo del motor ya no llega y el domo lo dice en vez de pintarlo.
+    ['dia', { moonAlt: -20, cloud: 0, sunAlt: -10 }]
   ];
 
   // A 70 grados la masa de aire es 1,06 y el termino de aerosol vale casi

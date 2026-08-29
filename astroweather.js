@@ -28,8 +28,12 @@
       error: 'No se ha podido leer la previsión ahora mismo. Se actualiza cada 6 horas; vuelve a intentarlo en un rato.',
       titulo: 'Nerpio, <span>esta noche</span>',
       sitio: 'AstroCamp · Nerpio (Albacete) · 1.650 m · MPC I79',
-      probLabel: 'de probabilidad de que la noche sea utilizable',
-      horasUtiles: 'horas utilizables esperadas',
+      probLabel: 'de probabilidad de que haya condiciones para abrir',
+      probTitulo: 'Condiciones, no comportamiento',
+      horasUtiles: 'h utilizables esperadas',
+      horasUtilesOscuras: 'de ellas en oscuridad astronómica',
+      horasTitulo: 'Por qué son dos números',
+      horasExplica: 'La primera cuenta toda la ventana del producto, del ocaso menos una hora al orto más una, así que incluye el crepúsculo: por eso puede pasar de las horas de oscuridad astronómica. En crepúsculo se hace planetaria y objetos brillantes, no cielo profundo. La segunda es la parte que cae dentro de la oscuridad de verdad, y es la que cuenta para campo profundo.',
       noche: 'Noche del', luna: 'Luna', oscuridad: 'Oscuridad astronómica',
       cielo: 'Cielo más oscuro', seeing: 'Seeing', transparencia: 'Transparencia',
       iluminada: 'iluminada', sinCalibrar: 'estimación sin calibrar',
@@ -37,11 +41,14 @@
       consejos: 'Qué hacer esta noche',
       adquisicion: 'Por filtro y técnica', familias: 'Por familia de objeto',
       otros: 'Y además',
+      referencias: 'De dónde sale cada consejo',
       perfil: 'Altura sobre el horizonte durante la noche',
       pulsaPerfil: 'Pulsa en el gráfico para ver qué pasa a esa hora.',
       aEsaHora: 'A las', altura: 'altura', rinde: 'rendimiento',
       limitaPor: 'limita', bajoHorizonte: 'bajo el horizonte',
       bajoMinimo: 'demasiado bajo para observar', cieloAhora: 'cielo',
+      esDeDia: 'todavía es de día', solA: 'Sol a',
+      yAdemas: 'y además el objeto está a', yTampocoNoche: 'y tampoco es noche cerrada',
       limita: { c: 'el cielo', l: 'la Luna', f: 'el fondo', a: 'la altura',
                 n: 'nada', '-': 'la altura', x: 'sin puntuar' },
       sensores: 'Ahora mismo en Nerpio',
@@ -79,7 +86,7 @@
         sinLunaDespejado: 'Sin Luna, despejado', sinLunaMedia: 'Sin Luna, media nube',
         sinLunaCubierto: 'Sin Luna, cubierto', llenaDespejado: 'Luna llena, despejado',
         llenaMedia: 'Luna llena, media nube', llenaCubierto: 'Luna llena, cubierto',
-        calima: 'Calima, sin Luna', crepusculo: 'Crepúsculo náutico'
+        calima: 'Calima, sin Luna', dia: 'Día'
       },
       cupula: {
         luna: 'Luna',
@@ -95,8 +102,12 @@
       error: 'The forecast could not be read right now. It refreshes every 6 hours; try again shortly.',
       titulo: 'Nerpio, <span>tonight</span>',
       sitio: 'AstroCamp · Nerpio (Albacete, Spain) · 1,650 m · MPC I79',
-      probLabel: 'probability that the night will be usable',
-      horasUtiles: 'expected usable hours',
+      probLabel: 'chance there will be CONDITIONS to open',
+      probTitulo: 'Conditions, not behaviour',
+      horasUtiles: 'h of expected usable time',
+      horasUtilesOscuras: 'of them in astronomical darkness',
+      horasTitulo: 'Why there are two numbers',
+      horasExplica: 'The first counts the whole product window, from one hour before sunset to one hour after sunrise, so it includes twilight: that is why it can exceed the hours of astronomical darkness. Twilight is for planetary and bright targets, not deep sky. The second is the part that falls inside real darkness, and that is the one that counts for deep sky.',
       noche: 'Night of', luna: 'Moon', oscuridad: 'Astronomical darkness',
       cielo: 'Darkest sky', seeing: 'Seeing', transparencia: 'Transparency',
       iluminada: 'illuminated', sinCalibrar: 'uncalibrated estimate',
@@ -104,11 +115,14 @@
       consejos: 'What to do tonight',
       adquisicion: 'By filter and technique', familias: 'By object family',
       otros: 'And also',
+      referencias: 'Where each piece of advice comes from',
       perfil: 'Altitude above the horizon through the night',
       pulsaPerfil: 'Click the chart to see what happens at that hour.',
       aEsaHora: 'At', altura: 'altitude', rinde: 'yield',
       limitaPor: 'limited by', bajoHorizonte: 'below the horizon',
       bajoMinimo: 'too low to observe', cieloAhora: 'sky',
+      esDeDia: 'still daytime', solA: 'Sun at',
+      yAdemas: 'and the target is at', yTampocoNoche: 'and it is not full night either',
       limita: { c: 'the sky', l: 'the Moon', f: 'the background', a: 'altitude',
                 n: 'nothing', '-': 'altitude', x: 'not scored' },
       sensores: 'Right now at Nerpio',
@@ -146,7 +160,7 @@
         sinLunaDespejado: 'No Moon, clear', sinLunaMedia: 'No Moon, half cloud',
         sinLunaCubierto: 'No Moon, overcast', llenaDespejado: 'Full Moon, clear',
         llenaMedia: 'Full Moon, half cloud', llenaCubierto: 'Full Moon, overcast',
-        calima: 'Dust haze, no Moon', crepusculo: 'Nautical twilight'
+        calima: 'Dust haze, no Moon', dia: 'Daytime'
       },
       cupula: {
         luna: 'Moon',
@@ -281,11 +295,23 @@
     var html = '<div class="aw-headline">';
     if (typeof p === 'number') {
       html += '<div class="aw-prob">' + Math.round(p * 100) + '%</div>' +
-        '<div class="aw-prob-label">' + esc(t.probLabel) + '</div>';
+        '<div class="aw-prob-label">' + esc(t.probLabel) +
+        (noche.probabilidad_definicion
+          ? '<span class="aw-info" tabindex="0">?<span class="aw-pop">' +
+            '<b>' + esc(t.probTitulo) + '</b>' +
+            esc(noche.probabilidad_definicion) + '</span></span>'
+          : '') + '</div>';
     }
     html += '<div class="aw-when">' + esc(t.noche) + ' <strong>' + fecha(noche.noche, lang) + '</strong>';
     if (num(noche.horas_utilizables_esperadas) !== null) {
-      html += '<br>' + num(noche.horas_utilizables_esperadas) + ' ' + esc(t.horasUtiles);
+      // Las dos cuentas juntas y con su diferencia dicha: la grande incluye
+      // crepúsculo y por eso puede pasar de la oscuridad astronómica, y la que
+      // vale para cielo profundo es la pequeña.
+      var oscuras = num(noche.horas_utilizables_oscuras);
+      html += '<br>' + num(noche.horas_utilizables_esperadas) + ' ' + esc(t.horasUtiles) +
+        (oscuras !== null ? ', ' + oscuras + ' ' + esc(t.horasUtilesOscuras) : '') +
+        '<span class="aw-info" tabindex="0">?<span class="aw-pop">' +
+        '<b>' + esc(t.horasTitulo) + '</b>' + esc(t.horasExplica) + '</span></span>';
     }
     html += '</div></div><div class="aw-grid">';
     if (typeof noche.luna_iluminacion === 'number') {
@@ -347,6 +373,17 @@
       '</span></summary>' + luces + '</details>';
   }
 
+  // De dónde sale cada correlación. Va dentro del JSON y se enseña aquí por la
+  // misma razón que la procedencia de cada número: se le está diciendo a
+  // alguien que cambie lo que iba a hacer esta noche.
+  function bloqueReferencias(refs, t) {
+    if (!refs || !refs.length) { return ''; }
+    return '<details class="aw-refs"><summary>' + esc(t.referencias) + '</summary>' +
+      refs.map(function (r) {
+        return '<div class="ref"><b>' + esc(r.tema) + '</b> ' + esc(r.dice) + '</div>';
+      }).join('') + '</details>';
+  }
+
   function bloqueConsejos(noche, t) {
     var c = noche.consejos;
     if (!c || !c.adquisicion) { return ''; }
@@ -354,7 +391,8 @@
       (c.resumen ? '<p class="aw-headline-tip">' + esc(c.resumen) + '</p>' : '') +
       filaSemaforos(t.adquisicion, c.adquisicion, true) +
       filaSemaforos(t.familias, c.objetos, true) +
-      filaSemaforos(t.otros, c.avisos, false) + '</div>';
+      filaSemaforos(t.otros, c.avisos, false) +
+      bloqueReferencias(c.referencias, t) + '</div>';
   }
 
   function bloqueSensores(datos, t) {
@@ -432,16 +470,30 @@
   function bloqueTiempo(marcos, indice, t) {
     var n = marcos.length;
     if (!n) { return ''; }
-    var partes = [], inicio = null;
-    marcos.forEach(function (f, i) {
-      if (f.dark && inicio === null) { inicio = i; }
-      if ((!f.dark || i === n - 1) && inicio !== null) {
-        var fin = f.dark ? i : i - 1;
-        partes.push('<div class="dark" style="left:' + (inicio / (n - 1) * 100) +
-          '%;width:' + ((fin - inicio) / (n - 1) * 100) + '%"></div>');
-        inicio = null;
+    var partes = [];
+    // Tres regímenes, no dos: día, crepúsculo y noche cerrada. Antes solo se
+    // pintaba la noche y los dos extremos quedaban en negro, que es justo el
+    // color de lo contrario de lo que son.
+    function banda(clase2, desde, hasta) {
+      if (hasta <= desde) { return; }
+      partes.push('<div class="' + clase2 + '" style="left:' +
+        (desde / (n - 1) * 100) + '%;width:' +
+        ((hasta - desde) / (n - 1) * 100) + '%"></div>');
+    }
+    var regimen = function (f) {
+      // `sky_mag_trustworthy` es falso donde el ajuste de crepúsculo ya no
+      // llega (Sol por encima de −8°): eso es de día a todos los efectos.
+      if (f.sky_mag_trustworthy === false) { return 'dia'; }
+      return f.dark ? 'noche' : 'crepusculo';
+    };
+    var actual = regimen(marcos[0]), desde = 0;
+    for (var k = 1; k <= n; k++) {
+      var r = (k < n) ? regimen(marcos[k]) : null;
+      if (r !== actual) {
+        banda(actual, desde, k - 1);
+        actual = r; desde = k - 1;
       }
-    });
+    }
     marcos.forEach(function (f, i) {
       if (i % 6) { return; }
       partes.push('<div class="tick" style="left:' + (i / (n - 1) * 100) + '%"></div>');
@@ -486,17 +538,17 @@
       return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
     }).join(' ');
 
-    // Los tres instantes que se planifican. El paso por el meridiano NO es
-    // siempre el maximo: un objeto puede culminar fuera de la ventana de la
-    // noche, y entonces son dos momentos distintos.
+    // Solo el máximo. El paso por el meridiano y el máximo son EL MISMO
+    // instante para todo lo que culmina dentro de la noche -- que es casi
+    // todo -- y por eso sus dos etiquetas se pisaban: no eran dos momentos,
+    // era el mismo escrito dos veces.
     function hito(i, clase2) {
       if (i === null || i === undefined || alt[i] === undefined) { return ''; }
       return '<line class="hito ' + clase2 + '" x1="' + x(i).toFixed(2) + '" x2="' +
         x(i).toFixed(2) + '" y1="' + top + '" y2="' + (H - bot) +
         '" vector-effect="non-scaling-stroke"/>';
     }
-    var marcas = hito(objeto.i_meridiano, 'meridiano') +
-                 hito(objeto.i_max, 'max') + hito(objeto.i_min, 'min');
+    var marcas = hito(objeto.i_max, 'max');
 
     return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img">' +
       '<line class="grid" x1="0" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
@@ -513,24 +565,15 @@
       }).join('') + '</svg>';
   }
 
-  // Las etiquetas de los hitos van FUERA del SVG, en HTML: dentro se estiran
-  // con `preserveAspectRatio="none"` y el texto sale deformado.
+  // La etiqueta va FUERA del SVG, en HTML: dentro se estira con
+  // `preserveAspectRatio="none"` y el texto sale deformado. Y va ENCIMA de la
+  // curva, que es donde no pisa nada.
   function hitosHtml(objeto, marcos, t) {
-    var n = (objeto.alt || []).length;
-    if (!n) { return ''; }
-    function marca(i, clase2, etiqueta, valor) {
-      if (i === null || i === undefined || !marcos[i]) { return ''; }
-      return '<span class="hito ' + clase2 + '" style="left:' +
-        (i / Math.max(1, n - 1) * 100).toFixed(2) + '%">' +
-        esc(etiqueta) + ' ' + esc(marcos[i].label) +
-        (valor !== null && valor !== undefined ? ' · ' + num(valor, 0) + '°' : '') +
-        '</span>';
-    }
-    return '<div class="aw-hitos">' +
-      marca(objeto.i_meridiano, 'meridiano', t.meridiano, null) +
-      marca(objeto.i_max, 'max', t.maxCorto, objeto.alt[objeto.i_max]) +
-      marca(objeto.i_min, 'min', t.minCorto, objeto.alt[objeto.i_min]) +
-      '</div>';
+    var n = (objeto.alt || []).length, i = objeto.i_max;
+    if (!n || i === null || i === undefined || !marcos[i]) { return ''; }
+    return '<div class="aw-hitos"><span class="hito max" style="left:' +
+      (i / Math.max(1, n - 1) * 100).toFixed(2) + '%">' +
+      num(objeto.alt[i], 0) + '° · ' + esc(marcos[i].label) + '</span></div>';
   }
 
   function carril(objeto, color, t, marcos) {
@@ -549,8 +592,8 @@
           '" aria-label="' + esc(t.quitar) + ' ' + esc(objeto.nombre) + '" title="' +
           esc(t.quitar) + '">×</button>' +
       '</div>' +
-      '<div class="aw-profile">' + perfilSvg(objeto, color, t) + '</div>' +
       hitosHtml(objeto, marcos, t) +
+      '<div class="aw-profile">' + perfilSvg(objeto, color, t) + '</div>' +
       (objeto.externo
         ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
       '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
@@ -689,6 +732,22 @@
           ' (' + num(a, 0) + '°).';
       }
       if (codigo === '-') {
+        // Dos causas distintas que decian lo mismo. A las 21:09 el objeto
+        // estaba a 12 grados Y todavia no era de noche, y el mensaje solo
+        // hablaba de la altura: quien lo leia no podia saber si esperando
+        // mejoraba o no.
+        var deDia = m.sky_mag_trustworthy === false;
+        var claro = !m.dark;
+        if (deDia) {
+          return '<b>' + esc(m.label) + '</b> ' + esc(t.esDeDia) +
+            ' (' + esc(t.solA) + ' ' + num(m.sun_alt, 0) + '°), ' +
+            esc(t.yAdemas) + ' ' + num(a, 0) + '°.';
+        }
+        if (claro) {
+          return '<b>' + esc(m.label) + '</b> ' + num(a, 0) + '°: ' +
+            esc(t.bajoMinimo) + ', ' + esc(t.yTampocoNoche) +
+            ' (' + esc(t.solA) + ' ' + num(m.sun_alt, 0) + '°).';
+        }
         return '<b>' + esc(m.label) + '</b> ' + num(a, 0) + '°: ' +
           esc(t.bajoMinimo) + '.';
       }
@@ -849,8 +908,18 @@
     var noche = datos.noches && datos.noches[0];
     if (!noche) { return '<div class="aw-state">' + esc(t.error) + '</div>'; }
 
+    // Mañana va en la cabecera, pequeño y a la derecha: es contexto de la
+    // decisión de hoy -- si hoy no sale, ¿espero a mañana? -- y al final de la
+    // página llegaba cuando ya la habías tomado.
+    var siguiente = datos.noches[1];
+    var manana = (siguiente && typeof siguiente.probabilidad_de_abrir === 'number')
+      ? '<span class="aw-manana"><span class="d">' + esc(t.manana) + '</span>' +
+        '<b>' + Math.round(siguiente.probabilidad_de_abrir * 100) + '%</b>' +
+        '<span class="d">' + fecha(siguiente.noche, lang) + '</span></span>'
+      : '';
     var html = '<div class="aw-head"><h2>' + t.titulo + '</h2>' +
-      '<span class="aw-site">' + esc(t.sitio) + '</span></div><div class="aw-body">';
+      '<span class="aw-site">' + esc(t.sitio) + manana + '</span></div>' +
+      '<div class="aw-body">';
     // El orden importa: primero como esta la noche, luego lo que dicen los
     // sensores AHORA -- que es lo que confirma o desmiente la prevision -- y
     // solo despues el plan, que se decide con las dos cosas delante.
@@ -858,13 +927,6 @@
     html += bloqueSensores(datos, t);
     html += bloqueConsejos(noche, t);
     html += bloqueElegir(t);
-
-    var siguiente = datos.noches[1];
-    if (siguiente && typeof siguiente.probabilidad_de_abrir === 'number') {
-      html += '<div class="aw-next"><span class="d">' + esc(t.manana) + '</span>' +
-        '<b>' + Math.round(siguiente.probabilidad_de_abrir * 100) + '%</b>' +
-        '<span class="d">' + fecha(siguiente.noche, lang) + '</span></div>';
-    }
 
     html += '<div class="aw-foot">' + t.pie;
     if (datos.generado_utc) {

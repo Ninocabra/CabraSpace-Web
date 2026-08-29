@@ -475,10 +475,21 @@
   overflow: hidden;
 }
 .aw-timeline .track:focus-visible { outline: 2px solid rgba(207, 171, 74, 0.6); }
-/* La oscuridad astronómica: lo que de verdad es noche. */
-.aw-timeline .dark {
+/* Los tres regímenes de la noche, con el mismo código de color que el domo:
+   naranja el día, un azul intermedio el crepúsculo y el azul profundo la
+   oscuridad astronómica. Dejar los extremos en negro los pintaba del color de
+   lo contrario de lo que son. */
+.aw-timeline .dia {
   position: absolute; top: 0; bottom: 0;
-  background: linear-gradient(rgba(90, 120, 200, 0.22), rgba(40, 60, 120, 0.28));
+  background: linear-gradient(rgba(224, 132, 52, 0.30), rgba(170, 92, 34, 0.22));
+}
+.aw-timeline .crepusculo {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(150, 120, 150, 0.22), rgba(80, 80, 150, 0.24));
+}
+.aw-timeline .noche {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(90, 120, 200, 0.22), rgba(40, 60, 120, 0.30));
   border-left: 1px solid rgba(140, 170, 240, 0.35);
   border-right: 1px solid rgba(140, 170, 240, 0.35);
 }
@@ -647,13 +658,11 @@
 
 /* ---- Hitos del perfil ---- */
 .aw-profile .hito { stroke-width: 1; }
-.aw-profile .hito.meridiano { stroke: rgba(207, 171, 74, 0.55); stroke-dasharray: 2 3; }
 .aw-profile .hito.max { stroke: rgba(110, 193, 119, 0.5); }
-.aw-profile .hito.min { stroke: rgba(138, 138, 146, 0.45); }
 .aw-hitos {
   position: relative;
-  height: 15px;
-  margin-top: 2px;
+  height: 14px;
+  margin: 6px 0 -4px;
 }
 .aw-hitos .hito {
   position: absolute;
@@ -662,9 +671,7 @@
   font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
 }
-.aw-hitos .hito.meridiano { color: var(--gold-primary, #cfab4a); }
-.aw-hitos .hito.max { color: #6ec177; }
-.aw-hitos .hito.min { color: var(--text-muted, #777); }
+.aw-hitos .hito.max { color: #6ec177; font-weight: 600; }
 
 /* ---- Objetos que el motor no ha puntuado ---- */
 .aw-lane .head .q.externo { font-variant-numeric: tabular-nums; color: var(--text-muted, #888); }
@@ -693,3 +700,61 @@
 /* La línea de tiempo va a lo ancho, encima de los carriles, y sin margen
    lateral: su cursor y el de los perfiles tienen que caer en la misma vertical. */
 .aw-timeline { margin: 22px 0 0; }
+
+/* ---- Mañana, en la cabecera ---- */
+.aw-manana {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+}
+.aw-manana b { color: var(--gold-primary, #cfab4a); font-weight: 600; }
+.aw-manana .d { color: var(--text-muted, #777); }
+@media (max-width: 620px) {
+  .aw-manana { display: flex; margin: 6px 0 0; padding: 0; border-left: none; }
+}
+
+/* ---- El "?" que abre la explicación ---- */
+.aw-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px; height: 15px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--text-muted, #888);
+  font-size: 0.62rem;
+  cursor: help;
+  vertical-align: middle;
+}
+.aw-info:hover, .aw-info:focus { border-color: rgba(207, 171, 74, 0.6); color: var(--gold-primary, #cfab4a); }
+.aw-info .aw-pop { bottom: calc(100% + 8px); left: auto; right: 0; }
+.aw-info:hover .aw-pop, .aw-info:focus .aw-pop { opacity: 1; pointer-events: auto; }
+
+/* ---- Referencias ---- */
+.aw-refs { margin-top: 14px; }
+.aw-refs > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.aw-refs > summary::-webkit-details-marker { display: none; }
+.aw-refs > summary::after { content: ' ▾'; }
+.aw-refs[open] > summary::after { content: ' ▴'; }
+.aw-refs .ref {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #aaa);
+  padding: 6px 0;
+}
+.aw-refs .ref b { color: var(--text-primary, #eee); display: block; }
