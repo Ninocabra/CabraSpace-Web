@@ -268,49 +268,6 @@
     window.AWDome.pintar(cielo, encima, datos.cupula, objetos, indice, t.cupula);
   }
 
-  // ------------------------------------------- PERFIL DE ALTURA -----------
-  // El grafico por objeto: la altura durante toda la noche, coloreada por lo
-  // que la limita en cada momento. Es la vista que responde "cuando lo
-  // apunto", que la cupula sola no contesta.
-  function perfilSvg(objeto, marcos) {
-    var alt = objeto.alt || [], n = alt.length;
-    if (!n) { return ''; }
-    var W = 100, H = 100, pad = 4;
-    var x = function (i) { return pad + i * (W - 2 * pad) / Math.max(1, n - 1); };
-    var y = function (a) { return H - pad - Math.max(0, Math.min(90, a)) / 90 * (H - 2 * pad); };
-    var color = { c: '#d15f5f', l: '#d8a53c', f: '#d8a53c', a: '#8a8a92',
-                  n: '#6ec177', '-': 'rgba(255,255,255,0.12)' };
-
-    var barras = '';
-    for (var i = 0; i < n; i++) {
-      var codigo = (objeto.limita || '').charAt(i) || '-';
-      var ancho = (W - 2 * pad) / n;
-      if (alt[i] > 0) {
-        barras += '<rect x="' + (x(i) - ancho / 2).toFixed(2) + '" y="' + y(alt[i]).toFixed(2) +
-          '" width="' + ancho.toFixed(2) + '" height="' + (H - pad - y(alt[i])).toFixed(2) +
-          '" fill="' + color[codigo] + '" opacity="' +
-          (codigo === 'n' ? 0.5 : 0.28) + '"/>';
-      }
-    }
-    var linea = alt.map(function (a, i) {
-      return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
-    }).join(' ');
-
-    return '<div class="aw-profile"><svg viewBox="0 0 ' + W + ' ' + H +
-      '" preserveAspectRatio="none" role="img">' +
-      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
-      '<line class="min" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(30) + '" y2="' + y(30) + '"/>' +
-      '<line class="grid" x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
-      barras +
-      '<path d="' + linea + '" fill="none" stroke="#cfab4a" stroke-width="1.2" vector-effect="non-scaling-stroke"/>' +
-      '<line class="cursor" id="aw-p-cursor" x1="0" x2="0" y1="' + pad + '" y2="' + (H - pad) + '" vector-effect="non-scaling-stroke"/>' +
-      alt.map(function (a, i) {
-        return '<rect class="hit" data-i="' + i + '" x="' + (x(i) - (W - 2 * pad) / n / 2).toFixed(2) +
-          '" y="0" width="' + ((W - 2 * pad) / n).toFixed(2) + '" height="' + H + '"/>';
-      }).join('') +
-      '</svg></div>';
-  }
-
   // ------------------------------------------------------------ BLOQUES ----  // ------------------------------------------------------------ BLOQUES ----
   function bloqueResumen(noche, t, lang) {
     // Cual de las casillas es la que hoy estropea la noche. Lo decide el motor
@@ -523,22 +480,97 @@
       '<p class="nota">' + esc(t.claveNota) + '</p></div>';
   }
 
+  /* LA VENTANA QUE SE PINTA, y la pintan los dos: la línea de tiempo y los
+     perfiles. No es que se hayan cuadrado a mano, es que miden lo mismo — por
+     eso el cursor de arriba cae en la misma vertical que el de abajo.
+
+     Va de una hora antes de la oscuridad astronómica a una hora después. NO es
+     la ventana del producto, que va de una hora antes de la puesta a una hora
+     después de la salida: esa es la correcta para contar horas utilizables —
+     el crepúsculo sirve para planetaria — pero pintada ocupa media gráfica con
+     un cielo en el que no se hace cielo profundo, y aplasta la noche de verdad
+     contra el centro. */
+  var MARGEN_VENTANA_MS = 3600 * 1000;
+
+  function ventanaNoche(marcos) {
+    var n = marcos.length;
+    if (!n) { return { desde: 0, hasta: 0 }; }
+    var completa = { desde: 0, hasta: n - 1 };
+    var primero = -1, ultimo = -1;
+    marcos.forEach(function (m, i) {
+      if (m.dark) { if (primero < 0) { primero = i; } ultimo = i; }
+    });
+    if (primero < 0) { return completa; }
+    var ms = marcos.map(function (m) { return new Date(m.t).getTime(); });
+    if (!isFinite(ms[primero]) || !isFinite(ms[ultimo])) { return completa; }
+    var v = { desde: 0, hasta: n - 1 };
+    for (var i = 0; i < n; i++) {
+      if (ms[i] <= ms[primero] - MARGEN_VENTANA_MS) { v.desde = i; }
+    }
+    for (var j = n - 1; j >= 0; j--) {
+      if (ms[j] >= ms[ultimo] + MARGEN_VENTANA_MS) { v.hasta = j; }
+    }
+    return (v.hasta - v.desde >= 2) ? v : completa;
+  }
+
+  // Sitio para respirar arriba y abajo de la curva, en unidades del viewBox.
+  // Estan aqui fuera porque el eje de alturas, que se dibuja en HTML, tiene que
+  // usar exactamente los mismos numeros o las etiquetas no caen en sus rayas.
+  var PERFIL_TOP = 6, PERFIL_BOT = 4;
+
+  function perfilY(a) {
+    return PERFIL_TOP + (90 - Math.max(0, Math.min(90, a))) / 90 *
+      (100 - PERFIL_TOP - PERFIL_BOT);
+  }
+
+  /* Suavizado monotono de Fritsch-Carlson, y la diferencia con una spline
+     cualquiera importa: una Catmull-Rom se pasa de largo en los picos e INVENTA
+     alturas que el objeto nunca alcanza, justo encima del maximo, que es el
+     punto que la gente lee. Esta no puede — entre dos muestras se queda acotada
+     por ellas. Suave y sin mentir. */
+  function curvaSuave(pts) {
+    var n = pts.length;
+    if (n < 2) { return n ? 'M' + pts[0][0].toFixed(2) + ' ' + pts[0][1].toFixed(2) : ''; }
+    var dx = [], m = [], i;
+    for (i = 0; i < n - 1; i++) {
+      dx.push(pts[i + 1][0] - pts[i][0]);
+      m.push((pts[i + 1][1] - pts[i][1]) / (dx[i] || 1e-6));
+    }
+    var tg = [m[0]];
+    for (i = 1; i < n - 1; i++) {
+      if (m[i - 1] * m[i] <= 0) { tg.push(0); }
+      else {
+        var w1 = 2 * dx[i] + dx[i - 1], w2 = dx[i] + 2 * dx[i - 1];
+        tg.push((w1 + w2) / (w1 / m[i - 1] + w2 / m[i]));
+      }
+    }
+    tg.push(m[n - 2]);
+    var d = 'M' + pts[0][0].toFixed(2) + ' ' + pts[0][1].toFixed(2);
+    for (i = 0; i < n - 1; i++) {
+      var h = dx[i] / 3;
+      d += ' C' + (pts[i][0] + h).toFixed(2) + ' ' + (pts[i][1] + tg[i] * h).toFixed(2) +
+           ' ' + (pts[i + 1][0] - h).toFixed(2) + ' ' + (pts[i + 1][1] - tg[i + 1] * h).toFixed(2) +
+           ' ' + pts[i + 1][0].toFixed(2) + ' ' + pts[i + 1][1].toFixed(2);
+    }
+    return d;
+  }
+
   // -------------------------------------------------- LÍNEA DE TIEMPO -----
   // Una barra con la oscuridad astronómica marcada, no un control deslizante
   // pelado: lo que se quiere ver de un vistazo es CUÁNTO de la noche es noche
   // de verdad y dónde estás dentro de ella.
-  function bloqueTiempo(marcos, indice, t) {
-    var n = marcos.length;
-    if (!n) { return ''; }
+  function bloqueTiempo(marcos, indice, t, v) {
+    var n = v.hasta - v.desde;
+    if (n < 1) { return ''; }
+    var pos = function (i) { return (i - v.desde) / n * 100; };
     var partes = [];
     // Tres regímenes, no dos: día, crepúsculo y noche cerrada. Antes solo se
     // pintaba la noche y los dos extremos quedaban en negro, que es justo el
     // color de lo contrario de lo que son.
     function banda(clase2, desde, hasta) {
       if (hasta <= desde) { return; }
-      partes.push('<div class="' + clase2 + '" style="left:' +
-        (desde / (n - 1) * 100) + '%;width:' +
-        ((hasta - desde) / (n - 1) * 100) + '%"></div>');
+      partes.push('<div class="' + clase2 + '" style="left:' + pos(desde) +
+        '%;width:' + (pos(hasta) - pos(desde)) + '%"></div>');
     }
     var regimen = function (f) {
       // `sky_mag_trustworthy` es falso donde el ajuste de crepúsculo ya no
@@ -546,93 +578,151 @@
       if (f.sky_mag_trustworthy === false) { return 'dia'; }
       return f.dark ? 'noche' : 'crepusculo';
     };
-    var actual = regimen(marcos[0]), desde = 0;
-    for (var k = 1; k <= n; k++) {
-      var r = (k < n) ? regimen(marcos[k]) : null;
+    var actual = regimen(marcos[v.desde]), desde = v.desde;
+    for (var k = v.desde + 1; k <= v.hasta + 1; k++) {
+      var r = (k <= v.hasta) ? regimen(marcos[k]) : null;
       if (r !== actual) {
         banda(actual, desde, k - 1);
         actual = r; desde = k - 1;
       }
     }
-    marcos.forEach(function (f, i) {
-      if (i % 6) { return; }
-      partes.push('<div class="tick" style="left:' + (i / (n - 1) * 100) + '%"></div>');
-      partes.push('<span class="lbl" style="left:' + (i / (n - 1) * 100) + '%">' +
-        esc(f.label) + '</span>');
-    });
-    partes.push('<div class="cur" id="aw-cur" style="left:' +
-      (indice / (n - 1) * 100) + '%"></div>');
+    for (var i = v.desde; i <= v.hasta; i++) {
+      if ((i - v.desde) % 4) { continue; }
+      partes.push('<div class="tick" style="left:' + pos(i) + '%"></div>');
+      partes.push('<span class="lbl" style="left:' + pos(i) + '%">' +
+        esc(marcos[i].label) + '</span>');
+    }
+    partes.push('<div class="cur" id="aw-cur" style="left:' + pos(indice) + '%"></div>');
+    // Los mandos van ENCIMA y la pista sola en su línea, a lo ancho. Estaban
+    // los tres en fila, así que la pista era más estrecha que las gráficas de
+    // los objetos por lo que ocupaban el botón y la hora, y los dos cursores
+    // no caían en la misma vertical aunque midieran lo mismo.
     return '<div class="aw-timeline">' +
-      '<button type="button" class="aw-play" id="aw-play" aria-label="' +
-        esc(t.reproducir) + '" title="' + esc(t.reproducir) + '">▶</button>' +
+      '<div class="mandos">' +
+        '<button type="button" class="aw-play" id="aw-play" aria-label="' +
+          esc(t.reproducir) + '" title="' + esc(t.reproducir) + '">▶</button>' +
+        '<span class="now" id="aw-t-lab">' + esc(marcos[indice].label) + '</span>' +
+      '</div>' +
       '<div class="track" id="aw-track" role="slider" tabindex="0" ' +
-        'aria-valuemin="0" aria-valuemax="' + (n - 1) + '" aria-valuenow="' + indice +
-        '" aria-label="' + esc(t.horaCupula) + '">' + partes.join('') + '</div>' +
-      '<span class="now" id="aw-t-lab">' + esc(marcos[indice].label) + '</span></div>';
+        'aria-valuemin="' + v.desde + '" aria-valuemax="' + v.hasta +
+        '" aria-valuenow="' + indice + '" aria-label="' + esc(t.horaCupula) + '">' +
+        partes.join('') + '</div></div>';
   }
 
   // ------------------------------------------------- PERFIL POR OBJETO ----
-  function perfilSvg(objeto, color, t) {
-    var alt = objeto.alt || [], n = alt.length;
-    if (!n) { return ''; }
-    // SIN margen lateral: la x del punto `i` es la misma fraccion que la del
-    // cursor de la linea de tiempo, asi que los dos cursores caen en la misma
-    // vertical. Con padding no coincidian y la vista mentia sobre el instante.
-    var W = 100, H = 100, top = 6, bot = 4;
-    var x = function (i) { return i * W / Math.max(1, n - 1); };
-    var y = function (a) {
-      return H - bot - Math.max(0, Math.min(90, a)) / 90 * (H - top - bot);
-    };
-    var tinte = { c: '#d15f5f', l: '#d8a53c', f: '#d8a53c', a: '#8a8a92',
-                  n: '#6ec177', '-': 'rgba(255,255,255,0.10)' };
-    var barras = '', ancho = W / n;
-    for (var i = 0; i < n; i++) {
-      var codigo = (objeto.limita || '').charAt(i) || '-';
-      if (alt[i] > 0) {
-        barras += '<rect x="' + (x(i) - ancho / 2).toFixed(2) + '" y="' + y(alt[i]).toFixed(2) +
-          '" width="' + ancho.toFixed(2) + '" height="' + (H - bot - y(alt[i])).toFixed(2) +
-          '" fill="' + tinte[codigo] + '" opacity="' + (codigo === 'n' ? 0.5 : 0.26) + '"/>';
-      }
-    }
-    var linea = alt.map(function (a, i) {
-      return (i ? 'L' : 'M') + x(i).toFixed(2) + ' ' + y(a).toFixed(2);
-    }).join(' ');
+  // Los tonos de "qué lo limita". Bajados de saturación respecto a los de
+  // antes: aquí son un fondo, no un aviso, y el aviso ya lo da el veredicto de
+  // la cabecera.
+  var TINTE_LIMITA = { c: '#c2666b', l: '#c9a052', f: '#c9a052', a: '#8b909e',
+                       n: '#5fb478', '-': 'rgba(255,255,255,0.05)' };
 
-    // Solo el máximo. El paso por el meridiano y el máximo son EL MISMO
-    // instante para todo lo que culmina dentro de la noche -- que es casi
-    // todo -- y por eso sus dos etiquetas se pisaban: no eran dos momentos,
-    // era el mismo escrito dos veces.
-    function hito(i, clase2) {
-      if (i === null || i === undefined || alt[i] === undefined) { return ''; }
-      return '<line class="hito ' + clase2 + '" x1="' + x(i).toFixed(2) + '" x2="' +
-        x(i).toFixed(2) + '" y1="' + top + '" y2="' + (H - bot) +
+  // Cada SVG necesita ids propios para sus degradados: dos objetos en la misma
+  // página compartirían la definición y el segundo saldría del color del
+  // primero.
+  var perfilSeq = 0;
+
+  function perfilSvg(objeto, color, t, v, minAlt) {
+    var alt = objeto.alt || [];
+    var desde = v.desde, hasta = Math.min(v.hasta, alt.length - 1);
+    if (hasta - desde < 1) { return ''; }
+    var W = 100, H = 100, base = perfilY(0);
+    var tramo = hasta - desde;
+    var x = function (i) { return (i - desde) * W / tramo; };
+    var id = 'awp' + (++perfilSeq);
+
+    var puntos = [];
+    for (var i = desde; i <= hasta; i++) { puntos.push([x(i), perfilY(alt[i])]); }
+    var curva = curvaSuave(puntos);
+    // El área bajo la curva, cerrada por el horizonte. Sirve de recorte: los
+    // colores de "qué lo limita" van DENTRO, así que el borde de arriba es la
+    // curva y no la escalera de barras que había.
+    var area = curva + ' L' + W.toFixed(2) + ' ' + base.toFixed(2) +
+               ' L0 ' + base.toFixed(2) + ' Z';
+
+    var ancho = W / tramo;
+    var franjas = '';
+    for (var j = desde; j <= hasta; j++) {
+      var codigo = (objeto.limita || '').charAt(j) || '-';
+      // Se solapan un pelin. Pegadas justas, el borde compartido cae en un pixel
+      // fraccionario y el antialias deja una raya mas clara en cada junta: el
+      // relleno salia con una empalizada de lineas verticales de arriba abajo.
+      franjas += '<rect x="' + (x(j) - ancho / 2 - 0.04).toFixed(2) + '" y="0" width="' +
+        (ancho + 0.08).toFixed(2) + '" height="' + H + '" fill="' +
+        TINTE_LIMITA[codigo] + '"/>';
+    }
+
+    function hito(i) {
+      if (i === null || i === undefined || i < desde || i > hasta) { return ''; }
+      return '<line class="hito max" x1="' + x(i).toFixed(2) + '" x2="' + x(i).toFixed(2) +
+        '" y1="' + PERFIL_TOP + '" y2="' + base.toFixed(2) +
         '" vector-effect="non-scaling-stroke"/>';
     }
-    var marcas = hito(objeto.i_max, 'max');
+
+    var rayas = [90, 60, 30, 0].map(function (a) {
+      return '<line class="grid" x1="0" x2="' + W + '" y1="' + perfilY(a).toFixed(2) +
+        '" y2="' + perfilY(a).toFixed(2) + '"/>';
+    }).join('');
+    var minimo = (typeof minAlt === 'number')
+      ? '<line class="min" x1="0" x2="' + W + '" y1="' + perfilY(minAlt).toFixed(2) +
+        '" y2="' + perfilY(minAlt).toFixed(2) + '"/>' : '';
+
+    var hits = '';
+    for (var k = desde; k <= hasta; k++) {
+      hits += '<rect class="hit" data-i="' + k + '" x="' + (x(k) - ancho / 2).toFixed(2) +
+        '" y="0" width="' + ancho.toFixed(2) + '" height="' + H + '"/>';
+    }
 
     return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img">' +
-      '<line class="grid" x1="0" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
-      '<line class="min" x1="0" x2="' + W + '" y1="' + y(25) + '" y2="' + y(25) + '"/>' +
-      '<line class="grid" x1="0" x2="' + W + '" y1="' + y(60) + '" y2="' + y(60) + '"/>' +
-      barras + marcas +
-      '<path d="' + linea + '" fill="none" stroke="' + color +
-        '" stroke-width="1.4" vector-effect="non-scaling-stroke"/>' +
-      '<line class="cursor" x1="0" x2="0" y1="' + top + '" y2="' + (H - bot) +
-        '" vector-effect="non-scaling-stroke"/>' +
-      alt.map(function (a, i) {
-        return '<rect class="hit" data-i="' + i + '" x="' + (x(i) - ancho / 2).toFixed(2) +
-          '" y="0" width="' + ancho.toFixed(2) + '" height="' + H + '"/>';
-      }).join('') + '</svg>';
+      '<defs>' +
+        '<clipPath id="' + id + 'a" clipPathUnits="userSpaceOnUse">' +
+          '<path d="' + area + '"/></clipPath>' +
+        // El desvanecido: el color de lo que limita pesa abajo y se disuelve
+        // hacia arriba, para que la curva se lea por encima de su propio fondo.
+        '<linearGradient id="' + id + 'f" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="#fff" stop-opacity="0.07"/>' +
+          '<stop offset="1" stop-color="#fff" stop-opacity="0.62"/></linearGradient>' +
+        '<mask id="' + id + 'm" maskUnits="userSpaceOnUse" x="0" y="0" width="' + W +
+          '" height="' + H + '">' +
+          '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="url(#' + id + 'f)"/>' +
+        '</mask>' +
+        // Y el color del objeto tiñe el área entera, muy flojo, para que cada
+        // carril se distinga del de al lado sin depender solo de la línea.
+        '<linearGradient id="' + id + 'c" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="' + color + '" stop-opacity="0.22"/>' +
+          '<stop offset="1" stop-color="' + color + '" stop-opacity="0.01"/></linearGradient>' +
+      '</defs>' +
+      rayas + minimo +
+      '<g clip-path="url(#' + id + 'a)" mask="url(#' + id + 'm)">' + franjas + '</g>' +
+      '<path d="' + area + '" fill="url(#' + id + 'c)"/>' +
+      hito(objeto.i_max) +
+      '<path d="' + curva + '" fill="none" stroke="' + color +
+        '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"' +
+        ' vector-effect="non-scaling-stroke"/>' +
+      '<line class="cursor" x1="0" x2="0" y1="' + PERFIL_TOP + '" y2="' + base.toFixed(2) +
+        '" vector-effect="non-scaling-stroke"/>' + hits + '</svg>';
+  }
+
+  /* El eje de alturas va en HTML y no dentro del SVG, y no por gusto: el SVG se
+     estira con `preserveAspectRatio="none"` — que es justo lo que le permite
+     ocupar el mismo ancho exacto que la línea de tiempo — y ahí dentro
+     cualquier texto se estira con él y sale deformado. */
+  function ejeHtml() {
+    return '<div class="aw-eje" aria-hidden="true">' +
+      [90, 60, 30, 0].map(function (a) {
+        return '<span style="top:' + perfilY(a).toFixed(2) + '%">' + a + '°</span>';
+      }).join('') + '</div>';
   }
 
   // La etiqueta va FUERA del SVG, en HTML: dentro se estira con
   // `preserveAspectRatio="none"` y el texto sale deformado. Y va ENCIMA de la
   // curva, que es donde no pisa nada.
-  function hitosHtml(objeto, marcos, t) {
-    var n = (objeto.alt || []).length, i = objeto.i_max;
-    if (!n || i === null || i === undefined || !marcos[i]) { return ''; }
+  function hitosHtml(objeto, marcos, t, v) {
+    var i = objeto.i_max;
+    if (i === null || i === undefined || i < v.desde || i > v.hasta || !marcos[i]) {
+      return '';
+    }
     return '<div class="aw-hitos"><span class="hito max" style="left:' +
-      (i / Math.max(1, n - 1) * 100).toFixed(2) + '%">' +
+      ((i - v.desde) / Math.max(1, v.hasta - v.desde) * 100).toFixed(2) + '%">' +
       num(objeto.alt[i], 0) + '° · ' + esc(marcos[i].label) + '</span></div>';
   }
 
@@ -670,7 +760,7 @@
     return Math.min.apply(null, vivos);
   }
 
-  function carril(objeto, color, t, marcos) {
+  function carril(objeto, color, t, marcos, v, minAlt) {
     return '<div class="aw-lane" data-obj="' + esc(objeto.nombre) + '">' +
       '<div class="head">' +
         '<i class="dot" style="background:' + color + '"></i>' +
@@ -695,8 +785,9 @@
           '" aria-label="' + esc(t.quitar) + ' ' + esc(objeto.nombre) + '" title="' +
           esc(t.quitar) + '">×</button>' +
       '</div>' +
-      hitosHtml(objeto, marcos, t) +
-      '<div class="aw-profile">' + perfilSvg(objeto, color, t) + '</div>' +
+      hitosHtml(objeto, marcos, t, v) +
+      '<div class="aw-profile">' + perfilSvg(objeto, color, t, v, minAlt) +
+        ejeHtml() + '</div>' +
       (objeto.externo
         ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
       '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
@@ -889,19 +980,30 @@
         sepTexto(objeto, m, i, t) + '.';
     }
 
+    var ventana = ventanaNoche(marcos);
+    indice = Math.max(ventana.desde, Math.min(ventana.hasta, indice));
+
     // Solo mueve el cursor y repinta: no reconstruye el HTML, que es lo que
     // haría perder el foco y el scroll cada vez que corre la animación.
     function irA(i) {
-      indice = Math.max(0, Math.min(marcos.length - 1, i));
+      // Se clava a la ventana pintada. Fuera de ella el cursor se salia del
+      // dibujo y seguia moviendose sin que se viera, que es peor que no
+      // moverse.
+      indice = Math.max(ventana.desde, Math.min(ventana.hasta, i));
       var etiqueta = destino.querySelector('#aw-t-lab');
       var cursor = destino.querySelector('#aw-cur');
       var pista = destino.querySelector('#aw-track');
       if (etiqueta && marcos[indice]) { etiqueta.textContent = marcos[indice].label; }
-      var pct = indice / Math.max(1, marcos.length - 1) * 100;
+      var pct = (indice - ventana.desde) /
+        Math.max(1, ventana.hasta - ventana.desde) * 100;
       if (cursor) { cursor.style.left = pct + '%'; }
       if (pista) { pista.setAttribute('aria-valuenow', indice); }
       destino.querySelectorAll('.aw-profile .cursor').forEach(function (linea) {
-        var xx = 4 + indice * (100 - 8) / Math.max(1, marcos.length - 1);
+        // La MISMA fraccion que el cursor de arriba. Antes llevaba un margen de
+        // 4 unidades que el SVG habia dejado de tener, asi que el cursor del
+        // perfil no caia sobre su propia curva: se iba un 4 % a la derecha al
+        // principio de la noche y convergia hacia el final.
+        var xx = pct;
         linea.setAttribute('x1', xx); linea.setAttribute('x2', xx);
       });
       elegidos.forEach(function (o) {
@@ -926,9 +1028,12 @@
           '</div>' +
           '<div class="aw-side">' + bloqueClave(datos.cupula, t) + '</div>' +
         '</div>' +
-        bloqueTiempo(marcos, indice, t) +
+        bloqueTiempo(marcos, indice, t, ventana) +
         '<div class="aw-lanes">' +
-          elegidos.map(function (o, i) { return carril(o, color(i), t, marcos); }).join('') +
+          elegidos.map(function (o, i) {
+            return carril(o, color(i), t, marcos, ventana,
+                          datos.cupula && datos.cupula.min_altitude);
+          }).join('') +
         '</div>';
 
       var pila = destino.querySelector('.aw-dome-stack');
@@ -1062,7 +1167,7 @@
         } else {
           boton.textContent = '❚❚'; boton.title = t.pausar;
           reproduciendo = setInterval(function () {
-            irA((indice + 1) % marcos.length);
+            irA(indice >= ventana.hasta ? ventana.desde : indice + 1);
           }, 550);
         }
         return;
@@ -1070,7 +1175,8 @@
       var pista = e.target.closest('#aw-track');
       if (pista) {
         var caja2 = pista.getBoundingClientRect();
-        irA(Math.round((e.clientX - caja2.left) / caja2.width * (marcos.length - 1)));
+        irA(ventana.desde + Math.round((e.clientX - caja2.left) / caja2.width *
+                                       (ventana.hasta - ventana.desde)));
       }
     });
     destino.addEventListener('keydown', function (e) {

@@ -483,15 +483,20 @@
 
 
 /* ======================= Línea de tiempo ============================ */
-.aw-timeline {
+/* Los mandos arriba y la pista sola en su linea: es lo que le da a la pista
+   EXACTAMENTE el ancho de las graficas de los objetos, que es la condicion
+   para que los dos cursores caigan en la misma vertical. En fila con el boton
+   y la hora, la pista era mas estrecha y no habia forma de cuadrarlos. */
+.aw-timeline { margin-top: 12px; }
+.aw-timeline .mandos {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 12px;
+  margin-bottom: 7px;
 }
 .aw-timeline .track {
   position: relative;
-  flex: 1;
+  width: 100%;
   height: 26px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -542,8 +547,6 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary, #bbb);
   font-size: 0.85rem;
-  min-width: 42px;
-  text-align: right;
 }
 
 /* ======================== Clave de color ============================ */
@@ -622,10 +625,33 @@
   border-color: rgba(209, 95, 95, 0.6);
   color: #e08b8b;
 }
-.aw-profile { margin-top: 8px; }
-.aw-profile svg { width: 100%; height: 92px; display: block; overflow: visible; }
-.aw-profile .grid { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
-.aw-profile .min { stroke: rgba(209, 95, 95, 0.4); stroke-dasharray: 3 3; }
+.aw-profile { margin-top: 8px; position: relative; }
+.aw-profile svg { width: 100%; height: 104px; display: block; overflow: visible; }
+.aw-profile .grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
+.aw-profile .min { stroke: rgba(209, 95, 95, 0.34); stroke-dasharray: 3 4; }
+/* El eje de alturas, en HTML y encima del SVG. Pegado al borde izquierdo
+   porque la grafica no puede llevar margen lateral: ese margen es justo lo que
+   la desalinearia de la linea de tiempo. La sombra es para que se lea cuando
+   la curva pasa por detras. */
+.aw-eje {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.aw-eje span {
+  position: absolute;
+  left: 2px;
+  transform: translateY(-50%);
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+  /* Chapa oscura detras: las de 30 y 0 caen DENTRO del relleno, que es la parte
+     mas saturada de la grafica, y con sombra sola no se leian. */
+  color: rgba(190, 196, 210, 0.72);
+  background: rgba(10, 12, 16, 0.62);
+  padding: 0 3px;
+  border-radius: 3px;
+  line-height: 1.35;
+}
 .aw-profile .cursor { stroke: rgba(207, 171, 74, 0.75); stroke-width: 1.5; }
 .aw-profile rect.hit { fill: transparent; cursor: pointer; }
 .aw-profile rect.hit:hover { fill: rgba(255, 255, 255, 0.05); }
