@@ -46,8 +46,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Celestron
 
 ### ACCESSORIES
-- **Modelo: EclipSmart**
-  - [Cómo ver el eclipse de forma segura con kits EclipSmart de Celestron](https://www.youtube.com/watch?v=3Va8zB4XYk4) (2026-03-09)
 - **Modelo: Proyección**
   - [Oculares de proyección recomendados para telescopios de astrofotografía](https://www.youtube.com/watch?v=nxTnBf7jYmI) (2026-06-07)
 
@@ -59,6 +57,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: 9.25 Edge HD**
   - [Celestron 9.25 Edge HD como telescopio visual](https://www.reddit.com/r/telescopes/comments/1tx6ezv/celestron_925_edge_as_a_visual_telescope/) (2026-06-05)
 - **Modelo: CPC Deluxe HD**
+  - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Ed Ting**
@@ -91,10 +90,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Scott Roberts**
   - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
-
-### TELESCOPES
-- **Actualizaciones Generales / Revisiones:**
-  - [Cómo elegir el telescopio adecuado - Preguntas frecuentes](https://www.youtube.com/shorts/zAYh91ltVXE) (2025-12-22)
 
 ## INDI Library
 
@@ -277,6 +272,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### TELESCOPES
 - **Modelo: MK127**
+  - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
   - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
 - **Modelo: SA401 Pro**
   - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
