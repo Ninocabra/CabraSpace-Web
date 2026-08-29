@@ -252,7 +252,8 @@
     return '<div class="aw-sensor ' + (estado || '') + '"' +
       (cuando ? ' title="' + esc(String(cuando).replace('T', ' ').slice(0, 16)) + ' UTC"' : '') +
       '><span class="k">' + esc(clave) + '</span>' +
-      '<span class="v">' + esc(valor) + (unidad ? ' ' + esc(unidad) : '') + '</span>' +
+      '<span class="v">' + esc(valor) +
+        (unidad ? ' <span class="u">' + esc(unidad) + '</span>' : '') + '</span>' +
       (cuando ? '<span class="cuando">' + esc(String(cuando).slice(11, 16)) + '</span>' : '') +
       '</div>';
   }
@@ -442,9 +443,10 @@
     html += sensor(t.temp, num(s.temperatura), '°C', '', s.medido_utc);
     html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '', s.medido_utc);
     html += sensor(t.rocio, num(s.margen_rocio), '°C',
-      s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''));
+      s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''),
+      s.medido_utc);
     html += sensor(t.viento, num(s.viento_ms * 3.6, 0), 'km/h', s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc);
-    html += sensor(t.presion, num(s.presion, 0), 'hPa', s.medido_utc);
+    html += sensor(t.presion, num(s.presion, 0), 'hPa', '', s.medido_utc);
     // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
     // fabricante deriva el índice de nubes que va al lado, y el índice es
     // además el que consume el motor. Dos números para lo mismo, y el crudo
@@ -455,11 +457,11 @@
     // publica null para los dos casos distintos y aquí simplemente no se pinta.
     if (s.techos_total) {
       html += sensor(t.techos, s.techos_abiertos + '/' + s.techos_total, '',
-        s.techos_abiertos > 0 ? 'good' : '');
+        s.techos_abiertos > 0 ? 'good' : '', s.medido_utc);
     }
     if (s.estado_seguridad) {
       html += sensor(t.seguridad, s.estado_seguridad, '',
-        s.estado_seguridad === 'Safe' ? 'good' : 'alert');
+        s.estado_seguridad === 'Safe' ? 'good' : 'alert', s.medido_utc);
     }
     html += '</div>';
 

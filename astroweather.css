@@ -234,15 +234,40 @@
 .aw-sensor .k {
   display: block;
   font-size: 0.63rem;
+  line-height: 1.25;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-muted, #777);
   margin-bottom: 3px;
+  /* Dos lineas de alto siempre: «MARGEN DE ROCIO» y «TECHOS ABIERTOS» parten
+     en dos y las demas no, asi que sin esto los valores de la fila salian a
+     alturas distintas. */
+  min-height: 2.5em;
 }
 .aw-sensor .v {
+  /* En bloque, y esto NO es cosmetico: en linea, la hora que va detras heredaba
+     el tamano del valor y se le montaba encima -- «20.15 mag/arcsec²19:50». */
+  display: block;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-secondary, #bbb);
+  font-variant-numeric: tabular-nums;
+}
+/* La unidad, mas pequena y apagada que el numero: el numero es el dato y la
+   unidad solo dice en que esta. Ademas asi cabe, que es lo que evita que la
+   casilla del fotometro parta en dos lineas y descuadre la fila. */
+.aw-sensor .v .u {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted, #777);
+}
+/* La hora de la medida: pequena y apagada. Esta para poder mirarla, no para
+   competir con el numero. */
+.aw-sensor .cuando {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.63rem;
+  color: var(--text-muted, #777);
   font-variant-numeric: tabular-nums;
 }
 .aw-sensor.alert .v { color: #e08b8b; }
