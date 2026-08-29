@@ -561,6 +561,9 @@
     // JSON -- y no una prevision: nada de lo que decide el producto se
     // recalcula aqui.
     aHorizonte: toHorizon,
+    // Separacion angular entre dos puntos del cielo. La usa la pagina para
+    // los objetos de fuera, a los que el motor no les ha calculado nada.
+    separacion: separation,
     muestras: muestras,
     muestraAltitud: MUESTRA_ALT,
     cargarViaLactea: cargarViaLactea,

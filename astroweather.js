@@ -74,6 +74,8 @@
       reproducir: 'Reproducir la noche', pausar: 'Pausar',
       quitar: 'Quitar', siDespejaCorto: 'si despeja',
       meridiano: 'meridiano', maxCorto: 'máx', minCorto: 'mín',
+      minimo: 'de la Luna, mínimo', lunaCerca: 'la Luna manda en el encuadre',
+      lunaAbajo: 'Luna bajo el horizonte',
       buscarFuera: 'Buscar «%s» en SIMBAD', resolviendo: 'Resolviendo…',
       noResuelto: 'SIMBAD no conoce ese nombre.',
       porCoordenadas: 'O escribe coordenadas: «10 45 03 -59 41 04» o «161.26 -59.68»',
@@ -148,6 +150,8 @@
       reproducir: 'Play the night', pausar: 'Pause',
       quitar: 'Remove', siDespejaCorto: 'if it clears',
       meridiano: 'meridian', maxCorto: 'max', minCorto: 'min',
+      minimo: 'from the Moon, minimum', lunaCerca: 'the Moon owns the frame',
+      lunaAbajo: 'Moon below the horizon',
       buscarFuera: 'Look up “%s” in SIMBAD', resolviendo: 'Resolving…',
       noResuelto: 'SIMBAD does not know that name.',
       porCoordenadas: 'Or type coordinates: “10 45 03 -59 41 04” or “161.26 -59.68”',
@@ -576,6 +580,15 @@
       num(objeto.alt[i], 0) + '° · ' + esc(marcos[i].label) + '</span></div>';
   }
 
+  function minimoLuna(objeto) {
+    var serie = objeto.sep_luna || [];
+    var vivos = serie.filter(function (v) { return typeof v === 'number'; });
+    if (!vivos.length) {
+      return typeof objeto.separacion_luna === 'number' ? objeto.separacion_luna : null;
+    }
+    return Math.min.apply(null, vivos);
+  }
+
   function carril(objeto, color, t, marcos) {
     return '<div class="aw-lane" data-obj="' + esc(objeto.nombre) + '">' +
       '<div class="head">' +
@@ -588,6 +601,13 @@
               esc(t.siDespejaCorto) + '</span>' +
             '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +
               esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span>') +
+        // La separación mínima a la Luna en toda la noche: es la que decide si
+        // el objeto es viable con esta fase, y por debajo de 40° el halo manda
+        // sobre el encuadre entero en banda ancha.
+        (minimoLuna(objeto) !== null
+          ? '<span class="q luna' + (minimoLuna(objeto) < 40 ? ' cerca' : '') + '">☾ ' +
+            num(minimoLuna(objeto), 0) + '° ' + esc(t.minimo) + '</span>'
+          : '') +
         '<button type="button" class="quitar" data-quitar="' + esc(objeto.nombre) +
           '" aria-label="' + esc(t.quitar) + ' ' + esc(objeto.nombre) + '" title="' +
           esc(t.quitar) + '">×</button>' +
@@ -669,7 +689,14 @@
         break;
       }
     }
-    return { nombre: nombre, ra: ra, dec: dec, externo: true,
+    // Y su separación a la Luna, que es geometría igual que la altura.
+    var sep = [];
+    (cupula.frames || []).forEach(function (f, i) {
+      sep.push(f.moon_alt !== undefined && window.AWDome.separacion
+        ? Math.round(window.AWDome.separacion(alt[i], az[i], f.moon_alt, f.moon_az) * 10) / 10
+        : null);
+    });
+    return { nombre: nombre, ra: ra, dec: dec, externo: true, sep_luna: sep,
              tipo: 'externo', clase: 'sin puntuar', alias: [], nota: '',
              alt: alt, az: az, rend: alt.map(function () { return 0; }),
              limita: alt.map(function () { return 'x'; }).join(''),
@@ -722,6 +749,19 @@
       lista.hidden = false;
     }
 
+    // La separación a la Luna EN ESE INSTANTE, que es la que cambia: la Luna
+    // se mueve y el objeto también. Y con la Luna bajo el horizonte se dice,
+    // porque entonces el número es geometría sin consecuencias.
+    function sepTexto(objeto, m, i, t) {
+      var s2 = (objeto.sep_luna || [])[i];
+      if (typeof s2 !== 'number') { return ''; }
+      if (!(m.moon_alt > 0)) {
+        return ' · ' + esc(t.lunaAbajo);
+      }
+      return ' · ☾ ' + num(s2, 0) + '°' +
+        (s2 < 40 ? ' (' + esc(t.lunaCerca) + ')' : '');
+    }
+
     function detalleDe(objeto, i) {
       var m = marcos[i];
       if (!m) { return ''; }
@@ -755,7 +795,8 @@
         esc(t.rinde) + ' ' + num(((objeto.rend || [])[i] || 0) * 100, 0) + ' %, ' +
         esc(t.limitaPor) + ' ' + esc((t.limita && t.limita[codigo]) || codigo) +
         (m.sky_mag !== undefined && m.sky_mag !== null
-          ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1) : '') + '.';
+          ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1) : '') +
+        sepTexto(objeto, m, i, t) + '.';
     }
 
     // Solo mueve el cursor y repinta: no reconstruye el HTML, que es lo que

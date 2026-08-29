@@ -758,3 +758,7 @@
   padding: 6px 0;
 }
 .aw-refs .ref b { color: var(--text-primary, #eee); display: block; }
+
+/* ---- Separación a la Luna en la cabecera del carril ---- */
+.aw-lane .head .q.luna { color: var(--text-secondary, #aaa); }
+.aw-lane .head .q.luna.cerca { color: #e0a06b; }
