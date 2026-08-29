@@ -9,6 +9,7 @@
   <meta name="description" content="Planifica tus noches de astrofotografía y observación con el pronóstico de calidad de cielo inteligente de NightVis, integrado en CabraSpace.">
   <link rel="stylesheet" href="index.css?v=1.3">
   <link rel="stylesheet" href="support.css">
+  <link rel="stylesheet" href="astroweather.css">
   <style>
     /* ── Page-level overrides ── */
     .tool-hero {
@@ -120,6 +121,10 @@
       .tool-card-body h1 { font-size: 1.35rem; }
       .tool-cta { padding: 12px 28px; font-size: 0.95rem; }
     }
+
+    /* Con el panel de AstroWeather encima, el hero ya no es la primera pantalla:
+       deja de reservarse el alto completo y de empujar la tarjeta hacia abajo. */
+    .tool-hero { min-height: auto; padding-top: 48px; }
   </style>
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/astroforecast.html">
@@ -221,6 +226,11 @@
   <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
 
   <!-- Tool Hero Section -->
+  <!-- AstroWeather: la noche de Nerpio, leida del JSON publico del motor -->
+  <section class="aw-section">
+    <div id="astroweather" class="aw-panel" data-lang="es"></div>
+  </section>
+
   <section class="tool-hero">
     <div class="tool-card">
       <div class="tool-card-img-wrapper">
@@ -255,6 +265,7 @@
       }
     });
   </script>
+  <script src="astroweather.js"></script>
   <script src="mobile-menu.js"></script>
 </body>
 </html>
