@@ -194,12 +194,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: seguridad**
   - [Advertencia de seguridad de QHYCCD sobre código malicioso en su sitio web](https://www.qhyccd.com/security-advisory-malicious-code-on-www-qhyccd-com-10-12-august-2026/) (2026-08-12)
 
-## Sharpstar
-
-### TELESCOPES
-- **Modelo: SCA310**
-  - [La revisión más completa del Sharpstar SCA310](https://www.youtube.com/watch?v=Q5za55bc2sM) (2026-06-05)
-
 ## Siril
 
 ### SOFTWARE
@@ -253,6 +247,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
 - **Modelo: Star Fest 2026**
   - [SVBONY en Star Fest 2026: noticias y novedades](https://www.youtube.com/shorts/Faw5jPxGfM8) (2026-08-14)
+- **Modelo: portabilidad**
+  - [Desmontaje rápido de telescopios: el nuevo desafío de Svbony](https://www.youtube.com/watch?v=JojqSirKXDY) (2026-08-29)
 - **Modelo: summer deals**
   - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
 
