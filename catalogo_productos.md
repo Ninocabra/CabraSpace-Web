@@ -91,6 +91,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Scott Roberts**
   - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
 
+### TELESCOPES
+- **Modelo: Buzz Aldrin**
+  - [El telescopio de Buzz Aldrin incluye una pieza de la Luna](https://www.youtube.com/shorts/7t8ug8sOq5c) (2026-08-26)
+
 ## INDI Library
 
 ### SOFTWARE
@@ -112,8 +116,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: ToupTek Astro**
   - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
-- **Modelo: barn door tracker**
-  - [Consejos sobre el seguidor estelar de tipo Barn Door](https://www.reddit.com/r/telescopes/comments/1twt9cs/barn_door_star_tracker_advice_pls/) (2026-06-04)
 
 ### MOUNTS
 - **Modelo: montura armónica**
