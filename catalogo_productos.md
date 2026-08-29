@@ -54,8 +54,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Eclips Solar Total de Agosto de 2026: Guía para Observadores](https://www.celestron.com/blogs/news/pursuing-the-shadow-the-august-2026-total-solar-eclipse) (2026-07-01)
 
 ### TELESCOPES
-- **Modelo: 9.25 Edge HD**
-  - [Celestron 9.25 Edge HD como telescopio visual](https://www.reddit.com/r/telescopes/comments/1tx6ezv/celestron_925_edge_as_a_visual_telescope/) (2026-06-05)
 - **Modelo: CPC Deluxe HD**
   - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
@@ -193,6 +191,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Solución de Cámara Mosaico CMOS de QHYCCD](https://www.qhyccd.com/cmos-mosaic-camera-solution/) (2026-07-17)
 - **Modelo: QHY585**
   - [Cámara Astronómica QHY585M con Sensor Sony IMX585](https://www.qhyccd.com/qhy585-imx585/) (2026-07-16)
+
+### SOFTWARE
+- **Modelo: seguridad**
+  - [Advertencia de seguridad de QHYCCD sobre código malicioso en su sitio web](https://www.qhyccd.com/security-advisory-malicious-code-on-www-qhyccd-com-10-12-august-2026/) (2026-08-12)
 
 ## Sharpstar
 
