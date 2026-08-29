@@ -64,7 +64,14 @@
       veredicto: { recomendado: 'recomendado', posible: 'posible',
                    'poco rentable': 'poco rentable', 'no observable': 'no observable' },
       severidad: { evitar: 'evitar', aprovecha: 'aprovecha', cuidado: 'cuidado' },
-      cardinales: ['N', 'E', 'S', 'O'],
+      reproducir: 'Reproducir la noche', pausar: 'Pausar',
+      cupula: {
+        luna: 'Luna',
+        fueraModelo: 'DE DÍA — FUERA DEL MODELO',
+        fueraModeloNota: 'el ajuste de crepúsculo llega hasta −8° de altura solar',
+        cardinales: [[0, 'N'], [45, 'NE'], [90, 'E'], [135, 'SE'],
+                     [180, 'S'], [225, 'SO'], [270, 'O'], [315, 'NO']]
+      },
       transp: null
     },
     en: {
@@ -108,7 +115,14 @@
       veredicto: { recomendado: 'recommended', posible: 'possible',
                    'poco rentable': 'low yield', 'no observable': 'not observable' },
       severidad: { evitar: 'avoid', aprovecha: 'make the most of it', cuidado: 'watch out' },
-      cardinales: ['N', 'E', 'S', 'W'],
+      reproducir: 'Play the night', pausar: 'Pause',
+      cupula: {
+        luna: 'Moon',
+        fueraModelo: 'DAYTIME — OUTSIDE THE MODEL',
+        fueraModeloNota: 'the twilight fit only reaches −8° of solar altitude',
+        cardinales: [[0, 'N'], [45, 'NE'], [90, 'E'], [135, 'SE'],
+                     [180, 'S'], [225, 'SW'], [270, 'W'], [315, 'NW']]
+      },
       transp: [
         ['noche transparente', 'clear night'],
         ['transparencia media', 'medium transparency: fine for narrowband, not for deep broadband'],
@@ -169,125 +183,13 @@
   }
 
   // -------------------------------------------------------- LA CÚPULA ------
-  // Proyección polar: el cenit en el centro, el horizonte en el borde. No
-  // calcula posiciones -- las trazas y la Luna vienen ya resueltas del motor.
-  function dibujarCupula(canvas, cupula, objeto, indice, t) {
-    var ctx = canvas.getContext('2d');
-    var escala = window.devicePixelRatio || 1;
-    var lado = canvas.clientWidth || 320;
-    canvas.width = lado * escala;
-    canvas.height = lado * escala;
-    ctx.setTransform(escala, 0, 0, escala, 0, 0);
-    ctx.clearRect(0, 0, lado, lado);
-
-    var cx = lado / 2, cy = lado / 2, R = lado / 2 - 14;
-    var marco = (cupula && cupula.marcos && cupula.marcos[indice]) || null;
-
-    function punto(alt, az) {
-      var r = (90 - Math.max(0, Math.min(90, alt))) / 90 * R;
-      var a = (az - 90) * Math.PI / 180;      // N arriba, E a la derecha
-      return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
-    }
-
-    // Fondo del cielo: más claro cuanto más brillante lo dé el modelo.
-    var mag = marco && typeof marco.cielo_mag === 'number' ? marco.cielo_mag : 21.5;
-    var brillo = Math.max(0, Math.min(1, (21.8 - mag) / 5));
-    var fondo = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
-    fondo.addColorStop(0, 'rgba(30,38,58,' + (0.35 + brillo * 0.5) + ')');
-    fondo.addColorStop(1, 'rgba(10,12,20,0.95)');
-    ctx.fillStyle = fondo;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
-
-    // Anillos de altura: 30 y 60 grados.
-    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
-    ctx.lineWidth = 1;
-    [30, 60].forEach(function (alt) {
-      ctx.beginPath();
-      ctx.arc(cx, cy, (90 - alt) / 90 * R, 0, 6.2832);
-      ctx.stroke();
-    });
-    ctx.strokeStyle = 'rgba(207,171,74,0.28)';
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.stroke();
-
-    // Nubes del modelo: manchas difusas, nunca objetos nítidos. El modelo
-    // resuelve 9-25 km y dibujarlas con borde sería mentir sobre su precisión.
-    (marco && marco.nubes ? marco.nubes : []).forEach(function (n) {
-      var p = punto(n.alt, n.az);
-      var radio = Math.max(8, (n.span || 20) / 90 * R * 0.7);
-      var g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], radio);
-      var opacidad = Math.min(0.55, (n.cover || 0) / 100 * 0.6);
-      g.addColorStop(0, 'rgba(190,200,215,' + opacidad + ')');
-      g.addColorStop(1, 'rgba(190,200,215,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(p[0], p[1], radio, 0, 6.2832); ctx.fill();
-    });
-
-    // La Luna y su halo.
-    if (marco && typeof marco.luna_alt === 'number' && marco.luna_alt > -2) {
-      var pl = punto(marco.luna_alt, marco.luna_az);
-      var ilum = (cupula.luna && cupula.luna.illumination) || 0;
-      var halo = ctx.createRadialGradient(pl[0], pl[1], 0, pl[0], pl[1], R * 0.42);
-      halo.addColorStop(0, 'rgba(240,235,205,' + (0.10 + ilum * 0.22) + ')');
-      halo.addColorStop(1, 'rgba(240,235,205,0)');
-      ctx.fillStyle = halo;
-      ctx.beginPath(); ctx.arc(pl[0], pl[1], R * 0.42, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = 'rgba(245,240,215,0.92)';
-      ctx.beginPath(); ctx.arc(pl[0], pl[1], 5, 0, 6.2832); ctx.fill();
-    }
-
-    // Puntos cardinales.
-    ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.font = '600 11px Inter, system-ui, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    [[0, t.cardinales[0]], [90, t.cardinales[1]],
-     [180, t.cardinales[2]], [270, t.cardinales[3]]].forEach(function (par) {
-      var p = punto(-2.5, par[0]);
-      ctx.fillText(par[1], p[0], p[1]);
-    });
-
-    // El recorrido del objeto y donde esta AHORA. La traza viene alineada
-    // uno a uno con los marcos de la cupula, asi que el punto del instante es
-    // `alt[indice]` y no hay que buscarlo por tiempo: antes se buscaba el mas
-    // cercano dentro de una traza recortada, y el marcador se quedaba clavado
-    // media noche mientras solo se movia la Luna.
-    var alt = (objeto && objeto.alt) || [];
-    var az = (objeto && objeto.az) || [];
-    if (alt.length) {
-      ctx.strokeStyle = 'rgba(207,171,74,0.75)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      var dibujando = false;
-      for (var i = 0; i < alt.length; i++) {
-        if (alt[i] < 0) { dibujando = false; continue; }   // bajo el horizonte
-        var p = punto(alt[i], az[i]);
-        if (!dibujando) { ctx.moveTo(p[0], p[1]); dibujando = true; }
-        else { ctx.lineTo(p[0], p[1]); }
-      }
-      ctx.stroke();
-
-      // Salida y puesta, que es lo que se quiere planificar.
-      var vivos = [];
-      for (var j = 0; j < alt.length; j++) { if (alt[j] >= 0) { vivos.push(j); } }
-      ctx.fillStyle = 'rgba(207,171,74,0.35)';
-      vivos.slice(0, 1).concat(vivos.slice(-1)).forEach(function (k) {
-        var q = punto(alt[k], az[k]);
-        ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 6.2832); ctx.fill();
-      });
-
-      if (alt[indice] >= 0) {
-        var pm = punto(alt[indice], az[indice]);
-        ctx.fillStyle = '#cfab4a';
-        ctx.beginPath(); ctx.arc(pm[0], pm[1], 6.5, 0, 6.2832); ctx.fill();
-        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
-      } else {
-        // Decirlo, en vez de dejar el marcador en un sitio que es mentira.
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font = '600 11px Inter, system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(t.bajoHorizonte, cx, cy + R * 0.72);
-        ctx.textAlign = 'left';
-      }
-    }
+  // El render vive en astroweather-dome.js: es el port del mockup del motor,
+  // con su física. Aquí solo se le dan los datos y los textos.
+  function pintarCupula(destino, datos, objeto, indice, t) {
+    var cielo = destino.querySelector('#aw-sky');
+    var encima = destino.querySelector('#aw-over');
+    if (!cielo || !encima || !window.AWDome) { return; }
+    window.AWDome.pintar(cielo, encima, datos.cupula, objeto, indice, t.cupula);
   }
 
   // ------------------------------------------- PERFIL DE ALTURA -----------
@@ -468,7 +370,7 @@
     function elegir(objeto) {
       lista.hidden = true;
       entrada.value = objeto.nombre;
-      var marcos = (datos.cupula && datos.cupula.marcos) || [];
+      var marcos = (datos.cupula && datos.cupula.frames) || [];
       // Se abre en el mejor momento del objeto, que es lo que se quiere ver.
       var indice = 0;
       if (objeto.mejor_hora && marcos.length) {
@@ -481,12 +383,20 @@
       destino.innerHTML =
         '<div class="aw-chosen">' +
           '<div class="aw-dome-wrap">' +
-            '<canvas class="aw-dome" id="aw-canvas"></canvas>' +
+            // Dos lienzos apilados: el cielo se pinta píxel a píxel y es caro,
+            // y lo de encima cambia con cada cuadro. Separarlos evita repintar
+            // el cielo entero para mover un punto.
+            '<div class="aw-dome-stack">' +
+              '<canvas class="aw-dome" id="aw-sky"></canvas>' +
+              '<canvas class="aw-dome" id="aw-over"></canvas>' +
+            '</div>' +
             (marcos.length
-              ? '<div class="aw-time"><span>' + esc(t.horaCupula) + '</span>' +
+              ? '<div class="aw-time">' +
+                '<button type="button" class="aw-play" id="aw-play" ' +
+                'aria-label="' + esc(t.reproducir) + '" title="' + esc(t.reproducir) + '">▶</button>' +
                 '<input type="range" id="aw-t" min="0" max="' + (marcos.length - 1) +
                 '" value="' + indice + '">' +
-                '<span class="now" id="aw-t-lab">' + esc(marcos[indice].etiqueta) + '</span></div>'
+                '<span class="now" id="aw-t-lab">' + esc(marcos[indice].label) + '</span></div>'
               : '') +
           '</div>' +
           '<div class="aw-obj">' +
@@ -522,7 +432,6 @@
           '</span>' + perfilSvg(objeto, marcos) +
           '<div class="aw-detail" id="aw-det">' + esc(t.pulsaPerfil) + '</div></div>';
 
-      var canvas = destino.querySelector('#aw-canvas');
       var deslizador = destino.querySelector('#aw-t');
       var etiqueta = destino.querySelector('#aw-t-lab');
       var cursor = destino.querySelector('#aw-p-cursor');
@@ -536,31 +445,51 @@
         // Ocho grados NO es "bajo el horizonte": es visible e inservible, y
         // decirlo mal hace dudar de todo lo demas.
         if (a < 0) {
-          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
             esc(t.bajoHorizonte) + ' (' + num(a, 0) + '°).';
         }
         if (codigo === '-') {
-          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+          return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
             num(a, 0) + '°: ' + esc(t.bajoMinimo) + '.';
         }
-        return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.etiqueta) + '</b> ' +
+        return '<b>' + esc(t.aEsaHora) + ' ' + esc(m.label) + '</b> ' +
           esc(t.altura) + ' ' + num(a, 0) + '°, ' + esc(t.rinde) + ' ' +
           num((objeto.rend[i] || 0) * 100, 0) + ' %, ' + esc(t.limitaPor) + ' ' +
           esc((t.limita && t.limita[codigo]) || codigo) +
-          (m.cielo_mag !== undefined && m.cielo_mag !== null
-            ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.cielo_mag, 1)
+          (m.sky_mag !== undefined && m.sky_mag !== null
+            ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1)
             : '') + '.';
       }
 
       function repintar() {
         var i = deslizador ? parseInt(deslizador.value, 10) : indice;
-        if (etiqueta && marcos[i]) { etiqueta.textContent = marcos[i].etiqueta; }
+        if (etiqueta && marcos[i]) { etiqueta.textContent = marcos[i].label; }
         if (cursor) {
           var xx = 4 + i * (100 - 8) / Math.max(1, (objeto.alt || []).length - 1);
           cursor.setAttribute('x1', xx); cursor.setAttribute('x2', xx);
         }
         if (detalle) { detalle.innerHTML = contar(i); }
-        dibujarCupula(canvas, datos.cupula, objeto, i, t);
+        pintarCupula(destino, datos, objeto, i, t);
+      }
+
+      // Reproducir la noche. Es la forma natural de leer una cúpula: lo que
+      // cuenta es CÓMO se mueve todo junto, no una foto de las 22:00.
+      var reproduciendo = null;
+      var boton = destino.querySelector('#aw-play');
+      if (boton && deslizador) {
+        boton.addEventListener('click', function () {
+          if (reproduciendo) {
+            clearInterval(reproduciendo); reproduciendo = null;
+            boton.textContent = '▶'; boton.title = t.reproducir;
+            return;
+          }
+          boton.textContent = '❚❚'; boton.title = t.pausar;
+          reproduciendo = setInterval(function () {
+            var siguiente = (parseInt(deslizador.value, 10) + 1) % marcos.length;
+            deslizador.value = siguiente;
+            repintar();
+          }, 550);
+        });
       }
 
       if (deslizador) { deslizador.addEventListener('input', repintar); }
@@ -572,8 +501,29 @@
         if (deslizador) { deslizador.value = celda.getAttribute('data-i'); }
         repintar();
       });
-      window.addEventListener('resize', repintar);
-      repintar();
+      // El primer pintado no puede lanzarse "cuando toque": justo despues de
+      // escribir el HTML el navegador todavia no ha resuelto el ancho, y un
+      // lienzo de ancho cero se pinta a la nada sin quejarse. Se pinta cuando
+      // la caja TIENE tamano, y se repinta si cambia -- que cubre ademas el
+      // giro del movil y el resize de la ventana.
+      var pila = destino.querySelector('.aw-dome-stack');
+      if (window.ResizeObserver && pila) {
+        var observador = new ResizeObserver(function () {
+          if (pila.clientWidth > 0) { repintar(); }
+        });
+        observador.observe(pila);
+      } else {
+        window.addEventListener('resize', repintar);
+      }
+      // Y un repintado de respaldo pase lo que pase. Cuesta un pintado de mas y
+      // quita de encima toda una familia de problemas: navegador sin
+      // ResizeObserver, caja que ya tenia tamano antes de observarla, o una
+      // fuente que llega tarde y recoloca.
+      setTimeout(repintar, 60);
+      // Y otra vez cuando la panoramica de la Via Lactea acabe de decodificarse.
+      if (window.AWDome && !window.AWDome.listaViaLactea()) {
+        window.AWDome.pendiente.push(repintar);
+      }
     }
 
     entrada.addEventListener('input', pintarResultados);
@@ -619,6 +569,12 @@
   function arrancar() {
     var caja = document.getElementById('astroweather');
     if (!caja) { return; }
+    // La panorámica de la Vía Láctea (ESO / Serge Brunier, CC BY 4.0) tarda en
+    // decodificarse. Hasta que llega, la cúpula dibuja el perfil medido liso,
+    // que es exactamente lo que dibujaba antes de tenerla.
+    if (window.AWDome && !window.AWDome.listaViaLactea()) {
+      window.AWDome.cargarViaLactea('img/astroweather-milkyway.png');
+    }
     var lang = caja.getAttribute('data-lang') === 'en' ? 'en' : 'es';
     var t = T[lang];
     caja.innerHTML = '<div class="aw-state">' + esc(t.cargando) + '</div>';
