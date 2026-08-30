@@ -39,16 +39,60 @@
 .aw-headline {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 28px;
+  align-items: flex-start;
+  gap: 14px 28px;
   padding: 18px 0 22px;
   border-bottom: 1px solid rgba(207, 171, 74, 0.12);
+}
+
+/* Los tres bloques que responden a la unica pregunta que trae a alguien aqui:
+   ¿preparo el telescopio? Dos son PREVISION -- esta noche grande, manana
+   pequenio al lado -- y el tercero, del mismo tamanio que el primero, no es
+   prevision: es lo que el observatorio esta haciendo ahora mismo. */
+.aw-decision {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px 34px;
+}
+.aw-decision .rotulo {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 6px;
+  white-space: nowrap;
 }
 /* La palabra arriba y el porcentaje debajo en pequeño. Un 47 % no le dice a
    nadie si conviene subir al observatorio: obliga a poner el umbral en la
    cabeza de quien lee. La probabilidad no se esconde -- va justo debajo, con
    su definición a un clic -- pero deja de ser lo primero que se ve. */
-.aw-verdict { max-width: 420px; }
+.aw-verdict { max-width: 340px; }
+
+/* El estado real de los techos, a la misma escala que la prevision. Verde solo
+   cuando hay alguno abierto: cerrados de dia es lo normal, no una alarma. */
+.aw-techos { max-width: 260px; }
+.aw-techos .palabra {
+  font-family: 'Inter', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-secondary, #aaa);
+  font-variant-numeric: tabular-nums;
+}
+.aw-techos.hay .palabra { color: #6ec177; }
+.aw-techos .palabra .de {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted, #777);
+}
+.aw-techos .prob {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
+  line-height: 1.5;
+}
 .aw-verdict .palabra {
   font-family: 'Inter', sans-serif;
   font-size: 3.2rem;
@@ -189,7 +233,10 @@
 
 @media (max-width: 600px) {
   .aw-head, .aw-body { padding-left: 18px; padding-right: 18px; }
-  .aw-verdict .palabra { font-size: 2.4rem; }
+  .aw-verdict .palabra, .aw-techos .palabra { font-size: 2.4rem; }
+  .aw-techos .palabra .de { font-size: 1.2rem; }
+  .aw-decision { gap: 18px; }
+  .aw-manana { align-self: flex-start; }
   .aw-when { margin-left: 0; text-align: left; width: 100%; }
 }
 
@@ -756,28 +803,24 @@
 .aw-timeline { margin: 22px 0 0; }
 
 /* ---- Mañana, en la cabecera ---- */
+/* Manana: pequenio y al lado. Es contexto de la decision de hoy -- si hoy no
+   sale, ¿espero a manana? -- y no una segunda prevision que compita con ella,
+   asi que se lee en un vistazo lateral y no ocupa el centro. */
 .aw-manana {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-left: 14px;
-  padding-left: 14px;
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  align-self: flex-end;
+  padding-bottom: 4px;
   font-size: 0.78rem;
+  line-height: 1.4;
 }
-.aw-manana .v { display: inline-flex; flex-direction: column; line-height: 1.35; }
 .aw-manana b {
+  display: block;
   color: var(--gold-primary, #cfab4a);
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
 }
-.aw-manana b.abierto { color: #6ec177; }
-.aw-manana b.cerrado { color: #d15f5f; }
+.aw-manana.abierto b { color: #6ec177; }
+.aw-manana.cerrado b { color: #d15f5f; }
 .aw-manana .p { color: var(--text-muted, #777); font-variant-numeric: tabular-nums; }
-.aw-manana .d { color: var(--text-muted, #777); }
-@media (max-width: 620px) {
-  .aw-manana { display: flex; margin: 6px 0 0; padding: 0; border-left: none; }
-}
 
 /* ---- El "?" que abre la explicación ---- */
 .aw-info {

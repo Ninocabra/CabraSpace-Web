@@ -41,6 +41,11 @@
       probTitulo: 'Condiciones, no comportamiento',
       abierto: 'Abierto', cerrado: 'Cerrado',
       veredictoTitulo: 'De dónde sale esta palabra',
+      previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
+      estadoTechos: 'Estado actual de techos', abiertosDe: 'abiertos de',
+      sinDatoTechos: 'el sitio no lo está diciendo ahora',
+      techosTitulo: 'Esto es medida, no previsión',
+      techosNota: 'Cuántos techos hay abiertos AHORA MISMO en el observatorio, leído de su propia página. No es una previsión ni tiene nada que ver con la de al lado: es lo que está pasando. Que estén cerrados de día es lo normal, y que estén abiertos es la señal más fuerte que hay de que la noche está saliendo bien — la abren personas que están mirando el cielo.',
       horasUtiles: 'h utilizables esperadas',
       horasUtilesOscuras: 'de ellas en oscuridad astronómica',
       horasTitulo: 'Por qué son dos números',
@@ -134,6 +139,11 @@
       probTitulo: 'Conditions, not behaviour',
       abierto: 'Open', cerrado: 'Closed',
       veredictoTitulo: 'Where this word comes from',
+      previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
+      estadoTechos: 'Roofs right now', abiertosDe: 'open of',
+      sinDatoTechos: 'the site is not reporting it right now',
+      techosTitulo: 'This is measurement, not forecast',
+      techosNota: 'How many roofs are open AT THIS MOMENT at the observatory, read from its own page. It is not a forecast and has nothing to do with the one next to it: it is what is happening. Closed during the day is normal, and open is the strongest signal there is that the night is turning out well — they are opened by people who are looking at the sky.',
       horasUtiles: 'h of expected usable time',
       horasUtilesOscuras: 'of them in astronomical darkness',
       horasTitulo: 'Why there are two numbers',
@@ -287,7 +297,12 @@
       '><span class="k">' + esc(clave) + '</span>' +
       '<span class="v">' + esc(valor) +
         (unidad ? ' <span class="u">' + esc(unidad) + '</span>' : '') + '</span>' +
-      (cuando ? '<span class="cuando">' + esc(String(cuando).slice(11, 16)) + '</span>' : '') +
+      // Con su ZONA. La hora sale del JSON en UTC y el visitante la lee en la
+      // suya: "19:49" a secas se entiende como la hora de su reloj, y en
+      // verano son dos horas de diferencia -- suficiente para creer que un
+      // sensor lleva parado media tarde cuando midio hace un minuto.
+      (cuando ? '<span class="cuando">' + esc(String(cuando).slice(11, 16)) +
+                ' UTC</span>' : '') +
       '</div>';
   }
 
@@ -302,7 +317,7 @@
   }
 
   // ------------------------------------------------------------ BLOQUES ----  // ------------------------------------------------------------ BLOQUES ----
-  function bloqueResumen(noche, t, lang) {
+  function bloqueResumen(datos, noche, t, lang) {
     // Cual de las casillas es la que hoy estropea la noche. Lo decide el motor
     // -- la misma funcion que pinta los semaforos -- para que la casilla roja y
     // el semaforo rojo no puedan discrepar.
@@ -311,7 +326,7 @@
     var cielo = noche.cielo || {};
     var seeing = cielo.seeing || {};
     var transp = cielo.transparencia || {};
-    var html = '<div class="aw-headline">';
+    var html = '<div class="aw-headline"><div class="aw-decision">';
     if (typeof p === 'number') {
       // La palabra manda y el porcentaje va debajo. Un 47 % obliga a poner el
       // umbral en la cabeza de quien lee, y cada uno lo pone donde quiere.
@@ -327,12 +342,46 @@
         (vd && vd.regla ? esc(vd.regla) + ' ' : '') +
         esc(noche.probabilidad_definicion || '') + '</span></span>';
       html += '<div class="aw-verdict' + (vd ? (vd.abierto ? ' abierto' : ' cerrado') : '') + '">' +
+        '<span class="rotulo">' + esc(t.previsionTecho) + ' · ' + esc(t.estaNoche) + '</span>' +
         (vd ? '<div class="palabra">' + esc(vd.abierto ? t.abierto : t.cerrado) + '</div>'
             : '<div class="palabra num">' + Math.round(p * 100) + '%</div>') +
         '<div class="prob">' + (vd ? '<b>' + Math.round(p * 100) + '%</b> ' : '') +
           esc(t.probLabel) + explica + '</div></div>';
     }
-    html += '<div class="aw-when">' + esc(t.noche) + ' <strong>' + fecha(noche.noche, lang) + '</strong>';
+    // Mañana, pequeño y al lado: es contexto de la decisión de hoy -- si hoy no
+    // sale, ¿espero a mañana? -- y no una segunda previsión que compita con ella.
+    var manana = datos.noches && datos.noches[1];
+    if (manana && typeof manana.probabilidad_de_abrir === 'number') {
+      var vm = manana.veredicto_abrir;
+      var pm = Math.round(manana.probabilidad_de_abrir * 100);
+      html += '<div class="aw-manana' + (vm ? (vm.abierto ? ' abierto' : ' cerrado') : '') + '">' +
+        '<span class="rotulo">' + esc(t.manana) + '</span>' +
+        '<b>' + (vm ? esc(vm.abierto ? t.abierto : t.cerrado) : pm + '%') + '</b>' +
+        '<span class="p">' + (vm ? pm + '% · ' : '') + fecha(manana.noche, lang) + '</span>' +
+        '</div>';
+    }
+    /* Y AL LADO, DEL MISMO TAMAÑO, LO QUE NO ES PREVISIÓN. Las dos cosas de la
+       izquierda son un modelo diciendo qué espera; esto es el observatorio
+       diciendo qué está haciendo. Juntas responden de un vistazo la única
+       pregunta que trae aquí a nadie: ¿preparo el telescopio?
+
+       0/0 no se pinta: no es "ningún techo abierto", es "no ha llegado el
+       dato", y se leen igual. */
+    var sen = datos.sensores || {};
+    if (sen.techos_total) {
+      var abiertos = sen.techos_abiertos || 0;
+      html += '<div class="aw-techos' + (abiertos > 0 ? ' hay' : '') + '">' +
+        '<span class="rotulo">' + esc(t.estadoTechos) +
+          '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
+          esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
+        '<div class="palabra">' + abiertos + '<span class="de">/' +
+          sen.techos_total + '</span></div>' +
+        '<div class="prob">' + esc(t.abiertosDe) + ' ' + sen.techos_total +
+          (sen.medido_utc
+            ? ' · ' + esc(String(sen.medido_utc).slice(11, 16)) + ' UTC' : '') +
+        '</div></div>';
+    }
+    html += '</div><div class="aw-when">' + esc(t.noche) + ' <strong>' + fecha(noche.noche, lang) + '</strong>';
     if (num(noche.horas_utilizables_esperadas) !== null) {
       // Las dos cuentas juntas y con su diferencia dicha: la grande incluye
       // crepúsculo y por eso puede pasar de la oscuridad astronómica, y la que
@@ -467,12 +516,9 @@
     // necesita una escala que la página no da.
     html += sensor(t.indice, num(s.cielo_indice), '',
       s.cielo_despejado === true ? 'good' : '', s.medido_utc);
-    // 0/0 no es "ningún techo abierto", es "no vino el bloque". El motor
-    // publica null para los dos casos distintos y aquí simplemente no se pinta.
-    if (s.techos_total) {
-      html += sensor(t.techos, s.techos_abiertos + '/' + s.techos_total, '',
-        s.techos_abiertos > 0 ? 'good' : '', s.medido_utc);
-    }
+    // Los techos ya NO van aquí: suben a la cabecera, del tamaño de la
+    // previsión y a su lado, porque no son un sensor más -- son la respuesta
+    // medida a la misma pregunta que la previsión contesta estimando.
     if (s.estado_seguridad) {
       html += sensor(t.seguridad, s.estado_seguridad, '',
         s.estado_seguridad === 'Safe' ? 'good' : 'alert', s.medido_utc);
@@ -1416,29 +1462,13 @@
     // Mañana va en la cabecera, pequeño y a la derecha: es contexto de la
     // decisión de hoy -- si hoy no sale, ¿espero a mañana? -- y al final de la
     // página llegaba cuando ya la habías tomado.
-    var siguiente = datos.noches[1];
-    var manana = '';
-    if (siguiente && typeof siguiente.probabilidad_de_abrir === 'number') {
-      // Mismo trato que hoy: primero la palabra, y el porcentaje debajo en
-      // pequeño. Que la de mañana se lea igual que la de hoy es la mitad de su
-      // utilidad: se está comparando una con otra.
-      var vm = siguiente.veredicto_abrir;
-      var pm = Math.round(siguiente.probabilidad_de_abrir * 100);
-      manana = '<span class="aw-manana"><span class="d">' + esc(t.manana) + '</span>' +
-        '<span class="v">' +
-          '<b' + (vm ? ' class="' + (vm.abierto ? 'abierto' : 'cerrado') + '"' : '') + '>' +
-            (vm ? esc(vm.abierto ? t.abierto : t.cerrado) : pm + '%') + '</b>' +
-          '<span class="p">' + (vm ? pm + '% · ' : '') +
-            fecha(siguiente.noche, lang) + '</span>' +
-        '</span></span>';
-    }
     var html = '<div class="aw-head"><h2>' + t.titulo + '</h2>' +
-      '<span class="aw-site">' + esc(t.sitio) + manana + '</span></div>' +
+      '<span class="aw-site">' + esc(t.sitio) + '</span></div>' +
       '<div class="aw-body">';
     // El orden importa: primero como esta la noche, luego lo que dicen los
     // sensores AHORA -- que es lo que confirma o desmiente la prevision -- y
     // solo despues el plan, que se decide con las dos cosas delante.
-    html += bloqueResumen(noche, t, lang);
+    html += bloqueResumen(datos, noche, t, lang);
     html += bloqueSensores(datos, t);
     html += bloqueConsejos(noche, t);
     html += bloqueElegir(t);
