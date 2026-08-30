@@ -95,7 +95,10 @@
       porCoordenadas: 'O escribe coordenadas: «10 45 03 -59 41 04» o «161.26 -59.68»',
       coordsMal: 'No entiendo esas coordenadas.',
       sinPuntuar: 'Objeto externo: la altura es geometría y sale del mismo tiempo sidéreo que la cúpula, pero el motor NO lo ha puntuado — no hay horas de SNR ni veredicto para él.',
-      sinTraza: 'El motor SÍ lo ha puntuado, pero no está entre los que viajan con su traza hora a hora: la altura y la separación a la Luna se calculan aquí, con el mismo tiempo sidéreo que la cúpula. Por eso no hay rendimiento instantáneo ni qué lo limita en cada momento.',
+      sinTrazaTitulo: 'De dónde sale esta curva',
+      sinTraza: 'El motor lo puntúa, pero su recorrido no viaja en el fichero: solo los mejores de la noche lo llevan. La curva de altura y la separación a la Luna se calculan aquí, con el mismo tiempo sidéreo que la cúpula. Por eso el detalle de cada instante dice a qué altura está y qué cielo hay, pero no cuánto rinde ni qué lo limita.',
+      horasQueTitulo: 'Qué son estas horas',
+      horasQueSon: 'No son las horas que el objeto pasa sobre el horizonte: son las que RINDEN. Cada instante vale entre 0 y 1 según lo que le dejan el fondo de cielo, la altura y el seeing, y luego se suman — dos horas malas pueden valer menos que una buena, y lo que sale son horas equivalentes a una hora de referencia de este sitio. «Si despeja» significa dando el cielo por despejado, sin descontar la probabilidad de nubes: es el techo de la noche para este objeto. Un cero no es un fallo de la cuenta — es que ni despejando del todo cuaja, y la frase de debajo dice qué lo impide.',
       coordenadas: 'coordenadas',
       clave: 'Qué color es qué cielo',
       claveTitulo: 'Cómo se lee la bóveda',
@@ -184,7 +187,10 @@
       porCoordenadas: 'Or type coordinates: “10 45 03 -59 41 04” or “161.26 -59.68”',
       coordsMal: 'I cannot read those coordinates.',
       sinPuntuar: 'External target: the altitude is geometry, from the same sidereal time as the dome, but the engine has NOT scored it — no SNR hours and no verdict.',
-      sinTraza: 'The engine DID score it, but it is not among the ones that travel with an hour-by-hour trace: altitude and Moon separation are computed here, from the same sidereal time as the dome. That is why there is no instantaneous yield and no limiting factor per moment.',
+      sinTrazaTitulo: 'Where this curve comes from',
+      sinTraza: 'The engine does score it, but its track does not travel in the file: only the best of the night carry one. The altitude curve and the Moon separation are computed here, from the same sidereal time as the dome. That is why the per-moment detail gives altitude and sky but no yield and no limiting factor.',
+      horasQueTitulo: 'What these hours are',
+      horasQueSon: 'Not the hours the target spends above the horizon: the hours it YIELDS. Every moment is worth between 0 and 1 depending on what the sky background, the altitude and the seeing allow, and those are then added up — two poor hours can be worth less than one good one, and the result is hours equivalent to one reference hour at this site. “If it clears” means taking the sky as clear, without discounting the chance of cloud: it is the ceiling of the night for this target. A zero is not a broken sum — it means it does not come through even under a fully clear sky, and the line below says what stops it.',
       coordenadas: 'coordinates',
       clave: 'Which colour is which sky',
       claveTitulo: 'How to read the dome',
@@ -545,6 +551,33 @@
     return (v.hasta - v.desde >= 2) ? v : completa;
   }
 
+  /* EL EJE DE TIEMPO, y hasta hoy no era de tiempo: era lineal en INDICE DE
+     MARCO mientras la rejilla del motor es ADAPTATIVA -- 30 minutos en el
+     crepusculo y 10 en la noche cerrada (`night.adaptive_hours(10, 30)`). Cada
+     paso de media hora se dibujaba con el mismo ancho que uno de diez, o sea
+     que el crepusculo salia estirado al triple y la noche aplastada, y la
+     curva de altura -- que es suave, es geometria -- llegaba con un CODO en
+     cada cambio de rejilla, a las 22:07 y a las 06:57.
+
+     No era la interpolacion, era el eje: la curva estaba bien y el sitio donde
+     se pintaba cada punto, mal. Ahora la posicion sale del instante, asi que
+     una hora de reloj mide lo mismo en toda la grafica, la linea de tiempo de
+     arriba y los perfiles de abajo siguen midiendo lo mismo (que es lo que
+     mantiene los dos cursores en la misma vertical) y los codos desaparecen
+     solos. */
+  function escalaTiempo(marcos, v) {
+    var ms = marcos.map(function (m) { return new Date(m.t).getTime(); });
+    var t0 = ms[v.desde], t1 = ms[v.hasta];
+    var ancho = t1 - t0;
+    if (!isFinite(ancho) || ancho <= 0) {
+      // Sin instantes utilizables se cae al indice, que es lo que habia: peor
+      // reparto, pero nunca una division por cero ni una curva sin dibujar.
+      var n = Math.max(1, v.hasta - v.desde);
+      return function (j) { return Math.max(0, Math.min(1, (j - v.desde) / n)); };
+    }
+    return function (j) { return Math.max(0, Math.min(1, (ms[j] - t0) / ancho)); };
+  }
+
   // Sitio para respirar arriba y abajo de la curva, en unidades del viewBox.
   // Estan aqui fuera porque el eje de alturas, que se dibuja en HTML, tiene que
   // usar exactamente los mismos numeros o las etiquetas no caen en sus rayas.
@@ -594,7 +627,8 @@
   function bloqueTiempo(marcos, indice, t, v) {
     var n = v.hasta - v.desde;
     if (n < 1) { return ''; }
-    var pos = function (i) { return (i - v.desde) / n * 100; };
+    var frac = escalaTiempo(marcos, v);
+    var pos = function (i) { return frac(i) * 100; };
     var partes = [];
     // Tres regímenes, no dos: día, crepúsculo y noche cerrada. Antes solo se
     // pintaba la noche y los dos extremos quedaban en negro, que es justo el
@@ -618,8 +652,18 @@
         actual = r; desde = k - 1;
       }
     }
+    // Marcas cada hora de reloj, no cada cuatro muestras: con el eje en tiempo
+    // real "cada cuatro" reparte las etiquetas a distancias distintas segun la
+    // rejilla, y una escala que no es regular se lee como si el tiempo tampoco
+    // lo fuera. La etiqueta sigue siendo la del motor -- hora del sitio -- y
+    // no una que calcule aqui con la zona horaria del visitante.
+    var HORA = 3600000;
+    var cuando = marcos.map(function (m) { return new Date(m.t).getTime(); });
+    var salto = (cuando[v.hasta] - cuando[v.desde]) > 10 * HORA ? 2 * HORA : HORA;
+    var ultima = -Infinity;
     for (var i = v.desde; i <= v.hasta; i++) {
-      if ((i - v.desde) % 4) { continue; }
+      if (cuando[i] - ultima < salto) { continue; }
+      ultima = cuando[i];
       partes.push('<div class="tick" style="left:' + pos(i) + '%"></div>');
       partes.push('<span class="lbl" style="left:' + pos(i) + '%">' +
         esc(marcos[i].label) + '</span>');
@@ -641,6 +685,39 @@
         partes.join('') + '</div></div>';
   }
 
+  /* Etiquetas que no se pisan. Cuántas horas caben depende del ancho REAL, y
+     eso no se sabe cuando se arma el HTML: en el móvil las diez horas de la
+     noche salían una encima de otra, «07 22:07 23:07 00:07». Se pintan todas y
+     después se apaga la que solape con la anterior, MEDIDO. Las marcas se
+     quedan: son de un píxel y no estorban, y sin ellas la escala pierde el
+     detalle que la etiqueta ya no da. */
+  function aclararEtiquetas(pista) {
+    if (!pista) { return; }
+    var limites = pista.getBoundingClientRect();
+    var primera = pista.querySelector('.lbl');
+    // Si la pista no da ni para una etiqueta es que todavía no está pintada, o
+    // está dentro de algo oculto: TODAS caen en el mismo punto y esta función
+    // las apagaría todas menos una, para siempre, porque nadie la vuelve a
+    // llamar. Medir ahí no es medir. El observador de tamaño la repite en
+    // cuanto hay ancho de verdad.
+    if (!primera || limites.width < primera.getBoundingClientRect().width) { return; }
+    var derecha = -Infinity;
+    [].slice.call(pista.querySelectorAll('.lbl')).forEach(function (el) {
+      el.style.display = '';
+      // Centrada sobre su marca, salvo en los extremos: la primera va pegada
+      // al borde de la pista, así que centrada se sale por la izquierda y se
+      // leía «07» donde ponía 21:07.
+      el.style.transform = 'translateX(-50%)';
+      var caja = el.getBoundingClientRect();
+      if (!caja.width) { return; }
+      if (caja.left < limites.left) { el.style.transform = 'translateX(0)'; }
+      else if (caja.right > limites.right) { el.style.transform = 'translateX(-100%)'; }
+      caja = el.getBoundingClientRect();
+      if (caja.left < derecha + 7) { el.style.display = 'none'; }
+      else { derecha = caja.right; }
+    });
+  }
+
   // ------------------------------------------------- PERFIL POR OBJETO ----
   // Los tonos de "qué lo limita". Bajados de saturación respecto a los de
   // antes: aquí son un fondo, no un aviso, y el aviso ya lo da el veredicto de
@@ -653,13 +730,23 @@
   // primero.
   var perfilSeq = 0;
 
-  function perfilSvg(objeto, color, t, v, minAlt) {
+  function perfilSvg(objeto, color, t, v, minAlt, marcos) {
     var alt = objeto.alt || [];
     var desde = v.desde, hasta = Math.min(v.hasta, alt.length - 1);
     if (hasta - desde < 1) { return ''; }
     var W = 100, H = 100, base = perfilY(0);
-    var tramo = hasta - desde;
-    var x = function (i) { return (i - desde) * W / tramo; };
+    // La escala es la de la VENTANA ENTERA, la misma que la línea de tiempo, y
+    // no la del tramo que este objeto tenga serie: los dos cursores tienen que
+    // caer en la misma vertical. Si la serie se queda corta, la curva termina
+    // antes, que es lo honesto; lo que no puede es reescalarse para llenar.
+    var frac = escalaTiempo(marcos, v);
+    var x = function (i) { return frac(i) * W; };
+    // El trozo de eje que representa cada muestra va de la mitad del hueco
+    // anterior a la mitad del siguiente. Con la rejilla adaptativa NO son
+    // todos iguales: una muestra de crepúsculo vale media hora y una de noche
+    // cerrada diez minutos.
+    var izq = function (j) { return j <= desde ? x(desde) : (x(j - 1) + x(j)) / 2; };
+    var der = function (j) { return j >= hasta ? x(hasta) : (x(j) + x(j + 1)) / 2; };
     var id = 'awp' + (++perfilSeq);
 
     var puntos = [];
@@ -668,18 +755,18 @@
     // El área bajo la curva, cerrada por el horizonte. Sirve de recorte: los
     // colores de "qué lo limita" van DENTRO, así que el borde de arriba es la
     // curva y no la escalera de barras que había.
-    var area = curva + ' L' + W.toFixed(2) + ' ' + base.toFixed(2) +
-               ' L0 ' + base.toFixed(2) + ' Z';
+    var area = curva + ' L' + x(hasta).toFixed(2) + ' ' + base.toFixed(2) +
+               ' L' + x(desde).toFixed(2) + ' ' + base.toFixed(2) + ' Z';
 
-    var ancho = W / tramo;
     var franjas = '';
     for (var j = desde; j <= hasta; j++) {
       var codigo = (objeto.limita || '').charAt(j) || '-';
       // Se solapan un pelin. Pegadas justas, el borde compartido cae en un pixel
       // fraccionario y el antialias deja una raya mas clara en cada junta: el
       // relleno salia con una empalizada de lineas verticales de arriba abajo.
-      franjas += '<rect x="' + (x(j) - ancho / 2 - 0.04).toFixed(2) + '" y="0" width="' +
-        (ancho + 0.08).toFixed(2) + '" height="' + H + '" fill="' +
+      var a = izq(j) - 0.04, b = der(j) + 0.04;
+      franjas += '<rect x="' + a.toFixed(2) + '" y="0" width="' +
+        (b - a).toFixed(2) + '" height="' + H + '" fill="' +
         TINTE_LIMITA[codigo] + '"/>';
     }
 
@@ -700,8 +787,8 @@
 
     var hits = '';
     for (var k = desde; k <= hasta; k++) {
-      hits += '<rect class="hit" data-i="' + k + '" x="' + (x(k) - ancho / 2).toFixed(2) +
-        '" y="0" width="' + ancho.toFixed(2) + '" height="' + H + '"/>';
+      hits += '<rect class="hit" data-i="' + k + '" x="' + izq(k).toFixed(2) +
+        '" y="0" width="' + (der(k) - izq(k)).toFixed(2) + '" height="' + H + '"/>';
     }
 
     return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img">' +
@@ -754,7 +841,7 @@
       return '';
     }
     return '<div class="aw-hitos"><span class="hito max" style="left:' +
-      ((i - v.desde) / Math.max(1, v.hasta - v.desde) * 100).toFixed(2) + '%">' +
+      (escalaTiempo(marcos, v)(i) * 100).toFixed(2) + '%">' +
       num(objeto.alt[i], 0) + '° · ' + esc(marcos[i].label) + '</span></div>';
   }
 
@@ -796,14 +883,26 @@
     return '<div class="aw-lane" data-obj="' + esc(objeto.nombre) + '">' +
       '<div class="head">' +
         '<i class="dot" style="background:' + color + '"></i>' +
-        '<span class="n">' + esc(objeto.nombre) + '</span>' +
+        '<span class="n">' + esc(objeto.nombre) +
+          // La procedencia de la curva, al lado del nombre y plegada: era un
+          // párrafo de tres líneas explicando un detalle de fontanería nuestro
+          // que al que mira el gráfico no le cambia nada de lo que va a hacer.
+          (objeto.sinTraza
+            ? '<span class="aw-info izq abajo" tabindex="0">?<span class="aw-pop"><b>' +
+              esc(t.sinTrazaTitulo) + '</b>' + esc(t.sinTraza) + '</span></span>'
+            : '') + '</span>' +
         // Las coordenadas, para TODOS y no solo para los de fuera: es lo
         // primero que hace falta para apuntar, y tenerlas solo en los que el
         // motor no conoce era justo al reves de lo util.
         coordenadasHtml(objeto, t) +
+        // Y qué son esas horas, a un clic. «0,0 h si despeja» sin explicar no
+        // dice nada: no son horas de reloj, son horas EQUIVALENTES de una hora
+        // de referencia, y el cero es una respuesta y no una casilla vacía.
         (objeto.externo ? ''
           : '<span class="q">' + num(objeto.horas_si_despeja) + ' ' + t.horas + ' ' +
-              esc(t.siDespejaCorto) + '</span>' +
+              esc(t.siDespejaCorto) +
+              '<span class="aw-info izq abajo" tabindex="0">?<span class="aw-pop"><b>' +
+              esc(t.horasQueTitulo) + '</b>' + esc(t.horasQueSon) + '</span></span></span>' +
             '<span class="aw-tag ' + clase(objeto.veredicto) + '">' +
               esc(t.veredicto[objeto.veredicto] || objeto.veredicto) + '</span>') +
         // La separación mínima a la Luna en toda la noche: es la que decide si
@@ -818,13 +917,12 @@
           esc(t.quitar) + '">×</button>' +
       '</div>' +
       hitosHtml(objeto, marcos, t, v) +
-      '<div class="aw-profile">' + perfilSvg(objeto, color, t, v, minAlt) +
+      '<div class="aw-profile">' + perfilSvg(objeto, color, t, v, minAlt, marcos) +
         ejeHtml() + '</div>' +
       (objeto.externo ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
       // El porqué del veredicto, que es lo que se ha venido a leer cuando el
       // veredicto es malo: «el cielo no baja de 20.0 mag/arcsec2 esta noche».
       (objeto.porque ? '<p class="aw-porque">' + esc(objeto.porque) + '</p>' : '') +
-      (objeto.sinTraza ? '<p class="aw-externo">' + esc(t.sinTraza) + '</p>' : '') +
       '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
     '</div>';
   }
@@ -1074,6 +1172,7 @@
     }
 
     var ventana = ventanaNoche(marcos);
+    var fraccion = escalaTiempo(marcos, ventana);
     indice = Math.max(ventana.desde, Math.min(ventana.hasta, indice));
 
     // Solo mueve el cursor y repinta: no reconstruye el HTML, que es lo que
@@ -1087,8 +1186,7 @@
       var cursor = destino.querySelector('#aw-cur');
       var pista = destino.querySelector('#aw-track');
       if (etiqueta && marcos[indice]) { etiqueta.textContent = marcos[indice].label; }
-      var pct = (indice - ventana.desde) /
-        Math.max(1, ventana.hasta - ventana.desde) * 100;
+      var pct = fraccion(indice) * 100;
       if (cursor) { cursor.style.left = pct + '%'; }
       if (pista) { pista.setAttribute('aria-valuenow', indice); }
       destino.querySelectorAll('.aw-profile .cursor').forEach(function (linea) {
@@ -1132,10 +1230,16 @@
       var pila = destino.querySelector('.aw-dome-stack');
       if (window.ResizeObserver && pila) {
         new ResizeObserver(function () {
-          if (pila.clientWidth > 0) { irA(indice); }
+          if (pila.clientWidth > 0) {
+            irA(indice);
+            aclararEtiquetas(destino.querySelector('#aw-track'));
+          }
         }).observe(pila);
       }
-      setTimeout(function () { irA(indice); }, 60);
+      setTimeout(function () {
+        irA(indice);
+        aclararEtiquetas(destino.querySelector('#aw-track'));
+      }, 60);
       if (window.AWDome && !window.AWDome.listaViaLactea()) {
         window.AWDome.pendiente.push(function () { irA(indice); });
       }
@@ -1268,9 +1372,18 @@
       }
       var pista = e.target.closest('#aw-track');
       if (pista) {
+        // De donde se ha pinchado al marco MAS CERCANO en la misma escala en
+        // que esta pintado. Con la regla vieja -- repartir por indice -- un
+        // clic en mitad de la noche caia en otra hora distinta de la que
+        // marcaba el dedo, y cuanto mas adaptativa la rejilla, mas lejos.
         var caja2 = pista.getBoundingClientRect();
-        irA(ventana.desde + Math.round((e.clientX - caja2.left) / caja2.width *
-                                       (ventana.hasta - ventana.desde)));
+        var objetivo = (e.clientX - caja2.left) / caja2.width;
+        var cerca = ventana.desde, dist = Infinity;
+        for (var q2 = ventana.desde; q2 <= ventana.hasta; q2++) {
+          var d2 = Math.abs(fraccion(q2) - objetivo);
+          if (d2 < dist) { dist = d2; cerca = q2; }
+        }
+        irA(cerca);
       }
     });
     destino.addEventListener('keydown', function (e) {
