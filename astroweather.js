@@ -40,6 +40,7 @@
       horasExplica: 'La primera cuenta toda la ventana del producto, del ocaso menos una hora al orto más una, así que incluye el crepúsculo: por eso puede pasar de las horas de oscuridad astronómica. En crepúsculo se hace planetaria y objetos brillantes, no cielo profundo. La segunda es la parte que cae dentro de la oscuridad de verdad, y es la que cuenta para campo profundo.',
       noche: 'Noche del', luna: 'Luna', oscuridad: 'Oscuridad astronómica',
       cielo: 'Cielo más oscuro', seeing: 'Seeing', transparencia: 'Transparencia',
+      tipico: 'típico',
       iluminada: 'iluminada', sinCalibrar: 'estimación sin calibrar',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'Qué hacer esta noche',
@@ -132,6 +133,7 @@
       horasExplica: 'The first counts the whole product window, from one hour before sunset to one hour after sunrise, so it includes twilight: that is why it can exceed the hours of astronomical darkness. Twilight is for planetary and bright targets, not deep sky. The second is the part that falls inside real darkness, and that is the one that counts for deep sky.',
       noche: 'Night of', luna: 'Moon', oscuridad: 'Astronomical darkness',
       cielo: 'Darkest sky', seeing: 'Seeing', transparencia: 'Transparency',
+      tipico: 'typical',
       iluminada: 'illuminated', sinCalibrar: 'uncalibrated estimate',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'What to do tonight',
@@ -353,8 +355,15 @@
       // Se ensena el CORREGIDO contra el fotometro, con el crudo detras: el
       // fotometro es medida y el modelo es estimacion, asi que manda el primero.
       var corregido = num(cielo.mag_cenit_corregido, 2);
-      var cal = cielo.calibracion_fotometro || {};
-      var nota = t.magArc + (corregido !== null ? ' · ' + t.calibrado : '');
+      // Y al lado, lo TIPICO. Un solo número no describe una noche con Luna:
+      // el mejor instante y el habitual se llevan tres magnitudes, que es un
+      // factor 16 de fondo, y enseñando solo el mejor se lee como si el cielo
+      // estuviera así toda la noche.
+      var tipico = num(cielo.mag_cenit_tipico_corregido, 1);
+      if (tipico === null) { tipico = num(cielo.mag_cenit_tipico, 1); }
+      var nota = t.magArc +
+        (tipico !== null ? ' · ' + t.tipico + ' ' + tipico : '') +
+        (corregido !== null ? ' · ' + t.calibrado : '');
       html += celda(t.cielo, corregido !== null ? corregido
                                                 : num(cielo.mag_cenit_mas_oscuro, 2),
         nota, limita === 'cielo');
