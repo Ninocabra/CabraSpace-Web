@@ -32,6 +32,8 @@
       sitio: 'AstroCamp · Nerpio (Albacete) · 1.650 m · MPC I79',
       probLabel: 'de probabilidad de que haya condiciones para abrir',
       probTitulo: 'Condiciones, no comportamiento',
+      abierto: 'Abierto', cerrado: 'Cerrado',
+      veredictoTitulo: 'De dónde sale esta palabra',
       horasUtiles: 'h utilizables esperadas',
       horasUtilesOscuras: 'de ellas en oscuridad astronómica',
       horasTitulo: 'Por qué son dos números',
@@ -78,6 +80,7 @@
       siDespeja: 'h si despeja', esperadas: 'h esperadas',
       manana: 'Mañana', pie: PIE_ES, generado: 'Generado',
       notaViento: 'La puerta de viento no está calibrada y el modelo se queda corto: trata el veredicto de abrir como optimista en viento.',
+      notaVientoTitulo: 'La puerta de viento',
       tercil: { favorable: 'favorable', normal: 'normal', desfavorable: 'desfavorable' },
       veredicto: { recomendado: 'recomendado', posible: 'posible',
                    'poco rentable': 'poco rentable', 'no observable': 'no observable' },
@@ -92,8 +95,10 @@
       porCoordenadas: 'O escribe coordenadas: «10 45 03 -59 41 04» o «161.26 -59.68»',
       coordsMal: 'No entiendo esas coordenadas.',
       sinPuntuar: 'Objeto externo: la altura es geometría y sale del mismo tiempo sidéreo que la cúpula, pero el motor NO lo ha puntuado — no hay horas de SNR ni veredicto para él.',
+      sinTraza: 'El motor SÍ lo ha puntuado, pero no está entre los que viajan con su traza hora a hora: la altura y la separación a la Luna se calculan aquí, con el mismo tiempo sidéreo que la cúpula. Por eso no hay rendimiento instantáneo ni qué lo limita en cada momento.',
       coordenadas: 'coordenadas',
       clave: 'Qué color es qué cielo',
+      claveTitulo: 'Cómo se lee la bóveda',
       claveNota: 'El negro es el cielo más oscuro que da este sitio; encima solo se pinta lo que estorba, y su color dice qué es: azul la Luna, gris las nubes, rojo la calima, amarillo el día. En las nubes, cuanto más claras más tapan. El número es la magnitud por segundo de arco al cuadrado, y en la nube espesa engaña a propósito: sin ciudad debajo la nube OSCURECE el cielo — se traga el airglow en vez de reflejar farolas, medido aquí sobre 4.690 horas — así que sale oscurísimo y a la vez inservible.',
       muestras: {
         oscura: 'Lo más oscuro que da', lunaCerca: 'Luna llena, a 10°',
@@ -116,6 +121,8 @@
       sitio: 'AstroCamp · Nerpio (Albacete, Spain) · 1,650 m · MPC I79',
       probLabel: 'chance there will be CONDITIONS to open',
       probTitulo: 'Conditions, not behaviour',
+      abierto: 'Open', cerrado: 'Closed',
+      veredictoTitulo: 'Where this word comes from',
       horasUtiles: 'h of expected usable time',
       horasUtilesOscuras: 'of them in astronomical darkness',
       horasTitulo: 'Why there are two numbers',
@@ -162,6 +169,7 @@
       siDespeja: 'h if it clears', esperadas: 'h expected',
       manana: 'Tomorrow', pie: PIE_EN, generado: 'Generated',
       notaViento: 'The wind gate is uncalibrated and the model runs low: treat the open/close verdict as optimistic on wind.',
+      notaVientoTitulo: 'The wind gate',
       tercil: { favorable: 'favourable', normal: 'typical', desfavorable: 'poor' },
       veredicto: { recomendado: 'recommended', posible: 'possible',
                    'poco rentable': 'low yield', 'no observable': 'not observable' },
@@ -176,8 +184,10 @@
       porCoordenadas: 'Or type coordinates: “10 45 03 -59 41 04” or “161.26 -59.68”',
       coordsMal: 'I cannot read those coordinates.',
       sinPuntuar: 'External target: the altitude is geometry, from the same sidereal time as the dome, but the engine has NOT scored it — no SNR hours and no verdict.',
+      sinTraza: 'The engine DID score it, but it is not among the ones that travel with an hour-by-hour trace: altitude and Moon separation are computed here, from the same sidereal time as the dome. That is why there is no instantaneous yield and no limiting factor per moment.',
       coordenadas: 'coordinates',
       clave: 'Which colour is which sky',
+      claveTitulo: 'How to read the dome',
       claveNota: 'Black is the darkest sky this site gives; on top of it only what gets in the way is painted, and its colour says which: blue the Moon, grey the cloud, red the dust haze, yellow the daylight. For cloud, the paler the more it blocks. The number is the magnitude per square arcsecond, and on thick cloud it misleads on purpose: with no city below, cloud DARKENS the sky — it swallows the airglow instead of reflecting streetlights, measured here over 4,690 hours — so it reads very dark and is useless all the same.',
       muestras: {
         oscura: 'The darkest it gets', lunaCerca: 'Full Moon, 10° away',
@@ -202,6 +212,14 @@
 
   var ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ESCAPES[c]; }); }
+
+  /* «M 31», «M31», «m  31» y «Messier 31» son el mismo objeto para quien
+     escribe, y «ngc7000» tambien. Sin normalizar habia que acertar con la
+     forma exacta del alias publicado, que es pedirle al visitante que adivine
+     como lo escribimos nosotros. */
+  function normaliza(texto) {
+    return String(texto).toLowerCase().replace(/\s+/g, '').replace(/^messier/, 'm');
+  }
 
   function num(v, d) {
     return (typeof v === 'number' && isFinite(v)) ? v.toFixed(d === undefined ? 1 : d) : null;
@@ -280,13 +298,24 @@
     var transp = cielo.transparencia || {};
     var html = '<div class="aw-headline">';
     if (typeof p === 'number') {
-      html += '<div class="aw-prob">' + Math.round(p * 100) + '%</div>' +
-        '<div class="aw-prob-label">' + esc(t.probLabel) +
-        (noche.probabilidad_definicion
-          ? '<span class="aw-info" tabindex="0">?<span class="aw-pop">' +
-            '<b>' + esc(t.probTitulo) + '</b>' +
-            esc(noche.probabilidad_definicion) + '</span></span>'
-          : '') + '</div>';
+      // La palabra manda y el porcentaje va debajo. Un 47 % obliga a poner el
+      // umbral en la cabeza de quien lee, y cada uno lo pone donde quiere.
+      //
+      // El corte lo decide el MOTOR y viaja en el JSON: si la palabra se
+      // decidiera aquí, el día que el motor cambiara de umbral la página
+      // seguiría diciendo lo contrario con el mismo número al lado. Sin
+      // `veredicto_abrir` no se inventa ninguna: se enseña la cifra sola, que
+      // es lo que había antes.
+      var vd = noche.veredicto_abrir;
+      var explica = '<span class="aw-info izq abajo" tabindex="0">?<span class="aw-pop">' +
+        '<b>' + esc(vd ? t.veredictoTitulo : t.probTitulo) + '</b>' +
+        (vd && vd.regla ? esc(vd.regla) + ' ' : '') +
+        esc(noche.probabilidad_definicion || '') + '</span></span>';
+      html += '<div class="aw-verdict' + (vd ? (vd.abierto ? ' abierto' : ' cerrado') : '') + '">' +
+        (vd ? '<div class="palabra">' + esc(vd.abierto ? t.abierto : t.cerrado) + '</div>'
+            : '<div class="palabra num">' + Math.round(p * 100) + '%</div>') +
+        '<div class="prob">' + (vd ? '<b>' + Math.round(p * 100) + '%</b> ' : '') +
+          esc(t.probLabel) + explica + '</div></div>';
     }
     html += '<div class="aw-when">' + esc(t.noche) + ' <strong>' + fecha(noche.noche, lang) + '</strong>';
     if (num(noche.horas_utilizables_esperadas) !== null) {
@@ -296,7 +325,7 @@
       var oscuras = num(noche.horas_utilizables_oscuras);
       html += '<br>' + num(noche.horas_utilizables_esperadas) + ' ' + esc(t.horasUtiles) +
         (oscuras !== null ? ', ' + oscuras + ' ' + esc(t.horasUtilesOscuras) : '') +
-        '<span class="aw-info" tabindex="0">?<span class="aw-pop">' +
+        '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop">' +
         '<b>' + esc(t.horasTitulo) + '</b>' + esc(t.horasExplica) + '</span></span>';
     }
     html += '</div></div><div class="aw-grid">';
@@ -389,7 +418,13 @@
 
   function bloqueSensores(datos, t) {
     var s = datos.sensores;
-    var html = '<div class="aw-sensors"><h3>' + esc(t.sensores) + '</h3>';
+    // La advertencia de la puerta de viento vive en el "?" del titulo. Estaba
+    // como un parrafo al pie del bloque, y un aviso permanente que no cambia
+    // nunca deja de leerse a los dos dias: ocupa el sitio de lo que si cambia.
+    // Sigue estando y sigue siendo de seguridad, pero a un clic.
+    var html = '<div class="aw-sensors"><h3>' + esc(t.sensores) +
+      '<span class="aw-info izq" tabindex="0">?<span class="aw-pop"><b>' +
+      esc(t.notaVientoTitulo) + '</b>' + esc(t.notaViento) + '</span></span></h3>';
     if (!s) { return html + '<div class="aw-stale">' + esc(t.sinSensores) + '</div></div>'; }
 
     html += '<div class="aw-sensor-grid">';
@@ -439,10 +474,6 @@
     if (s.incompleto) {
       html += '<div class="aw-stale incompleta">' + esc(s.incompleto) + '.</div>';
     }
-    // La puerta de viento se ha medido optimista y eso alimenta una decisión
-    // de seguridad: baja aquí, junto al viento, en vez de desaparecer.
-    html += '<div class="aw-warnings" style="margin-top:12px"><li style="list-style:none;margin-left:0">' +
-      esc(t.notaViento) + '</li></div>';
     return html + '</div>';
   }
 
@@ -470,14 +501,15 @@
     var filas;
     try { filas = window.AWDome.muestras(cupula); } catch (e) { return ''; }
     return '<div class="aw-key"><span class="lbl">' + esc(t.clave) +
-      ' · ' + window.AWDome.muestraAltitud + '°</span>' +
+      ' · ' + window.AWDome.muestraAltitud + '°' +
+      '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
+      esc(t.claveTitulo) + '</b>' + esc(t.claveNota) + '</span></span></span>' +
       filas.map(function (f) {
         return '<div class="sw">' +
           '<i style="background:rgb(' + f.rgb.join(',') + ')"></i>' +
           '<span>' + esc(t.muestras[f.clave] || f.clave) + '</span>' +
           '<b>' + f.mag.toFixed(1) + '</b></div>';
-      }).join('') +
-      '<p class="nota">' + esc(t.claveNota) + '</p></div>';
+      }).join('') + '</div>';
   }
 
   /* LA VENTANA QUE SE PINTA, y la pintan los dos: la línea de tiempo y los
@@ -788,8 +820,11 @@
       hitosHtml(objeto, marcos, t, v) +
       '<div class="aw-profile">' + perfilSvg(objeto, color, t, v, minAlt) +
         ejeHtml() + '</div>' +
-      (objeto.externo
-        ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
+      (objeto.externo ? '<p class="aw-externo">' + esc(t.sinPuntuar) + '</p>' : '') +
+      // El porqué del veredicto, que es lo que se ha venido a leer cuando el
+      // veredicto es malo: «el cielo no baja de 20.0 mag/arcsec2 esta noche».
+      (objeto.porque ? '<p class="aw-porque">' + esc(objeto.porque) + '</p>' : '') +
+      (objeto.sinTraza ? '<p class="aw-externo">' + esc(t.sinTraza) + '</p>' : '') +
       '<div class="aw-detail" data-detalle="' + esc(objeto.nombre) + '"></div>' +
     '</div>';
   }
@@ -880,10 +915,41 @@
              i_max: iMax, i_min: iMin, i_meridiano: iMer };
   }
 
+  /* Un objeto que el motor SI ha puntuado pero que no viaja con su traza hora
+     a hora: los ~940 que quedan por debajo de los 40 mejores. La geometria se
+     calcula aqui igual que la de un objeto de fuera -- mismo tiempo sidereo,
+     misma cupula -- y encima se le pegan los numeros del motor, que existen.
+
+     La diferencia con `objetoExterno` no es cosmetica: aquel dice "no hay
+     veredicto" y este lo tiene. Meterlos a todos por el mismo sitio era
+     publicar como desconocido algo que el motor habia calculado y que estaba
+     en el mismo fichero. */
+  function objetoPuntuado(ficha, cupula) {
+    var o = objetoExterno(ficha.nombre, ficha.ra, ficha.dec, cupula);
+    o.externo = false;
+    o.sinTraza = true;
+    o.tipo = ficha.tipo || o.tipo;
+    o.clase = ficha.clase || o.clase;
+    o.alias = ficha.alias || [];
+    o.horas_si_despeja = ficha.horas_si_despeja;
+    o.horas_esperadas = ficha.horas_esperadas;
+    o.veredicto = ficha.veredicto || null;
+    o.porque = ficha.porque || '';
+    return o;
+  }
+
   // ------------------------------------------------------------ MONTAJE ---
   function montarBuscador(caja, datos, t, lang) {
     var noche = datos.noches[0];
     var catalogo = noche.objetos || [];
+    /* EL UNIVERSO QUE SE PUEDE BUSCAR, y hasta hoy no era el catálogo: era la
+       lista de recomendaciones. El motor puntúa ~1.000 objetos cada noche y
+       publicaba solo los que sacaban horas, así que un objeto se caía del
+       buscador EXACTAMENTE cuando la respuesta era interesante — M31 con Luna
+       llena no aparecía, se iba a SIMBAD, y volvía pintado como «el motor NO lo
+       ha puntuado». Lo había puntuado: cero, y con el motivo escrito.
+       Ahora el JSON trae los ~1.000 con su veredicto y su porqué. */
+    var universo = noche.catalogo || noche.ranking || [];
     var marcos = (datos.cupula && datos.cupula.frames) || [];
     var entrada = caja.querySelector('#aw-q');
     var lista = caja.querySelector('#aw-res');
@@ -899,25 +965,45 @@
     function pintarResultados() {
       var q = entrada.value.trim().toLowerCase();
       if (!q) { lista.hidden = true; return; }
+      var qs = normaliza(q);
       var puestos = elegidos.map(function (o) { return o.nombre; });
+      function nombresDe(o) { return [o.nombre].concat(o.alias || []); }
       function coincide(o) {
         if (puestos.indexOf(o.nombre) !== -1) { return false; }
-        if (o.nombre.toLowerCase().indexOf(q) !== -1) { return true; }
-        return (o.alias || []).some(function (a) {
-          return a.toLowerCase().indexOf(q) !== -1;
+        return nombresDe(o).some(function (a) {
+          return String(a).toLowerCase().indexOf(q) !== -1 ||
+                 normaliza(a).indexOf(qs) !== -1;
         });
       }
-      // Primero los que llevan traza; detras, el resto del ranking de la noche.
+      // Primero los que llevan traza; detras, el resto de lo evaluado.
       var hits = catalogo.filter(coincide);
       var vistos = hits.map(function (o) { return o.nombre; });
-      (noche.ranking || []).forEach(function (r) {
+      universo.forEach(function (r) {
         if (vistos.indexOf(r.nombre) === -1 && coincide(r)) { hits.push(r); }
       });
-      hits = hits.slice(0, 12);
+      // Con mil objetos detras, quien teclea el nombre EXACTO tiene que verlo
+      // el primero: si no, «M31» sale por debajo de cualquier cosa mejor
+      // puntuada que lleve «m31» dentro. Empate resuelto por el orden de
+      // llegada, que ya viene ordenado por lo que rinde esta noche.
+      function precision(o) {
+        var nombres = nombresDe(o).map(normaliza);
+        if (nombres.indexOf(qs) !== -1) { return 0; }
+        if (nombres.some(function (x) { return x.indexOf(qs) === 0; })) { return 1; }
+        return 2;
+      }
+      hits = hits.map(function (o, i) { return [precision(o), i, o]; })
+        .sort(function (a, b) { return (a[0] - b[0]) || (a[1] - b[1]); })
+        .map(function (par) { return par[2]; })
+        .slice(0, 12);
       var html = hits.map(function (o) {
+        // Las horas y el veredicto juntos: «0,0 h» a secas se lee como un fallo
+        // del buscador, y es una respuesta.
         return '<button type="button" data-n="' + esc(o.nombre) + '">' +
           '<span class="n">' + esc(o.nombre) + '</span>' +
-          '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas + '</span></button>';
+          '<span class="h">' + num(o.horas_si_despeja) + ' ' + t.horas +
+          (o.veredicto ? ' <i class="' + clase(o.veredicto) + '">' +
+            esc(t.veredicto[o.veredicto] || o.veredicto) + '</i>' : '') +
+          '</span></button>';
       }).join('');
       if (!hits.length) { html += '<div class="none">' + esc(t.sinResultados) + '</div>'; }
       // Siempre, no solo cuando no hay resultados: el catálogo son 44 objetos
@@ -972,12 +1058,19 @@
         return '<b>' + esc(m.label) + '</b> ' + num(a, 0) + '°: ' +
           esc(t.bajoMinimo) + '.';
       }
+      var cielo = (m.sky_mag !== undefined && m.sky_mag !== null)
+        ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1) : '';
+      // Sin traza no hay rendimiento por instante NI que lo limita, y decir
+      // "rinde 0 %, limita sin puntuar" era rellenar el hueco con un cero
+      // inventado: el motor no ha calculado ese numero para este objeto.
+      if (codigo === 'x') {
+        return '<b>' + esc(m.label) + '</b> ' + esc(t.altura) + ' ' + num(a, 0) + '°' +
+          cielo + sepTexto(objeto, m, i, t) + '.';
+      }
       return '<b>' + esc(m.label) + '</b> ' + esc(t.altura) + ' ' + num(a, 0) + '°, ' +
         esc(t.rinde) + ' ' + num(((objeto.rend || [])[i] || 0) * 100, 0) + ' %, ' +
         esc(t.limitaPor) + ' ' + esc((t.limita && t.limita[codigo]) || codigo) +
-        (m.sky_mag !== undefined && m.sky_mag !== null
-          ? ' · ' + esc(t.cieloAhora) + ' ' + num(m.sky_mag, 1) : '') +
-        sepTexto(objeto, m, i, t) + '.';
+        cielo + sepTexto(objeto, m, i, t) + '.';
     }
 
     var ventana = ventanaNoche(marcos);
@@ -1048,19 +1141,14 @@
       }
     }
 
-    // Un nombre puede venir de tres sitios: de los 40 con traza, del ranking de
-    // la noche (que lleva coordenadas pero no traza) o de fuera. Se resuelve
-    // aqui una vez en vez de en cada sitio que anade.
+    // Un nombre puede venir de tres sitios: de los 40 con traza, del catálogo de
+    // la noche (que lleva coordenadas y veredicto, pero no traza) o de fuera.
+    // Se resuelve aqui una vez en vez de en cada sitio que anade.
     function anadirPorNombre(nombre) {
       var conTraza = catalogo.filter(function (o) { return o.nombre === nombre; })[0];
       if (conTraza) { return anadir(conTraza); }
-      var delRanking = (noche.ranking || []).filter(function (r) {
-        return r.nombre === nombre;
-      })[0];
-      if (delRanking) {
-        return anadir(objetoExterno(delRanking.nombre, delRanking.ra,
-                                    delRanking.dec, datos.cupula));
-      }
+      var puntuado = universo.filter(function (r) { return r.nombre === nombre; })[0];
+      if (puntuado) { return anadir(objetoPuntuado(puntuado, datos.cupula)); }
     }
 
     function anadir(objeto) {
@@ -1088,7 +1176,13 @@
     // El desplegable: lo que el motor ha puntuado como mejor ESTA NOCHE sobre el
     // catalogo entero, no una lista de favoritos. Agrupado por clase, que es lo
     // que decide con que se saca.
-    var ranking = noche.ranking || [];
+    // El desplegable sigue siendo de RECOMENDADOS: el catálogo entero incluye
+    // ahora lo que puntúa cero, y una lista de mil con ochocientos ceros no
+    // recomienda nada. Lo que puntúa cero se encuentra buscándolo, que es
+    // cuando alguien pregunta por él.
+    var ranking = universo.filter(function (r) {
+      return r.horas_si_despeja > 0;
+    }).slice(0, 150);
     var reco = caja.querySelector('#aw-reco');
     if (reco) {
       var grupos = {};
@@ -1194,11 +1288,21 @@
     // decisión de hoy -- si hoy no sale, ¿espero a mañana? -- y al final de la
     // página llegaba cuando ya la habías tomado.
     var siguiente = datos.noches[1];
-    var manana = (siguiente && typeof siguiente.probabilidad_de_abrir === 'number')
-      ? '<span class="aw-manana"><span class="d">' + esc(t.manana) + '</span>' +
-        '<b>' + Math.round(siguiente.probabilidad_de_abrir * 100) + '%</b>' +
-        '<span class="d">' + fecha(siguiente.noche, lang) + '</span></span>'
-      : '';
+    var manana = '';
+    if (siguiente && typeof siguiente.probabilidad_de_abrir === 'number') {
+      // Mismo trato que hoy: primero la palabra, y el porcentaje debajo en
+      // pequeño. Que la de mañana se lea igual que la de hoy es la mitad de su
+      // utilidad: se está comparando una con otra.
+      var vm = siguiente.veredicto_abrir;
+      var pm = Math.round(siguiente.probabilidad_de_abrir * 100);
+      manana = '<span class="aw-manana"><span class="d">' + esc(t.manana) + '</span>' +
+        '<span class="v">' +
+          '<b' + (vm ? ' class="' + (vm.abierto ? 'abierto' : 'cerrado') + '"' : '') + '>' +
+            (vm ? esc(vm.abierto ? t.abierto : t.cerrado) : pm + '%') + '</b>' +
+          '<span class="p">' + (vm ? pm + '% · ' : '') +
+            fecha(siguiente.noche, lang) + '</span>' +
+        '</span></span>';
+    }
     var html = '<div class="aw-head"><h2>' + t.titulo + '</h2>' +
       '<span class="aw-site">' + esc(t.sitio) + manana + '</span></div>' +
       '<div class="aw-body">';

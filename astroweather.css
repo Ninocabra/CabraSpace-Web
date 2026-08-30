@@ -44,18 +44,31 @@
   padding: 18px 0 22px;
   border-bottom: 1px solid rgba(207, 171, 74, 0.12);
 }
-.aw-prob {
+/* La palabra arriba y el porcentaje debajo en pequeño. Un 47 % no le dice a
+   nadie si conviene subir al observatorio: obliga a poner el umbral en la
+   cabeza de quien lee. La probabilidad no se esconde -- va justo debajo, con
+   su definición a un clic -- pero deja de ser lo primero que se ve. */
+.aw-verdict { max-width: 420px; }
+.aw-verdict .palabra {
   font-family: 'Inter', sans-serif;
   font-size: 3.2rem;
   font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.01em;
   color: var(--gold-primary, #cfab4a);
 }
-.aw-prob-label {
-  font-size: 0.95rem;
-  color: var(--text-secondary, #aaa);
-  max-width: 320px;
+.aw-verdict.abierto .palabra { color: #6ec177; }
+.aw-verdict.cerrado .palabra { color: #d15f5f; }
+.aw-verdict .prob {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
   line-height: 1.5;
+}
+.aw-verdict .prob b {
+  color: var(--text-secondary, #aaa);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .aw-when {
   margin-left: auto;
@@ -142,31 +155,6 @@
 .aw-tag.mid { color: #cfab4a; }
 .aw-tag.low { color: #8a8a92; }
 
-/* -- Nota lateral. Antes era el bloque "lo que no cuadra"; ahora solo la
-   usa la advertencia de la puerta de viento, que es de seguridad. -- */
-.aw-warnings {
-  margin-top: 26px;
-  border-left: 3px solid rgba(207, 171, 74, 0.55);
-  background: rgba(207, 171, 74, 0.05);
-  border-radius: 0 8px 8px 0;
-  padding: 14px 18px;
-}
-.aw-warnings h3 {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--gold-primary, #cfab4a);
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-.aw-warnings li {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text-secondary, #aaa);
-  margin: 0 0 6px 18px;
-}
-.aw-warnings li:last-child { margin-bottom: 0; }
-
 /* -- Segunda noche, compacta -- */
 .aw-next {
   margin-top: 22px;
@@ -201,7 +189,7 @@
 
 @media (max-width: 600px) {
   .aw-head, .aw-body { padding-left: 18px; padding-right: 18px; }
-  .aw-prob { font-size: 2.4rem; }
+  .aw-verdict .palabra { font-size: 2.4rem; }
   .aw-when { margin-left: 0; text-align: left; width: 100%; }
 }
 
@@ -327,10 +315,14 @@
 .aw-results button .h { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .aw-results .none { padding: 12px 13px; color: var(--text-muted, #777); font-size: 0.88rem; }
 
+/* La cúpula es el dibujo y la clave es su pie: estaban a dos columnas donde la
+   leyenda se llevaba la más ancha, así que un cuadro de texto salía más grande
+   que el cielo que explica. Ahora la cúpula se queda con todo lo que sobra y la
+   clave con una columna estrecha y fija. */
 .aw-chosen {
   margin-top: 18px;
   display: grid;
-  grid-template-columns: minmax(300px, 420px) 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 230px);
   gap: 22px;
   align-items: start;
 }
@@ -342,6 +334,10 @@
 .aw-dome-stack {
   position: relative;
   width: 100%;
+  /* Tope para que en pantallas anchas no se coma la página entera: es un
+     círculo, y lo que crece de ancho crece igual de alto. */
+  max-width: 660px;
+  margin: 0 auto;
   aspect-ratio: 1;
 }
 .aw-dome {
@@ -477,6 +473,12 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease;
+  /* El globo no hereda el estilo de la etiqueta que lo hospeda: colgado de un
+     rotulo en versalitas salia el parrafo entero EN MAYUSCULAS. */
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  text-align: left;
 }
 .aw-light:hover .aw-pop, .aw-light.open .aw-pop { opacity: 1; pointer-events: auto; }
 .aw-pop b { color: var(--text-primary, #eee); display: block; margin-bottom: 4px; }
@@ -562,14 +564,14 @@
 .aw-key .sw {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 3px 0;
-  font-size: 0.82rem;
+  gap: 7px;
+  padding: 2px 0;
+  font-size: 0.72rem;
   color: var(--text-secondary, #aaa);
 }
 .aw-key .sw i {
-  width: 26px; height: 15px;
-  border-radius: 3px;
+  width: 18px; height: 11px;
+  border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.10);
   flex: 0 0 auto;
 }
@@ -577,13 +579,7 @@
   margin-left: auto;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  font-size: 0.76rem;
-  color: var(--text-muted, #777);
-}
-.aw-key .nota {
-  margin: 10px 0 0;
-  font-size: 0.74rem;
-  line-height: 1.55;
+  font-size: 0.68rem;
   color: var(--text-muted, #777);
 }
 
@@ -763,13 +759,21 @@
 .aw-manana {
   display: inline-flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
   margin-left: 14px;
   padding-left: 14px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.78rem;
 }
-.aw-manana b { color: var(--gold-primary, #cfab4a); font-weight: 600; }
+.aw-manana .v { display: inline-flex; flex-direction: column; line-height: 1.35; }
+.aw-manana b {
+  color: var(--gold-primary, #cfab4a);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.aw-manana b.abierto { color: #6ec177; }
+.aw-manana b.cerrado { color: #d15f5f; }
+.aw-manana .p { color: var(--text-muted, #777); font-variant-numeric: tabular-nums; }
 .aw-manana .d { color: var(--text-muted, #777); }
 @media (max-width: 620px) {
   .aw-manana { display: flex; margin: 6px 0 0; padding: 0; border-left: none; }
@@ -792,7 +796,48 @@
 }
 .aw-info:hover, .aw-info:focus { border-color: rgba(207, 171, 74, 0.6); color: var(--gold-primary, #cfab4a); }
 .aw-info .aw-pop { bottom: calc(100% + 8px); left: auto; right: 0; }
+/* Cuando el "?" vive al principio de una línea, el globo tiene que abrirse
+   hacia la derecha o se sale de la pantalla por la izquierda. Y cuando vive
+   arriba del todo, hacia abajo, o se sale por el techo. */
+.aw-info.izq .aw-pop { left: 0; right: auto; }
+.aw-info.abajo .aw-pop { top: calc(100% + 8px); bottom: auto; }
+
+/* En móvil no hay anclaje que valga: el globo mide 340 px y la pantalla 375, así
+   que colgado de un "?" que no esté justo en el centro se sale por un lado.
+   Fijado a la ventana se queda donde estaba en vertical y ocupa el ancho útil,
+   que es lo único que cabe. */
+@media (max-width: 600px) {
+  .aw-info .aw-pop,
+  .aw-info.izq .aw-pop,
+  .aw-info.abajo .aw-pop {
+    position: fixed;
+    left: 12px; right: 12px;
+    top: auto; bottom: 12px;
+    width: auto;
+    max-height: 58vh;
+    overflow-y: auto;
+  }
+}
 .aw-info:hover .aw-pop, .aw-info:focus .aw-pop { opacity: 1; pointer-events: auto; }
+
+/* El porqué del veredicto, en el carril del objeto. */
+.aw-porque {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #aaa);
+}
+
+/* El veredicto al lado de las horas en la lista de resultados: "0,0 h" a secas
+   se lee como un fallo del buscador, y es una respuesta. */
+.aw-results button .h i {
+  font-style: normal;
+  font-size: 0.78rem;
+  margin-left: 6px;
+}
+.aw-results button .h i.ok { color: #7fc98a; }
+.aw-results button .h i.mid { color: #cfab4a; }
+.aw-results button .h i.low { color: #8a8a92; }
 
 /* ---- Referencias ---- */
 .aw-refs { margin-top: 14px; }
