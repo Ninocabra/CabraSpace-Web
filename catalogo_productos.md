@@ -200,12 +200,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Procesamiento de Imágenes**
   - [Siril Versión 1.4.4: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.4) (2026-06-16)
 
-## Sky-Watcher
-
-### TELESCOPES
-- **Modelo: Evostar EDX**
-  - [Sky-Watcher Evostar EDX: Panorama General Detallado](https://www.youtube.com/watch?v=_tZJyxqHEQs) (2026-06-05)
-
 ## Skywatcher
 
 ### ACCESSORIES
@@ -391,6 +385,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
+- **Modelo: PHD2 Guiding**
+  - [PHD2 Guiding v2.6.14dev1: Novedades en Binning, Soporte Alpaca y Mejoras para Cámaras ZWO/ToupTek](https://github.com/OpenPHDGuiding/phd2/releases/tag/v2.6.14dev1) (2026-08-30)
 - **Modelo: communty**
   - [Más allá de la astrofotografía. Un mensaje de ZWO](https://www.youtube.com/shorts/MdM5e4MdjKI) (2026-08-05)
 - **Modelo: planetary-imaging**
