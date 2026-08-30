@@ -10,6 +10,13 @@
   'use strict';
 
   var URL_NOCHE = 'https://raw.githubusercontent.com/Ninocabra/CabraSpace-AstroWeather-Data/main/noche.json';
+  /* Los sensores del sitio, aparte. `noche.json` son 660 kB y cuesta 26 s de
+     calculo, asi que se rehace cada 6 h -- que es cuando llega modelo nuevo --
+     mientras que esto son 1,5 kB y se reescribe cada cuarto de hora en la
+     ventana en la que alguien esta decidiendo si sube al observatorio. Si no
+     esta o no responde, se usa el bloque que viene dentro de la noche: es el
+     mismo formato, solo que mas viejo. */
+  var URL_AHORA = 'https://raw.githubusercontent.com/Ninocabra/CabraSpace-AstroWeather-Data/main/ahora.json';
   var REPO = 'https://github.com/Ninocabra/CabraSpace-AstroWeather-Data';
 
   var PIE_ES = 'Previsión del motor propio de CabraSpace, calculada para AstroCamp (Nerpio). Cada número viaja con su procedencia dentro del ' +
@@ -1462,12 +1469,21 @@
     // CDN -- y pasada la ventana el visitante no puede quedarse con una
     // previsión vieja pegada en su navegador. `cache: 'no-cache'` solo no
     // bastaba: revalida contra un borde que a su vez tiene su propia copia.
-    fetch(URL_NOCHE + '?t=' + Math.floor(Date.now() / 300000), { cache: 'no-cache' })
-      .then(function (r) {
+    var sello = '?t=' + Math.floor(Date.now() / 300000);
+    Promise.all([
+      fetch(URL_NOCHE + sello, { cache: 'no-cache' }).then(function (r) {
         if (!r.ok) { throw new Error('HTTP ' + r.status); }
         return r.json();
-      })
-      .then(function (datos) {
+      }),
+      // Este NO puede tumbar la pagina: sin sensores frescos se ensena la
+      // prevision con los que traiga dentro, que es peor pero no es nada.
+      fetch(URL_AHORA + sello, { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; })
+    ])
+      .then(function (respuestas) {
+        var datos = respuestas[0], ahora = respuestas[1];
+        if (ahora && ahora.sensores) { datos.sensores = ahora.sensores; }
         caja.innerHTML = render(datos, t, lang);
         if (datos.noches && datos.noches[0]) { montarBuscador(caja, datos, t, lang); }
       })
