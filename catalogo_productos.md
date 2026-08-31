@@ -149,13 +149,14 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
 - **Modelo: Ed Ting**
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
+- **Modelo: Lukomatico**
+  - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
 - **Modelo: Marketing**
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
   - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
 - **Modelo: StellaLyra**
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
-  - [Nuevo telescopio Newtoniano StellaLyra 8" f/5 M-LRN con enfocador de doble velocidad de 2"](https://stargazerslounge.com/topic/445765-stellalyra-8-f5-m-lrn-newt-2-dual-speed-focuser/) (2026-06-05)
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
 - **Modelo: sampling**
