@@ -575,6 +575,10 @@
 .paleta-cupula .aw-franja .crep { background: rgba(255, 204, 56, 0.16); }
 .paleta-cupula .aw-franja .lin { background: rgba(255, 255, 255, 0.35); }
 .paleta-cupula .aw-franja .barra > i.luna { background: rgb(82, 140, 255); opacity: 1; }
+/* El carril del seeing, arriba del todo y separado del color: la turbulencia
+   no ilumina el cielo, lo emborrona, y meterla en la paleta de brillo diria
+   otra cosa. La Luna se queda abajo; asi los dos carriles se leen a la vez. */
+.aw-franja .barra > i.see { top: 0; bottom: auto; height: 3px; }
 .paleta-cupula .aw-franja .glifo { color: rgb(140, 178, 255); }
 /* Los numeros van sobre una banda que recorre de casi negro a casi BLANCO --
    negro es cielo limpio y blanco es tapado del todo -- asi que ni texto claro

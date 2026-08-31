@@ -44,16 +44,18 @@
       previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
       franjaTitulo: 'Cómo evoluciona la noche',
       vistaBoveda: 'Bóveda', vistaCupula: 'Cúpula 3D',
+      sinNubes: 'La rejilla de nubes no llegó en la pasada que generó esta noche, así que la cúpula NO dibuja nubes: un cielo limpio aquí no significa que lo esté. Las franjas de arriba sí llevan la nubosidad prevista, que viene por otro camino.',
       vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en Nerpio mirando al horizonte. Arrastra para girar.',
       franjaHoy: 'Hoy', franjaManana: 'Mañana',
       franjaLuna: 'Luna', franjaNubes: 'nubes',
       franjaOscura: 'oscuridad astronómica',
       franjaNota: 'Cada franja va del ocaso al orto y su ancho es la duración real de esa noche. ' +
         'El color es la nubosidad prevista hora a hora — verde despejado, ámbar parcial, rojo cubierto — ' +
-        'y los números son el porcentaje de nubes cuando pasa del 20 %. La zona más oscura es la oscuridad ' +
-        'astronómica; a los lados queda el crepúsculo. La línea dorada marca las horas en las que el motor ' +
-        'dice que quien limita la noche es la Luna. Seeing y transparencia NO se pintan aquí: el motor los ' +
-        'publica como un valor para toda la noche, no hora a hora, y están en las casillas de abajo.',
+        'y los números son el porcentaje de nubes cuando pasa del 20 %. Sobre esa base negra se suma cada estorbo ' +
+        'con el color que tiene en la cúpula: gris la nube, azul la Luna, rojo la calima, amarillo el crepúsculo. ' +
+        'Cuanto más claro, más tapado el cielo. La línea de abajo marca las horas en las que el motor dice que ' +
+        'quien limita es la Luna, y la de arriba es el seeing: casi invisible cuando es bueno, clara cuando ' +
+        'pasa de 1,9 segundos de arco. La zona central es la oscuridad astronómica.',
       estadoTechos: 'Estado actual de techos', abiertosDe: 'abiertos de',
       sinDatoTechos: 'el sitio no lo está diciendo ahora',
       techosTitulo: 'Esto es medida, no previsión',
@@ -154,16 +156,18 @@
       previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
       franjaTitulo: 'How the night unfolds',
       vistaBoveda: 'Zenith', vistaCupula: '3D dome',
+      sinNubes: 'The cloud grid did not arrive in the pass that generated tonight, so the dome draws NO clouds: a clear sky here does not mean the sky is clear. The strips above do carry the cloud forecast, which comes by another route.',
       vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at Nerpio looking at the horizon. Drag to turn.',
       franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
       franjaLuna: 'Moon', franjaNubes: 'clouds',
       franjaOscura: 'astronomical darkness',
       franjaNota: 'Each strip runs from sunset to sunrise and its width is that night’s real duration. ' +
         'Colour is the hourly cloud forecast — green clear, amber partial, red overcast — and the numbers are ' +
-        'cloud cover when it goes above 20%. The darker zone is astronomical darkness; twilight sits on either ' +
-        'side. The gold line marks the hours where the engine says the Moon is what limits the night. Seeing and ' +
-        'transparency are NOT drawn here: the engine publishes one value for the whole night, not hourly, and ' +
-        'they are in the cards below.',
+        'cloud cover when it goes above 20%. Over that black base each obstacle adds its own dome colour: grey for ' +
+        'cloud, blue for the Moon, red for dust, yellow for twilight. The lighter it gets, the more blocked the ' +
+        'sky. The lower line marks the hours where the engine says the Moon is the limit, and the upper one is ' +
+        'seeing: nearly invisible when good, clear once it passes 1.9 arcseconds. The central zone is ' +
+        'astronomical darkness.',
       estadoTechos: 'Roofs right now', abiertosDe: 'open of',
       sinDatoTechos: 'the site is not reporting it right now',
       techosTitulo: 'This is measurement, not forecast',
@@ -421,6 +425,15 @@
     if (h.limita === 'luna') {
       sumarTinte(c, pal.luna, (noche.luna_iluminacion || 0) * 0.55);
     }
+    /* LA CALIMA, en el rojo que la boveda ya le tiene reservado y que hasta hoy
+       no se usaba en la franja porque el motor no publicaba el AOD por hora.
+       Ahora si. El umbral de aire limpio, 0,07, es el MISMO que usa la boveda
+       (`AOD_LIMPIO`): por debajo no hay nada que pintar. Esta noche va de 0,085
+       a 0,192, o sea el aire se enturbia al doble mientras el panel decia
+       "noche transparente" con un solo numero. */
+    if (typeof h.aod === 'number') {
+      sumarTinte(c, pal.polvo, Math.max(0, h.aod - 0.07) / 0.25 * 0.55);
+    }
     return 'rgb(' + c.map(Math.round).join(',') + ')';
   }
 
@@ -452,6 +465,30 @@
     var degradado = horas.map(function (h) {
       return colorHora(h, noche) + ' ' + r1(pct(h.t_utc)) + '%';
     }).join(', ');
+
+    /* EL SEEING VA EN SU PROPIO CARRIL Y NO EN EL COLOR, y no es por falta de
+       sitio: el seeing no TIÑE el cielo, lo emborrona. La paleta de la boveda
+       codifica brillo de fondo -- lo que se interpone entre tu y el objeto --
+       y meter ahi la turbulencia seria decir que la mala definicion ilumina el
+       cielo, que es falso. Carril propio, en gris neutro, y asi ademas se lee
+       independiente: puede haber una noche negra con seeing malo.
+
+       La escala son los terciles del motor: 1,35" favorable y 1,90"
+       desfavorable. Con seeing bueno el carril es casi invisible, que es
+       exactamente lo que hay que decir cuando no hay nada que avisar. */
+    var conSeeing = horas.filter(function (h) {
+      return typeof h.seeing_arcsec === 'number';
+    });
+    var seeing = '';
+    if (conSeeing.length) {
+      seeing = '<i class="see" style="background:linear-gradient(90deg,' +
+        horas.map(function (h) {
+          var a = typeof h.seeing_arcsec === 'number'
+            ? Math.max(0, Math.min(1, (h.seeing_arcsec - 1.0) / 0.9)) : 0;
+          return 'rgba(226,233,248,' + (a * 0.85).toFixed(2) + ') ' +
+                 r1(pct(h.t_utc)) + '%';
+        }).join(', ') + ')"></i>';
+    }
 
     var velos = '', marcas = '';
     if (cr.astronomico_desde && cr.astronomico_hasta) {
@@ -524,7 +561,7 @@
       '<div class="pista" style="width:' + r1(vano / msMax * 100) + '%">' +
         '<div class="barra" role="img" aria-label="' + esc(resumen) + '">' +
           '<i class="nub" style="background:linear-gradient(90deg,' + degradado + ')"></i>' +
-          velos + luna + cifras +
+          velos + seeing + luna + cifras +
         '</div>' +
         '<span class="hh izq">' + esc(hora(cr.ocaso)) + '</span>' +
         '<span class="hh der">' + esc(hora(cr.orto)) + '</span>' + marcas +
@@ -1534,6 +1571,11 @@
       }
       destino.innerHTML =
         (vacio ? '<div class="aw-hint">' + esc(t.pista) + '</div>' : '') +
+        // Y si la rejilla de nubes no llego, DECIRLO. Un cielo limpio dibujado
+        // por falta de dato se lee igual que uno limpio de verdad, y esa
+        // confusion vale una noche de trabajo perdida.
+        (datos.cupula && datos.cupula.clouds_available === false
+          ? '<div class="aw-stale">' + esc(t.sinNubes) + '</div>' : '') +
         '<div class="aw-chosen">' +
           '<div class="aw-dome-wrap">' +
             '<div class="aw-vista" role="group">' +
