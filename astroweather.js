@@ -42,6 +42,16 @@
       abierto: 'Abierto', cerrado: 'Cerrado',
       veredictoTitulo: 'De dónde sale esta palabra',
       previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
+      franjaTitulo: 'Cómo evoluciona la noche',
+      franjaHoy: 'Hoy', franjaManana: 'Mañana',
+      franjaLuna: 'Luna', franjaNubes: 'nubes',
+      franjaOscura: 'oscuridad astronómica',
+      franjaNota: 'Cada franja va del ocaso al orto y su ancho es la duración real de esa noche. ' +
+        'El color es la nubosidad prevista hora a hora — verde despejado, ámbar parcial, rojo cubierto — ' +
+        'y los números son el porcentaje de nubes cuando pasa del 20 %. La zona más oscura es la oscuridad ' +
+        'astronómica; a los lados queda el crepúsculo. La línea dorada marca las horas en las que el motor ' +
+        'dice que quien limita la noche es la Luna. Seeing y transparencia NO se pintan aquí: el motor los ' +
+        'publica como un valor para toda la noche, no hora a hora, y están en las casillas de abajo.',
       estadoTechos: 'Estado actual de techos', abiertosDe: 'abiertos de',
       sinDatoTechos: 'el sitio no lo está diciendo ahora',
       techosTitulo: 'Esto es medida, no previsión',
@@ -140,6 +150,16 @@
       abierto: 'Open', cerrado: 'Closed',
       veredictoTitulo: 'Where this word comes from',
       previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
+      franjaTitulo: 'How the night unfolds',
+      franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
+      franjaLuna: 'Moon', franjaNubes: 'clouds',
+      franjaOscura: 'astronomical darkness',
+      franjaNota: 'Each strip runs from sunset to sunrise and its width is that night’s real duration. ' +
+        'Colour is the hourly cloud forecast — green clear, amber partial, red overcast — and the numbers are ' +
+        'cloud cover when it goes above 20%. The darker zone is astronomical darkness; twilight sits on either ' +
+        'side. The gold line marks the hours where the engine says the Moon is what limits the night. Seeing and ' +
+        'transparency are NOT drawn here: the engine publishes one value for the whole night, not hourly, and ' +
+        'they are in the cards below.',
       estadoTechos: 'Roofs right now', abiertosDe: 'open of',
       sinDatoTechos: 'the site is not reporting it right now',
       techosTitulo: 'This is measurement, not forecast',
@@ -317,6 +337,141 @@
   }
 
   // ------------------------------------------------------------ BLOQUES ----  // ------------------------------------------------------------ BLOQUES ----
+  /* ==================== LAS DOS FRANJAS DE LA NOCHE ==================
+     La cabecera dice "92 %" para hoy y "92 %" para manana, y son dos noches
+     que no se parecen en nada: hoy esta despejada hasta la 01:00 y se cubre
+     al 100 % antes del amanecer; manana empieza con 39 % de nubes y se abre a
+     cero a medianoche. Un numero por noche no puede contar eso, y es
+     exactamente lo que hay que ver antes de decidir si merece la pena montar.
+
+     QUE SE PINTA Y QUE NO, que aqui esta la unica decision de diseno que
+     importa. El motor publica POR HORA: `nubes_previstas`, `p_utilizable` y
+     `limita`. Publica POR NOCHE, un solo valor: seeing y transparencia. Asi
+     que el seeing y la transparencia NO se dibujan a lo largo de la franja
+     aunque de verdad cambien durante la noche -- dibujar una variacion que no
+     esta medida seria inventarsela, que es la trampa que ya nos costo el
+     panel del 29-08 -- y se quedan en sus casillas de abajo, que es donde el
+     dato tiene el alcance que dice tener. Si se quieren en la franja, el
+     arreglo es del MOTOR: publicar la serie horaria que ya tiene de ECMWF y
+     de CAMS. */
+
+  // Verde despejado, ambar parcial, rojo cubierto: los mismos tres colores
+  // con los que la pagina ya semaforea los consejos.
+  function colorNube(frac) {
+    var paradas = [[95, 207, 149], [232, 173, 82], [240, 112, 90]];
+    var x = Math.max(0, Math.min(1, frac)) * 2;
+    var i = x < 1 ? 0 : 1, f = x - i;
+    var a = paradas[i], b = paradas[i + 1];
+    return 'rgb(' + a.map(function (v, k) {
+      return Math.round(v + (b[k] - v) * f);
+    }).join(',') + ')';
+  }
+
+  function franja(noche, rotulo, lang, t, msMax) {
+    var cr = noche.crepusculo || {};
+    var horas = noche.horas || [];
+    if (!cr.ocaso || !cr.orto || !horas.length) { return ''; }
+    var t0 = Date.parse(cr.ocaso), t1 = Date.parse(cr.orto), vano = t1 - t0;
+    if (!(vano > 0)) { return ''; }
+    // Las horas publicadas van de 18:00 a 06:00 UTC y el vano del ocaso al
+    // orto: las de los extremos caen FUERA. No se recortan, se dejan en su
+    // sitio real -- el degradado admite paradas fuera de rango y asi el color
+    // del borde sigue siendo el que interpola de verdad.
+    function pct(iso) { return (Date.parse(iso) - t0) / vano * 100; }
+    function r1(x) { return Math.round(x * 10) / 10; }
+
+    var degradado = horas.map(function (h) {
+      return colorNube((h.nubes_previstas || 0) / 100) + ' ' + r1(pct(h.t_utc)) + '%';
+    }).join(', ');
+
+    var velos = '';
+    if (cr.astronomico_desde && cr.astronomico_hasta) {
+      var d0 = Math.max(0, pct(cr.astronomico_desde));
+      var d1 = Math.min(100, pct(cr.astronomico_hasta));
+      velos = '<i class="crep" style="left:0;width:' + r1(d0) + '%"></i>' +
+              '<i class="crep" style="left:' + r1(d1) + '%;width:' + r1(100 - d1) + '%"></i>' +
+              '<i class="lin" style="left:' + r1(d0) + '%"></i>' +
+              '<i class="lin" style="left:' + r1(d1) + '%"></i>';
+    }
+
+    /* La Luna, por TRAMOS y no de la primera a la ultima: si alguna vez deja
+       de limitar en mitad de la noche -- se pone y vuelve a salir no, pero un
+       tramo de nubes que pase a mandar si -- pintar de un extremo al otro
+       diria que limito todo el rato. */
+    var luna = '', tramo = null, primeraLuna = null;
+    horas.forEach(function (h, i) {
+      var esLuna = h.limita === 'luna';
+      if (esLuna && tramo === null) {
+        tramo = pct(h.t_utc);
+        if (primeraLuna === null) { primeraLuna = tramo; }
+      }
+      if (tramo !== null && (!esLuna || i === horas.length - 1)) {
+        var a = Math.max(0, tramo), b = Math.min(100, pct(h.t_utc));
+        if (b > a) {
+          luna += '<i class="luna" style="left:' + r1(a) + '%;width:' + r1(b - a) + '%"></i>';
+        }
+        tramo = null;
+      }
+    });
+    if (luna && typeof noche.luna_iluminacion === 'number') {
+      luna += '<b class="glifo" style="left:' + r1(Math.max(0, primeraLuna)) + '%">&#9790; ' +
+        Math.round(noche.luna_iluminacion * 100) + '%</b>';
+    }
+
+    // Los numeros solo donde la nube ya cuenta: por debajo del 20 % el color
+    // lo dice igual y la franja se llena de cifras que nadie lee.
+    var cifras = horas.filter(function (h) {
+      var x = pct(h.t_utc);
+      return (h.nubes_previstas || 0) >= 20 && x >= 0 && x <= 100;
+    }).map(function (h) {
+      return '<b class="pct" style="left:' + r1(pct(h.t_utc)) + '%">' +
+        Math.round(h.nubes_previstas) + '</b>';
+    }).join('');
+
+    var dentro = horas.filter(function (h) {
+      var x = pct(h.t_utc); return x >= 0 && x <= 100;
+    });
+    var pico = dentro.reduce(function (a, h) {
+      return (h.nubes_previstas || 0) > (a.nubes_previstas || 0) ? h : a;
+    }, dentro[0] || horas[0]);
+    var resumen = rotulo + ': ' + t.franjaNubes + ' ' +
+      Math.round((dentro[0] || horas[0]).nubes_previstas || 0) + '% → ' +
+      Math.round(pico.nubes_previstas || 0) + '%' +
+      (luna ? ' · ' + t.franjaLuna : '');
+
+    return '<div class="aw-franja">' +
+      '<span class="dia">' + esc(rotulo) + '<em>' + fecha(noche.noche, lang) + '</em></span>' +
+      '<div class="pista" style="width:' + r1(vano / msMax * 100) + '%">' +
+        '<div class="barra" role="img" aria-label="' + esc(resumen) + '">' +
+          '<i class="nub" style="background:linear-gradient(90deg,' + degradado + ')"></i>' +
+          velos + luna + cifras +
+        '</div>' +
+        '<span class="hh izq">' + esc(hora(cr.ocaso)) + '</span>' +
+        '<span class="hh der">' + esc(hora(cr.orto)) + '</span>' +
+      '</div></div>';
+  }
+
+  function bloqueFranjas(datos, t, lang) {
+    var ns = (datos.noches || []).slice(0, 2);
+    if (!ns.length) { return ''; }
+    // El ANCHO es la duracion: dos noches de distinta longitud no pueden
+    // ocupar lo mismo, o la comparacion de un vistazo miente.
+    var vanos = ns.map(function (n) {
+      var c = n.crepusculo || {};
+      return (c.ocaso && c.orto) ? Date.parse(c.orto) - Date.parse(c.ocaso) : 0;
+    });
+    var msMax = Math.max.apply(null, vanos);
+    if (!(msMax > 0)) { return ''; }
+    var filas = ns.map(function (n, i) {
+      return franja(n, i === 0 ? t.franjaHoy : t.franjaManana, lang, t, msMax);
+    }).join('');
+    if (!filas) { return ''; }
+    return '<div class="aw-franjas"><span class="rotulo">' + esc(t.franjaTitulo) +
+      '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
+      esc(t.franjaTitulo) + '</b>' + esc(t.franjaNota) + '</span></span></span>' +
+      filas + '</div>';
+  }
+
   function bloqueResumen(datos, noche, t, lang) {
     // Cual de las casillas es la que hoy estropea la noche. Lo decide el motor
     // -- la misma funcion que pinta los semaforos -- para que la casilla roja y
@@ -392,7 +547,7 @@
         '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop">' +
         '<b>' + esc(t.horasTitulo) + '</b>' + esc(t.horasExplica) + '</span></span>';
     }
-    html += '</div></div><div class="aw-grid">';
+    html += '</div></div>' + bloqueFranjas(datos, t, lang) + '<div class="aw-grid">';
     if (typeof noche.luna_iluminacion === 'number') {
       html += celda(t.luna, Math.round(noche.luna_iluminacion * 100) + '%',
         t.iluminada, limita === 'luna');
@@ -1267,11 +1422,26 @@
     }
 
     function repintarTodo() {
-      if (!elegidos.length) {
+      var vacio = !elegidos.length;
+      /* LA BOVEDA SE PINTA AUNQUE NO HAYA NINGUN OBJETO ELEGIDO. Antes, sin
+         elegir nada, aqui solo quedaba una linea de texto gris y lo mas
+         llamativo de la pagina no existia hasta que alguien adivinaba que
+         habia que escribir un nombre. Ahora la boveda esta desde el principio,
+         con su linea de tiempo viva: se puede recorrer la noche y ver girar el
+         cielo sin escribir nada, y la pista se lee al lado explicando que se
+         le puede pedir.
+
+         Y NO es pintar la ausencia de dato como si fuera dato -- que es la
+         trampa que ya nos mordio el 29-08 -- porque lo que se dibuja es cielo
+         medido y no un relleno: si el motor no ha publicado cupula, `marcos`
+         viene vacio y se cae a la pista de siempre. Lo unico que falta aqui es
+         la eleccion del visitante, y eso lo dice la pista. */
+      if (vacio && !marcos.length) {
         destino.innerHTML = '<div class="aw-hint">' + esc(t.pista) + '</div>';
         return;
       }
       destino.innerHTML =
+        (vacio ? '<div class="aw-hint">' + esc(t.pista) + '</div>' : '') +
         '<div class="aw-chosen">' +
           '<div class="aw-dome-wrap">' +
             '<div class="aw-dome-stack">' +
@@ -1282,12 +1452,13 @@
           '<div class="aw-side">' + bloqueClave(datos.cupula, t) + '</div>' +
         '</div>' +
         bloqueTiempo(marcos, indice, t, ventana) +
-        '<div class="aw-lanes">' +
-          elegidos.map(function (o, i) {
-            return carril(o, color(i), t, marcos, ventana,
-                          datos.cupula && datos.cupula.min_altitude);
-          }).join('') +
-        '</div>';
+        (vacio ? '' :
+          '<div class="aw-lanes">' +
+            elegidos.map(function (o, i) {
+              return carril(o, color(i), t, marcos, ventana,
+                            datos.cupula && datos.cupula.min_altitude);
+            }).join('') +
+          '</div>');
 
       var pila = destino.querySelector('.aw-dome-stack');
       if (window.ResizeObserver && pila) {
@@ -1453,6 +1624,24 @@
       if (e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault(); }
       if (e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault(); }
     });
+
+    /* EL CURSOR ARRANCA EN LA PRIMERA HORA QUE EL MODELO SABE PINTAR, y no en
+       el primer marco. La ventana empieza una hora ANTES de la oscuridad
+       astronomica, y ahi `sky_mag_trustworthy` es falso: la cupula abria con
+       el circulo gris de "fuera del modelo", que es honesto pero es justo lo
+       contrario de llamar la atencion. Medido sobre la noche del 31-08: 51 de
+       59 marcos son fiables y el primero es el indice 4, o sea abre en 21:36
+       en vez de en 19:36. El crepusculo sigue ahi, a un paso del cursor. */
+    for (var p0 = ventana.desde; p0 <= ventana.hasta; p0++) {
+      if (marcos[p0] && marcos[p0].sky_mag_trustworthy) { indice = p0; break; }
+    }
+
+    // Y UNA PRIMERA PINTADA, que antes no existia. `repintarTodo` solo corria
+    // al anadir o quitar un objeto, asi que al cargar la pagina lo unico que
+    // habia en `#aw-chosen` era la pista que `bloqueElegir` deja escrita en el
+    // HTML. Esa pista se queda como respaldo para el instante anterior a que
+    // corra el JS; a partir de aqui manda esto.
+    repintarTodo();
   }
 
   function render(datos, t, lang) {
