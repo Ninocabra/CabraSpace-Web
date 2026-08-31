@@ -706,13 +706,32 @@
     return html + '</div>';
   }
 
+  /* EL IDIOMA DEL TEXTO QUE REDACTA EL MOTOR. Los rotulos de la pagina los
+     traduce `T`; esto es para lo que llega ya escrito dentro del JSON -- los
+     consejos, sus detalles y las referencias -- que desde el 31-08-2026 viaja
+     en los dos idiomas con las claves `_en`.
+
+     CON RESPALDO AL CASTELLANO A PROPOSITO: entre que se publica esta pagina y
+     que el colector vuelve a generar el JSON hay una ventana en la que las
+     claves inglesas no existen todavia. Durante esa ventana la version inglesa
+     enseña el castellano, que es feo, pero enseñar un hueco en blanco donde iba
+     el consejo es peor. */
+  var LANG = 'es';
+
+  function bil(obj, campo) {
+    if (!obj) { return ''; }
+    var ingles = LANG === 'en' ? obj[campo + '_en'] : null;
+    return (ingles === undefined || ingles === null || ingles === '')
+      ? (obj[campo] || '') : ingles;
+  }
+
   function semaforo(fila) {
     return '<span class="aw-light ' + esc(fila.luz) + '" tabindex="0">' +
       '<span class="dot"></span>' +
-      '<span class="name">' + esc(fila.etiqueta) + '</span>' +
-      '<span class="short">' + esc(fila.resumen) + '</span>' +
-      '<span class="aw-pop"><b>' + esc(fila.etiqueta) + '</b>' +
-      esc(fila.detalle) + '</span></span>';
+      '<span class="name">' + esc(bil(fila, 'etiqueta')) + '</span>' +
+      '<span class="short">' + esc(bil(fila, 'resumen')) + '</span>' +
+      '<span class="aw-pop"><b>' + esc(bil(fila, 'etiqueta')) + '</b>' +
+      esc(bil(fila, 'detalle')) + '</span></span>';
   }
 
   function filaSemaforos(etiqueta, filas, plegable) {
@@ -749,7 +768,8 @@
     return '<span class="aw-info abajo refs" tabindex="0">?<span class="aw-pop"><b>' +
       esc(t.referencias) + '</b>' +
       refs.map(function (r) {
-        return '<span class="ref"><b>' + esc(r.tema) + '</b> ' + esc(r.dice) + '</span>';
+        return '<span class="ref"><b>' + esc(bil(r, 'tema')) + '</b> ' +
+          esc(bil(r, 'dice')) + '</span>';
       }).join('') + '</span></span>';
   }
 
@@ -762,7 +782,7 @@
        la procedencia se va al "?" del extremo derecho de esa misma línea. Se
        ahorran tres líneas de altura sin quitar una sola cosa. */
     return '<div class="aw-plan"><h3>' + esc(t.consejos) + '</h3>' +
-      (c.resumen ? '<p class="aw-headline-tip">' + esc(c.resumen) + '</p>' : '') +
+      (c.resumen ? '<p class="aw-headline-tip">' + esc(bil(c, 'resumen')) + '</p>' : '') +
       '<div class="aw-lane-pair">' +
         filaSemaforos(t.adquisicion, c.adquisicion, true) +
         filaSemaforos(t.familias, c.objetos, true) +
@@ -1903,6 +1923,7 @@
       window.AWDome.cargarViaLactea('img/astroweather-milkyway.png');
     }
     var lang = caja.getAttribute('data-lang') === 'en' ? 'en' : 'es';
+    LANG = lang;
     var t = T[lang];
     caja.innerHTML = '<div class="aw-state">' + esc(t.cargando) + '</div>';
 
