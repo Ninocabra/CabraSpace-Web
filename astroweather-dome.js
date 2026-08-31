@@ -584,62 +584,124 @@
     });
   }
 
+  /* ================= LAS NUBES, COMO CAMPO Y NO COMO DISCOS =============
+     QUE ERA EL PROBLEMA. Cada celda de la rejilla se pintaba como un disco con
+     gradiente radial, asi que la cupula salia con bolas separadas. Nino
+     pregunto si eso significaba algo, y la respuesta honesta era: la POSICION
+     si -- la elevacion sale de atan2(altura de la capa, distancia) y el azimut
+     es el rumbo real -- y el TAMANIO tambien, pero la forma redonda y los
+     huecos entre bolas no. Eran artefactos del muestreo: 8 rumbos x 6 anillos
+     de un campo que es continuo. Un hueco entre dos discos no era "ahi hay
+     claro", era "ahi no hay muestra", y se leia como lo primero.
+
+     QUE SE HACE AHORA. El mismo dato, interpolado. Cada muestra aporta con un
+     nucleo gaussiano de anchura SU PROPIO TAMANIO ANGULAR -- que es
+     exactamente lo que la muestra representa: una celda de ~15 km vista desde
+     aqui, 60 grados a 2 km y 9,5 a 90 -- y el campo es la suma normalizada.
+     No se inventa resolucion: se deja de fingir que el borde del disco es el
+     borde de una nube.
+
+     EL PRIOR DE CERO es lo que hace que esto no manche el cielo entero. El
+     motor descarta las celdas por debajo del 5 %, asi que una muestra ausente
+     NO es "no se": es "casi nada". Un peso constante en el denominador
+     representa ese cero, y sin el una nube suelta se extenderia sin decaer
+     hasta el borde de la cupula.
+
+     LAS TRES CAPAS SE COMBINAN COMO OPACIDADES INDEPENDIENTES, 1 - prod(1-o),
+     que es lo que hacen de verdad: un cirro por encima de un estrato tapa lo
+     que deja pasar el estrato. Antes se apilaban dibujando uno encima de otro
+     y el resultado dependia del ORDEN en que llegaran los parches. */
+
   var capaNube = null;
+  // Lado del bufer de nubes. Bajo a proposito: el campo de nubes es de baja
+  // frecuencia -- la muestra mas fina abarca 9,5 grados -- asi que 160 px
+  // sobran y el lienzo los escala suave. A tamanio completo esto serian 1,3
+  // millones de pixeles por cada movimiento del cursor de tiempo.
+  var NUBE_BUF = 160;
+  var PRIOR_CERO = 0.16;
+
   function dibujarNubes(o, cupula, f, cx, cy, R) {
-    // La nube iluminada por arriba dispersa hacia ti, así que con Luna es MÁS
-    // brillante que el cielo de alrededor. Pero echar noventa parches
-    // superpuestos directamente sobre la cúpula la satura a blanco, así que se
-    // componen antes en su propia capa — donde el apilamiento está acotado por
-    // el color de la nube — y esa capa terminada se suma una sola vez.
     if (!f.clouds || !f.clouds.length) { return; }
-    if (!capaNube) { capaNube = document.createElement('canvas'); }
-    var size = Math.round(2 * R) + 24;
-    capaNube.width = capaNube.height = size;
-    var cc = capaNube.getContext('2d');
-    cc.clearRect(0, 0, size, size);
-    var ox = size / 2, oy = size / 2;
+
+    // Las muestras, ya en vectores: comparar direcciones con un producto
+    // escalar es mucho mas barato que con senos y cosenos, y esto corre una vez
+    // por pixel y por muestra.
+    var capas = { low: [], mid: [], high: [] };
+    var hay = false;
     f.clouds.forEach(function (c) {
-      if (c.alt <= 0) { return; }
-      var xy = project(c.alt, c.az, ox, oy, R);
-      if (!xy[2]) { return; }
-      // El tamanio del parche sale de CUANTOS PIXELES MIDE UN GRADO, que no es
-      // el mismo numero en las dos vistas: en la boveda el radio R son 90
-      // grados clavados, y en la cupula depende del zoom. Atado a R como
-      // estaba, un cirro de 40 grados salia un 20 % pequenio con el campo
-      // abierto y enorme al acercarse.
-      var porGrado = VISTA.modo === 'cupula' ? escalaPersp(R) * D2R : R / 90;
-      var radius = Math.max(20, c.span * porGrado * (c.overhead ? 0.85 : 1.0));
-      // Cuanto tapa DE VERDAD: la cobertura por el peso de su capa. Un
-      // estrato bajo al 90 % y un cirro al 90 % no estorban igual.
-      var estorbo = Math.min(1, c.cover / 100 * (LAYER_WEIGHT[c.layer] || 0.8));
-      // Y el gris sale de ahi: oscuro lo que deja ver, blanco lo que tapa.
-      // Estaba justo al reves -- las nubes bajas se pintaban gris oscuro (107)
-      // y los cirros casi blancos (207), porque el color venia de la ALTURA de
-      // la capa y no de lo que estorba. Se leia como que un cirro es peor que
-      // un estrato, que es lo contrario de lo que pasa.
-      var tono = Math.round(58 + estorbo * 197);
-      var rr = tono, gg = tono, bb = tono;
-      // La opacidad acompana al tono pero con SUELO: la cobertura sigue siendo
-      // el numero -- se publica en el JSON y se lee en el panel por horas -- y
-      // esto solo decide como de visible sale en pantalla. Sin ese suelo, una
-      // nube tenue queda a la vez oscura y transparente y desaparece, que para
-      // un aviso de nubes es lo mismo que no estar.
-      var a = Math.min(0.90, 0.20 + estorbo * 0.70);
-      var grad = cc.createRadialGradient(xy[0], xy[1], 0, xy[0], xy[1], radius);
-      grad.addColorStop(0, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a + ')');
-      grad.addColorStop(0.5, 'rgba(' + rr + ',' + gg + ',' + bb + ',' + a * 0.45 + ')');
-      grad.addColorStop(1, 'rgba(' + rr + ',' + gg + ',' + bb + ',0)');
-      cc.fillStyle = grad;
-      cc.beginPath(); cc.arc(xy[0], xy[1], radius, 0, 6.2832); cc.fill();
+      if (c.alt <= 0 || !(c.cover > 0)) { return; }
+      var lista = capas[c.layer] || capas.mid;
+      // La anchura del nucleo es el radio angular de la celda. El 0,6 lo
+      // estrecha un poco: con el span entero las celdas vecinas se funden tanto
+      // que el campo pierde la estructura que SI trae el dato.
+      var sigma = Math.max(5, c.span) * D2R * 0.6;
+      // El COSENO limite, precalculado. El nucleo cae por debajo de 0,004 a
+      // partir de 3,35 sigma, asi que mas alla la muestra no aporta -- y
+      // descartarla por el coseno, que ya se tiene, evita el `acos`. Eso es lo
+      // caro: sin este corte, cada pixel llamaba a acos por cada una de las
+      // hasta 117 muestras y el repintado costaba 100 ms.
+      lista.push({ v: unitVec(c.alt, c.az), cover: c.cover / 100,
+                   inv2: 1 / (2 * sigma * sigma),
+                   cosLim: Math.cos(Math.min(Math.PI, 3.35 * sigma)) });
+      hay = true;
     });
+    if (!hay) { return; }
+
+    if (!capaNube) { capaNube = document.createElement('canvas'); }
+    capaNube.width = capaNube.height = NUBE_BUF;
+    var cc = capaNube.getContext('2d');
+    var img = cc.createImageData(NUBE_BUF, NUBE_BUF), px = img.data;
+    var paso = 2 * R / NUBE_BUF;
+    var ordenCapas = ["low", "mid", "high"];
+
+    for (var y = 0; y < NUBE_BUF; y++) {
+      for (var x = 0; x < NUBE_BUF; x++) {
+        var i = (y * NUBE_BUF + x) * 4;
+        // El MISMO par proyeccion/inversa que el resto de la cupula, asi que
+        // las nubes caen donde caen las estrellas en las dos vistas.
+        var d = unproject(cx - R + (x + 0.5) * paso,
+                          cy - R + (y + 0.5) * paso, cx, cy, R);
+        if (!d || d[0] < 0) { px[i + 3] = 0; continue; }
+        var v = unitVec(d[0], d[1]);
+        var transp = 1;
+        for (var k = 0; k < 3; k++) {
+          var lista = capas[ordenCapas[k]];
+          if (!lista.length) { continue; }
+          var suma = 0, peso = PRIOR_CERO;
+          for (var m = 0; m < lista.length; m++) {
+            var s = lista[m];
+            var cosang = v[0] * s.v[0] + v[1] * s.v[1] + v[2] * s.v[2];
+            // Fuera de su alcance, y decidido con el coseno que ya se tiene:
+            // el `acos` solo se paga por las muestras que van a contar.
+            if (cosang < s.cosLim) { continue; }
+            var ang = Math.acos(Math.min(1, cosang));
+            var w = Math.exp(-ang * ang * s.inv2);
+            suma += w * s.cover; peso += w;
+          }
+          var cobertura = suma / peso;
+          transp *= 1 - Math.min(1, cobertura * (LAYER_WEIGHT[ordenCapas[k]] || 0.8));
+        }
+        var estorbo = 1 - transp;
+        if (estorbo < 0.02) { px[i + 3] = 0; continue; }
+        // Oscuro lo que deja ver, blanco lo que tapa. El tono sale de lo que
+        // ESTORBA y no de la altura de la capa: un cirro al 90 % no es peor
+        // que un estrato al 90 %, y pintarlo mas claro decia lo contrario.
+        var tono = Math.round(58 + estorbo * 197);
+        px[i] = tono; px[i + 1] = tono; px[i + 2] = tono;
+        px[i + 3] = Math.round(255 * Math.min(0.92, 0.12 + estorbo * 0.80));
+      }
+    }
+    cc.putImageData(img, 0, 0);
+
     // Se dibuja ENCIMA, no se suma. Una nube tapa lo que hay detras: ese es su
     // efecto y ese tiene que ser su dibujo. Con 'lighter' la nube ACLARABA el
     // cielo, asi que sobre un cielo con Luna sumaba brillo en vez de comerse la
     // vista, y era imposible distinguir una noche cubierta de una despejada con
     // Luna: las dos salian claras.
     o.save();
+    o.imageSmoothingEnabled = true;
     o.globalAlpha = 0.95;
-    o.drawImage(capaNube, cx - ox, cy - oy);
+    o.drawImage(capaNube, cx - R, cy - R, 2 * R, 2 * R);
     o.restore();
   }
 
