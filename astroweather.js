@@ -666,6 +666,27 @@
        0/0 no se pinta: no es "ningún techo abierto", es "no ha llegado el
        dato", y se leen igual. */
     var sen = datos.sensores || {};
+    /* Y SI NO RESPONDE, EL ULTIMO ESTADO CONOCIDO. Lo que se rescata es abierto
+       o cerrado, no la cuenta: el archivo guarda un booleano y "0/18" de hace
+       ocho horas no se puede reconstruir sin inventarselo.
+
+       Esta es la casilla que mas pesa de la pagina, asi que es donde la
+       etiqueta importa mas: un "abierto" de hace ocho horas sin decir de cuando
+       es se lee como "el observatorio esta funcionando esta noche", que es
+       exactamente la frase que no queremos que nadie se lleve de aqui. */
+    var techosViejo = (sen.del_archivo || {}).techos;
+    if (!sen.techos_total && typeof sen.techos_estado_archivo === 'boolean'
+        && techosViejo) {
+      html += '<div class="aw-techos caido">' +
+        '<span class="no-responde">NO RESPONDE</span>' +
+        '<span class="rotulo">' + esc(t.estadoTechos) +
+          '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
+          esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
+        '<div class="palabra">' +
+          esc(sen.techos_estado_archivo ? t.abierto : t.cerrado) + '</div>' +
+        '<div class="prob">' + esc(String(techosViejo).slice(11, 16)) + ' UTC</div>' +
+        '</div>';
+    }
     if (sen.techos_total) {
       var abiertos = sen.techos_abiertos || 0;
       html += '<div class="aw-techos' + (abiertos > 0 ? ' hay' : '') + '">' +

@@ -467,6 +467,18 @@
 }
 .aw-sensor.caido .v { color: var(--text-secondary, #bbb); }
 .aw-sensor.caido .cuando { color: #e8ad52; }
+/* La misma marca en la casilla de techos de la cabecera, que no es un sensor
+   mas -- va con el tamanio de la prevision -- pero se cae igual. */
+.aw-techos.caido .no-responde {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #e8ad52;
+  margin-bottom: 4px;
+}
+.aw-techos.caido .palabra { color: var(--text-secondary, #bbb); }
+.aw-techos.caido .prob { color: #e8ad52; }
 
 /* ============== El selector de vista de la cupula ==================
    Encima del dibujo y no en un panel aparte: es una propiedad de lo que estas
