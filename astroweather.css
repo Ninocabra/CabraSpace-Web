@@ -449,6 +449,32 @@
 }
 .aw-hint { font-size: 0.85rem; color: var(--text-muted, #777); margin-top: 14px; }
 
+/* ============== El selector de vista de la cupula ==================
+   Encima del dibujo y no en un panel aparte: es una propiedad de lo que estas
+   mirando, no un ajuste de la pagina. */
+.aw-vista { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+.aw-vista button {
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(150, 164, 192, 0.22);
+  background: transparent;
+  color: var(--text-muted, #777);
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+.aw-vista button:hover { color: var(--text-primary, #eee); border-color: rgba(207, 171, 74, 0.45); }
+.aw-vista button.on {
+  color: var(--gold-primary, #cfab4a);
+  border-color: rgba(207, 171, 74, 0.55);
+  background: rgba(207, 171, 74, 0.08);
+}
+/* En perspectiva el dibujo se agarra y se gira; el cursor tiene que decirlo. */
+.aw-dome-stack.gira { cursor: grab; touch-action: pan-y; }
+.aw-dome-stack.gira:active { cursor: grabbing; }
+
 /* ================== Las dos franjas de la noche ====================
    Poco alto a propósito: es una primera impresión, no un gráfico. El detalle
    está en las casillas de debajo y en la cúpula del final. El ANCHO de cada

@@ -154,9 +154,75 @@
     return [alt / D2R, ((az / D2R) % 360 + 360) % 360];
   }
 
+  /* ==================== LAS DOS VISTAS DEL MISMO CIELO ================
+     La boveda de siempre es una proyeccion CENITAL: se mira hacia arriba, el
+     cenit en el centro y el horizonte en el borde del circulo. La cupula 3D es
+     la misma hemisfera vista en PERSPECTIVA desde el suelo, como quien esta
+     plantado en Nerpio mirando al sur: el horizonte es una linea y el cenit
+     queda arriba.
+
+     Y AQUI ESTA LO QUE IMPORTA: no son dos dibujos, es un dibujo y dos
+     proyecciones. Todo -- el color del cielo pixel a pixel, la Via Lactea, la
+     Luna, los parches de nube, las estrellas, las trazas -- pasa por `project`
+     y por su inversa. Cambiando SOLO ese par de funciones las dos vistas son
+     identicas por construccion y no pueden discrepar nunca. Es exactamente la
+     leccion de [[el-mismo-concepto-calculado-dos-veces]]: la forma de que dos
+     vistas no se contradigan no es cuidarlas, es que compartan la cuenta.
+
+     `project` devuelve [x, y, visible]. El tercer elemento solo importa en
+     perspectiva -- media esfera queda A LA ESPALDA de la camara -- y los sitios
+     que dibujan lineas o simbolos lo consultan. Los que no, siguen leyendo
+     xy[0] y xy[1] como siempre. */
+  var VISTA = { modo: 'boveda', az: 180, alt: 28, fov: 118 };
+
+  function camara() {
+    var f = unitVec(VISTA.alt, VISTA.az);
+    // r = w x f con w = (0,0,1): sale (-sin az, cos az, 0), o sea el Este a la
+    // DERECHA mirando al Norte, que es como se ve estando de pie. La boveda usa
+    // la convencion contraria porque alli se mira hacia arriba y el cielo sale
+    // reflejado.
+    var az = VISTA.az * D2R;
+    var r = [-Math.sin(az), Math.cos(az), 0];
+    var u = [f[1] * r[2] - f[2] * r[1],
+             f[2] * r[0] - f[0] * r[2],
+             f[0] * r[1] - f[1] * r[0]];
+    return { f: f, r: r, u: u };
+  }
+
+  function projectPersp(alt, az, cx, cy, R) {
+    var v = unitVec(alt, az), c = camara();
+    var zc = v[0] * c.f[0] + v[1] * c.f[1] + v[2] * c.f[2];
+    if (zc <= 0.03) { return [-9999, -9999, false]; }
+    var xc = v[0] * c.r[0] + v[1] * c.r[1] + v[2] * c.r[2];
+    var yc = v[0] * c.u[0] + v[1] * c.u[1] + v[2] * c.u[2];
+    var k = R / Math.tan(VISTA.fov / 2 * D2R);
+    return [cx + xc / zc * k, cy - yc / zc * k, true];
+  }
+
   function project(alt, az, cx, cy, R) {
+    if (VISTA.modo === 'cupula') { return projectPersp(alt, az, cx, cy, R); }
     var r = (90 - alt) / 90 * R, a = az * D2R;
-    return [cx - r * Math.sin(a), cy - r * Math.cos(a)];
+    return [cx - r * Math.sin(a), cy - r * Math.cos(a), true];
+  }
+
+  // La inversa: de pixel a direccion del cielo. Devuelve null fuera del dibujo
+  // (la boveda es un circulo) y alt < 0 es suelo, no cielo.
+  function unproject(x, y, cx, cy, R) {
+    if (VISTA.modo === 'cupula') {
+      var k = R / Math.tan(VISTA.fov / 2 * D2R), c = camara();
+      var xn = (x - cx) / k, yn = -(y - cy) / k;
+      var d = [c.f[0] + xn * c.r[0] + yn * c.u[0],
+               c.f[1] + xn * c.r[1] + yn * c.u[1],
+               c.f[2] + xn * c.r[2] + yn * c.u[2]];
+      var n = Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+      d[0] /= n; d[1] /= n; d[2] /= n;
+      return [Math.asin(d[2]) / D2R,
+              ((Math.atan2(d[1], d[0]) / D2R) % 360 + 360) % 360];
+    }
+    var dx = x - cx, dy = y - cy, rr = Math.sqrt(dx * dx + dy * dy);
+    if (rr > R + 1) { return null; }
+    return [90 - Math.min(rr, R) / R * 90,
+            ((Math.atan2(-dx, -dy) / D2R) % 360 + 360) % 360];
   }
 
   function unitVec(alt, az) {
@@ -355,12 +421,38 @@
   // ------------------------------------------------------- PINTADO -------
   var buf = null, bctx = null;
 
+  /* El recorte de cada vista. La boveda es un circulo porque el circulo ES el
+     horizonte; la cupula es un rectangulo porque lo que la acota es el encuadre
+     de la camara, no el cielo. */
+  /* EL MARGEN NO ES EL MISMO EN LAS DOS VISTAS, y no es un capricho: los 30 px
+     de la boveda son el sitio de la ROSA DE LOS VIENTOS, que en perspectiva no
+     existe. Dejarlos alli se comia un tercio de un lienzo de 163 px. Lo calcula
+     una sola funcion porque lo consultan tres -- el cielo al escalar el bufer,
+     la capa de encima al fijar su radio y el recorte -- y si se separan, el
+     dibujo y sus adornos dejan de caer en el mismo sitio. */
+  function margen() { return VISTA.modo === 'cupula' ? 6 : MARGEN; }
+
+  function recortar(c, lado) {
+    c.beginPath();
+    if (VISTA.modo === 'cupula') {
+      var m = margen(), w = lado - 2 * m, rad = 10;
+      c.moveTo(m + rad, m);
+      c.arcTo(m + w, m, m + w, m + w, rad);
+      c.arcTo(m + w, m + w, m, m + w, rad);
+      c.arcTo(m, m + w, m, m, rad);
+      c.arcTo(m, m, m + w, m, rad);
+    } else {
+      c.arc(lado / 2, lado / 2, lado / 2 - MARGEN, 0, 6.2832);
+    }
+    c.clip();
+  }
+
   function pintarFueraDelModelo(canvas, lado, dpr, textos) {
     canvas.width = canvas.height = lado * dpr;
     var c = canvas.getContext('2d');
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, lado, lado);
-    var R = lado / 2 - MARGEN;
+    var R = lado / 2 - margen();
     c.fillStyle = 'rgba(120,132,158,.09)';
     c.beginPath(); c.arc(lado / 2, lado / 2, R, 0, 6.2832); c.fill();
     c.strokeStyle = 'rgba(120,132,158,.3)'; c.setLineDash([6, 7]); c.lineWidth = 1.5;
@@ -386,10 +478,17 @@
     for (var y = 0; y < BUF; y++) {
       for (var x = 0; x < BUF; x++) {
         var i = (y * BUF + x) * 4;
-        var dx = x - cx, dy = y - cy, rr = Math.sqrt(dx * dx + dy * dy);
-        if (rr > R + 1) { px[i + 3] = 0; continue; }
-        var alt = 90 - Math.min(rr, R) / R * 90;
-        var az = ((Math.atan2(-dx, -dy) / D2R) % 360 + 360) % 360;
+        var d = unproject(x, y, cx, cy, R);
+        if (!d) { px[i + 3] = 0; continue; }
+        var alt = d[0], az = d[1];
+        // Bajo el horizonte no hay cielo que estimar: en la vista en
+        // perspectiva eso es SUELO, y pintarlo es lo que hace que se lea donde
+        // acaba el mundo. En la cenital no ocurre nunca -- el borde del circulo
+        // ES el horizonte -- asi que esta rama solo vive en la cupula.
+        if (alt < 0) {
+          px[i] = 13; px[i + 1] = 14; px[i + 2] = 17; px[i + 3] = 255;
+          continue;
+        }
         skyAt(alt, az, env, rgb);
         px[i] = rgb[0]; px[i + 1] = rgb[1]; px[i + 2] = rgb[2]; px[i + 3] = 255;
         if (f.moon_alt > 0 && separation(alt, az, f.moon_alt, f.moon_az) < 0.9) {
@@ -404,9 +503,10 @@
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, lado, lado);
     c.save();
-    c.beginPath(); c.arc(lado / 2, lado / 2, lado / 2 - MARGEN, 0, 6.2832); c.clip();
+    recortar(c, lado);
     c.imageSmoothingEnabled = true;
-    c.drawImage(buf, MARGEN, MARGEN, lado - 2 * MARGEN, lado - 2 * MARGEN);
+    var m = margen();
+    c.drawImage(buf, m, m, lado - 2 * m, lado - 2 * m);
     c.restore();
   }
 
@@ -416,6 +516,7 @@
       var p = toHorizon(s.ra, s.dec, lst, lat);
       if (p[0] <= 1) { return; }
       var xy = project(p[0], p[1], cx, cy, R);
+      if (!xy[2]) { return; }
       var size = Math.max(0.9, 2.7 - s.mag * 0.55);
       // Las débiles se ahogan primero: eso es lo que hace un cielo brillante.
       var a = Math.max(0.16, Math.min(1, (1 - s.mag * 0.19) * (0.45 + vis * 0.55)));
@@ -437,6 +538,7 @@
       var h = toHorizon(p.ra, p.dec, lst, lat);
       if (h[0] <= 1) { return; }
       var xy = project(h[0], h[1], cx, cy, R);
+      if (!xy[2]) { return; }
       o.fillStyle = '#f6e6b8';
       o.beginPath(); o.arc(xy[0], xy[1], 3.2, 0, 6.2832); o.fill();
       o.strokeStyle = 'rgba(246,230,184,.3)'; o.lineWidth = 1;
@@ -465,6 +567,7 @@
     f.clouds.forEach(function (c) {
       if (c.alt <= 0) { return; }
       var xy = project(c.alt, c.az, ox, oy, R);
+      if (!xy[2]) { return; }
       var radius = Math.max(20, c.span / 90 * R * (c.overhead ? 0.85 : 1.0));
       // Cuanto tapa DE VERDAD: la cobertura por el peso de su capa. Un
       // estrato bajo al 90 % y un cirro al 90 % no estorban igual.
@@ -500,18 +603,47 @@
     o.restore();
   }
 
+  /* La rejilla deja de dibujarse con `arc` y pasa a MUESTREARSE en azimut.
+     Un circulo concentrico solo es un paralelo de altura en la proyeccion
+     cenital; en perspectiva es una curva. Muestreando cada 3 grados y uniendo
+     con rectas sale bien en las dos, y el codigo deja de saber en cual esta. */
+  function paralelo(o, alt, cx, cy, R) {
+    o.beginPath();
+    var empezado = false;
+    for (var az = 0; az <= 360; az += 3) {
+      var xy = project(alt, az, cx, cy, R);
+      if (!xy[2]) { empezado = false; continue; }
+      if (empezado) { o.lineTo(xy[0], xy[1]); }
+      else { o.moveTo(xy[0], xy[1]); empezado = true; }
+    }
+    o.stroke();
+  }
+
   function dibujarRejilla(o, cupula, cx, cy, R) {
     o.strokeStyle = 'rgba(150,164,192,.13)'; o.lineWidth = 1;
-    [25, 50, 75].forEach(function (alt) {
-      o.beginPath(); o.arc(cx, cy, (90 - alt) / 90 * R, 0, 6.2832); o.stroke();
-    });
+    [25, 50, 75].forEach(function (alt) { paralelo(o, alt, cx, cy, R); });
+    // Los meridianos: del horizonte al cenit, y no del borde al centro, que eso
+    // era otra vez geometria de la vista metida en el dibujo.
     for (var az = 0; az < 360; az += 45) {
-      var xy = project(0, az, cx, cy, R);
-      o.beginPath(); o.moveTo(cx, cy); o.lineTo(xy[0], xy[1]); o.stroke();
+      o.beginPath();
+      var empezado = false;
+      for (var a = 0; a <= 90; a += 3) {
+        var xy = project(a, az, cx, cy, R);
+        if (!xy[2]) { empezado = false; continue; }
+        if (empezado) { o.lineTo(xy[0], xy[1]); }
+        else { o.moveTo(xy[0], xy[1]); empezado = true; }
+      }
+      o.stroke();
     }
     o.strokeStyle = 'rgba(240,112,90,.32)'; o.setLineDash([3, 5]);
-    o.beginPath(); o.arc(cx, cy, (90 - cupula.min_altitude) / 90 * R, 0, 6.2832);
-    o.stroke(); o.setLineDash([]);
+    paralelo(o, cupula.min_altitude, cx, cy, R);
+    o.setLineDash([]);
+    // Y en perspectiva, el HORIZONTE: en la boveda es el borde del circulo y no
+    // hace falta dibujarlo, aqui es la linea que separa cielo de suelo.
+    if (VISTA.modo === 'cupula') {
+      o.strokeStyle = 'rgba(150,164,192,.35)';
+      paralelo(o, 0, cx, cy, R);
+    }
   }
 
   function dibujarTraza(o, objeto, color, indice, cx, cy, R, textos) {
@@ -526,6 +658,10 @@
     for (var i = 0; i < alt.length; i++) {
       if (alt[i] <= 0) { empezado = false; continue; }
       var xy = project(alt[i], az[i], cx, cy, R);
+      // A la espalda de la camara la traza se CORTA. Uniendo los dos lados se
+      // dibujaria una recta atravesando la pantalla por donde el objeto no ha
+      // pasado nunca.
+      if (!xy[2]) { empezado = false; continue; }
       if (empezado) { o.lineTo(xy[0], xy[1]); }
       else { o.moveTo(xy[0], xy[1]); empezado = true; }
     }
@@ -535,6 +671,7 @@
     var abierto = (objeto.limita || '').charAt(indice) !== '-'
                   && (objeto.rend || [])[indice] > 0;
     var p = project(alt[indice], az[indice], cx, cy, R);
+    if (!p[2]) { return; }
     o.fillStyle = color;
     o.beginPath(); o.arc(p[0], p[1], abierto ? 5.5 : 3.4, 0, 6.2832); o.fill();
     if (!abierto) {
@@ -549,6 +686,7 @@
   function dibujarLuna(o, cupula, f, cx, cy, R, textos) {
     if (f.moon_alt <= 0) { return; }
     var xy = project(f.moon_alt, f.moon_az, cx, cy, R);
+    if (!xy[2]) { return; }
     o.fillStyle = '#f7efd8';
     o.beginPath(); o.arc(xy[0], xy[1], 5.5, 0, 6.2832); o.fill();
     o.strokeStyle = 'rgba(127,176,239,.5)'; o.lineWidth = 1.4;
@@ -560,6 +698,27 @@
   }
 
   function dibujarRosa(o, cx, cy, R, cardinales) {
+    /* En perspectiva no hay rosa que valga: una corona de rumbos alrededor del
+       centro solo significa algo si el centro es el cenit. Aqui los rumbos son
+       sitios del HORIZONTE, asi que se escriben donde caen -- y de paso eso es
+       lo que te dice hacia donde estas mirando. */
+    if (VISTA.modo === 'cupula') {
+      var nombres = cardinales || ['N', 'E', 'S', 'O'];
+      [[0, nombres[0]], [45, ''], [90, nombres[1]], [135, ''],
+       [180, nombres[2]], [225, ''], [270, nombres[3]], [315, '']]
+        .forEach(function (par) {
+          var xy = project(0, par[0], cx, cy, R);
+          if (!xy[2]) { return; }
+          o.strokeStyle = 'rgba(205,214,232,.35)'; o.lineWidth = par[1] ? 1.4 : 1;
+          o.beginPath(); o.moveTo(xy[0], xy[1] - 6); o.lineTo(xy[0], xy[1] + 6); o.stroke();
+          if (!par[1]) { return; }
+          o.fillStyle = 'rgba(226,233,248,.75)';
+          o.font = '600 12px Sora, Inter, sans-serif';
+          o.textAlign = 'center';
+          o.fillText(par[1], xy[0], xy[1] + 21);
+        });
+      return;
+    }
     // La escala de rumbos va SOBRE el instrumento, no en un pie de foto.
     o.save();
     o.translate(cx, cy);
@@ -601,7 +760,7 @@
     var o = canvas.getContext('2d');
     o.setTransform(dpr, 0, 0, dpr, 0, 0);
     o.clearRect(0, 0, lado, lado);
-    var R = lado / 2 - MARGEN, cx = lado / 2, cy = lado / 2;
+    var R = lado / 2 - margen(), cx = lado / 2, cy = lado / 2;
     var f = cupula.frames[indice];
     var lst = cupula.lst[indice], lat = cupula.site.lat;
     var dia = !f.sky_mag_trustworthy;
@@ -609,7 +768,7 @@
     // Nada va fuera de la cúpula: un parche de nube es un trozo de cielo, y un
     // trozo de cielo que se derrama pasado el horizonte se lee como una farola.
     o.save();
-    o.beginPath(); o.arc(cx, cy, R, 0, 6.2832); o.clip();
+    recortar(o, lado);
     // Cuánto de la galaxia se ve de verdad con el fondo de esta noche.
     var galVis = dia ? 0 : Math.max(0, Math.min(1, (f.sky_mag - 19.2) / 2.2));
     if (!dia) {
@@ -694,6 +853,15 @@
     cargarViaLactea: cargarViaLactea,
     pendiente: MW_PENDIENTE,
     listaViaLactea: function () { return MW_SHAPE !== null; },
+    // El modo de vista y hacia donde mira la camara. Vive en el modulo y no en
+    // la llamada porque lo consultan tanto `project` como su inversa, y el
+    // sitio donde un dato lo leen dos funciones es el modulo.
+    vista: VISTA,
+    fijarVista: function (modo, az) {
+      VISTA.modo = modo === 'cupula' ? 'cupula' : 'boveda';
+      if (typeof az === 'number') { VISTA.az = ((az % 360) + 360) % 360; }
+      return VISTA;
+    },
     pintar: function (skyCanvas, overCanvas, cupula, objetos, indice, textos) {
       if (!cupula || !cupula.frames || !cupula.frames[indice]) { return; }
       var lado = skyCanvas.clientWidth || 320;

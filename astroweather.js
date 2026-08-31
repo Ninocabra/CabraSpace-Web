@@ -43,6 +43,8 @@
       veredictoTitulo: 'De dónde sale esta palabra',
       previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
       franjaTitulo: 'Cómo evoluciona la noche',
+      vistaBoveda: 'Bóveda', vistaCupula: 'Cúpula 3D',
+      vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en Nerpio mirando al horizonte. Arrastra para girar.',
       franjaHoy: 'Hoy', franjaManana: 'Mañana',
       franjaLuna: 'Luna', franjaNubes: 'nubes',
       franjaOscura: 'oscuridad astronómica',
@@ -151,6 +153,8 @@
       veredictoTitulo: 'Where this word comes from',
       previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
       franjaTitulo: 'How the night unfolds',
+      vistaBoveda: 'Zenith', vistaCupula: '3D dome',
+      vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at Nerpio looking at the horizon. Drag to turn.',
       franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
       franjaLuna: 'Moon', franjaNubes: 'clouds',
       franjaOscura: 'astronomical darkness',
@@ -329,10 +333,29 @@
   // -------------------------------------------------------- LA CÚPULA ------
   // El render vive en astroweather-dome.js: es el port del mockup del motor,
   // con su física. Aquí solo se le dan los datos y los textos.
+  /* QUE VISTA SE ESTA MIRANDO. Vive aqui y no dentro del buscador porque la
+     pinta `pintarCupula`, que es de modulo, y se recuerda entre visitas: quien
+     prefiere la cupula 3D la prefiere siempre, y volver a la boveda en cada
+     recarga es pedirle que elija dos veces. Un `localStorage` que falle -- modo
+     privado, permisos -- no puede tumbar el panel: se cae a la boveda. */
+  var VISTA = 'boveda';
+  try {
+    if (window.localStorage && localStorage.getItem('aw-vista') === 'cupula') {
+      VISTA = 'cupula';
+    }
+  } catch (e) { VISTA = 'boveda'; }
+
+  function guardarVista(v) {
+    VISTA = v;
+    try { if (window.localStorage) { localStorage.setItem('aw-vista', v); } }
+    catch (e) { /* que no se pueda recordar no es motivo para no cambiarla */ }
+  }
+
   function pintarCupula(destino, datos, objetos, indice, t) {
     var cielo = destino.querySelector('#aw-sky');
     var encima = destino.querySelector('#aw-over');
     if (!cielo || !encima || !window.AWDome) { return; }
+    if (window.AWDome.fijarVista) { window.AWDome.fijarVista(VISTA); }
     window.AWDome.pintar(cielo, encima, datos.cupula, objetos, indice, t.cupula);
   }
 
@@ -1466,7 +1489,15 @@
         (vacio ? '<div class="aw-hint">' + esc(t.pista) + '</div>' : '') +
         '<div class="aw-chosen">' +
           '<div class="aw-dome-wrap">' +
-            '<div class="aw-dome-stack">' +
+            '<div class="aw-vista" role="group">' +
+              '<button type="button" data-vista="boveda"' +
+                (VISTA === 'boveda' ? ' class="on"' : '') + '>' + esc(t.vistaBoveda) + '</button>' +
+              '<button type="button" data-vista="cupula"' +
+                (VISTA === 'cupula' ? ' class="on"' : '') + '>' + esc(t.vistaCupula) + '</button>' +
+              '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
+                esc(t.vistaCupula) + '</b>' + esc(t.vistaNota) + '</span></span>' +
+            '</div>' +
+            '<div class="aw-dome-stack' + (VISTA === 'cupula' ? ' gira' : '') + '">' +
               '<canvas class="aw-dome" id="aw-sky"></canvas>' +
               '<canvas class="aw-dome" id="aw-over"></canvas>' +
             '</div>' +
@@ -1608,6 +1639,11 @@
     });
 
     destino.addEventListener('click', function (e) {
+      var cambio = e.target.closest('button[data-vista]');
+      if (cambio) {
+        guardarVista(cambio.getAttribute('data-vista'));
+        return repintarTodo();
+      }
       var fuera = e.target.closest('button[data-quitar]');
       if (fuera) { return quitar(fuera.getAttribute('data-quitar')); }
       var celda = e.target.closest('rect.hit');
@@ -1646,6 +1682,27 @@
       if (e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault(); }
       if (e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault(); }
     });
+
+    /* ARRASTRAR PARA GIRAR, y solo en la cupula. En la boveda se ve el cielo
+       ENTERO de una vez, asi que no hay hacia donde mirar y el gesto no
+       significaria nada. Un ancho de pantalla equivale al campo de vision, que
+       es lo que hace que el cielo siga al dedo en vez de deslizarse. */
+    var arrastre = null;
+    destino.addEventListener('pointerdown', function (e) {
+      if (VISTA !== 'cupula' || !window.AWDome || !window.AWDome.vista) { return; }
+      var pila = e.target.closest('.aw-dome-stack');
+      if (!pila) { return; }
+      arrastre = { x: e.clientX, az: window.AWDome.vista.az, w: pila.clientWidth || 320 };
+      try { pila.setPointerCapture(e.pointerId); } catch (err) { /* da igual */ }
+    });
+    destino.addEventListener('pointermove', function (e) {
+      if (!arrastre) { return; }
+      var giro = (e.clientX - arrastre.x) / arrastre.w * window.AWDome.vista.fov;
+      window.AWDome.fijarVista('cupula', arrastre.az - giro);
+      irA(indice);
+    });
+    destino.addEventListener('pointerup', function () { arrastre = null; });
+    destino.addEventListener('pointercancel', function () { arrastre = null; });
 
     /* EL CURSOR ARRANCA EN LA PRIMERA HORA QUE EL MODELO SABE PINTAR, y no en
        el primer marco. La ventana empieza una hora ANTES de la oscuridad
