@@ -471,8 +471,11 @@
   border-color: rgba(207, 171, 74, 0.55);
   background: rgba(207, 171, 74, 0.08);
 }
-/* En perspectiva el dibujo se agarra y se gira; el cursor tiene que decirlo. */
-.aw-dome-stack.gira { cursor: grab; touch-action: pan-y; }
+/* En perspectiva el dibujo se agarra y se orienta; el cursor tiene que decirlo.
+   `touch-action: none` y no `pan-y`: el gesto vertical AHORA significa cambiar
+   la elevacion, asi que dejarselo al scroll de la pagina se lo quitaria al
+   dibujo justo en la mitad de los arrastres. */
+.aw-dome-stack.gira { cursor: grab; touch-action: none; }
 .aw-dome-stack.gira:active { cursor: grabbing; }
 
 /* ================== Las dos franjas de la noche ====================

@@ -1692,13 +1692,21 @@
       if (VISTA !== 'cupula' || !window.AWDome || !window.AWDome.vista) { return; }
       var pila = e.target.closest('.aw-dome-stack');
       if (!pila) { return; }
-      arrastre = { x: e.clientX, az: window.AWDome.vista.az, w: pila.clientWidth || 320 };
+      arrastre = { x: e.clientX, y: e.clientY,
+                   az: window.AWDome.vista.az, alt: window.AWDome.vista.alt,
+                   w: pila.clientWidth || 320, h: pila.clientHeight || 320 };
       try { pila.setPointerCapture(e.pointerId); } catch (err) { /* da igual */ }
     });
     destino.addEventListener('pointermove', function (e) {
       if (!arrastre) { return; }
-      var giro = (e.clientX - arrastre.x) / arrastre.w * window.AWDome.vista.fov;
-      window.AWDome.fijarVista('cupula', arrastre.az - giro);
+      // LOS DOS EJES, que es lo que hace que esto sea orientar y no solo girar:
+      // horizontal cambia el rumbo, vertical la elevacion. El lienzo es
+      // cuadrado, asi que el mismo campo de vision sirve de escala para los
+      // dos y el cielo se mueve lo mismo en las dos direcciones.
+      var fov = window.AWDome.vista.fov;
+      var giro = (e.clientX - arrastre.x) / arrastre.w * fov;
+      var sube = (e.clientY - arrastre.y) / arrastre.h * fov;
+      window.AWDome.fijarVista('cupula', arrastre.az - giro, arrastre.alt + sube);
       irA(indice);
     });
     destino.addEventListener('pointerup', function () { arrastre = null; });

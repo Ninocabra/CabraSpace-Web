@@ -173,7 +173,15 @@
      perspectiva -- media esfera queda A LA ESPALDA de la camara -- y los sitios
      que dibujan lineas o simbolos lo consultan. Los que no, siguen leyendo
      xy[0] y xy[1] como siempre. */
-  var VISTA = { modo: 'boveda', az: 180, alt: 28, fov: 118 };
+  /* LA ELEVACION DE ARRANQUE, 45 GRADOS, ES UNA CUENTA Y NO UN GUSTO. En una
+     camara estenopeica el horizonte cae por debajo del centro una fraccion
+     tan(elevacion)/tan(fov/2) de la media altura. Con 28 grados salia
+     0,532/1,664 = 0,32, o sea el horizonte al 66 % de la imagen: un tercio del
+     dibujo era suelo. Con 45 sale 1,000/1,664 = 0,60 y el horizonte se va al
+     80 %, que deja el cielo -- que es lo que se viene a ver -- ocupando cuatro
+     quintos. */
+  var VISTA = { modo: 'boveda', az: 180, alt: 45, fov: 118 };
+  var ALT_MIN = -25, ALT_MAX = 87;   // mas arriba la camara degenera en el cenit
 
   function camara() {
     var f = unitVec(VISTA.alt, VISTA.az);
@@ -857,9 +865,16 @@
     // la llamada porque lo consultan tanto `project` como su inversa, y el
     // sitio donde un dato lo leen dos funciones es el modulo.
     vista: VISTA,
-    fijarVista: function (modo, az) {
+    fijarVista: function (modo, az, alt) {
       VISTA.modo = modo === 'cupula' ? 'cupula' : 'boveda';
       if (typeof az === 'number') { VISTA.az = ((az % 360) + 360) % 360; }
+      // La elevacion se ACOTA y el azimut no: girar sobre uno mismo da la
+      // vuelta entera y es continuo, pero mirar mas alla del cenit no es mirar
+      // mas arriba, es quedar cabeza abajo. La camara no tiene alabeo, asi que
+      // pasado el cenit el mundo se invertiria sin que nadie lo haya pedido.
+      if (typeof alt === 'number') {
+        VISTA.alt = Math.max(ALT_MIN, Math.min(ALT_MAX, alt));
+      }
       return VISTA;
     },
     pintar: function (skyCanvas, overCanvas, cupula, objetos, indice, textos) {
