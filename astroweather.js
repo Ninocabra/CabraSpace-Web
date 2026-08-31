@@ -278,6 +278,18 @@
     return (typeof v === 'number' && isFinite(v)) ? v.toFixed(d === undefined ? 1 : d) : null;
   }
 
+  /* CONVERTIR DE UNIDAD ANTES DE COMPROBAR ES COMO UNA AUSENCIA SE VUELVE UN
+     CERO. `num` protege bien -- devuelve null para lo que no es numero -- pero
+     en JavaScript `null * 3.6` es 0, y para cuando `num` lo mira ya es un
+     numero perfectamente valido. La noche del 31-08-2026 AstroCamp dejo de
+     responder, `viento_ms` llego a null y el panel publico "VIENTO 0 km/h": el
+     campo que alimenta la puerta de seguridad, diciendo calma absoluta cuando
+     lo que habia era silencio. Es la tercera vez que este proyecto pinta la
+     ausencia de dato como dato, y las tres en un sitio distinto. */
+  function kmh(ms) {
+    return (typeof ms === 'number' && isFinite(ms)) ? ms * 3.6 : null;
+  }
+
   function fecha(iso, lang) {
     var d = new Date(iso.length === 10 ? iso + 'T12:00:00Z' : iso);
     if (isNaN(d.getTime())) { return esc(iso); }
@@ -812,7 +824,8 @@
     html += sensor(t.rocio, num(s.margen_rocio), '°C',
       s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''),
       s.medido_utc);
-    html += sensor(t.viento, num(s.viento_ms * 3.6, 0), 'km/h', s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc);
+    html += sensor(t.viento, num(kmh(s.viento_ms), 0), 'km/h',
+                   s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc);
     html += sensor(t.presion, num(s.presion, 0), 'hPa', '', s.medido_utc);
     // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
     // fabricante deriva el índice de nubes que va al lado, y el índice es
