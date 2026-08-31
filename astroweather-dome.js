@@ -180,8 +180,9 @@
      dibujo era suelo. Con 45 sale 1,000/1,664 = 0,60 y el horizonte se va al
      80 %, que deja el cielo -- que es lo que se viene a ver -- ocupando cuatro
      quintos. */
-  var VISTA = { modo: 'boveda', az: 180, alt: 45, fov: 118 };
+  var VISTA = { modo: 'boveda', az: 180, alt: 45, fov: 140 };
   var ALT_MIN = -25, ALT_MAX = 87;   // mas arriba la camara degenera en el cenit
+  var FOV_MIN = 35, FOV_MAX = 160;
 
   function camara() {
     var f = unitVec(VISTA.alt, VISTA.az);
@@ -197,14 +198,36 @@
     return { f: f, r: r, u: u };
   }
 
+  /* LA PROYECCION ES ESTEREOGRAFICA Y NO RECTILINEA, y esto es lo que permite
+     abrir el campo hasta dar sensacion de cupula. Una camara normal (r = k
+     tan t) deja de servir mucho antes de donde hace falta: a 140 grados de
+     campo el borde va a tan(70) = 2,75 contra tan(35) = 0,70 del medio, o sea
+     las esquinas estiradas casi CUATRO veces, y el horizonte sale como una
+     recta rigida que no se parece a estar debajo de un cielo.
+
+     La estereografica (r = 2k tan(t/2)) es conforme -- conserva las formas en
+     pequenio, asi que las constelaciones siguen siendo ellas -- aguanta campos
+     enormes sin reventar y curva el horizonte, que es justo lo que se lee como
+     boveda. Es la que usan los planetarios, y por este motivo.
+
+     k se fija para que el semicampo caiga en el borde: R = 2k tan(fov/4). */
+  function escalaPersp(R) {
+    return R / (2 * Math.tan(VISTA.fov / 4 * D2R));
+  }
+
   function projectPersp(alt, az, cx, cy, R) {
     var v = unitVec(alt, az), c = camara();
     var zc = v[0] * c.f[0] + v[1] * c.f[1] + v[2] * c.f[2];
-    if (zc <= 0.03) { return [-9999, -9999, false]; }
     var xc = v[0] * c.r[0] + v[1] * c.r[1] + v[2] * c.r[2];
     var yc = v[0] * c.u[0] + v[1] * c.u[1] + v[2] * c.u[2];
-    var k = R / Math.tan(VISTA.fov / 2 * D2R);
-    return [cx + xc / zc * k, cy - yc / zc * k, true];
+    var rho = Math.sqrt(xc * xc + yc * yc);
+    var th = Math.atan2(rho, zc);
+    // Cerca de 180 grados la estereografica manda el punto al infinito. Se
+    // corta antes: 150 grados ya es mas de lo que ningun encuadre ensena.
+    if (th > 2.618) { return [-9999, -9999, false]; }
+    if (rho < 1e-9) { return [cx, cy, true]; }
+    var rp = 2 * escalaPersp(R) * Math.tan(th / 2);
+    return [cx + xc / rho * rp, cy - yc / rho * rp, true];
   }
 
   function project(alt, az, cx, cy, R) {
@@ -217,11 +240,14 @@
   // (la boveda es un circulo) y alt < 0 es suelo, no cielo.
   function unproject(x, y, cx, cy, R) {
     if (VISTA.modo === 'cupula') {
-      var k = R / Math.tan(VISTA.fov / 2 * D2R), c = camara();
+      var k = escalaPersp(R), c = camara();
       var xn = (x - cx) / k, yn = -(y - cy) / k;
-      var d = [c.f[0] + xn * c.r[0] + yn * c.u[0],
-               c.f[1] + xn * c.r[1] + yn * c.u[1],
-               c.f[2] + xn * c.r[2] + yn * c.u[2]];
+      var rp = Math.sqrt(xn * xn + yn * yn);
+      var th = 2 * Math.atan(rp / 2);          // la inversa de r = 2k tan(t/2)
+      var ct = Math.cos(th), st = rp < 1e-9 ? 0 : Math.sin(th) / rp;
+      var d = [ct * c.f[0] + st * (xn * c.r[0] + yn * c.u[0]),
+               ct * c.f[1] + st * (xn * c.r[1] + yn * c.u[1]),
+               ct * c.f[2] + st * (xn * c.r[2] + yn * c.u[2])];
       var n = Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
       d[0] /= n; d[1] /= n; d[2] /= n;
       return [Math.asin(d[2]) / D2R,
@@ -576,7 +602,13 @@
       if (c.alt <= 0) { return; }
       var xy = project(c.alt, c.az, ox, oy, R);
       if (!xy[2]) { return; }
-      var radius = Math.max(20, c.span / 90 * R * (c.overhead ? 0.85 : 1.0));
+      // El tamanio del parche sale de CUANTOS PIXELES MIDE UN GRADO, que no es
+      // el mismo numero en las dos vistas: en la boveda el radio R son 90
+      // grados clavados, y en la cupula depende del zoom. Atado a R como
+      // estaba, un cirro de 40 grados salia un 20 % pequenio con el campo
+      // abierto y enorme al acercarse.
+      var porGrado = VISTA.modo === 'cupula' ? escalaPersp(R) * D2R : R / 90;
+      var radius = Math.max(20, c.span * porGrado * (c.overhead ? 0.85 : 1.0));
       // Cuanto tapa DE VERDAD: la cobertura por el peso de su capa. Un
       // estrato bajo al 90 % y un cirro al 90 % no estorban igual.
       var estorbo = Math.min(1, c.cover / 100 * (LAYER_WEIGHT[c.layer] || 0.8));
@@ -865,7 +897,7 @@
     // la llamada porque lo consultan tanto `project` como su inversa, y el
     // sitio donde un dato lo leen dos funciones es el modulo.
     vista: VISTA,
-    fijarVista: function (modo, az, alt) {
+    fijarVista: function (modo, az, alt, fov) {
       VISTA.modo = modo === 'cupula' ? 'cupula' : 'boveda';
       if (typeof az === 'number') { VISTA.az = ((az % 360) + 360) % 360; }
       // La elevacion se ACOTA y el azimut no: girar sobre uno mismo da la
@@ -874,6 +906,9 @@
       // pasado el cenit el mundo se invertiria sin que nadie lo haya pedido.
       if (typeof alt === 'number') {
         VISTA.alt = Math.max(ALT_MIN, Math.min(ALT_MAX, alt));
+      }
+      if (typeof fov === 'number') {
+        VISTA.fov = Math.max(FOV_MIN, Math.min(FOV_MAX, fov));
       }
       return VISTA;
     },

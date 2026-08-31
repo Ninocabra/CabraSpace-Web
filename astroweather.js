@@ -1687,17 +1687,45 @@
        ENTERO de una vez, asi que no hay hacia donde mirar y el gesto no
        significaria nada. Un ancho de pantalla equivale al campo de vision, que
        es lo que hace que el cielo siga al dedo en vez de deslizarse. */
-    var arrastre = null;
+    var arrastre = null, dedos = {}, pellizco = null;
+
+    function separacionDedos() {
+      var ids = Object.keys(dedos);
+      if (ids.length < 2) { return 0; }
+      var a = dedos[ids[0]], b = dedos[ids[1]];
+      return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    }
+
     destino.addEventListener('pointerdown', function (e) {
       if (VISTA !== 'cupula' || !window.AWDome || !window.AWDome.vista) { return; }
       var pila = e.target.closest('.aw-dome-stack');
       if (!pila) { return; }
+      dedos[e.pointerId] = { x: e.clientX, y: e.clientY };
+      // DOS DEDOS SON UN PELLIZCO, no dos arrastres. Se cancela el arrastre en
+      // curso: si no, el primer dedo seguiria girando el cielo mientras el
+      // segundo hace zoom y el gesto haria dos cosas a la vez.
+      if (Object.keys(dedos).length === 2) {
+        arrastre = null;
+        pellizco = { d: separacionDedos(), fov: window.AWDome.vista.fov };
+        return;
+      }
       arrastre = { x: e.clientX, y: e.clientY,
                    az: window.AWDome.vista.az, alt: window.AWDome.vista.alt,
                    w: pila.clientWidth || 320, h: pila.clientHeight || 320 };
       try { pila.setPointerCapture(e.pointerId); } catch (err) { /* da igual */ }
     });
     destino.addEventListener('pointermove', function (e) {
+      if (dedos[e.pointerId]) { dedos[e.pointerId] = { x: e.clientX, y: e.clientY }; }
+      if (pellizco) {
+        var d = separacionDedos();
+        // Dedos que se separan = campo mas estrecho = acercarse.
+        if (d > 4 && pellizco.d > 4) {
+          window.AWDome.fijarVista('cupula', undefined, undefined,
+                                   pellizco.fov * pellizco.d / d);
+          irA(indice);
+        }
+        return;
+      }
       if (!arrastre) { return; }
       // LOS DOS EJES, que es lo que hace que esto sea orientar y no solo girar:
       // horizontal cambia el rumbo, vertical la elevacion. El lienzo es
@@ -1709,8 +1737,27 @@
       window.AWDome.fijarVista('cupula', arrastre.az - giro, arrastre.alt + sube);
       irA(indice);
     });
-    destino.addEventListener('pointerup', function () { arrastre = null; });
-    destino.addEventListener('pointercancel', function () { arrastre = null; });
+    function soltar(e) {
+      delete dedos[e.pointerId];
+      if (Object.keys(dedos).length < 2) { pellizco = null; }
+      arrastre = null;
+    }
+    destino.addEventListener('pointerup', soltar);
+    destino.addEventListener('pointercancel', soltar);
+
+    /* LA RUEDA, para el escritorio. `passive: false` es obligatorio: sin el, el
+       navegador ignora el `preventDefault` y la pagina se desplaza a la vez que
+       el cielo se acerca, que es la peor de las dos cosas. Se multiplica y no se
+       suma porque el zoom se percibe en proporcion: un paso del 12 % se siente
+       igual de grande con campo ancho que estrecho. */
+    destino.addEventListener('wheel', function (e) {
+      if (VISTA !== 'cupula' || !window.AWDome || !window.AWDome.vista) { return; }
+      if (!e.target.closest('.aw-dome-stack')) { return; }
+      e.preventDefault();
+      var f = window.AWDome.vista.fov * (e.deltaY > 0 ? 1.12 : 1 / 1.12);
+      window.AWDome.fijarVista('cupula', undefined, undefined, f);
+      irA(indice);
+    }, { passive: false });
 
     /* EL CURSOR ARRANCA EN LA PRIMERA HORA QUE EL MODELO SABE PINTAR, y no en
        el primer marco. La ventana empieza una hora ANTES de la oscuridad
