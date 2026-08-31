@@ -378,6 +378,52 @@
      arreglo es del MOTOR: publicar la serie horaria que ya tiene de ECMWF y
      de CAMS. */
 
+  /* ============ LA PALETA DE LA FRANJA, Y COMO SE VUELVE ATRAS ==========
+     UNA SOLA LINEA. Cambiar `PALETA_FRANJA` a 'semaforo' devuelve exactamente
+     lo que habia antes; las dos implementaciones se quedan enteras y ninguna
+     depende de la otra. Se pide asi a proposito: esto es una decision de
+     lenguaje visual, no un arreglo, y las decisiones de lenguaje visual hay que
+     poder deshacerlas despues de vivir con ellas un par de noches.
+
+       'cupula'   base NEGRA -- la noche perfecta no tiene nada delante -- y
+                  cada estorbo sumando su color y su intensidad, que es
+                  literalmente lo que hace la boveda pixel a pixel: nube en
+                  GRIS por cuanto cubre, Luna en AZUL por cuanto ilumina,
+                  crepusculo en AMARILLO. Cuanto mas claro, mas tapado.
+       'semaforo' verde despejado / ambar parcial / rojo cubierto.
+
+     El motivo del cambio: en la cupula la Luna es AZUL y el amarillo es luz de
+     dia. Tener la Luna dorada en la franja y azul tres bloques mas abajo es el
+     mismo concepto con dos reglas, que es el patron que nos ha mordido tres
+     veces este mes. Los colores no se copian aqui: se leen de `AWDome.paleta`,
+     que es donde viven. */
+  var PALETA_FRANJA = 'cupula';
+
+  function paletaCupula() {
+    return (window.AWDome && window.AWDome.paleta) || null;
+  }
+
+  // Suma un tinte sobre lo que ya hay, que es como compone la boveda el exceso
+  // de brillo: cada cosa que estorba ACLARA el cielo, nunca lo oscurece.
+  function sumarTinte(base, color, k) {
+    for (var i = 0; i < 3; i++) {
+      base[i] = Math.min(255, base[i] + color[i] * Math.max(0, Math.min(1, k)));
+    }
+  }
+
+  function colorHora(h, noche) {
+    var pal = paletaCupula();
+    if (PALETA_FRANJA !== 'cupula' || !pal) {
+      return colorNube((h.nubes_previstas || 0) / 100);
+    }
+    var c = [10, 11, 14];                       // noche perfecta: casi negro
+    sumarTinte(c, pal.nube, (h.nubes_previstas || 0) / 100 * 0.92);
+    if (h.limita === 'luna') {
+      sumarTinte(c, pal.luna, (noche.luna_iluminacion || 0) * 0.55);
+    }
+    return 'rgb(' + c.map(Math.round).join(',') + ')';
+  }
+
   // Verde despejado, ambar parcial, rojo cubierto: los mismos tres colores
   // con los que la pagina ya semaforea los consejos.
   function colorNube(frac) {
@@ -404,7 +450,7 @@
     function r1(x) { return Math.round(x * 10) / 10; }
 
     var degradado = horas.map(function (h) {
-      return colorNube((h.nubes_previstas || 0) / 100) + ' ' + r1(pct(h.t_utc)) + '%';
+      return colorHora(h, noche) + ' ' + r1(pct(h.t_utc)) + '%';
     }).join(', ');
 
     var velos = '', marcas = '';
@@ -500,7 +546,8 @@
       return franja(n, i === 0 ? t.franjaHoy : t.franjaManana, lang, t, msMax);
     }).join('');
     if (!filas) { return ''; }
-    return '<div class="aw-franjas"><span class="rotulo">' + esc(t.franjaTitulo) +
+    return '<div class="aw-franjas paleta-' + PALETA_FRANJA + '"><span class="rotulo">' +
+      esc(t.franjaTitulo) +
       '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
       esc(t.franjaTitulo) + '</b>' + esc(t.franjaNota) + '</span></span></span>' +
       filas + '</div>';

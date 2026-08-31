@@ -893,6 +893,17 @@
     cargarViaLactea: cargarViaLactea,
     pendiente: MW_PENDIENTE,
     listaViaLactea: function () { return MW_SHAPE !== null; },
+    /* LA PALETA, PUBLICADA. La usa tambien la franja de la noche del panel, y
+       lo que NO puede pasar es que alli la Luna sea dorada y aqui azul: seria
+       otra vez el mismo concepto con dos reglas. Se exporta desde donde vive en
+       vez de copiarse. En 0-255 porque quien la consume pinta CSS. */
+    paleta: {
+      galaxia: C_GALAXY.map(function (v) { return Math.round(v * 255); }),
+      luna: C_MOON.map(function (v) { return Math.round(v * 255); }),
+      polvo: C_DUST.map(function (v) { return Math.round(v * 255); }),
+      dia: C_DAY.map(function (v) { return Math.round(v * 255); }),
+      nube: C_CLOUD.map(function (v) { return Math.round(v * 255); })
+    },
     // El modo de vista y hacia donde mira la camara. Vive en el modulo y no en
     // la llamada porque lo consultan tanto `project` como su inversa, y el
     // sitio donde un dato lo leen dos funciones es el modulo.

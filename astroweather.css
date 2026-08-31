@@ -563,6 +563,31 @@
   font-weight: 600;
 }
 
+/* ---- Paleta de la cupula: base negra y cada estorbo con SU color ----
+   Se activa sola con la clase que pone `PALETA_FRANJA` en el JS. Quitando ese
+   interruptor -- una linea -- estas reglas dejan de aplicarse y vuelve el
+   semaforo sin tocar nada mas. Los tres colores son los de `AWDome.paleta`:
+   dia (255,204,56), Luna (82,140,255) y nube (219,224,235). */
+.paleta-cupula .aw-franja .barra { background: #0a0b0e; }
+.paleta-cupula .aw-franja .nub { opacity: 1; }
+/* El crepusculo deja de ser un velo oscuro y pasa a ser lo que ES: luz de dia
+   que todavia estorba. En la boveda ese amarillo significa exactamente esto. */
+.paleta-cupula .aw-franja .crep { background: rgba(255, 204, 56, 0.16); }
+.paleta-cupula .aw-franja .lin { background: rgba(255, 255, 255, 0.35); }
+.paleta-cupula .aw-franja .barra > i.luna { background: rgb(82, 140, 255); opacity: 1; }
+.paleta-cupula .aw-franja .glifo { color: rgb(140, 178, 255); }
+/* Los numeros van sobre una banda que recorre de casi negro a casi BLANCO --
+   negro es cielo limpio y blanco es tapado del todo -- asi que ni texto claro
+   ni texto oscuro valen para todo el recorrido. La pastilla lo resuelve de una
+   vez y no depende del valor que haya debajo. */
+.paleta-cupula .aw-franja .pct {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(8, 9, 12, 0.62);
+  padding: 1px 4px;
+  border-radius: 4px;
+  top: 3px;
+}
+
 @media (max-width: 620px) {
   .aw-franja { flex-direction: column; gap: 4px; }
   .aw-franja .dia { flex: none; padding-top: 0; }
