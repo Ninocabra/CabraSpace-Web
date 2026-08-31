@@ -384,7 +384,7 @@
       return colorNube((h.nubes_previstas || 0) / 100) + ' ' + r1(pct(h.t_utc)) + '%';
     }).join(', ');
 
-    var velos = '';
+    var velos = '', marcas = '';
     if (cr.astronomico_desde && cr.astronomico_hasta) {
       var d0 = Math.max(0, pct(cr.astronomico_desde));
       var d1 = Math.min(100, pct(cr.astronomico_hasta));
@@ -392,6 +392,15 @@
               '<i class="crep" style="left:' + r1(d1) + '%;width:' + r1(100 - d1) + '%"></i>' +
               '<i class="lin" style="left:' + r1(d0) + '%"></i>' +
               '<i class="lin" style="left:' + r1(d1) + '%"></i>';
+      // Y SUS HORAS DEBAJO, que son las que se planifican. El ocaso y el orto
+      // acotan la franja; lo que se apunta en la agenda es cuando empieza y
+      // cuando se acaba la oscuridad astronomica, que es la parte en la que se
+      // hace cielo profundo. Van mas claras que las de los extremos a
+      // proposito: son la informacion, no el marco.
+      marcas = '<span class="hh osc" style="left:' + r1(d0) + '%">' +
+                 esc(hora(cr.astronomico_desde)) + '</span>' +
+               '<span class="hh osc" style="left:' + r1(d1) + '%">' +
+                 esc(hora(cr.astronomico_hasta)) + '</span>';
     }
 
     /* La Luna, por TRAMOS y no de la primera a la ultima: si alguna vez deja
@@ -424,8 +433,10 @@
       var x = pct(h.t_utc);
       return (h.nubes_previstas || 0) >= 20 && x >= 0 && x <= 100;
     }).map(function (h) {
-      return '<b class="pct" style="left:' + r1(pct(h.t_utc)) + '%">' +
-        Math.round(h.nubes_previstas) + '</b>';
+      // Con nube y con unidad: un "47" suelto sobre una barra de colores no
+      // dice de que es. Nino lo miro y pregunto exactamente eso.
+      return '<b class="pct" style="left:' + r1(pct(h.t_utc)) + '%">&#9729; ' +
+        Math.round(h.nubes_previstas) + '%</b>';
     }).join('');
 
     var dentro = horas.filter(function (h) {
@@ -447,7 +458,7 @@
           velos + luna + cifras +
         '</div>' +
         '<span class="hh izq">' + esc(hora(cr.ocaso)) + '</span>' +
-        '<span class="hh der">' + esc(hora(cr.orto)) + '</span>' +
+        '<span class="hh der">' + esc(hora(cr.orto)) + '</span>' + marcas +
       '</div></div>';
   }
 
@@ -497,7 +508,8 @@
         (vd && vd.regla ? esc(vd.regla) + ' ' : '') +
         esc(noche.probabilidad_definicion || '') + '</span></span>';
       html += '<div class="aw-verdict' + (vd ? (vd.abierto ? ' abierto' : ' cerrado') : '') + '">' +
-        '<span class="rotulo">' + esc(t.previsionTecho) + ' · ' + esc(t.estaNoche) + '</span>' +
+        '<span class="rotulo">' + esc(t.previsionTecho) + ' · ' + esc(t.estaNoche) +
+          ' · ' + fecha(noche.noche, lang) + '</span>' +
         (vd ? '<div class="palabra">' + esc(vd.abierto ? t.abierto : t.cerrado) + '</div>'
             : '<div class="palabra num">' + Math.round(p * 100) + '%</div>') +
         '<div class="prob">' + (vd ? '<b>' + Math.round(p * 100) + '%</b> ' : '') +
@@ -536,17 +548,13 @@
             ? ' · ' + esc(String(sen.medido_utc).slice(11, 16)) + ' UTC' : '') +
         '</div></div>';
     }
-    html += '</div><div class="aw-when">' + esc(t.noche) + ' <strong>' + fecha(noche.noche, lang) + '</strong>';
-    if (num(noche.horas_utilizables_esperadas) !== null) {
-      // Las dos cuentas juntas y con su diferencia dicha: la grande incluye
-      // crepúsculo y por eso puede pasar de la oscuridad astronómica, y la que
-      // vale para cielo profundo es la pequeña.
-      var oscuras = num(noche.horas_utilizables_oscuras);
-      html += '<br>' + num(noche.horas_utilizables_esperadas) + ' ' + esc(t.horasUtiles) +
-        (oscuras !== null ? ', ' + oscuras + ' ' + esc(t.horasUtilesOscuras) : '') +
-        '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop">' +
-        '<b>' + esc(t.horasTitulo) + '</b>' + esc(t.horasExplica) + '</span></span>';
-    }
+    /* SE VA EL BLOQUE `aw-when` ENTERO, y las dos cosas que decia por separado.
+       La fecha estaba abajo a la derecha diciendo "noche del lunes 31" mientras
+       arriba del todo ya ponia "esta noche": la misma cosa dos veces y en dos
+       esquinas. Ahora la fecha va donde estaba el rotulo.
+       Y las horas utilizables se caen: la que vale para cielo profundo es la
+       de oscuridad astronomica, que tiene su propia casilla justo debajo, y
+       ahora ademas sus dos horas escritas en la base de la franja. */
     html += '</div></div>' + bloqueFranjas(datos, t, lang) + '<div class="aw-grid">';
     if (typeof noche.luna_iluminacion === 'number') {
       html += celda(t.luna, Math.round(noche.luna_iluminacion * 100) + '%',
@@ -620,26 +628,40 @@
       '</span></summary>' + luces + '</details>';
   }
 
-  // De dónde sale cada correlación. Va dentro del JSON y se enseña aquí por la
-  // misma razón que la procedencia de cada número: se le está diciendo a
-  // alguien que cambie lo que iba a hacer esta noche.
-  function bloqueReferencias(refs, t) {
+  /* De dónde sale cada correlación. Va dentro del JSON y se enseña aquí por la
+     misma razón que la procedencia de cada número: se le está diciendo a
+     alguien que cambie lo que iba a hacer esta noche.
+
+     A UN "?" Y NO A UNA LÍNEA PROPIA. Era un `details` a lo ancho del bloque
+     que, plegado, seguía gastando una línea entera para decir su propio
+     título. La procedencia tiene que estar y tiene que ser accesible, pero no
+     compite por altura con el consejo: es lo mismo que ya se hizo con la nota
+     del viento en la cabecera de sensores. */
+  function infoReferencias(refs, t) {
     if (!refs || !refs.length) { return ''; }
-    return '<details class="aw-refs"><summary>' + esc(t.referencias) + '</summary>' +
+    return '<span class="aw-info abajo refs" tabindex="0">?<span class="aw-pop"><b>' +
+      esc(t.referencias) + '</b>' +
       refs.map(function (r) {
-        return '<div class="ref"><b>' + esc(r.tema) + '</b> ' + esc(r.dice) + '</div>';
-      }).join('') + '</details>';
+        return '<span class="ref"><b>' + esc(r.tema) + '</b> ' + esc(r.dice) + '</span>';
+      }).join('') + '</span></span>';
   }
 
   function bloqueConsejos(noche, t) {
     var c = noche.consejos;
     if (!c || !c.adquisicion) { return ''; }
+    /* LAS DOS PLEGABLES, EN PARALELO. Son hermanas -- el mismo semáforo visto
+       por filtro y visto por familia de objeto -- y apiladas gastaban dos
+       líneas para decir lo mismo dos veces. Al lado se leen de una pasada, y
+       la procedencia se va al "?" del extremo derecho de esa misma línea. Se
+       ahorran tres líneas de altura sin quitar una sola cosa. */
     return '<div class="aw-plan"><h3>' + esc(t.consejos) + '</h3>' +
       (c.resumen ? '<p class="aw-headline-tip">' + esc(c.resumen) + '</p>' : '') +
-      filaSemaforos(t.adquisicion, c.adquisicion, true) +
-      filaSemaforos(t.familias, c.objetos, true) +
-      filaSemaforos(t.otros, c.avisos, false) +
-      bloqueReferencias(c.referencias, t) + '</div>';
+      '<div class="aw-lane-pair">' +
+        filaSemaforos(t.adquisicion, c.adquisicion, true) +
+        filaSemaforos(t.familias, c.objetos, true) +
+        infoReferencias(c.referencias, t) +
+      '</div>' +
+      filaSemaforos(t.otros, c.avisos, false) + '</div>';
   }
 
   function bloqueSensores(datos, t) {

@@ -525,13 +525,36 @@
 .aw-franja .hh { position: absolute; top: 25px; font-size: 0.62rem; color: var(--text-muted, #777); }
 .aw-franja .hh.izq { left: 0; }
 .aw-franja .hh.der { right: 0; }
+/* Las de la oscuridad astronomica, centradas bajo su marca y mas claras que
+   el ocaso y el orto: son las que se apuntan en la agenda, y las de los
+   extremos solo dicen donde empieza y acaba el dibujo. */
+.aw-franja .hh.osc {
+  transform: translateX(-50%);
+  color: var(--text-secondary, #bbb);
+  font-weight: 600;
+}
 
 @media (max-width: 620px) {
   .aw-franja { flex-direction: column; gap: 4px; }
   .aw-franja .dia { flex: none; padding-top: 0; }
   /* El ancho proporcional NO se pisa aqui: es el que hace comparables las dos
      noches de un vistazo, y en columna sigue siendo legible. */
+  /* Con la barra corta, el ocaso y el orto se comen a las horas de oscuridad,
+     que son las que importan. Se van los extremos, no las buenas. */
+  .aw-franja .hh.izq, .aw-franja .hh.der { display: none; }
 }
+
+/* Las dos plegables hermanas, en paralelo, y la procedencia en el "?" del
+   extremo derecho de esa misma linea. Flex y no grid para que en pantalla
+   estrecha caigan solas una debajo de otra sin tener que redefinir columnas. */
+.aw-lane-pair { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 24px; }
+.aw-lane-pair > .aw-lane-row { flex: 1 1 250px; min-width: 0; }
+.aw-lane-pair > .aw-info { flex: 0 0 auto; margin-top: 4px; }
+/* Pegado al borde derecho, el globo tiene que abrirse hacia DENTRO o se sale
+   de la pagina. */
+.aw-lane-pair > .aw-info.refs .aw-pop { left: auto; right: 0; }
+.aw-pop .ref { display: block; margin-top: 9px; font-size: 0.8rem; }
+.aw-pop .ref b { color: var(--text-primary, #eee); }
 
 /* ======================= Semáforo de la noche ======================= */
 /* MARCO DORADO, y no es decoración: "Qué hacer esta noche" son cinco cosas
