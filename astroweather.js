@@ -328,21 +328,33 @@
       (nota ? '<span class="n">' + esc(nota) + '</span>' : '') + '</div>';
   }
 
-  function sensor(clave, valor, unidad, estado, cuando) {
+  /* UNA CASILLA DE SENSOR, VIVA O RESCATADA.
+     Cuando la fuente no responde NO se borra el dato: se conserva la ultima
+     lectura y se marca. Borrarla dejaba el panel en dos casillas y quien lo
+     miraba no podia saber si eso era el sitio o era la descarga; y ponerla sin
+     marcar es peor todavia, porque un viento de hace ocho horas leido como si
+     fuera de ahora es exactamente el error que este proyecto lleva tres
+     capitulos persiguiendo.
+     El aviso va ARRIBA, antes que el nombre y el numero, para que no se pueda
+     leer el valor sin haber leido antes que no es de ahora. */
+  function sensor(clave, valor, unidad, estado, cuando, rescatado) {
     if (valor === null || valor === undefined) { return ''; }
-    // La hora va en la casilla y entera en el title: quien quiera saber de
-    // cuando es la medida la ve, y quien no, no se come una fecha completa.
-    return '<div class="aw-sensor ' + (estado || '') + '"' +
-      (cuando ? ' title="' + esc(String(cuando).replace('T', ' ').slice(0, 16)) + ' UTC"' : '') +
-      '><span class="k">' + esc(clave) + '</span>' +
+    var caido = !!rescatado;
+    var marca = rescatado || cuando;
+    // La hora va SIEMPRE que se sepa, y entera en el title: quien quiera saber
+    // de cuando es la medida la ve, y quien no, no se come una fecha completa.
+    return '<div class="aw-sensor ' + (estado || '') + (caido ? ' caido' : '') + '"' +
+      (marca ? ' title="' + esc(String(marca).replace('T', ' ').slice(0, 16)) + ' UTC"' : '') +
+      '>' + (caido ? '<span class="no-responde">NO RESPONDE</span>' : '') +
+      '<span class="k">' + esc(clave) + '</span>' +
       '<span class="v">' + esc(valor) +
         (unidad ? ' <span class="u">' + esc(unidad) + '</span>' : '') + '</span>' +
       // Con su ZONA. La hora sale del JSON en UTC y el visitante la lee en la
       // suya: "19:49" a secas se entiende como la hora de su reloj, y en
       // verano son dos horas de diferencia -- suficiente para creer que un
       // sensor lleva parado media tarde cuando midio hace un minuto.
-      (cuando ? '<span class="cuando">' + esc(String(cuando).slice(11, 16)) +
-                ' UTC</span>' : '') +
+      (marca ? '<span class="cuando">' + esc(String(marca).slice(11, 16)) +
+               ' UTC</span>' : '') +
       '</div>';
   }
 
@@ -815,24 +827,36 @@
     if (!s) { return html + '<div class="aw-stale">' + esc(t.sinSensores) + '</div></div>'; }
 
     html += '<div class="aw-sensor-grid">';
+    // De donde salio cada valor: si la clave esta en `del_archivo`, ese campo
+    // NO viene de la lectura de ahora sino de la ultima que hubo, y trae su
+    // propia hora. Cada campo puede estar en un estado distinto -- AEMET sigue
+    // dando temperatura cuando AstroCamp ya no da nada -- asi que se pregunta
+    // uno a uno y no por el bloque entero.
+    var arch = s.del_archivo || {};
+    // El margen de rocio se DERIVA de temperatura y punto de rocio, asi que
+    // esta caido si cualquiera de los dos lo esta.
+    var rocioViejo = arch.punto_rocio || arch.temperatura;
     // El fotometro primero: es la unica medida DIRECTA del fondo de cielo que
     // hay en esta pagina, y todo lo demas del cielo es estimacion.
     html += sensor(t.fotometro, num(s.cielo_mag_medido, 2), t.magArc, 'good',
       s.cielo_mag_medido_utc);
-    html += sensor(t.temp, num(s.temperatura), '°C', '', s.medido_utc);
-    html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '', s.medido_utc);
+    html += sensor(t.temp, num(s.temperatura), '°C', '', s.medido_utc,
+                   arch.temperatura);
+    html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '',
+                   s.medido_utc, arch.humedad);
     html += sensor(t.rocio, num(s.margen_rocio), '°C',
       s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''),
-      s.medido_utc);
+      s.medido_utc, rocioViejo);
     html += sensor(t.viento, num(kmh(s.viento_ms), 0), 'km/h',
-                   s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc);
-    html += sensor(t.presion, num(s.presion, 0), 'hPa', '', s.medido_utc);
+                   s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc, arch.viento_ms);
+    html += sensor(t.presion, num(s.presion, 0), 'hPa', '', s.medido_utc,
+                   arch.presion);
     // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
     // fabricante deriva el índice de nubes que va al lado, y el índice es
     // además el que consume el motor. Dos números para lo mismo, y el crudo
     // necesita una escala que la página no da.
     html += sensor(t.indice, num(s.cielo_indice), '',
-      s.cielo_despejado === true ? 'good' : '', s.medido_utc);
+      s.cielo_despejado === true ? 'good' : '', s.medido_utc, arch.cielo_indice);
     // Los techos ya NO van aquí: suben a la cabecera, del tamaño de la
     // previsión y a su lado, porque no son un sensor más -- son la respuesta
     // medida a la misma pregunta que la previsión contesta estimando.
@@ -847,15 +871,10 @@
         num(s.antiguedad_min, 0) + ' ' + esc(t.minutos) +
         (s.fresco === false ? ' · ' + esc(t.viejo) : '') + '.</div>';
     }
-    // La página de AstroCamp vuelve incompleta a ratos, y callarlo era lo peor
-    // que se podía hacer: el panel se quedaba en dos casillas y quien lo miraba
-    // no tenía forma de saber si eso era el sitio o era la descarga.
-    var completados = Object.keys(s.del_archivo || {});
-    if (completados.length) {
-      html += '<div class="aw-stale">' + esc(t.delArchivo) + ' ' +
-        completados.map(function (k) { return esc(t.campos[k] || k); }).join(', ') +
-        '.</div>';
-    }
+    // La lista de "completado desde el archivo" se retira: decia en una linea
+    // al pie lo que ahora dice CADA casilla en su sitio, y obligaba a cruzar
+    // dos cosas -- leer la lista y volver a buscar la casilla -- para saber si
+    // el numero que estabas mirando era de ahora.
     if (s.incompleto) {
       html += '<div class="aw-stale incompleta">' + esc(s.incompleto) + '.</div>';
     }

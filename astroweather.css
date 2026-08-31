@@ -449,6 +449,25 @@
 }
 .aw-hint { font-size: 0.85rem; color: var(--text-muted, #777); margin-top: 14px; }
 
+/* ------- El sensor que no responde: se conserva y se marca -------
+   El aviso va ARRIBA del nombre para que no se pueda leer el numero sin haber
+   leido antes que no es de ahora. Ambar y no rojo: el dato sigue siendo bueno,
+   lo que ha caducado es su hora. */
+.aw-sensor.caido {
+  border-color: rgba(232, 173, 82, 0.35);
+  background: rgba(232, 173, 82, 0.04);
+}
+.aw-sensor .no-responde {
+  display: block;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #e8ad52;
+  margin-bottom: 5px;
+}
+.aw-sensor.caido .v { color: var(--text-secondary, #bbb); }
+.aw-sensor.caido .cuando { color: #e8ad52; }
+
 /* ============== El selector de vista de la cupula ==================
    Encima del dibujo y no en un panel aparte: es una propiedad de lo que estas
    mirando, no un ajuste de la pagina. */
