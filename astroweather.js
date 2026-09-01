@@ -69,6 +69,7 @@
       cielo: 'Cielo más oscuro', seeing: 'Seeing', transparencia: 'Transparencia',
       tipico: 'típico',
       iluminada: 'iluminada', sinCalibrar: 'estimación sin calibrar',
+      calima: 'calima', sinPolvo: 'sin desglose de polvo',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'Qué hacer esta noche',
       adquisicion: 'Por filtro y técnica', familias: 'Por familia de objeto',
@@ -182,6 +183,7 @@
       cielo: 'Darkest sky', seeing: 'Seeing', transparencia: 'Transparency',
       tipico: 'typical',
       iluminada: 'illuminated', sinCalibrar: 'uncalibrated estimate',
+      calima: 'dust haze', sinPolvo: 'no dust breakdown',
       horas: 'h', magArc: 'mag/arcsec²',
       consejos: 'What to do tonight',
       adquisicion: 'By filter and technique', familias: 'By object family',
@@ -771,9 +773,18 @@
         seeing.calibrado === false ? t.sinCalibrar : null, limita === 'seeing');
     }
     if (transp.veredicto) {
+      // El pie dice de donde sale el numero Y si sabemos cuanto del aerosol es
+      // polvo. Sin esa segunda parte, la ausencia de aviso de calima se lee
+      // como "no hay calima", y del 27-08 al 01-09-2026 significo "no tenemos
+      // el dato" en noches que si la tenian.
+      var pie = null;
+      if (transp.origen) {
+        pie = 'AOD ' + num(transp.aod, 3) + ' · ' + transp.origen;
+        if (transp.calima) pie += ' · ' + t.calima;
+        else if (transp.especies === false) pie += ' · ' + t.sinPolvo;
+      }
       html += celda(t.transparencia, esc(traducirTransparencia(transp.veredicto, t)),
-        transp.origen ? 'AOD ' + num(transp.aod, 3) + ' · ' + transp.origen : null,
-        limita === 'transparencia');
+        pie, limita === 'transparencia');
     }
     return html + '</div>';
   }
