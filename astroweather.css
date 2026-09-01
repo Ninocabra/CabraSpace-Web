@@ -478,6 +478,9 @@
   margin-bottom: 4px;
 }
 .aw-techos.caido .palabra { color: var(--text-secondary, #bbb); }
+/* La raya del "no se sabe": tiene que leerse como ausencia y no como un valor,
+   asi que va en gris apagado y no en el color de un estado. */
+.aw-techos .palabra.sin-dato { color: var(--text-muted, #777); font-weight: 400; }
 .aw-techos.caido .prob { color: #e8ad52; }
 
 /* ============== El selector de vista de la cupula ==================

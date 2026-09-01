@@ -44,6 +44,7 @@
       previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
       franjaTitulo: 'Cómo evoluciona la noche',
       vistaBoveda: 'Bóveda', vistaCupula: 'Cúpula 3D',
+      sinDatoDesde: 'sin dato desde',
       sinNubes: 'La rejilla de nubes no llegó en la pasada que generó esta noche, así que la cúpula NO dibuja nubes: un cielo limpio aquí no significa que lo esté. Las franjas de arriba sí llevan la nubosidad prevista, que viene por otro camino.',
       vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en Nerpio mirando al horizonte. Arrastra para girar.',
       franjaHoy: 'Hoy', franjaManana: 'Mañana',
@@ -156,6 +157,7 @@
       previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
       franjaTitulo: 'How the night unfolds',
       vistaBoveda: 'Zenith', vistaCupula: '3D dome',
+      sinDatoDesde: 'no data since',
       sinNubes: 'The cloud grid did not arrive in the pass that generated tonight, so the dome draws NO clouds: a clear sky here does not mean the sky is clear. The strips above do carry the cloud forecast, which comes by another route.',
       vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at Nerpio looking at the horizon. Drag to turn.',
       franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
@@ -353,9 +355,25 @@
       // suya: "19:49" a secas se entiende como la hora de su reloj, y en
       // verano son dos horas de diferencia -- suficiente para creer que un
       // sensor lleva parado media tarde cuando midio hace un minuto.
-      (marca ? '<span class="cuando">' + esc(String(marca).slice(11, 16)) +
-               ' UTC</span>' : '') +
+      (marca ? '<span class="cuando">' + esc(String(marca).slice(11, 16)) + ' UTC' +
+               (caido ? esc(antiguedad(marca)) : '') + '</span>' : '') +
       '</div>';
+  }
+
+  /* LA HORA SOLA NO DICE QUE ES DE AYER. "10:21 UTC" a las 08:06 UTC de la
+     mañana siguiente se lee como de esta mañana -- y para saber que no lo es
+     hay que darse cuenta de que 10:21 aún no ha llegado hoy, que es una cuenta
+     que nadie hace de un vistazo. Con AstroCamp caída 22 horas, el panel
+     enseñaba viento y presión de ayer con una hora que parecía de hoy.
+     La hora se queda -- se pidió expresamente y es la referencia exacta -- y al
+     lado va lo que de verdad se lee: cuánto hace. */
+  function antiguedad(iso) {
+    var t0 = Date.parse(iso);
+    if (isNaN(t0)) { return ''; }
+    var h = (Date.now() - t0) / 3600000;
+    if (h < 1.5) { return ''; }                    // "hace 1 h" no aporta nada
+    if (h < 36) { return ' · ' + Math.round(h) + ' h'; }
+    return ' · ' + Math.round(h / 24) + ' d';
   }
 
   // -------------------------------------------------------- LA CÚPULA ------
@@ -666,25 +684,34 @@
        0/0 no se pinta: no es "ningún techo abierto", es "no ha llegado el
        dato", y se leen igual. */
     var sen = datos.sensores || {};
-    /* Y SI NO RESPONDE, EL ULTIMO ESTADO CONOCIDO. Lo que se rescata es abierto
-       o cerrado, no la cuenta: el archivo guarda un booleano y "0/18" de hace
-       ocho horas no se puede reconstruir sin inventarselo.
+    /* SIN DATO NO SE DICE NI ABIERTO NI CERRADO. Se dice que no se sabe.
 
-       Esta es la casilla que mas pesa de la pagina, asi que es donde la
-       etiqueta importa mas: un "abierto" de hace ocho horas sin decir de cuando
-       es se lee como "el observatorio esta funcionando esta noche", que es
-       exactamente la frase que no queremos que nadie se lleve de aqui. */
+       Ayer se rescataba el ultimo estado conocido, como se hace con los demas
+       sensores. Nino lo vio hoy y tenia razon en que no es lo mismo, y el
+       porque merece quedarse escrito:
+
+       UNA TEMPERATURA VIEJA SIGUE DICIENDO ALGO; UN TECHO VIEJO, NO. La
+       temperatura, la presion y la humedad son magnitudes continuas: se mueven
+       despacio, asi que una lectura de hace horas sigue acotando la de ahora y
+       envejece con dignidad si va fechada. El estado del techo NO es una
+       magnitud: es una DECISION discreta que toman personas y que cambia en un
+       minuto. Un "cerrado" de hace veintidos horas no es una medida degradada,
+       es otro hecho -- y encima el que mas peso tiene de toda la pagina.
+
+       Asi que el dato se conserva en el JSON (`techos_estado_archivo`, con su
+       nombre diciendo lo que es) pero AQUI no se pinta: la casilla ensena una
+       raya y desde cuando estamos a ciegas. */
     var techosViejo = (sen.del_archivo || {}).techos;
-    if (!sen.techos_total && typeof sen.techos_estado_archivo === 'boolean'
-        && techosViejo) {
+    if (!sen.techos_total && techosViejo) {
       html += '<div class="aw-techos caido">' +
         '<span class="no-responde">NO RESPONDE</span>' +
         '<span class="rotulo">' + esc(t.estadoTechos) +
           '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
           esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
-        '<div class="palabra">' +
-          esc(sen.techos_estado_archivo ? t.abierto : t.cerrado) + '</div>' +
-        '<div class="prob">' + esc(String(techosViejo).slice(11, 16)) + ' UTC</div>' +
+        '<div class="palabra sin-dato">&mdash;</div>' +
+        '<div class="prob">' + esc(t.sinDatoDesde) + ' ' +
+          esc(String(techosViejo).slice(11, 16)) + ' UTC' +
+          esc(antiguedad(techosViejo)) + '</div>' +
         '</div>';
     }
     if (sen.techos_total) {
