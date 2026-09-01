@@ -26,8 +26,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
 - **Modelo: N210**
   - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
-- **Modelo: SQA130**
-  - [Análisis del Askar SQA130: El telescopio de astrofotografía de $5000](https://www.youtube.com/watch?v=dfo6W2LiXSo) (2026-06-05)
 
 ## Baader
 
@@ -402,3 +400,5 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Seestar S50 Pro**
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
   - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
+- **Modelo: telescopio inteligente**
+  - [ZWO Seestar: Llévalo a tu próxima aventura astronómica](https://www.youtube.com/watch?v=GzP0xuBYJek) (2026-09-01)
