@@ -82,6 +82,14 @@
   font-variant-numeric: tabular-nums;
 }
 .aw-techos.hay .palabra { color: #6ec177; }
+.aw-techos .palabra {
+  /* Con la palabra delante, el recuento necesita aire y la caja necesita poder
+     partir: "Cerrado" a 3,2rem mas "0/18" no cabe en 260 px en una linea. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+}
 .aw-techos .palabra .de {
   font-size: 1.5rem;
   font-weight: 600;

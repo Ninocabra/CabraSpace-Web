@@ -722,8 +722,15 @@
         '<span class="rotulo">' + esc(t.estadoTechos) +
           '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
           esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
-        '<div class="palabra">' + abiertos + '<span class="de">/' +
-          sen.techos_total + '</span></div>' +
+        // LA PALABRA MANDA Y EL RECUENTO VA AL LADO. Un "0/18" a solas hay
+        // que traducirlo mentalmente, y encima se parece demasiado al "0/18"
+        // que salia cuando NO habia dato -- que es la confusion que llevamos
+        // toda la semana quitando de en medio. "Cerrado 0/18" dice lo mismo
+        // sin que nadie tenga que interpretarlo, y el guion de la version sin
+        // dato deja de poder confundirse con un cero.
+        '<div class="palabra">' + esc(abiertos > 0 ? t.abierto : t.cerrado) +
+          '<span class="de">' + abiertos + '/' + sen.techos_total +
+          '</span></div>' +
         '<div class="prob">' + esc(t.abiertosDe) + ' ' + sen.techos_total +
           (sen.medido_utc
             ? ' · ' + esc(String(sen.medido_utc).slice(11, 16)) + ' UTC' : '') +
