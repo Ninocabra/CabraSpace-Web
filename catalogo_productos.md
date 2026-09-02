@@ -157,8 +157,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
-- **Modelo: sampling**
-  - [¿Son los telescopios grandes peores para la astrofotografía?](https://www.youtube.com/watch?v=bOyjWlGmKoc) (2026-06-05)
 
 ## Player One
 
@@ -273,6 +271,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Telescopio Refractor SV503 70mm de Svbony: Explorando el Cosmos sin gastar una fortuna](https://www.youtube.com/shorts/bK21vw9ipaY) (2026-06-26)
 - **Modelo: SV503 70**
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
+- **Modelo: SV530**
+  - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV535**
   - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
 - **Modelo: SV550**
