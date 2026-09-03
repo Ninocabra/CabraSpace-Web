@@ -846,6 +846,22 @@
   border: 1px solid rgba(255, 255, 255, 0.10);
   flex: 0 0 auto;
 }
+/* El aviso de "sin desglose de polvo". Va DEBAJO de las muestras y no encima:
+   no es una advertencia sobre la pagina, es una nota sobre lo que se acaba de
+   leer -- en concreto sobre el rojo, que sin especies se pinta corto. */
+.aw-key .aviso {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  /* `--text-secondary` y no `--text-muted`, que es el tono del resto de las
+     notas de este bloque. Medido sobre el fondo compuesto (rgb 18,18,20): el
+     tono apagado da 2,76 de contraste y este 6,82. Para una etiqueta de
+     seccion en mayusculas 2,76 pasa; para cuatro lineas de prosa que corrigen
+     como se lee el rojo, es enterrar el aviso donde nadie lo lee. */
+  color: var(--text-secondary, #aaa);
+}
 .aw-key .sw b {
   margin-left: auto;
   font-weight: 500;

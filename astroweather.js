@@ -131,6 +131,7 @@
       coordenadas: 'coordenadas',
       clave: 'Qué color es qué cielo',
       claveTitulo: 'Cómo se lee la bóveda',
+      claveSinPolvo: 'Sin desglose de polvo esta noche: el rojo sale corto. Sin saber qué parte del aerosol es polvo, se corrige entero por la altura del sitio como si fuera capa límite, y el polvo va por encima — el cielo se pinta más limpio de lo que está.',
       claveNota: 'El negro es el cielo más oscuro que da este sitio; encima solo se pinta lo que estorba, y su color dice qué es: azul la Luna, gris las nubes, rojo la calima, amarillo el día. En las nubes, cuanto más claras más tapan. El número es la magnitud por segundo de arco al cuadrado, y en la nube espesa engaña a propósito: sin ciudad debajo la nube OSCURECE el cielo — se traga el airglow en vez de reflejar farolas, medido aquí sobre 4.690 horas — así que sale oscurísimo y a la vez inservible.',
       muestras: {
         oscura: 'Lo más oscuro que da', lunaCerca: 'Luna llena, a 10°',
@@ -245,6 +246,7 @@
       coordenadas: 'coordinates',
       clave: 'Which colour is which sky',
       claveTitulo: 'How to read the dome',
+      claveSinPolvo: 'No dust breakdown tonight: the red comes out short. With no split of the aerosol, all of it is corrected for site altitude as if it were boundary layer, and dust rides above — the sky is painted cleaner than it is.',
       claveNota: 'Black is the darkest sky this site gives; on top of it only what gets in the way is painted, and its colour says which: blue the Moon, grey the cloud, red the dust haze, yellow the daylight. For cloud, the paler the more it blocks. The number is the magnitude per square arcsecond, and on thick cloud it misleads on purpose: with no city below, cloud DARKENS the sky — it swallows the airglow instead of reflecting streetlights, measured here over 4,690 hours — so it reads very dark and is useless all the same.',
       muestras: {
         oscura: 'The darkest it gets', lunaCerca: 'Full Moon, 10° away',
@@ -970,6 +972,23 @@
     if (!window.AWDome || !window.AWDome.muestras) { return ''; }
     var filas;
     try { filas = window.AWDome.muestras(cupula); } catch (e) { return ''; }
+    /* SIN DESGLOSE DE POLVO, EL ROJO SALE CORTO, y hasta hoy nada lo decia.
+       La bóveda no pinta la calima desde `dust_alert` sino desde `aod_site`,
+       que es continuo. Y `extinction.evaluate` corrige el aerosol por la
+       altura del sitio: sin saber qué parte es polvo, rebaja TAMBIÉN el polvo
+       — que viaja por encima del observatorio y no se rebaja —, así que
+       `aod_site` sale por debajo y el render se ve más limpio de lo que está.
+       Medido el 01-09-2026: un 14 % en la k.
+
+       Aquí importa más que en la tabla, porque allí faltaba un aviso y aquí
+       está mal el PÍXEL, que es lo que la gente mira.
+
+       `=== false` a propósito y no un `!`: `undefined` es un payload anterior
+       al 03-09-2026, y de ese no sabemos si había desglose o no. Callar es lo
+       único honesto ahí; inventarse el aviso sería el mismo error al revés. */
+    var transp = (cupula && cupula.transparency) || {};
+    var aviso = transp.species_resolved === false
+      ? '<div class="aviso">' + esc(t.claveSinPolvo) + '</div>' : '';
     return '<div class="aw-key"><span class="lbl">' + esc(t.clave) +
       ' · ' + window.AWDome.muestraAltitud + '°' +
       '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
@@ -979,7 +998,7 @@
           '<i style="background:rgb(' + f.rgb.join(',') + ')"></i>' +
           '<span>' + esc(t.muestras[f.clave] || f.clave) + '</span>' +
           '<b>' + f.mag.toFixed(1) + '</b></div>';
-      }).join('') + '</div>';
+      }).join('') + aviso + '</div>';
   }
 
   /* LA VENTANA QUE SE PINTA, y la pintan los dos: la línea de tiempo y los
