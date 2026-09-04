@@ -32,8 +32,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Solar Filter**
   - [Haz tu propio filtro solar para casi cualquier telescopio (Guía DIY de película solar Baader)](https://www.youtube.com/watch?v=bDvwnYecK7o) (2026-07-19)
-- **Modelo: filtros**
-  - [Baader lanza nuevos filtros SLOAN/SDSS de 36mm (ugriz)](https://stargazerslounge.com/topic/445793-baader-new-gen-sloansdss-filter-sets-36mm-ugriz/) (2026-06-06)
 
 ## Baader Planetarium
 
@@ -392,6 +390,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO Reconoce a Un Astrógrafo y Comparte La Pasión Por La Imagen Planetaria](https://www.zwoastro.com/2026/08/04/konstantinos-planetary-astrophotography-journey/) (2026-08-04)
 
 ### TELESCOPES
+- **Modelo: Dwarf**
+  - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
 - **Modelo: FF131**
   - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
 - **Modelo: S50 Pro**
