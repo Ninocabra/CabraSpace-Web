@@ -40,6 +40,7 @@
       probLabel: 'de probabilidad de que haya condiciones para abrir',
       probTitulo: 'Condiciones, no comportamiento',
       abierto: 'Abierto', cerrado: 'Cerrado',
+      ventana: 'ventana',
       veredictoTitulo: 'De dónde sale esta palabra',
       previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
       franjaTitulo: 'Cómo evoluciona la noche',
@@ -155,6 +156,7 @@
       probLabel: 'chance there will be CONDITIONS to open',
       probTitulo: 'Conditions, not behaviour',
       abierto: 'Open', cerrado: 'Closed',
+      ventana: 'window',
       veredictoTitulo: 'Where this word comes from',
       previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
       franjaTitulo: 'How the night unfolds',
@@ -666,7 +668,14 @@
         (vd ? '<div class="palabra">' + esc(vd.abierto ? t.abierto : t.cerrado) + '</div>'
             : '<div class="palabra num">' + Math.round(p * 100) + '%</div>') +
         '<div class="prob">' + (vd ? '<b>' + Math.round(p * 100) + '%</b> ' : '') +
-          esc(t.probLabel) + explica + '</div></div>';
+          esc(t.probLabel) + explica + '</div>' +
+        // La ventana en la que se apoya la palabra (05-09-2026). "Abierto" con
+        // 100 % de nubes a las 22 h era verdad y parecía mentira: el número era
+        // el de las 03. Ahora la palabra dice DÓNDE, y el lector decide si esa
+        // franja le vale.
+        (vd && vd.ventana ? '<div class="ventana">' + esc(t.ventana) + ' ' +
+          hora(vd.ventana.desde) + '–' + hora(vd.ventana.hasta) + '</div>' : '') +
+        '</div>';
     }
     // Mañana, pequeño y al lado: es contexto de la decisión de hoy -- si hoy no
     // sale, ¿espero a mañana? -- y no una segunda previsión que compita con ella.
@@ -677,7 +686,9 @@
       html += '<div class="aw-manana' + (vm ? (vm.abierto ? ' abierto' : ' cerrado') : '') + '">' +
         '<span class="rotulo">' + esc(t.manana) + '</span>' +
         '<b>' + (vm ? esc(vm.abierto ? t.abierto : t.cerrado) : pm + '%') + '</b>' +
-        '<span class="p">' + (vm ? pm + '% · ' : '') + fecha(manana.noche, lang) + '</span>' +
+        '<span class="p">' + (vm ? pm + '% · ' : '') + fecha(manana.noche, lang) +
+          (vm && vm.ventana ? ' · ' + hora(vm.ventana.desde) + '–' + hora(vm.ventana.hasta) : '') +
+        '</span>' +
         '</div>';
     }
     /* Y AL LADO, DEL MISMO TAMAÑO, LO QUE NO ES PREVISIÓN. Las dos cosas de la

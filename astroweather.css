@@ -1172,3 +1172,8 @@
 .aw-reco:focus { border-color: rgba(207, 171, 74, 0.55); }
 .aw-reco optgroup { background: #101013; color: var(--gold-primary, #cfab4a); }
 .aw-reco option { background: #101013; color: var(--text-secondary, #bbb); }
+
+/* La ventana de dos horas en la que se apoya el veredicto (05-09-2026). Mismo
+   tono que el porcentaje de debajo de la palabra, no el apagado: es parte de
+   la decisión, no una nota al pie. */
+.aw-verdict .ventana { font-size: .85em; margin-top: .25em; opacity: .85; }
