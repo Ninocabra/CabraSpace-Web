@@ -88,6 +88,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Buzz Aldrin**
   - [El telescopio de Buzz Aldrin incluye una pieza de la Luna](https://www.youtube.com/shorts/7t8ug8sOq5c) (2026-08-26)
+- **Modelo: FirstLight 80**
+  - [Alerta de Oferta: Explore Scientific FirstLight 80 con Montura Twilight Nano por solo $129](https://www.youtube.com/watch?v=Z2NhRXisJKg) (2026-09-06)
 
 ## INDI Library
 
@@ -299,7 +301,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
-  - [Demostración de la cámara ToupTek AE676C para astrofotografía solar y lunar](https://www.youtube.com/shorts/-n1yUoZOilI) (2026-06-06)
 - **Modelo: CMOS**
   - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: Cámara CMOS**
