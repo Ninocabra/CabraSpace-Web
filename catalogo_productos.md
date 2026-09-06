@@ -151,8 +151,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
   - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
-- **Modelo: StellaLyra**
-  - [StellaLyra 12" f/4 M-LRN Newtoniano con enfocador de 3"](https://stargazerslounge.com/topic/445805-stellalyra-12-f4-m-lrn-newtonian-with-3-focuser/) (2026-06-06)
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
 
@@ -382,6 +380,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
+- **Modelo: N.I.N.A.**
+  - [Integración de N.I.N.A. con Seestar S50 Pro y S30 Pro](https://www.youtube.com/watch?v=uCdWJET7YZc) (2026-09-06)
 - **Modelo: PHD2 Guiding**
   - [PHD2 Guiding v2.6.14dev1: Novedades en Binning, Soporte Alpaca y Mejoras para Cámaras ZWO/ToupTek](https://github.com/OpenPHDGuiding/phd2/releases/tag/v2.6.14dev1) (2026-08-30)
 - **Modelo: communty**
