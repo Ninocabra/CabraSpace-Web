@@ -56,8 +56,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Ed Ting**
   - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
-- **Modelo: EdgeHD 925**
-  - [Por qué me arrepiento de haber comprado un Celestron EdgeHD 925 para astrofotografía](https://www.youtube.com/watch?v=N5tuVy9sdpQ) (2026-06-06)
 
 ## DayStar
 
@@ -307,6 +305,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: HOPE D60**
   - [Viaje a los cielos Bortle 1 del Tíbet con ToupTek HOPE D60 y kit completo](https://www.youtube.com/shorts/_TQCezXdMuk) (2026-08-13)
+- **Modelo: SkyEye Plus**
+  - [Presentación de la nueva serie SkyEye Plus de ToupTek](https://www.youtube.com/shorts/qcLCoQFmPq4) (2026-09-07)
 - **Modelo: ToupTek Astro**
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
