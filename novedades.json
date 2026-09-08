@@ -1,5 +1,24 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=8iBa4Qkw9Q4",
+    "title_es": "Procesamiento avanzado con datos gratuitos solicitado por el público",
+    "title_en": "Viewer Requested Advanced Processing with Free Data",
+    "summary_es": "En este recurso, SetiAstro presenta un flujo de trabajo de procesamiento avanzado para datos astronómicos gratuitos, enfocado en el uso de herramientas de PixInsight. Se explican técnicas para mejorar imágenes, aplicación de corrección de color y ajustes finos, todo con ejemplos prácticos. Es útil para astrónomos aficionados que buscan dominar PixInsight sin necesidad de adquirir datos propios.",
+    "summary_en": "This resource offers an advanced processing workflow for free astronomical data using PixInsight. SetiAstro demonstrates image enhancement, color calibration, and fine-tuning steps with practical examples. It's valuable for amateurs aiming to master PixInsight without collecting their own data.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-09-08",
+    "url": "https://www.youtube.com/watch?v=8iBa4Qkw9Q4",
+    "tags": [
+      "PixInsight",
+      "Advanced Processing",
+      "Free Data",
+      "Color calibration",
+      "Image enhancement",
+      "Tutorial"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=u98dj0PP6O8",
     "title_es": "Procesado de la Nebulosa Dumbbell en SHO con PiMagic",
     "title_en": "Processing the Dumbbell Nebula in SHO with PiMagic",
@@ -1827,24 +1846,6 @@
       "CUDA",
       "BlurXTerminator",
       "StarNet"
-    ]
-  },
-  {
-    "id": "https://pixinsight.com/forum/index.php?threads/procedure-to-enable-gpu-acceleration-for-bxt-starnet-etc-within-linux-mint-with-a-supported-nvidia-graphics-card.23356/",
-    "title_es": "Aceleración por GPU en Linux Mint para herramientas de Inteligencia Artificial",
-    "title_en": "GPU acceleration for BXT and StarNet on Linux Mint with NVIDIA cards",
-    "summary_es": "Instrucciones de configuración específicas para usuarios de Linux Mint con tarjetas gráficas NVIDIA compatibles para acelerar procesos basados en redes neuronales en PixInsight.",
-    "summary_en": "Specific installation and configuration instructions for Linux Mint users with supported NVIDIA graphics cards to accelerate neural network-based processes in PixInsight.",
-    "category_es": "SOFTWARE",
-    "category_en": "SOFTWARE",
-    "date": "2025-12-12",
-    "url": "https://pixinsight.com/forum/index.php?threads/procedure-to-enable-gpu-acceleration-for-bxt-starnet-etc-within-linux-mint-with-a-supported-nvidia-graphics-card.23356/",
-    "tags": [
-      "Linux Mint",
-      "NVIDIA",
-      "GPU",
-      "CUDA",
-      "BlurXTerminator"
     ]
   }
 ]
