@@ -36,6 +36,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Baader Planetarium
 
 ### ACCESSORIES
+- **Modelo: Cúpula**
+  - [Cúpula Baader Advanced Slit de 6,15 m para el GFZ de Potsdam](https://www.youtube.com/watch?v=MKVA8h6sR60) (2026-09-09)
 - **Modelo: Observable Space**
   - [Lo más destacado de ASTRO Friedrichshafen 2026 de Baader, Celestron y otros](https://www.youtube.com/watch?v=7lrgVyyXj2k) (2026-06-29)
 
@@ -299,8 +301,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
-- **Modelo: CMOS**
-  - [La Vía Láctea infrarroja que puedes fotografiar en una ciudad Bortle Clase 9](https://www.youtube.com/shorts/0EF1iJK3SkY) (2026-06-07)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: HOPE D60**
