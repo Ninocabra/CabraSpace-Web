@@ -225,8 +225,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
   - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
-- **Modelo: SA207 Pro**
-  - [Revisión de los Binoculares Svbony SA207 Pro](https://www.youtube.com/watch?v=Ds_KabHKoew) (2026-06-08)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV545**
@@ -306,6 +304,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SkyEye Plus**
   - [Presentación de la nueva serie SkyEye Plus de ToupTek](https://www.youtube.com/shorts/qcLCoQFmPq4) (2026-09-07)
 - **Modelo: ToupTek Astro**
+  - [Nuevo Kit de Imagen Mono Versátil ToupTek Astro: AE676M y AFW-mini](https://www.youtube.com/watch?v=mehD122BGW4) (2026-09-10)
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
 - **Modelo: astronomical camera**
