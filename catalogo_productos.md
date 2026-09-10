@@ -43,10 +43,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Celestron
 
-### ACCESSORIES
-- **Modelo: Proyección**
-  - [Oculares de proyección recomendados para telescopios de astrofotografía](https://www.youtube.com/watch?v=nxTnBf7jYmI) (2026-06-07)
-
 ### GENERAL
 - **Modelo: Total Solar Eclipse**
   - [La Eclips Solar Total de Agosto de 2026: Guía para Observadores](https://www.celestron.com/blogs/news/pursuing-the-shadow-the-august-2026-total-solar-eclipse) (2026-07-01)
@@ -76,6 +72,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: ALCON**
   - [Presentación de la Lente ALCON para 2026](https://www.youtube.com/watch?v=CGa_wxDKjvQ) (2026-08-15)
+- **Modelo: Sale**
+  - [Comienza hoy la Venta de Descubrimiento de Septiembre de Explore Scientific](https://www.youtube.com/shorts/NUBIBteTD0I) (2026-09-09)
 
 ### MOUNTS
 - **Modelo: Astronomical League**
