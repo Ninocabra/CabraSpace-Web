@@ -30,6 +30,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Baader
 
 ### ACCESSORIES
+- **Modelo: SLOAN**
+  - [Filtros Baader SLOAN/SDSS Nueva Generación - 1.25" "I"](https://stargazerslounge.com/topic/448156-baader-new-gen-sloansdss-filters-125-i/) (2026-09-11)
 - **Modelo: Solar Filter**
   - [Haz tu propio filtro solar para casi cualquier telescopio (Guía DIY de película solar Baader)](https://www.youtube.com/watch?v=bDvwnYecK7o) (2026-07-19)
 
@@ -224,9 +226,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
   - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
-  - [Lanzamiento global de los nuevos binoculares Svbony SA207 y SA207 Pro con ofertas de lanzamiento](https://www.youtube.com/watch?v=UOQWLIU2i-U) (2026-06-08)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
+- **Modelo: SV535**
+  - [Svbony SV535: Un objetivo versátil para fotografía de cámara y astrografía de cielo profundo](https://www.youtube.com/watch?v=--XrVJALlSQ) (2026-09-11)
 - **Modelo: SV545**
   - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
   - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
@@ -245,7 +248,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SC571CC**
   - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
   - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
-  - [Revisión completa de la cámara Svbony SC571CC: desde Júpiter hasta cielo profundo](https://www.youtube.com/watch?v=Dwa24s-OZq0) (2026-06-08)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
