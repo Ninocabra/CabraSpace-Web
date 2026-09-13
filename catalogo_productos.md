@@ -356,8 +356,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
 - **Modelo: space**
   - [Novedades de ZWO en Equipamiento Astrophotography](https://www.youtube.com/shorts/T_WA6jYybyo) (2026-07-18)
-- **Modelo: star tracker**
-  - [Ya no necesitas una Star Tracker para Astrofotografía](https://www.youtube.com/watch?v=tvPlLafd7sk) (2026-06-07)
 
 ### ASTROPHOTOGRAPHY
 - **Modelo: ASI2600MC Duo**
@@ -390,6 +388,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO Reconoce a Un Astrógrafo y Comparte La Pasión Por La Imagen Planetaria](https://www.zwoastro.com/2026/08/04/konstantinos-planetary-astrophotography-journey/) (2026-08-04)
 
 ### TELESCOPES
+- **Modelo: Draco**
+  - [Análisis del Seestar S50 Pro: ¿Está Obsoleto por el Draco?](https://www.youtube.com/watch?v=FYjgvCXXDeY) (2026-09-12)
 - **Modelo: Dwarf**
   - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
 - **Modelo: FF131**
