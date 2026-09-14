@@ -56,6 +56,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Ed Ting**
   - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
+- **Modelo: RASA 6**
+  - [Nuevo Astrográfo Celestron RASA 6](https://stargazerslounge.com/topic/431636-new-celestron-rasa-6-astrograph/) (2026-09-14)
 
 ## DayStar
 
@@ -319,8 +321,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
 
 ### TELESCOPES
-- **Modelo: HOPE D60**
-  - [ToupTek Astro Presenta el Dispositivo de Astrofotografía HOPE D60](https://www.youtube.com/shorts/kEbZME53qis) (2026-06-10)
 - **Modelo: comet**
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
 
