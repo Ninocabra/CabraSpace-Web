@@ -88,6 +88,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Buzz Aldrin**
   - [El telescopio de Buzz Aldrin incluye una pieza de la Luna](https://www.youtube.com/shorts/7t8ug8sOq5c) (2026-08-26)
+- **Modelo: ED80**
+  - [Análisis del Explorador Científico ED80 con Montura iEXOS-100](https://www.youtube.com/watch?v=O44ZN0Y8_OQ) (2026-09-14)
 - **Modelo: FirstLight 80**
   - [Alerta de Oferta: Explore Scientific FirstLight 80 con Montura Twilight Nano por solo $129](https://www.youtube.com/watch?v=Z2NhRXisJKg) (2026-09-06)
 
@@ -225,7 +227,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
-  - [Svbony SA207 y SA207Pro: Desempaque de los nuevos binoculares APO](https://www.youtube.com/shorts/Irn-y3SKMUU) (2026-06-08)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV535**
