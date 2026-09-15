@@ -218,13 +218,14 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Francisco Perez**
   - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
+- **Modelo: Kit de Cielo Profundo**
+  - [Oferta de Día de Astronomía de SVBONY #2: Construye tu Kit de Cielo Profundo con Francisco](https://www.youtube.com/watch?v=sYmor4_z7UE) (2026-09-15)
 - **Modelo: Ofertas**
   - [Ofertas de Verano Svbony: Hasta 50% de Descuento en Equipos de Astrofotografía](https://www.youtube.com/watch?v=wA0luIBeOvY) (2026-08-18)
 - **Modelo: Prime Day**
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
   - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
   - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
-  - [Svbony: Se acerca Prime Day, preparamos algo especial para ti](https://www.youtube.com/shorts/Hjy6Zv48b0M) (2026-06-12)
 - **Modelo: Rumak**
   - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
