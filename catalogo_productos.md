@@ -160,12 +160,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
 
-## Player One
-
-### CAMERAS
-- **Modelo: Astrofotografía Solar**
-  - [Manual del Observador Solar de Mark Johnston: Detalles ardientes con Cámaras Player One](https://player-one-astronomy.com/%e3%80%8anasa-solar-system-ambassador-mark-johnstons-solar-observers-handbook-the-fiery-details-through-player-one-cameras%e3%80%8b/) (2026-06-12)
-
 ## Primalucelab
 
 ### ACCESSORIES
@@ -232,6 +226,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
 - **Modelo: SA207pro**
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
+- **Modelo: SV225**
+  - [Presentación del Kit Visual Ultraportátil SVBONY: Montura SV225 y Telescopio MK105](https://www.youtube.com/watch?v=nZBfKjHkVXI) (2026-09-16)
 - **Modelo: SV535**
   - [Svbony SV535: Un objetivo versátil para fotografía de cámara y astrografía de cielo profundo](https://www.youtube.com/watch?v=--XrVJALlSQ) (2026-09-11)
 - **Modelo: SV545**
