@@ -252,8 +252,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: ASIAIR**
   - [Tertulia de Astronomos: Consejos y Equipos Recomendados por los Expertos](https://www.youtube.com/watch?v=-3xCc6VTfm4) (2026-07-08)
-- **Modelo: INDI Library**
-  - [Lanzamiento de la Librería INDI v2.2.3](https://github.com/indilib/indi/releases/tag/v2.2.3) (2026-06-14)
 
 ### TELESCOPES
 - **Modelo: MK127**
@@ -274,6 +272,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV550**
   - [SVBONY SV550 80mm Triplet APO: Desempaquetado y Ensamblaje](https://www.youtube.com/watch?v=la9dpejHKxA) (2026-08-01)
 - **Modelo: SV555**
+  - [Observación del eclipse solar en España con la SVBONY SV555](https://www.youtube.com/watch?v=b4DjxdUNjuM) (2026-09-16)
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
