@@ -118,6 +118,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
 
 ### MOUNTS
+- **Modelo: SetiAstro**
+  - [La Precisión Absurda de las Monturas de Telescopio: Una Maravilla de Ingeniería en tu Patio Trasero](https://www.youtube.com/watch?v=xHlWtuJ0LJk) (2026-09-18)
 - **Modelo: montura armónica**
   - [La Nueva Generación de Monturas Armónicas Ha Llegado](https://www.youtube.com/watch?v=y9Ktz3GHPAg) (2026-06-26)
 
@@ -325,12 +327,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Vespera Pro II**
   - [Análisis del Telescopio Inteligente Vaonis Vespera Pro II de $3000](https://www.youtube.com/watch?v=HqQunRqZO0A) (2026-06-20)
-
-## Vixen
-
-### TELESCOPES
-- **Modelo: 100EDsf**
-  - [Análisis del Vixen 100EDsf y telescopios similares: opción confiable en el mercado nuevo y usado](https://www.youtube.com/watch?v=mqR1mDJ0bjE) (2026-06-14)
 
 ## ZWO
 
