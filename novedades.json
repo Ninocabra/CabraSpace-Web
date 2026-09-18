@@ -1,5 +1,24 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=8azSS2YETQ4",
+    "title_es": "Procesado de Nightscape en Mosaico de 2 Paneles",
+    "title_en": "Two-Panel Nightscape Processing",
+    "summary_es": "Este tutorial de Utah Desert Remote Observatories detalla el proceso para integrar y procesar un mosaico de dos paneles para astrofotografía de paisajes nocturnos. Se cubren las técnicas clave de PixInsight para alinear, integrar y realizar el post-procesado de imágenes de gran campo. La metodología permite obtener una imagen final cohesiva y de alta calidad, enfocándose en un flujo de trabajo avanzado.",
+    "summary_en": "This Utah Desert Remote Observatories tutorial details the process for integrating and processing a two-panel mosaic for nightscape astrophotography. It covers key PixInsight techniques for aligning, integrating, and post-processing wide-field images. The methodology aims to produce a cohesive and high-quality final image, focusing on an advanced workflow.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-09-18",
+    "url": "https://www.youtube.com/watch?v=8azSS2YETQ4",
+    "tags": [
+      "Mosaic",
+      "ImageIntegration",
+      "DBE",
+      "NoiseXTerminator",
+      "GHS",
+      "Tutorial"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=8iBa4Qkw9Q4",
     "title_es": "Procesamiento avanzado con datos gratuitos solicitado por el público",
     "title_en": "Viewer Requested Advanced Processing with Free Data",
@@ -1827,25 +1846,6 @@
     "tags": [
       "PixInsight",
       "Update"
-    ]
-  },
-  {
-    "id": "https://pixinsight.com/forum/index.php?threads/procedure-to-enable-gpu-acceleration-for-bxt-starnet-etc-on-linux-with-rtx-5xxx-nvidia-graphics-cards.26622/",
-    "title_es": "Aceleración GPU para BXT y StarNet en Linux con RTX 5000",
-    "title_en": "GPU acceleration for BXT, StarNet, etc. on Linux with RTX 5xxx Nvidia cards",
-    "summary_es": "Guía oficial detallada paso a paso para configurar la aceleración por hardware en tarjetas gráficas NVIDIA de la serie RTX 5000 en sistemas Linux, mejorando drásticamente el rendimiento de BlurXTerminator y StarNet.",
-    "summary_en": "Detailed step-by-step guide to enable CUDA hardware acceleration for RTX 5xxx series NVIDIA graphics cards on Linux systems, significantly boosting BlurXTerminator and StarNet performance.",
-    "category_es": "SOFTWARE",
-    "category_en": "SOFTWARE",
-    "date": "2025-12-16",
-    "url": "https://pixinsight.com/forum/index.php?threads/procedure-to-enable-gpu-acceleration-for-bxt-starnet-etc-on-linux-with-rtx-5xxx-nvidia-graphics-cards.26622/",
-    "tags": [
-      "Linux",
-      "NVIDIA",
-      "GPU",
-      "CUDA",
-      "BlurXTerminator",
-      "StarNet"
     ]
   }
 ]
