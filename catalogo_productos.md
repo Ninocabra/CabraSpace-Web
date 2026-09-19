@@ -98,8 +98,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## INDI Library
 
 ### SOFTWARE
-- **Modelo: Hotfix**
-  - [Lanzamiento de la Librería INDI: Actualización Hotfix para GCC 15](https://github.com/indilib/indi/releases/tag/v2.2.3.1) (2026-06-15)
 - **Modelo: INDI Library**
   - [Lanzamiento de la Biblioteca INDI v2.2.4](https://github.com/indilib/indi/releases/tag/v2.2.4) (2026-08-01)
 - **Modelo: Linux**
@@ -140,6 +138,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
+- **Modelo: MLDenoise**
+  - [Comparativa: Denoise ML de PixInsight vs. NoiseXTerminator](https://www.youtube.com/watch?v=w1e3HRYUyRA) (2026-09-18)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
