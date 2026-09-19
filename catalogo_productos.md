@@ -140,11 +140,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: MLDenoise**
   - [Comparativa: Denoise ML de PixInsight vs. NoiseXTerminator](https://www.youtube.com/watch?v=w1e3HRYUyRA) (2026-09-18)
+- **Modelo: Pleiades Astrophoto**
+  - [Análisis de PixInsight 1.9.5 y nuevos desarrollos en astrofotografía](https://www.youtube.com/watch?v=L1pT3V5fR8s) (2026-09-19)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
   - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
-  - [Corrección de Color Eficiente: Un Script Gratuito de PixInsight para Reemplazar el Flujo de Trabajo de Photoshop](https://www.youtube.com/watch?v=jEPu_IkTSUM) (2026-06-14)
 - **Modelo: Veil**
   - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
 
@@ -171,7 +172,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: OUTPOST 3M**
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
-  - [Domo OUTPOST 3M de PrimaLuceLab instalado en el ASTRI Mini-Array en Tenerife](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-the-astri-mini-array-on-the-island-of-tenerife-canary-islands-spain/) (2026-06-15)
 
 ### MOUNTS
 - **Modelo: ASTRO-RES**
@@ -302,6 +302,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
+- **Modelo: Cámaras Astronómicas**
+  - [Comparativa de cámaras ToupTek para diferentes objetivos astronómicos](https://www.youtube.com/shorts/wzLoYet_pzk) (2026-09-19)
 - **Modelo: HOPE D60**
   - [Viaje a los cielos Bortle 1 del Tíbet con ToupTek HOPE D60 y kit completo](https://www.youtube.com/shorts/_TQCezXdMuk) (2026-08-13)
 - **Modelo: SkyEye Plus**
