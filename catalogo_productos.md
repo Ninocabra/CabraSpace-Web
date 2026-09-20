@@ -210,6 +210,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Svbony
 
 ### ACCESSORIES
+- **Modelo: Equipos de Astronomía**
+  - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
 - **Modelo: Filtro Solar**
   - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Francisco Perez**
@@ -249,7 +251,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
 - **Modelo: SC571CC**
   - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
-  - [Comparativa IMX571: Svbony SC571CC vs otras cámaras, ¿cuál elegir?](https://www.youtube.com/watch?v=xCd9Q_n4800) (2026-06-15)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
