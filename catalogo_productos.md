@@ -146,6 +146,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
   - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
+- **Modelo: TAIC**
+  - [Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)](https://www.youtube.com/watch?v=Tp08gy1xJZ8) (2026-09-19)
 - **Modelo: Veil**
   - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
 
@@ -346,8 +348,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: S50 Pro**
   - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
-- **Modelo: Willie Stickley**
-  - [El viaje de Willie Stickley en la astrofotografía con ZWO](https://www.zwoastro.com/2026/06/08/willie-stickley-zwo-astrophotography-journey/) (2026-06-08)
 - **Modelo: espacio**
   - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
 - **Modelo: space**
