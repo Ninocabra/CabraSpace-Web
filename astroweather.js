@@ -104,7 +104,7 @@
         'procesar la imagen. El mapa no dice qué hay: dice qué se espera — y es la única de las tres ' +
         'que se puede equivocar.',
       sitio: 'AstroCamp',
-      vistaPropia: 'Nuestro mapa', vistaWindy: 'Windy', vistaCamara: 'En directo',
+      vistaPropia: 'Previsión', vistaCamara: 'En directo',
       mapaAhora: 'ahora', mapaReproducir: 'Reproducir', mapaPausar: 'Pausar',
       fuentePrevisto: 'Lo que se ESPERA · ECMWF',
       mapaNoche: 'Ir a la noche', mapaOscura: 'oscuridad astronómica',
@@ -139,18 +139,6 @@
       camaraCongelada: 'Fotograma de las {h} UTC · la cámara llevaba {m} min sin refrescar',
       camaraVieja: 'Fotograma de las {h} UTC · leído hace {m} min',
       camaraCaida: 'La cámara no responde ahora mismo.',
-      mapaTitulo: 'Por qué este modelo y no otro',
-      mapaNota: 'El mapa enseña el ECMWF, que es el mismo modelo del que sale el veredicto de arriba, y ' +
-        'no es una preferencia: sobre este sitio y contra nuestro propio archivo se midieron ICON, GFS y ' +
-        'Météo-France frente a él de febrero a agosto de 2026, y ninguno lo mejoró. Solo lo bate ' +
-        'WeatherNext 3 de Google, que no publica mapa. Arrastra la línea de tiempo de abajo para ver las ' +
-        'horas que vienen: eso es lo que este mapa añade y las franjas de arriba no — por dónde entra la nube. ' +
-        'Y ojo con qué es dato y qué no: el relieve ámbar del fondo es el mapa, como las carreteras, y no ' +
-        'significa nada del tiempo. Lo que dice el modelo son las manchas grises, que son la nube, y las ' +
-        'rayas que corren, que son el viento. El recorte es aproximadamente el mismo que el del satélite de ' +
-        'arriba, para que las dos imágenes se puedan comparar sin hacer cuentas.',
-      mapaPie: '<b>El mapa.</b> Nubes previstas sobre Nerpio, modelo ECMWF, servidas por ' +
-        '<a href="https://www.windy.com/?38.166,-2.327,7" target="_blank" rel="noopener">Windy</a>.',
       elegir: 'Qué quieres apuntar',
       recoTitulo: 'Recomendados para esta noche', evaluados: 'evaluados', alt: 'alt',
       clases: { narrowband: 'Banda estrecha', normal: 'Banda ancha normal',
@@ -275,7 +263,7 @@
         'the image. The map does not say what is there: it says what is expected, and it is the only one ' +
         'of the three that can be wrong.',
       sitio: 'AstroCamp',
-      vistaPropia: 'Our map', vistaWindy: 'Windy', vistaCamara: 'Live',
+      vistaPropia: 'Forecast', vistaCamara: 'Live',
       mapaAhora: 'now', mapaReproducir: 'Play', mapaPausar: 'Pause',
       fuentePrevisto: 'What is EXPECTED · ECMWF',
       mapaNoche: 'Jump to the night', mapaOscura: 'astronomical darkness',
@@ -311,18 +299,6 @@
       camaraCongelada: 'Frame from {h} UTC · the camera had not refreshed for {m} min',
       camaraVieja: 'Frame from {h} UTC · read {m} min ago',
       camaraCaida: 'The camera is not responding right now.',
-      mapaTitulo: 'Why this model and not another',
-      mapaNota: 'The map shows ECMWF, the same model the verdict above comes from, and that is not a ' +
-        'preference: over this site and against our own archive, ICON, GFS and Météo-France were measured ' +
-        'against it from February to August 2026, and none of them beat it. Only Google’s WeatherNext 3 ' +
-        'does, and it publishes no map. Drag the timeline at the bottom to see the hours ahead: that is what ' +
-        'this map adds and the bands above do not — which way the cloud is coming from. ' +
-        'And mind which part is data: the amber relief underneath is the map, like the roads, and means ' +
-        'nothing about the weather. What the model says are the grey patches, which are cloud, and the ' +
-        'running streaks, which are wind. The crop is roughly the same as the satellite above, so the two ' +
-        'images can be compared without doing arithmetic.',
-      mapaPie: '<b>The map.</b> Forecast cloud over Nerpio, ECMWF model, served by ' +
-        '<a href="https://www.windy.com/?38.166,-2.327,7" target="_blank" rel="noopener">Windy</a>.',
       elegir: 'What do you want to shoot',
       recoTitulo: 'Recommended for tonight', evaluados: 'scored', alt: 'alt',
       clases: { narrowband: 'Narrowband', normal: 'Plain broadband',
@@ -1102,59 +1078,9 @@
   var ALLSKY_PROXY = 'https://images.weserv.nl/?url=';
   var ALLSKY_MS = 60000;
 
-  /* El mapa, y dos cosas que hubo que MEDIR antes de creerselas -- una salio
-     bien a la primera y la otra me tuvo un rato creyendo una mentira.
-
-     UNA: `product=ecmwf` no se da por bueno porque lo diga la documentacion de
-     Windy. El 21-09-2026 se pidio el mismo punto y la misma hora con
-     `product=gfs` y con `product=ecmwf`, y dieron 25 y 23 grados. Si el
-     parametro se ignorase en silencio, esta pagina estaria citando un modelo
-     que no es el que pinta -- y citar mal el modelo es exactamente el error
-     que el motor lleva medio proyecto evitando.
-
-     DOS, Y AQUI EL QUE MENTIA ERA EL INSTRUMENTO. Mirando capturas de pantalla
-     del embed con una cruz dibujada encima, el sitio parecia caer siempre en
-     tres cuartos de la caja y no en el centro, a dos tamanios distintos. Se
-     llego a escribir una correccion geometrica para compensarlo. Era FALSO: la
-     herramienta de captura recortaba la pagina en vez de escalarla, asi que las
-     posiciones que yo leia no eran las de la caja que creia estar mirando.
-
-     La comprobacion buena no fue mirar mejor, fue PREGUNTARLE AL QUE SABE. El
-     embed es de Leaflet y expone su mapa, asi que cargandolo a pelo en una
-     pestania del tamanio exacto y ejecutando dentro
-
-         W.require('map').map.latLngToContainerPoint([38.166, -2.327])
-
-     contesta el, sin capturas de por medio: 0,499 del ancho y 0,499 del alto a
-     923 x 519, y 0,500 y 0,500 a 452 x 254. **Windy centra donde se le pide, a
-     cualquier tamanio.** No hace falta corregir nada, y la correccion que
-     habia estaba desplazando el mapa un cuarto de caja hacia el sureste --
-     sacando el interior, que es por donde entra el tiempo, para meter mar.
-
-     Queda un desajuste de 9 px, la mitad del recorte de la leyenda de abajo
-     (ver la hoja de estilo): el centro de lo que se VE esta 9 px por encima del
-     centro del iframe. Sobre 519 px es el 1,7 % y no se toca; escribirlo vale
-     mas que arreglarlo.
-
-     `detail=` vacio quita la tabla horaria de Windy A PROPOSITO: esa tabla ya
-     esta en esta pagina, en nuestros colores y con nuestra incertidumbre
-     dentro. Lo que el mapa aporta y las franjas no es la DIRECCION -- por
-     donde entra la nube --, y para eso hace falta un mapa, no otra tabla. */
-  // Zoom 7 y no 6: a lo ancho del panel deja unos 890 km de lado, que es
-  // practicamente el recorte de 800 km que se le pide al satelite justo
-  // encima. Las dos vistas ensenian LA MISMA ZONA a proposito -- si una
-  // ensenia media peninsula y la otra la provincia, compararlas engania.
-  var MAPA_ZOOM = 7;
+  // Las coordenadas del sitio. Se quedan aunque Windy se haya ido: las usa el
+  // recorte de respaldo de las bases cuando el campo de nubes no llega.
   var MAPA_SITIO = { lat: 38.166, lon: -2.327 };
-
-  function urlMapa() {
-    return 'https://embed.windy.com/embed2.html' +
-      '?lat=' + MAPA_SITIO.lat + '&lon=' + MAPA_SITIO.lon +
-      '&detailLat=' + MAPA_SITIO.lat + '&detailLon=' + MAPA_SITIO.lon +
-      '&zoom=' + MAPA_ZOOM + '&level=surface&overlay=clouds&product=ecmwf' +
-      '&menu=&message=&marker=true&calendar=now&pressure=&type=map' +
-      '&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1';
-  }
 
   // El campo de nubes lo publica el MOTOR, no lo baja este navegador. Son 465
   // puntos y Open-Meteo cobra por punto: una tarde con visitas nos dejaria sin
@@ -1214,31 +1140,26 @@
           '</figcaption>' +
         '</figure>' +
         '<figure class="aw-pane">' +
-          '<div class="aw-tabs">' +
-            '<button type="button" class="aw-tab on" data-vista="propio">' +
-              esc(t.vistaPropia) + '</button>' +
-            '<button type="button" class="aw-tab" data-vista="windy">' +
-              esc(t.vistaWindy) + '</button>' +
-          '</div>' +
+          /* Aqui hubo dos pestanias, la nuestra y la de Windy. Windy se
+             retiro el 21-09-2026: estuvo detras de la suya para poder
+             compararlos una noche, la comparacion se hizo y gano el nuestro.
+             Queda una etiqueta fija, como la de la camara, que ademas es lo
+             que mantiene las dos cajas a la misma altura. */
+          '<div class="aw-tabs"><span class="aw-tab fija">' +
+            esc(t.vistaPropia) + '</span></div>' +
           '<div class="aw-frame aw-map">' +
-            '<div class="aw-capa" data-vista="propio">' +
-              '<img id="aw-base-dia" alt="" decoding="async">' +
-              '<img id="aw-base-noche" alt="" decoding="async">' +
-              '<canvas id="aw-mapa-nubes"></canvas>' +
-              '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
-              '<span class="aw-fuente" id="aw-fuente"></span>' +
-              // El dia y la hora, EN la imagen. En una animacion de 48 horas
-              // lo primero que se pierde es donde estas, y bajar la vista a
-              // la barra para averiguarlo rompe justo lo que la animacion
-              // tiene de util: ver el tiempo moverse sin dejar de mirar.
-              '<span class="aw-sello" id="aw-sello"></span>' +
-            '</div>' +
-            /* WINDY, detras de su pestania y SIN `src`. El iframe se crea al
-               pulsar, no al abrir la pagina: asi quien no lo pide no le manda
-               su visita a un tercero. */
-            '<div class="aw-capa" data-vista="windy" hidden></div>' +
+            '<img id="aw-base-dia" alt="" decoding="async">' +
+            '<img id="aw-base-noche" alt="" decoding="async">' +
+            '<canvas id="aw-mapa-nubes"></canvas>' +
+            '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
+            '<span class="aw-fuente" id="aw-fuente"></span>' +
+            // El dia y la hora, EN la imagen. En una animacion de 48 horas lo
+            // primero que se pierde es donde estas, y bajar la vista a la
+            // barra para averiguarlo rompe justo lo que la animacion tiene de
+            // util: ver el tiempo moverse sin dejar de mirar.
+            '<span class="aw-sello" id="aw-sello"></span>' +
           '</div>' +
-          '<div class="aw-tiempo" data-vista="propio">' +
+          '<div class="aw-tiempo">' +
             '<button type="button" id="aw-play" aria-label="' +
               esc(t.mapaReproducir) + '">▶</button>' +
             '<div class="aw-pista" id="aw-pista">' +
@@ -1305,15 +1226,17 @@
     });
   }
 
-  /* NUESTRO MAPA. Tres capas que tienen que cuadrar al pixel: el satelite de
-     EUMETSAT de fondo, el campo de nubes del ECMWF encima y la marca del sitio.
-     La caja de coordenadas la manda la REJILLA que publica el motor, y las
-     otras dos se adaptan a ella. Al reves -- elegir un recorte bonito y luego
+  /* EL MAPA. Tres capas que tienen que cuadrar al pixel: las bases sin nubes
+     de la NASA de fondo, el campo del ECMWF encima y la marca del sitio. La
+     caja de coordenadas la manda la REJILLA que publica el motor, y las otras
+     dos se adaptan a ella. Al reves -- elegir un recorte bonito y luego
      colocar el campo dentro -- es como se consigue un mapa desplazado que
-     nadie detecta, porque una nube 25 km mas al este sigue pareciendo una nube.
+     nadie detecta, porque una nube 25 km mas al este sigue pareciendo una
+     nube.
 
-     Windy se queda detras de su pestania y SIN `src` hasta que alguien la
-     pulsa. Asi quien no lo pide no le manda su visita a un tercero. */
+     Desde que se retiro Windy no queda un solo tercero que cargue al abrir la
+     pagina salvo los que sirven pixeles: NASA para el fondo, el proxy de la
+     camara, y nuestro propio repo de datos. */
   function hhmmUtc(d) {
     return ('0' + d.getUTCHours()).slice(-2) + ':' +
            ('0' + d.getUTCMinutes()).slice(-2);
@@ -1680,7 +1603,7 @@
   }
 
   function montarMapa(caja, t, datos) {
-    var capa = caja.querySelector('.aw-capa[data-vista="propio"]');
+    var capa = caja.querySelector('.aw-frame.aw-map');
     if (!capa) { return; }
     var lienzo = capa.querySelector('#aw-mapa-nubes');
     var barra = caja.querySelector('#aw-hora');
@@ -1688,8 +1611,6 @@
     var boton = caja.querySelector('#aw-play');
     var tiempo = caja.querySelector('.aw-tiempo');
     var pie = caja.querySelector('#aw-mapa-pie');
-
-    montarPestanias(caja, t);
 
     var medida = medir(capa, 921, 546);
     // El lienzo, en pixeles de DISPOSITIVO. Sin esto el campo sale borroso en
@@ -1894,41 +1815,6 @@
           }, MAPA_PASO_MS);
         });
       });
-  }
-
-  function montarPestanias(caja, t) {
-    /* `[data-vista]` Y NO `.aw-tab` A SECAS. La etiqueta "En directo" de la
-       camara comparte la clase para que las dos filas queden a la misma
-       altura, pero no es una pestania: no hay nada que elegir ahi. Cogiendola
-       en este selector, al pulsarla se buscaba una vista llamada `null`, no
-       la encontraba ninguna capa, se ocultaban TODAS y el mapa de al lado se
-       quedaba en negro. */
-    var botones = caja.querySelectorAll('.aw-tab[data-vista]');
-    var capas = caja.querySelectorAll('.aw-capa');
-    var tiempo = caja.querySelector('.aw-tiempo');
-    for (var i = 0; i < botones.length; i++) {
-      botones[i].addEventListener('click', function () {
-        var quiere = this.getAttribute('data-vista');
-        for (var k = 0; k < botones.length; k++) {
-          botones[k].className = 'aw-tab' +
-            (botones[k].getAttribute('data-vista') === quiere ? ' on' : '');
-        }
-        for (var j = 0; j < capas.length; j++) {
-          var suya = capas[j].getAttribute('data-vista') === quiere;
-          capas[j].hidden = !suya;
-          // El iframe de Windy se CREA al pulsar, no antes. Es la diferencia
-          // entre ofrecer un tercero y metérselo a todo el que entra.
-          if (suya && quiere === 'windy' && !capas[j].firstChild) {
-            var marco = document.createElement('iframe');
-            marco.title = t.vistaWindy;
-            marco.loading = 'lazy';
-            marco.src = urlMapa();
-            capas[j].appendChild(marco);
-          }
-        }
-        if (tiempo) { tiempo.hidden = quiere !== 'propio'; }
-      });
-    }
   }
 
   function montarAfuera(caja, t, datos) {

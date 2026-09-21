@@ -379,30 +379,7 @@
   box-shadow: inset 0 0 46px 10px rgba(5, 5, 6, 0.85);
 }
 .aw-eye > img { filter: saturate(0.8) brightness(0.94) contrast(1.03); }
-/* SIN SEPIA, y esto se vio mirando y no razonando. La nube de Windy es un velo
-   GRIS-AZUL sobre un mapa amarillo: es lo unico frio que hay en la imagen, asi
-   que la sepia -- que empuja todo hacia el marron -- la fundia justo con el
-   terreno. Se estaba borrando el dato para domar la decoracion. Ahora se deja
-   el color casi entero y se BAJA LA LUZ.
-
-   CUANTA luz se baja tambien se decidio mirando, y con una referencia al lado:
-   el IR de 10,5 um del propio Meteosat, que es tierra casi negra y nube
-   blanca. Con el terreno a media luz seguia leyendose como un dato marron que
-   no significa nada -- lo dijo Nino en cuanto lo vio, y tenia razon. Bajado
-   hasta aqui, el terreno se hunde al negro de la pagina, la nube y el viento
-   quedan como lo unico claro de la caja, y el mapa se PARECE al satelite de
-   arriba en vez de pelearse con el. Que es, ademas, lo que hace que las dos
-   vistas se puedan leer seguidas sin cambiar de idioma visual. */
-.aw-map .aw-capa[data-vista="windy"] > iframe { filter: saturate(0.6) brightness(0.42) contrast(1.7); }
-/* Al pasar por encima vuelve a su color. El mapa apagado se lee de un vistazo,
-   pero si alguien se para a mirar dónde está la nube quiere el contraste de
-   verdad, no nuestro bronce. */
-.aw-frame > img, .aw-frame > iframe,
-.aw-capa > img, .aw-capa > iframe { transition: filter 0.5s ease; }
-/* Al pasar por encima vuelve casi a su color. El mapa apagado se lee de un
-   vistazo, pero quien se para a mirar donde esta la nube quiere el contraste
-   de verdad, no nuestro carbon. */
-.aw-map:hover .aw-capa[data-vista="windy"] > iframe { filter: saturate(1) brightness(0.85) contrast(1.12); }
+.aw-frame > img { transition: filter 0.5s ease; }
 
 /* 1,686:1, y el numero no es de gusto: es la proporcion EN TERRENO de la
    rejilla que publica el motor -- 31 x 15 celdas de 0,5 grados son 1.313 por
@@ -418,7 +395,7 @@
 .aw-frame.aw-eye, .aw-frame.aw-map { aspect-ratio: 1.686 / 1; }
 .aw-frame.aw-eye > img { object-fit: contain; }
 
-/* -- Las dos vistas del mapa: la nuestra y la de Windy -- */
+/* -- Los rotulos de las dos cajas -- */
 .aw-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
 .aw-tab {
   font: inherit;
@@ -433,22 +410,15 @@
   border: 1px solid rgba(207, 171, 74, 0.18);
   transition: color 0.2s ease, border-color 0.2s ease;
 }
-.aw-tab:hover { color: var(--text-secondary, #9f9c94); }
-/* La etiqueta de la camara tiene la forma de una pestania pero no lo es: no
-   hay nada que elegir ahi. Sin borde, para que no invite a pulsarla. */
+/* Las dos etiquetas son FIJAS desde que se retiro Windy: ya no hay nada que
+   elegir. Se quedan porque rotulan cada caja y porque son lo que mantiene las
+   dos a la misma altura. Sin borde, para que no inviten a pulsarlas. */
 .aw-tab.fija {
   border-color: transparent;
   cursor: default;
   color: var(--text-muted, #5e5b54);
 }
-.aw-tab.on {
-  color: var(--gold-primary, #cfab4a);
-  border-color: rgba(207, 171, 74, 0.55);
-  background: rgba(207, 171, 74, 0.06);
-}
-.aw-capa { position: absolute; inset: 0; }
-.aw-capa[hidden] { display: none; }
-.aw-capa > img, .aw-capa > canvas, .aw-capa > iframe {
+.aw-map > img, .aw-map > canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -608,16 +578,6 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary, #9f9c94);
 }
-
-/* LA BARRA DE COLORES DE WINDY SE QUEDA FUERA. Es lo mas estridente de toda
-   la pagina -- un arcoiris a plena saturacion -- y encima rotula milimetros de
-   lluvia, que NO es lo que pinta la capa de nubes que estamos ensenando: con
-   ella puesta, la unica leyenda visible explicaba otra cosa. Se deja crecer el
-   iframe por debajo del marco y el marco, que recorta, se la come. La linea de
-   tiempo y la firma de Windy quedan dentro, que es lo que tiene que quedarse.
-   El precio son 9 px: el centro de lo que se ve queda esa media leyenda por
-   encima del centro del iframe, y Nerpio con el. Sobre 519 px es el 1,7 %. */
-.aw-map .aw-capa[data-vista="windy"] > iframe { height: calc(100% + 18px); }
 
 /* El satelite casi no se toca. Llega ya sobrio -- mar azul oscuro, tierra
    ocre, nube blanca -- porque es el planeta y no la interfaz de nadie, y
