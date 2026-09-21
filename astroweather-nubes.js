@@ -201,7 +201,24 @@
         offscreen.height = alto;
         var offCtx = offscreen.getContext('2d');
         offCtx.putImageData(imgData, 0, 0);
-        ctx.drawImage(offscreen, 0, 0);
+        /* DESENFOQUE POR DEBAJO DEL TAMANIO DE CELDA, y esto salio de medir el
+           perfil de alfa sobre el mapa de verdad. La interpolacion estaba bien;
+           lo que fallaba era otra cosa: el campo trae RACHAS DE CELDAS CON EL
+           MISMO VALOR -- 24, 24, 24, 14, 4 en una fila real -- y entre mesetas
+           hay una rampa de una sola celda. Una celda son 30 px sobre 900, o sea
+           un canto duro, y mesetas planas con cantos duros se leen como
+           CUADRADOS. Que es exactamente lo que se veia.
+           Un desenfoque de media celda reparte esa rampa sobre 45 px y el
+           rectangulo desaparece. No borra informacion que hubiera: el modelo no
+           resuelve por debajo de su celda, asi que todo lo que se difumina aqui
+           es estructura que nunca existio. */
+        if (opciones.suavizado > 0 && typeof offCtx.filter !== 'undefined') {
+          ctx.filter = 'blur(' + opciones.suavizado + 'px)';
+          ctx.drawImage(offscreen, 0, 0);
+          ctx.filter = 'none';
+        } else {
+          ctx.drawImage(offscreen, 0, 0);
+        }
       } else if (ctx.putImageData) {
         ctx.putImageData(imgData, 0, 0);
       }

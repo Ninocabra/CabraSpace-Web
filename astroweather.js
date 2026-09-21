@@ -1486,7 +1486,7 @@
     // sobre 340 px no son un mapa de viento, son ruido.
     var salto = ancho < 1200 ? 2 : 1;
     var paso = ancho / viento.nx;
-    var largoMax = Math.min(paso * 0.55, 34) * (salto > 1 ? 1.5 : 1);
+    var largoMax = Math.min(paso * 0.62, 40) * (salto > 1 ? 1.5 : 1);
     var umbral = viento.umbrales || {};
     ctx.save();
     ctx.lineCap = 'round';
@@ -1503,7 +1503,14 @@
         var y = alto - (j + 0.5) * (alto / viento.ny);
         // 12 m/s ya es la flecha entera: por encima lo que informa es el
         // color, y seguir alargando solo emborrona el mapa.
-        var largo = largoMax * Math.min(1, vel / 12);
+        /* ESCALA DE RAIZ Y CON SUELO. Con la escala lineal la mediana del
+           viento -- 2 m/s, medido sobre la pasada de hoy -- daba una flecha de
+           SEIS pixeles: no es que se leyera mal, es que casi no estaba. La
+           raiz levanta el extremo flojo sin tocar el orden, y el suelo del
+           30 % garantiza que toda flecha dibujada se vea. El precio es que el
+           largo deja de ser proporcional, asi que el largo es indicativo y
+           quien manda para decidir es el COLOR, que si sale de un umbral. */
+        var largo = largoMax * (0.3 + 0.7 * Math.sqrt(Math.min(1, vel / 12)));
         var nx = u / vel, ny = -v / vel;   // v hacia el norte = hacia arriba
         var peligro = racha >= (umbral.cierre || 11.1);
         var aviso = !peligro && racha >= (umbral.degradado || 8.3);
@@ -1530,13 +1537,15 @@
            continente justo cuando hacia falta. Con el contorno se lee igual
            sobre el mar oscuro, sobre la tierra clara y sobre una nube blanca,
            sin tener que gritar con el color. */
-        var gordo = peligro || aviso ? 3.0 : 2.4;
-        ctx.strokeStyle = 'rgba(6, 8, 12, 0.55)';
-        ctx.lineWidth = gordo + 2.2;
+        var gordo = peligro || aviso ? 3.6 : 3.0;
+        // El contorno, casi opaco: debajo puede haber luces de ciudad, que es
+        // lo mas brillante del mapa, y un halo timido ahi no separa nada.
+        ctx.strokeStyle = 'rgba(4, 6, 10, 0.78)';
+        ctx.lineWidth = gordo + 2.8;
         trazo();
-        ctx.strokeStyle = peligro ? 'rgba(232, 108, 108, 0.98)'
-                        : aviso ? 'rgba(232, 178, 70, 0.96)'
-                        : 'rgba(238, 224, 186, 0.8)';
+        ctx.strokeStyle = peligro ? 'rgba(240, 120, 120, 1)'
+                        : aviso ? 'rgba(240, 186, 78, 1)'
+                        : 'rgba(244, 234, 206, 0.95)';
         ctx.lineWidth = gordo;
         trazo();
       }
@@ -1685,6 +1694,19 @@
           window.AWNubes.pintar(ctx, {
             campo: mezcla(k), nx: r.nx, ny: r.ny,
             ancho: lienzo.width, alto: lienzo.height,
+            /* 0,35 de celda, y el numero sale de medir, no de probar a ojo.
+               Sobre el mapa real, con celdas de 45 px: sin desenfoque el
+               flanco de una nube pasa del 10 % al 90 % en 29 px -- un canto --
+               y hay mesetas planas de 96 px; a 0,35 el flanco se abre a 129 px
+               y la meseta baja a 59. Mas alla no compensa: a 0,5 la meseta
+               cae a 28 pero el pico de opacidad se desploma de 105 a 72,
+               porque difuminar reparte y las nubes finas se desvanecen.
+               Se calcula y no se fija: la celda mide distinto en pantalla
+               segun el ancho del marco. */
+            suavizado: Math.round(lienzo.width / (r.nx - 1) * 0.35),
+            // Compensa lo que el desenfoque se lleva del pico: con 0,85 y
+            // difuminado, una nube cerrada se quedaba en translucida.
+            opacidadMax: 0.95,
           });
           /* LA COSTA VA ENCIMA DEL CAMPO, no debajo, y se vio midiendo: con
              la costa abajo, en Cabo de Gata -- 64 % de nube prevista a +8 h --
