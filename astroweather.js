@@ -118,16 +118,22 @@
       satHora: 'Imagen de las {h} UTC · hace {m} min',
       vistaPropia: 'Nuestro mapa', vistaWindy: 'Windy',
       mapaAhora: 'ahora', mapaReproducir: 'Reproducir', mapaPausar: 'Pausar',
+      fuenteAhora: 'Lo que HAY · Meteosat-12',
+      fuentePrevisto: 'Lo que se ESPERA · ECMWF',
       mapaNoche: 'Ir a la noche', mapaOscura: 'oscuridad astronómica',
       mapaCrepusculo: 'crepúsculo',
       nubesPie: '<b>El mapa.</b> Nubes previstas por el ECMWF sobre el satélite, pintadas por nosotros.',
       nubesSin: 'La previsión de nubes no ha llegado; se queda el satélite solo.',
       nubesTitulo: 'Por qué este mapa es nuestro y no de nadie',
-      nubesNota: 'El fondo es el Meteosat de arriba — medida — y encima va el campo de nubes del ECMWF ' +
-        '— previsión —, pintado aquí con nuestros colores. La rejilla la publica el motor, no la baja tu ' +
-        'navegador: son 465 puntos y el proveedor cobra por punto, así que una tarde con visitas nos dejaría ' +
-        'sin servicio. La celda del centro es Nerpio exacto, no una interpolación. Y donde el modelo no ' +
-        'manda valor se ve una trama dorada, que significa «aquí no sabemos» y NO «aquí está despejado».',
+      nubesNota: 'UNA SOLA FUENTE CADA VEZ, y la barra es el interruptor. En «ahora» ves el Meteosat limpio, ' +
+        'sin nada encima: es una medida y no necesita ayuda. En cuanto avanzas una hora el satélite se apaga ' +
+        '— no sabe lo que viene — y aparece el campo previsto del ECMWF sobre la costa dibujada por ' +
+        'nosotros. Así nunca hay dos nubes discutiendo: la foto del presente no se mezcla con el pronóstico ' +
+        'del futuro. El campo se ve suave porque LO ES: la resolución efectiva del modelo es aún más gruesa ' +
+        'que su rejilla de 39 km, y afilarlo sería inventar detalle. La rejilla la publica el motor, no la ' +
+        'baja tu navegador: son 465 puntos y el proveedor cobra por punto. La celda del centro es Nerpio ' +
+        'exacto, no una interpolación. Y donde el modelo no manda valor se ve una trama dorada, que ' +
+        'significa «aquí no sabemos» y NO «aquí está despejado».',
       sateliteCaida: 'El satélite no responde ahora mismo.',
       camaraAlt: 'Cámara todo-cielo de AstroCamp, en directo',
       camaraTitulo: 'Esto es la comprobación, no la previsión',
@@ -290,17 +296,23 @@
       satHora: 'Image from {h} UTC · {m} min ago',
       vistaPropia: 'Our map', vistaWindy: 'Windy',
       mapaAhora: 'now', mapaReproducir: 'Play', mapaPausar: 'Pause',
+      fuenteAhora: 'What IS there · Meteosat-12',
+      fuentePrevisto: 'What is EXPECTED · ECMWF',
       mapaNoche: 'Jump to the night', mapaOscura: 'astronomical darkness',
       mapaCrepusculo: 'twilight',
       nubesPie: '<b>The map.</b> ECMWF forecast cloud over the satellite, drawn by us.',
       nubesSin: 'The cloud forecast did not arrive; the satellite is shown on its own.',
       nubesTitulo: 'Why this map is ours and nobody else’s',
-      nubesNota: 'The background is the satellite above — measurement — and over it goes the ECMWF cloud ' +
-        'field — forecast —, drawn here in our own colours. The grid is published by the engine, not ' +
-        'fetched by your browser: it is 465 points and the provider charges per point, so one busy evening ' +
-        'would leave us cut off. The centre cell is Nerpio exactly, not an interpolation. And where the ' +
-        'model sends no value you see a gold hatch, which means “we do not know here” and NOT “it is ' +
-        'clear here”.',
+      nubesNota: 'ONE SOURCE AT A TIME, and the slider is the switch. At “now” you see the satellite ' +
+        'clean, with nothing on top: it is a measurement and needs no help. The moment you step one hour ' +
+        'forward the satellite switches off — it does not know what is coming — and the ECMWF forecast ' +
+        'field appears over a coastline we draw ourselves. That way there are never two clouds arguing: ' +
+        'the photograph of the present is not mixed with the forecast of the future. The field looks ' +
+        'smooth because IT IS: the model’s effective resolution is coarser still than its 39 km grid, and ' +
+        'sharpening it would be inventing detail. The grid is published by the engine, not fetched by your ' +
+        'browser: it is 465 points and the provider charges per point. The centre cell is Nerpio exactly, ' +
+        'not an interpolation. And where the model sends no value you see a gold hatch, which means “we ' +
+        'do not know here” and NOT “it is clear here”.',
       sateliteCaida: 'The satellite is not responding right now.',
       camaraAlt: 'AstroCamp all-sky camera, live',
       camaraTitulo: 'This is the check, not the forecast',
@@ -1350,6 +1362,10 @@
               '" decoding="async" referrerpolicy="no-referrer">' +
               '<canvas id="aw-mapa-nubes"></canvas>' +
               '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
+              // Que fuente se esta viendo, encima de la imagen y no en un pie
+              // que nadie lee. Es LA pregunta del bloque: esto que miro, ¿ya
+              // ha pasado o es un pronostico?
+              '<span class="aw-fuente" id="aw-fuente"></span>' +
             '</div>' +
             /* WINDY, detras de su pestania y SIN `src`. El iframe se crea al
                pulsar, no al abrir la pagina: asi quien no lo pide no le manda
@@ -1515,6 +1531,42 @@
     return saltoA;
   }
 
+  /* LA COSTA, dibujada por nosotros. Existe porque el fondo del futuro no
+     puede ser el satelite: el satelite ES nubes, y poner nubes previstas
+     encima de nubes observadas es pedirle a quien mira que distinga dos cosas
+     blancas sin decirle cual es cual. Al avanzar la barra el satelite se apaga
+     y hace falta ALGO que siga diciendo donde esta uno; eso es la costa.
+
+     Natural Earth 1:10m, dominio publico, recortada una vez a la caja del mapa
+     y guardada al lado: 9 trazos, 1.331 puntos, 20 kB. Bajar los 10 MB del
+     original en cada visita para quedarse con esto no tendria ningun sentido.
+
+     La proyeccion es la misma que la del satelite y la del campo -- lineal en
+     longitud y latitud, que es lo que sirve EUMETSAT con `crs=CRS:84` --, asi
+     que las tres capas cuadran sin nada que ajustar. */
+  var URL_COSTA = 'astroweather-costa.json';
+
+  function pintarCosta(ctx, costa, bbox, ancho, alto) {
+    if (!costa || !costa.lineas) { return; }
+    var dx = bbox[2] - bbox[0], dy = bbox[3] - bbox[1];
+    if (!(dx > 0) || !(dy > 0)) { return; }
+    ctx.save();
+    ctx.lineWidth = Math.max(1, ancho / 900);
+    ctx.strokeStyle = 'rgba(207, 171, 74, 0.45)';
+    ctx.lineJoin = 'round';
+    for (var k = 0; k < costa.lineas.length; k++) {
+      var linea = costa.lineas[k];
+      ctx.beginPath();
+      for (var p = 0; p < linea.length; p++) {
+        var x = (linea[p][0] - bbox[0]) / dx * ancho;
+        var y = (bbox[3] - linea[p][1]) / dy * alto;
+        if (p === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function montarMapa(caja, t, datos) {
     var capa = caja.querySelector('.aw-capa[data-vista="propio"]');
     if (!capa) { return; }
@@ -1583,18 +1635,48 @@
         }
 
         var ctx = lienzo.getContext('2d');
+        var chip = caja.querySelector('#aw-fuente');
+        var costa = null;
+        fetch(URL_COSTA, { cache: 'force-cache' })
+          .then(function (c) { return c.ok ? c.json() : null; })
+          .catch(function () { return null; })
+          .then(function (c) { costa = c; pintar(+barra.value); });
+
+        /* EL INTERRUPTOR. En la casilla 0 manda la MEDIDA: el satelite entero y
+           el lienzo vacio, sin un solo pixel de modelo encima. A partir de la
+           casilla 1 manda el MODELO: el satelite se apaga -- no sabe lo que
+           viene -- y queda la costa con el campo previsto.
+
+           Nunca las dos a la vez, y esa es toda la idea. Pintar nubes
+           previstas sobre nubes observadas obliga a distinguir dos cosas
+           blancas sin decir cual es cual, y ademas mentia: al mover la barra a
+           +12 h, la foto de debajo seguia siendo la de ahora. */
         function pintar(k) {
           k = Math.max(0, Math.min(horas.length - 1, k | 0));
+          var esAhora = (k === 0);
+          img.classList.toggle('apagado', !esAhora);
+          if (chip) {
+            chip.textContent = esAhora ? t.fuenteAhora : t.fuentePrevisto;
+            chip.className = 'aw-fuente' + (esAhora ? ' medida' : '');
+          }
           ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+          // La primera casilla es AHORA, y se dice: una barra que empieza en
+          // una hora cualquiera invita a leer el mapa como si fuera medida.
+          rotulo.textContent = hora(horas[k]) + (esAhora ? ' · ' + t.mapaAhora : '');
+          if (esAhora) { return; }
           var campo = window.AWNubes.descodificar(nubes.campos.total[k],
                                                   nubes.codificacion);
           window.AWNubes.pintar(ctx, {
             campo: campo, nx: r.nx, ny: r.ny,
             ancho: lienzo.width, alto: lienzo.height,
           });
-          // La primera casilla es AHORA, y se dice: una barra que empieza en
-          // una hora cualquiera invita a leer el mapa como si fuera medida.
-          rotulo.textContent = hora(horas[k]) + (k === 0 ? ' · ' + t.mapaAhora : '');
+          /* LA COSTA VA ENCIMA DEL CAMPO, no debajo, y se vio midiendo: con
+             la costa abajo, en Cabo de Gata -- 64 % de nube prevista a +8 h --
+             los 169 pixeles del entorno eran velo y NINGUNO era oro. El velo
+             llega a alfa 185 sobre un filete de un pixel y se lo traga entero.
+             Justo donde hay nubes, que es donde uno mira, desaparecia la unica
+             referencia geografica que queda con el satelite apagado. */
+          pintarCosta(ctx, costa, bbox, lienzo.width, lienzo.height);
         }
         pintar(0);
         barra.addEventListener('input', function () { parar(); pintar(+barra.value); });

@@ -457,7 +457,38 @@
 /* El lienzo va ENCIMA del satelite y no lo tapa: lo que pinta es un velo con
    alfa, asi que no lleva fondo. */
 #aw-mapa-nubes { background: transparent; }
-#aw-mapa-sat { object-fit: cover; filter: saturate(0.9) contrast(1.05) brightness(0.9); }
+#aw-mapa-sat {
+  object-fit: cover;
+  filter: saturate(0.9) contrast(1.05) brightness(0.9);
+  transition: opacity 0.35s ease;
+}
+/* APAGADO DEL TODO y no atenuado. Atenuar dejaria sus nubes -- que son lo mas
+   claro de la imagen -- como lo ultimo en desaparecer, justo lo que hay que
+   quitar de en medio: una foto del presente no puede seguir puesta debajo de
+   un pronostico del futuro. La geografia la sostiene la costa. */
+#aw-mapa-sat.apagado { opacity: 0; }
+
+/* Que fuente se esta viendo, encima de la imagen. Es LA pregunta del bloque:
+   esto que miro, ¿ya ha pasado o es un pronostico? */
+.aw-fuente {
+  position: absolute;
+  left: 12px; bottom: 10px;
+  z-index: 3;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #9f9c94);
+  background: rgba(5, 5, 6, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+/* La medida se distingue de la prevision de un vistazo y sin leer: el oro de
+   la pagina es de lo que se sabe. */
+.aw-fuente.medida {
+  color: var(--gold-light, #e5cc8a);
+  border-color: rgba(207, 171, 74, 0.35);
+}
 
 /* -- La barra de tiempo -- */
 .aw-tiempo { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
