@@ -404,29 +404,19 @@
    de verdad, no nuestro carbon. */
 .aw-map:hover .aw-capa[data-vista="windy"] > iframe { filter: saturate(1) brightness(0.85) contrast(1.12); }
 
-/* La fila de abajo: el modelo, a todo lo ancho. Una tira ancha y no un
-   cuadrado porque lo que se mira en un mapa desde aqui es de DONDE viene el
-   tiempo, y aqui viene del oeste: los grados que valen la pena son los de
-   longitud. */
-.aw-panes.ancho { grid-template-columns: 1fr; margin-top: 18px; }
-/* 16:9, la misma proporcion que el satelite de arriba. A lo ancho del panel y
-   al zoom que pide `urlMapa`, eso son unos 890 x 500 km contra los 800 x 450
-   del recorte de EUMETSAT: la MISMA ZONA. Antes era una tira de 2,6:1 que
-   ensenaba de Lisboa a Oran, el doble de terreno, y poner dos vistas de la
-   misma cosa a escalas distintas una encima de otra es pedirle a quien mira
-   que haga la conversion en la cabeza. */
-/* 1,686:1 y no 16:9, y el numero no es de gusto: es la proporcion EN TERRENO
-   de la rejilla que publica el motor -- 31 x 15 celdas de 0,35 grados son 919
-   por 545 km aqui. Con la caja de esa forma, el recorte del satelite se pide
-   tal cual y el campo de nubes se pinta encima sin estirar ninguno de los dos.
-   Cualquier otra proporcion obliga a deformar algo, y deformar un mapa para
-   que quepa es como se acaba pintando la nube donde no esta. */
-.aw-panes.ancho .aw-frame { aspect-ratio: 1.686 / 1; }
-/* La camara va tambien a todo lo ancho desde que se retiro el Meteosat de su
-   lado, pero con SU proporcion nativa (1932x1088) y no con la del mapa: la
-   caja del mapa la manda la rejilla del modelo, y forzar a la camara a esa
-   forma le cortaria horizonte por arriba y por abajo. */
-.aw-panes.ancho .aw-frame.aw-eye { aspect-ratio: 16 / 9; }
+/* 1,686:1, y el numero no es de gusto: es la proporcion EN TERRENO de la
+   rejilla que publica el motor -- 31 x 15 celdas de 0,5 grados son 1.313 por
+   779 km aqui. Con la caja de esa forma, las bases de la NASA se piden tal
+   cual y el campo se pinta encima sin estirar ninguno de los dos. Cualquier
+   otra proporcion obliga a deformar algo, y deformar un mapa para que quepa
+   es como se acaba pintando la nube donde no esta. */
+/* Las dos cajas de la fila comparten proporcion para que los pies queden
+   alineados, y la que manda es la del MAPA: sale de la rejilla del modelo y
+   estirarla moveria las nubes de sitio. La camara se adapta con `contain` --
+   dos filetes negros invisibles sobre un marco negro -- en vez de recortarse
+   horizonte, que es lo que haria `cover`. */
+.aw-frame.aw-eye, .aw-frame.aw-map { aspect-ratio: 1.686 / 1; }
+.aw-frame.aw-eye > img { object-fit: contain; }
 
 /* -- Las dos vistas del mapa: la nuestra y la de Windy -- */
 .aw-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -444,6 +434,13 @@
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 .aw-tab:hover { color: var(--text-secondary, #9f9c94); }
+/* La etiqueta de la camara tiene la forma de una pestania pero no lo es: no
+   hay nada que elegir ahi. Sin borde, para que no invite a pulsarla. */
+.aw-tab.fija {
+  border-color: transparent;
+  cursor: default;
+  color: var(--text-muted, #5e5b54);
+}
 .aw-tab.on {
   color: var(--gold-primary, #cfab4a);
   border-color: rgba(207, 171, 74, 0.55);
@@ -489,6 +486,28 @@
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
+/* El dia y la hora, EN la imagen. Arriba a la derecha: abajo a la izquierda
+   ya esta el rotulo de la fuente, y las esquinas de abajo son donde cae la
+   costa de Africa. */
+.aw-sello {
+  position: absolute;
+  right: 12px; top: 10px;
+  z-index: 3;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-primary, #f5f4f0);
+  background: rgba(5, 5, 6, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* En "ahora" se distingue sin leer: el oro de la pagina es de lo que ya es. */
+.aw-sello.ahora {
+  color: var(--gold-light, #e5cc8a);
+  border-color: rgba(207, 171, 74, 0.4);
+}
+
 /* -- La barra de tiempo -- */
 .aw-tiempo { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .aw-tiempo[hidden] { display: none; }
@@ -528,6 +547,38 @@
    concepto en la misma pagina es como se consigue que nadie se fie de ninguno. */
 .aw-banda.crepusculo { background: rgba(207, 171, 74, 0.38); }
 .aw-banda.oscura { background: rgba(110, 150, 220, 0.55); }
+
+/* Las horas y los dias debajo de las bandas. Una barra de 48 horas sin
+   rotulos obliga a contar cuadraditos para saber si estas en esta noche o en
+   la siguiente, que es justo la pregunta que trae a alguien aqui. */
+.aw-marcas { position: relative; height: 13px; margin-top: 2px; }
+.aw-marca {
+  position: absolute;
+  top: -2px;
+  width: 1px; height: 4px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.aw-marca.dia { height: 6px; background: rgba(207, 171, 74, 0.55); }
+.aw-rot {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #5e5b54);
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* El dia a la derecha de su marca y no centrado: centrado, el rotulo de la
+   primera medianoche se sale por la izquierda y el de la ultima por la
+   derecha, y recortado deja "mie" en "ie". */
+.aw-rot.dia {
+  transform: none;
+  margin-left: 3px;
+  color: var(--gold-secondary, #a48231);
+  font-weight: 600;
+  text-transform: capitalize;
+}
 .aw-noche {
   flex: 0 0 auto;
   font: inherit;
@@ -633,9 +684,6 @@
 }
 @media (max-width: 720px) {
   .aw-panes { grid-template-columns: 1fr; gap: 20px; }
-  /* A 330 px de ancho, 2,6:1 son 127 px de alto: eso no es un mapa, es una
-     rendija. En vertical la tira ancha pierde su razon de ser. */
-  .aw-panes.ancho .aw-frame { aspect-ratio: 16 / 9; }
 }
 
 /* ==================== Qué quieres apuntar =========================== */

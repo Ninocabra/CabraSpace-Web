@@ -104,7 +104,7 @@
         'procesar la imagen. El mapa no dice qué hay: dice qué se espera — y es la única de las tres ' +
         'que se puede equivocar.',
       sitio: 'AstroCamp',
-      vistaPropia: 'Nuestro mapa', vistaWindy: 'Windy',
+      vistaPropia: 'Nuestro mapa', vistaWindy: 'Windy', vistaCamara: 'En directo',
       mapaAhora: 'ahora', mapaReproducir: 'Reproducir', mapaPausar: 'Pausar',
       fuentePrevisto: 'Lo que se ESPERA · ECMWF',
       mapaNoche: 'Ir a la noche', mapaOscura: 'oscuridad astronómica',
@@ -274,7 +274,7 @@
         'the image. The map does not say what is there: it says what is expected, and it is the only one ' +
         'of the three that can be wrong.',
       sitio: 'AstroCamp',
-      vistaPropia: 'Our map', vistaWindy: 'Windy',
+      vistaPropia: 'Our map', vistaWindy: 'Windy', vistaCamara: 'Live',
       mapaAhora: 'now', mapaReproducir: 'Play', mapaPausar: 'Pause',
       fuentePrevisto: 'What is EXPECTED · ECMWF',
       mapaNoche: 'Jump to the night', mapaOscura: 'astronomical darkness',
@@ -1187,8 +1187,21 @@
          del cielo de Nerpio en esta pagina, deja de ir a media anchura.
          Lo que se pierde y conviene no olvidar: ya no hay observacion
          REGIONAL, solo la vertical del observatorio. */
-      '<div class="aw-panes ancho">' +
+      /* LAS DOS, UNA AL LADO DE LA OTRA: lo que se ve desde el suelo y lo que
+         se espera sobre 1.300 km, a la misma altura y de un vistazo. Las dos
+         cajas comparten proporcion para que los pies queden alineados; la que
+         manda es la del MAPA, que sale de la rejilla del modelo y no se puede
+         estirar sin mover las nubes de sitio. La camara se adapta con
+         `contain`, o sea con dos filetes negros invisibles sobre un marco
+         negro, en vez de recortarse horizonte. */
+      '<div class="aw-panes">' +
         '<figure class="aw-pane">' +
+          // Una etiqueta a la altura de las pestanias del mapa. No es adorno:
+          // sin ella las dos cajas arrancan a alturas distintas y la fila se
+          // ve torcida. Y de paso dice lo que es, que es lo que hace la
+          // pestania del otro lado.
+          '<div class="aw-tabs"><span class="aw-tab fija">' +
+            esc(t.vistaCamara) + '</span></div>' +
           '<div class="aw-frame aw-eye">' +
             '<img id="aw-allsky" src="' + esc(urlAllsky()) + '" alt="' +
             esc(t.camaraAlt) + '" decoding="async" referrerpolicy="no-referrer">' +
@@ -1198,8 +1211,6 @@
             esc(t.camaraTitulo) + '</b>' + esc(t.camaraNota) + '</span></span>' +
           '</figcaption>' +
         '</figure>' +
-      '</div>' +
-      '<div class="aw-panes ancho">' +
         '<figure class="aw-pane">' +
           '<div class="aw-tabs">' +
             '<button type="button" class="aw-tab on" data-vista="propio">' +
@@ -1214,6 +1225,11 @@
               '<canvas id="aw-mapa-nubes"></canvas>' +
               '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
               '<span class="aw-fuente" id="aw-fuente"></span>' +
+              // El dia y la hora, EN la imagen. En una animacion de 48 horas
+              // lo primero que se pierde es donde estas, y bajar la vista a
+              // la barra para averiguarlo rompe justo lo que la animacion
+              // tiene de util: ver el tiempo moverse sin dejar de mirar.
+              '<span class="aw-sello" id="aw-sello"></span>' +
             '</div>' +
             /* WINDY, detras de su pestania y SIN `src`. El iframe se crea al
                pulsar, no al abrir la pagina: asi quien no lo pide no le manda
@@ -1227,6 +1243,7 @@
               '<input type="range" id="aw-hora" min="0" max="0" value="0" ' +
                 'aria-label="' + esc(t.afuera) + '">' +
               '<div class="aw-bandas" id="aw-bandas"></div>' +
+              '<div class="aw-marcas" id="aw-marcas"></div>' +
             '</div>' +
             '<button type="button" class="aw-noche" id="aw-ir-noche" hidden>' +
               esc(t.mapaNoche) + '</button>' +
@@ -1553,6 +1570,46 @@
     ctx.restore();
   }
 
+  /* LAS MARCAS DE LA BARRA. Una barra de 48 horas sin rotulos obliga a
+     contar cuadraditos para saber si estas en esta noche o en la siguiente,
+     que es justo la pregunta. Se ponen las horas de seis en seis y el DIA en
+     cada medianoche, porque el salto de dia es el unico sitio donde uno se
+     pierde de verdad.
+
+     El dia va a la derecha de su marca, no centrado: centrado, el rotulo de
+     la medianoche se sale por la izquierda en la primera y por la derecha en
+     la ultima, y recortarlo deja "mié" convertido en "ié". */
+  var MARCA_CADA_H = 6;
+
+  function pintarMarcas(caja, horas, lang) {
+    var tira = caja.querySelector('#aw-marcas');
+    if (!tira || horas.length < 2) { return; }
+    tira.innerHTML = '';
+    var t0 = new Date(horas[0]).getTime();
+    var t1 = new Date(horas[horas.length - 1]).getTime();
+    if (!(t1 > t0)) { return; }
+    var idioma = lang === 'en' ? 'en-GB' : 'es-ES';
+
+    for (var k = 0; k < horas.length; k++) {
+      var d = new Date(horas[k]);
+      var h = d.getHours();
+      var medianoche = (h === 0);
+      if (!medianoche && h % MARCA_CADA_H !== 0) { continue; }
+      var pct = (d.getTime() - t0) / (t1 - t0) * 100;
+      var m = document.createElement('i');
+      m.className = 'aw-marca' + (medianoche ? ' dia' : '');
+      m.style.left = pct.toFixed(2) + '%';
+      tira.appendChild(m);
+      var r = document.createElement('span');
+      r.className = 'aw-rot' + (medianoche ? ' dia' : '');
+      r.style.left = pct.toFixed(2) + '%';
+      r.textContent = medianoche
+        ? d.toLocaleDateString(idioma, { weekday: 'short', day: 'numeric' })
+        : ('0' + h).slice(-2);
+      tira.appendChild(r);
+    }
+  }
+
   function montarMapa(caja, t, datos) {
     var capa = caja.querySelector('.aw-capa[data-vista="propio"]');
     if (!capa) { return; }
@@ -1611,6 +1668,8 @@
         // prevision, no en el campo de nubes. Si la prevision no llego, la
         // barra sigue funcionando: simplemente sale lisa.
         var saltoNoche = pintarNoches(caja, t, datos, horas);
+        pintarMarcas(caja, horas, LANG);
+        var sello = capa.querySelector('#aw-sello');
         var irNoche = caja.querySelector('#aw-ir-noche');
         if (irNoche && saltoNoche !== null && saltoNoche !== undefined) {
           irNoche.hidden = false;
@@ -1689,8 +1748,15 @@
           ctx.clearRect(0, 0, lienzo.width, lienzo.height);
           // La primera casilla es AHORA, y se dice: una barra que empieza en
           // una hora cualquiera invita a leer el mapa como si fuera medida.
-          rotulo.textContent = hora(new Date(cuando).toISOString()) +
-            (esAhora ? ' · ' + t.mapaAhora : '');
+          var iso = new Date(cuando).toISOString();
+          rotulo.textContent = hora(iso) + (esAhora ? ' · ' + t.mapaAhora : '');
+          if (sello) {
+            sello.textContent =
+              new Date(cuando).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'es-ES',
+                { weekday: 'short', day: 'numeric', month: 'short' }) +
+              ' · ' + hora(iso) + (esAhora ? ' · ' + t.mapaAhora : '');
+            sello.className = 'aw-sello' + (esAhora ? ' ahora' : '');
+          }
           window.AWNubes.pintar(ctx, {
             campo: mezcla(k), nx: r.nx, ny: r.ny,
             ancho: lienzo.width, alto: lienzo.height,
