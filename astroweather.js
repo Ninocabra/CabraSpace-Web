@@ -104,21 +104,8 @@
         'procesar la imagen. El mapa no dice qué hay: dice qué se espera — y es la única de las tres ' +
         'que se puede equivocar.',
       sitio: 'AstroCamp',
-      sateliteAlt: 'Meteosat-12 sobre Nerpio',
-      sateliteTitulo: 'Qué se está mirando aquí',
-      sateliteNota: 'Meteosat-12 (MTG-I1), el geoestacionario europeo, en la composición Geo Colour: de día ' +
-        'se parece al color natural y de noche pasa sola a una composición de infrarrojo, para que la nube ' +
-        'se siga viendo con el Sol debajo del horizonte. Imagen nueva cada diez minutos, con unos veinte de ' +
-        'retraso de proceso. Sale del servicio WMS abierto de EUMETSAT — sin clave y sin coste —, así que ' +
-        'el recorte, la escala y el punto de AstroCamp los ponemos nosotros: esto no es la captura de la ' +
-        'web de nadie.',
-      satelitePie: '<b>El satélite.</b> Meteosat-12 sobre Nerpio, 800 km de lado, de ' +
-        '<a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a>.' +
-        '<span class="aw-hora" id="aw-sat-hora"></span>',
-      satHora: 'Imagen de las {h} UTC · hace {m} min',
       vistaPropia: 'Nuestro mapa', vistaWindy: 'Windy',
       mapaAhora: 'ahora', mapaReproducir: 'Reproducir', mapaPausar: 'Pausar',
-      fuenteAhora: 'Lo que HAY · Meteosat-12',
       fuentePrevisto: 'Lo que se ESPERA · ECMWF',
       mapaNoche: 'Ir a la noche', mapaOscura: 'oscuridad astronómica',
       mapaCrepusculo: 'crepúsculo',
@@ -140,7 +127,6 @@
         'ámbar, rachas por encima de 30 km/h, donde el guiado sufre en focal larga; rojo, por encima de ' +
         '40, donde el techo cierra. Apuntan con el viento medio y se pintan con la racha: la dirección la ' +
         'marca el flujo, pero lo que cierra el techo es el golpe.',
-      sateliteCaida: 'El satélite no responde ahora mismo.',
       camaraAlt: 'Cámara todo-cielo de AstroCamp, en directo',
       camaraTitulo: 'Esto es la comprobación, no la previsión',
       camaraNota: 'La cámara todo-cielo del propio observatorio, en directo y refrescada cada minuto. ' +
@@ -288,21 +274,8 @@
         'the image. The map does not say what is there: it says what is expected, and it is the only one ' +
         'of the three that can be wrong.',
       sitio: 'AstroCamp',
-      sateliteAlt: 'Meteosat-12 over Nerpio',
-      sateliteTitulo: 'What you are looking at here',
-      sateliteNota: 'Meteosat-12 (MTG-I1), the European geostationary satellite, in the Geo Colour ' +
-        'composite: by day it looks close to natural colour and at night it switches by itself to an ' +
-        'infrared composite, so cloud stays visible with the Sun below the horizon. A new image every ten ' +
-        'minutes, about twenty minutes behind. It comes from EUMETSAT’s open WMS service — no key, no ' +
-        'cost — so the crop, the scale and the AstroCamp marker are ours: this is not a screenshot of ' +
-        'anybody’s website.',
-      satelitePie: '<b>The satellite.</b> Meteosat-12 over Nerpio, 800 km across, from ' +
-        '<a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a>.' +
-        '<span class="aw-hora" id="aw-sat-hora"></span>',
-      satHora: 'Image from {h} UTC · {m} min ago',
       vistaPropia: 'Our map', vistaWindy: 'Windy',
       mapaAhora: 'now', mapaReproducir: 'Play', mapaPausar: 'Pause',
-      fuenteAhora: 'What IS there · Meteosat-12',
       fuentePrevisto: 'What is EXPECTED · ECMWF',
       mapaNoche: 'Jump to the night', mapaOscura: 'astronomical darkness',
       mapaCrepusculo: 'twilight',
@@ -325,7 +298,6 @@
         '30 km/h, where guiding suffers at long focal length; red, above 40, where the roof closes. They ' +
         'point with the mean wind and are coloured by the gust: the flow sets the direction, but it is ' +
         'the gust that closes the roof.',
-      sateliteCaida: 'The satellite is not responding right now.',
       camaraAlt: 'AstroCamp all-sky camera, live',
       camaraTitulo: 'This is the check, not the forecast',
       camaraNota: 'The observatory’s own all-sky camera, live and refreshed every minute. The timestamp ' +
@@ -1182,136 +1154,15 @@
       '&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1';
   }
 
-  /* EL SATELITE. Meteosat-12 por el WMS abierto de EUMETSAT: sin clave, sin
-     coste y sin condiciones de acceso -- lo dice su propio GetCapabilities,
-     `Fees: none` y `AccessConstraints: none`, comprobado el 21-09-2026.
-
-     Que sea WMS y no una captura de la web de nadie es lo que hace que esto se
-     pueda integrar SIN PELEARSE CON EL COLOR: se pide el recorte que se quiere,
-     al tamanio que se quiere, y la marca del observatorio la dibujamos nosotros
-     encima con el oro de la pagina. La imagen que llega ya es sobria -- mar
-     azul oscuro, tierra ocre, nube blanca -- porque es el planeta, no la
-     interfaz de un proveedor.
-
-     `rgb_geocolour` y no una banda suelta A PROPOSITO: esa composicion cambia
-     sola a infrarrojo cuando se pone el Sol, que es justo cuando esta pagina
-     se usa. Con una banda visible, la mitad util de la noche seria un
-     rectangulo negro. (Verificado de dia; queda por ver una noche entera.)
-
-     Y SEGUNDA VEZ LA MISMA TRAMPA: este servicio responde con
-     `Cache-Control: max-age=604800`, una semana, a una imagen que cambia cada
-     diez minutos. Igual que la camara con sus noventa dias. Por eso la URL
-     lleva sello, aqui de diez minutos, que es la cadencia real del producto. */
-  var SAT_WMS = 'https://view.eumetsat.int/geoserver/wms';
-  var SAT_CAPA = 'mtg_fd:rgb_geocolour';
-  var SAT_MS = 600000;
-  // Medio lado del recorte. 400 km no es un numero bonito: es la distancia a
-  // la que una linea de nubes que venga del oeste todavia da unas horas de
-  // margen para decidir, que es para lo que se mira un satelite desde aqui.
-  // Y cuadra con lo que ensenia el mapa de abajo al zoom que se le pide, para
-  // que las dos vistas se puedan comparar sin hacer cuentas.
-  var SAT_SEMIANCHO_KM = 400;
-  var KM_POR_GRADO = 111.32;
-
-  /* DE CUANDO ES LA IMAGEN, y por que no vale con estimarlo.
-
-     El servidor SI lo dice, pero por una cabecera que el navegador no deja
-     leer: cada GetMap vuelve con `Warning: 99 Default value used:
-     time=2026-09-21T13:40:00.000Z`. Esa cabecera no esta en la lista blanca
-     del CORS y EUMETSAT no la expone, asi que desde la pagina es invisible.
-
-     La via buena es el GetCapabilities del espacio de nombres `mtg_fd`, que
-     son 34 kB -- el general son 282 -- y trae, por capa, el `default` de su
-     dimension de tiempo: exactamente la pasada que el servidor serviria.
-
-     Y una vez sabida, SE PIDE ESA. Podria pedirse la imagen sin `time` y
-     rotularla con la hora leida del capabilities, pero entre una peticion y la
-     otra puede entrar una pasada nueva, y entonces el rotulo estaria
-     describiendo unos pixeles que no son. Pedir la misma hora que se rotula es
-     lo unico que garantiza que el pie hable de la imagen que hay encima.
-
-     Si el capabilities no llega, la imagen se pide sin hora -- el servidor da
-     la ultima igual -- y el pie se queda callado. Callar es correcto; poner
-     una hora inventada, no. */
-  var SAT_CAPS = 'https://view.eumetsat.int/geoserver/mtg_fd/wms' +
-    '?service=WMS&request=GetCapabilities&version=1.3.0';
-
-  function horaSatelite() {
-    return fetch(SAT_CAPS, { cache: 'no-cache' })
-      .then(function (r) { return r.ok ? r.text() : null; })
-      .then(function (xml) {
-        if (!xml) { return null; }
-        var doc = new DOMParser().parseFromString(xml, 'text/xml');
-        var capas = doc.getElementsByTagName('Layer');
-        // En el capabilities del espacio de nombres los nombres van SIN
-        // prefijo: la capa `mtg_fd:rgb_geocolour` se llama ahi `rgb_geocolour`.
-        var corta = SAT_CAPA.split(':').pop();
-        for (var i = 0; i < capas.length; i++) {
-          var nombre = capas[i].getElementsByTagName('Name')[0];
-          if (!nombre || nombre.textContent !== corta) { continue; }
-          var dims = capas[i].getElementsByTagName('Dimension');
-          for (var j = 0; j < dims.length; j++) {
-            if (dims[j].getAttribute('name') === 'time') {
-              return dims[j].getAttribute('default');
-            }
-          }
-        }
-        return null;
-      })
-      .catch(function () { return null; });
-  }
-
-  /* El mismo GetMap, pero con la caja DADA en vez de calculada. Existe porque
-     el mapa de abajo tiene que pedir exactamente la caja de la rejilla de
-     nubes: si el recorte del satelite y el del campo difirieran un cuarto de
-     grado, la nube saldria 25 km corrida y el mapa seguiria pareciendo bueno. */
-  function urlSateliteBbox(bbox, ancho, alto, cuando) {
-    var px = Math.min(Math.round(ancho * 2), 1200);
-    return SAT_WMS + '?service=WMS&version=1.3.0&request=GetMap' +
-      '&layers=' + encodeURIComponent(SAT_CAPA) +
-      '&styles=&format=image/jpeg&transparent=false&crs=CRS:84' +
-      '&bbox=' + bbox.map(function (v) { return v.toFixed(3); }).join(',') +
-      '&width=' + px + '&height=' + Math.round(px * alto / ancho) +
-      (cuando ? '&time=' + encodeURIComponent(cuando)
-              : '&n=' + Math.floor(Date.now() / SAT_MS));
-  }
-
-  function urlSatelite(ancho, alto, cuando) {
-    // El recorte se pide en grados y se sirve estirado a los pixeles que haya,
-    // asi que la caja de grados tiene que tener la proporcion del TERRENO, no
-    // la de la pantalla: a 38 grados de latitud un grado de longitud mide
-    // 87 km y uno de latitud 111, y sin el coseno Espania sale ensanchada.
-    var dLon = SAT_SEMIANCHO_KM /
-      (KM_POR_GRADO * Math.cos(MAPA_SITIO.lat * Math.PI / 180));
-    var dLat = (SAT_SEMIANCHO_KM * (alto / ancho)) / KM_POR_GRADO;
-    // El doble de pixeles que la caja, para que no se vea blanda en pantallas
-    // densas, con tope: pasado ese punto se pide mas resolucion de la que el
-    // instrumento tiene y solo se paga el peso.
-    var px = Math.min(Math.round(ancho * 2), 1200);
-    return SAT_WMS + '?service=WMS&version=1.3.0&request=GetMap' +
-      '&layers=' + encodeURIComponent(SAT_CAPA) +
-      '&styles=&format=image/jpeg&transparent=false&crs=CRS:84' +
-      '&bbox=' + (MAPA_SITIO.lon - dLon).toFixed(3) + ',' +
-                 (MAPA_SITIO.lat - dLat).toFixed(3) + ',' +
-                 (MAPA_SITIO.lon + dLon).toFixed(3) + ',' +
-                 (MAPA_SITIO.lat + dLat).toFixed(3) +
-      '&width=' + px + '&height=' + Math.round(px * alto / ancho) +
-      // Con hora explicita el sello sobra: la propia hora ya hace unica la URL
-      // y ademas la deja cacheable de verdad, que es lo que el servidor quiere
-      // con su `max-age` de una semana. Sin ella, el sello de diez minutos.
-      (cuando ? '&time=' + encodeURIComponent(cuando)
-              : '&n=' + Math.floor(Date.now() / SAT_MS));
-  }
-
   // El campo de nubes lo publica el MOTOR, no lo baja este navegador. Son 465
   // puntos y Open-Meteo cobra por punto: una tarde con visitas nos dejaria sin
   // servicio, y ademas la pagina estaria calculando por su cuenta y acabaria
   // discrepando del veredicto que tiene tres bloques mas arriba.
   var URL_NUBES = 'https://raw.githubusercontent.com/Ninocabra/' +
     'CabraSpace-AstroWeather-Data/main/nubes.json';
-  // 110 ms por cuarto de hora: una hora de modelo cada 0,44 s y las 48 en
-  // unos veinte segundos. A 350 y saltando horas enteras aquello era un pase
-  // de diapositivas.
+  // 110 ms por cuarto de hora: una hora de modelo cada 0,44 s y las 48 en unos
+  // veinte segundos. A 350 y saltando horas enteras aquello era un pase de
+  // diapositivas.
   var MAPA_PASO_MS = 110;
 
   function urlAllsky() {
@@ -1329,7 +1180,14 @@
     return '<div class="aw-outside"><h3>' + esc(t.afuera) +
       '<span class="aw-info izq" tabindex="0">?<span class="aw-pop"><b>' +
       esc(t.afueraTitulo) + '</b>' + esc(t.afueraNota) + '</span></span></h3>' +
-      '<div class="aw-panes">' +
+      /* ARRIBA, LA CAMARA SOLA Y A TODO LO ANCHO. Aqui hubo un panel del
+         Meteosat al lado; retirado el 21-09-2026 por decision de Nino. La
+         division queda mas limpia -- arriba lo que SE VE desde el suelo,
+         abajo lo que se ESPERA -- y la camara, que es la unica medida directa
+         del cielo de Nerpio en esta pagina, deja de ir a media anchura.
+         Lo que se pierde y conviene no olvidar: ya no hay observacion
+         REGIONAL, solo la vertical del observatorio. */
+      '<div class="aw-panes ancho">' +
         '<figure class="aw-pane">' +
           '<div class="aw-frame aw-eye">' +
             '<img id="aw-allsky" src="' + esc(urlAllsky()) + '" alt="' +
@@ -1338,21 +1196,6 @@
           '<figcaption class="aw-cap">' + t.camaraPie +
             '<span class="aw-info izq" tabindex="0">?<span class="aw-pop"><b>' +
             esc(t.camaraTitulo) + '</b>' + esc(t.camaraNota) + '</span></span>' +
-          '</figcaption>' +
-        '</figure>' +
-        '<figure class="aw-pane">' +
-          '<div class="aw-frame aw-sat">' +
-            '<img id="aw-satelite" alt="' + esc(t.sateliteAlt) +
-            '" decoding="async" referrerpolicy="no-referrer">' +
-            // La marca del sitio es NUESTRA y va exactamente en el centro,
-            // porque el recorte se ha pedido centrado en Nerpio. Es lo unico
-            // que le falta a la imagen cruda: sin ella, 800 km de sierra son
-            // 800 km de sierra y no se sabe cual es la de uno.
-            '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
-          '</div>' +
-          '<figcaption class="aw-cap">' + t.satelitePie +
-            '<span class="aw-info izq" tabindex="0">?<span class="aw-pop"><b>' +
-            esc(t.sateliteTitulo) + '</b>' + esc(t.sateliteNota) + '</span></span>' +
           '</figcaption>' +
         '</figure>' +
       '</div>' +
@@ -1365,49 +1208,24 @@
               esc(t.vistaWindy) + '</button>' +
           '</div>' +
           '<div class="aw-frame aw-map">' +
-            /* NUESTRO MAPA: el satelite de fondo y el campo de nubes encima,
-               los dos sobre EXACTAMENTE la misma caja de coordenadas -- la que
-               declara la rejilla del motor. Eso no es pulcritud: es lo unico
-               que garantiza que la nube caiga donde el modelo la pone. Si el
-               recorte del satelite y el del campo difirieran aunque fuese en
-               un cuarto de grado, la nube saldria desplazada 25 km y el mapa
-               seguiria pareciendo correcto. */
             '<div class="aw-capa" data-vista="propio">' +
-              // El orden importa: dia debajo, noche encima fundiendose con
-              // su opacidad, el Meteosat encima de los dos para la casilla de
-              // AHORA, y el lienzo por encima de todo.
               '<img id="aw-base-dia" alt="" decoding="async">' +
               '<img id="aw-base-noche" alt="" decoding="async">' +
-              '<img id="aw-mapa-sat" alt="' + esc(t.sateliteAlt) +
-              '" decoding="async" referrerpolicy="no-referrer">' +
               '<canvas id="aw-mapa-nubes"></canvas>' +
               '<span class="aw-sitio"><i></i><span>' + esc(t.sitio) + '</span></span>' +
-              // Que fuente se esta viendo, encima de la imagen y no en un pie
-              // que nadie lee. Es LA pregunta del bloque: esto que miro, ¿ya
-              // ha pasado o es un pronostico?
               '<span class="aw-fuente" id="aw-fuente"></span>' +
             '</div>' +
             /* WINDY, detras de su pestania y SIN `src`. El iframe se crea al
                pulsar, no al abrir la pagina: asi quien no lo pide no le manda
-               su visita a un tercero, que era la otra pega que tenia. */
+               su visita a un tercero. */
             '<div class="aw-capa" data-vista="windy" hidden></div>' +
           '</div>' +
           '<div class="aw-tiempo" data-vista="propio">' +
             '<button type="button" id="aw-play" aria-label="' +
               esc(t.mapaReproducir) + '">▶</button>' +
-            /* La pista lleva DEBAJO las noches, pintadas con el crepusculo que
-               publica el motor. No es adorno: de las 48 horas que cubre esta
-               barra, las unicas que importan para decidir si se monta el
-               telescopio son las ~18 que caen de noche, y una barra lisa las
-               esconde entre las otras treinta. */
             '<div class="aw-pista" id="aw-pista">' +
               '<input type="range" id="aw-hora" min="0" max="0" value="0" ' +
                 'aria-label="' + esc(t.afuera) + '">' +
-              /* Las bandas van DEBAJO del deslizador y no detras. Detras habria
-                 que dejar transparente la pista nativa del `range`, que cada
-                 navegador dibuja a su manera, y el resultado se rompe en uno de
-                 cada tres. Debajo se alinean igual de bien y no se pelean con
-                 nadie. */
               '<div class="aw-bandas" id="aw-bandas"></div>' +
             '</div>' +
             '<button type="button" class="aw-noche" id="aw-ir-noche" hidden>' +
@@ -1668,7 +1486,7 @@
     // sobre 340 px no son un mapa de viento, son ruido.
     var salto = ancho < 1200 ? 2 : 1;
     var paso = ancho / viento.nx;
-    var largoMax = Math.min(paso * 0.42, 26) * (salto > 1 ? 1.5 : 1);
+    var largoMax = Math.min(paso * 0.55, 34) * (salto > 1 ? 1.5 : 1);
     var umbral = viento.umbrales || {};
     ctx.save();
     ctx.lineCap = 'round';
@@ -1689,22 +1507,38 @@
         var nx = u / vel, ny = -v / vel;   // v hacia el norte = hacia arriba
         var peligro = racha >= (umbral.cierre || 11.1);
         var aviso = !peligro && racha >= (umbral.degradado || 8.3);
-        ctx.strokeStyle = peligro ? 'rgba(209, 95, 95, 0.95)'
-                        : aviso ? 'rgba(216, 165, 60, 0.9)'
-                        : 'rgba(229, 204, 138, 0.42)';
-        ctx.lineWidth = peligro || aviso ? 1.8 : 1.2;
         var x0 = x - nx * largo / 2, y0 = y - ny * largo / 2;
         var x1 = x + nx * largo / 2, y1 = y + ny * largo / 2;
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
-        // La punta, para que se vea HACIA donde sopla y no solo el eje.
-        var p = Math.max(3, largo * 0.32), a = 2.5;
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x1 - nx * p + ny * p / a, y1 - ny * p - nx * p / a);
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x1 - nx * p - ny * p / a, y1 - ny * p + nx * p / a);
-        ctx.stroke();
+        var p = Math.max(4, largo * 0.34), a = 2.4;
+
+        function trazo() {
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.lineTo(x1, y1);
+          // La punta, para que se vea HACIA donde sopla y no solo el eje.
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x1 - nx * p + ny * p / a, y1 - ny * p - nx * p / a);
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x1 - nx * p - ny * p / a, y1 - ny * p + nx * p / a);
+          ctx.stroke();
+        }
+
+        /* DOS PASADAS: primero un contorno oscuro y encima el color. Es el
+           truco de toda la vida de la cartografia, y aqui no es adorno: este
+           mapa cambia de fondo segun la hora -- tierra ocre de dia, luces de
+           ciudad de noche -- y una flecha de un solo color se perdia sobre el
+           continente justo cuando hacia falta. Con el contorno se lee igual
+           sobre el mar oscuro, sobre la tierra clara y sobre una nube blanca,
+           sin tener que gritar con el color. */
+        var gordo = peligro || aviso ? 3.0 : 2.4;
+        ctx.strokeStyle = 'rgba(6, 8, 12, 0.55)';
+        ctx.lineWidth = gordo + 2.2;
+        trazo();
+        ctx.strokeStyle = peligro ? 'rgba(232, 108, 108, 0.98)'
+                        : aviso ? 'rgba(232, 178, 70, 0.96)'
+                        : 'rgba(238, 224, 186, 0.8)';
+        ctx.lineWidth = gordo;
+        trazo();
       }
     }
     ctx.restore();
@@ -1713,7 +1547,6 @@
   function montarMapa(caja, t, datos) {
     var capa = caja.querySelector('.aw-capa[data-vista="propio"]');
     if (!capa) { return; }
-    var img = capa.querySelector('#aw-mapa-sat');
     var lienzo = capa.querySelector('#aw-mapa-nubes');
     var barra = caja.querySelector('#aw-hora');
     var rotulo = caja.querySelector('#aw-hora-rot');
@@ -1722,7 +1555,6 @@
     var pie = caja.querySelector('#aw-mapa-pie');
 
     montarPestanias(caja, t);
-    vigilar(img, t.sateliteCaida);
 
     var medida = medir(capa, 921, 546);
     // El lienzo, en pixeles de DISPOSITIVO. Sin esto el campo sale borroso en
@@ -1732,12 +1564,18 @@
     lienzo.width = Math.round(medida[0] * dpr);
     lienzo.height = Math.round(medida[1] * dpr);
 
-    function sinCampo() {
+    /* Sin campo no hay mapa que pintar, pero SI hay fondo: las bases de la
+       NASA no dependen del motor. Se dejan puestas y se retira la barra, que
+       sin horas no lleva a ningun sitio. */
+    function sinCampo(bbox) {
       if (tiempo) { tiempo.hidden = true; }
       if (pie) { pie.insertBefore(document.createTextNode(' ' + t.nubesSin), pie.firstChild); }
-      horaSatelite().then(function (cuando) {
-        img.src = urlSatelite(medida[0], medida[1], cuando);
-      });
+      var caja2 = bbox || [MAPA_SITIO.lon - 7.5, MAPA_SITIO.lat - 3.5,
+                           MAPA_SITIO.lon + 7.5, MAPA_SITIO.lat + 3.5];
+      var d = capa.querySelector('#aw-base-dia');
+      var n = capa.querySelector('#aw-base-noche');
+      if (d) { d.src = urlBase(GIBS_DIA, caja2, medida[0], medida[1]); }
+      if (n) { n.src = urlBase(GIBS_NOCHE, caja2, medida[0], medida[1]); }
     }
 
     var sello = '?t=' + Math.floor(Date.now() / 300000);
@@ -1755,12 +1593,9 @@
         var bbox = [r.lon0, r.lat0,
                     r.lon0 + (r.nx - 1) * r.paso,
                     r.lat0 + (r.ny - 1) * r.paso];
-        horaSatelite().then(function (cuando) {
-          img.src = urlSateliteBbox(bbox, medida[0], medida[1], cuando);
-        });
 
         var horas = nubes.horas || [];
-        if (!horas.length) { sinCampo(); return; }
+        if (!horas.length) { sinCampo(bbox); return; }
         barra.max = String(horas.length - 1);
 
         // Las noches se pintan con el crepusculo del motor, que viene en la
@@ -1832,23 +1667,21 @@
           k = Math.max(0, Math.min(horas.length - 1, +k || 0));
           var esAhora = (k < 0.001);
           var cuando = t0ms + k * 3600000;
-          img.classList.toggle('apagado', !esAhora);
           // Las bases de la NASA se funden con la hora que se esta mirando: de
           // dia el color natural, de noche las luces. Debajo del Meteosat
           // cuando manda el Meteosat, asi que el cambio no se ve en "ahora".
           if (baseNoche) {
             baseNoche.style.opacity = nocturnidad(cuando, datos && datos.noches);
           }
-          if (chip) {
-            chip.textContent = esAhora ? t.fuenteAhora : t.fuentePrevisto;
-            chip.className = 'aw-fuente' + (esAhora ? ' medida' : '');
-          }
+          // El chip dice SIEMPRE lo mismo, y por eso sigue: desde que se
+          // retiro el Meteosat todo lo que hay en este mapa es prevision, y un
+          // mapa que se parece a una foto tiene que decir que no lo es.
+          if (chip) { chip.textContent = t.fuentePrevisto; }
           ctx.clearRect(0, 0, lienzo.width, lienzo.height);
           // La primera casilla es AHORA, y se dice: una barra que empieza en
           // una hora cualquiera invita a leer el mapa como si fuera medida.
           rotulo.textContent = hora(new Date(cuando).toISOString()) +
             (esAhora ? ' · ' + t.mapaAhora : '');
-          if (esAhora) { return; }
           window.AWNubes.pintar(ctx, {
             campo: mezcla(k), nx: r.nx, ny: r.ny,
             ancho: lienzo.width, alto: lienzo.height,
@@ -1925,46 +1758,14 @@
     var ojo = caja.querySelector('#aw-allsky');
     if (ojo) { vigilar(ojo, t.camaraCaida); }
 
-    /* EL SATELITE. Aqui hay un paso mas y es asincrono: primero se averigua de
-       cuando es la ultima pasada, y solo entonces se pide -- esa misma -- y se
-       rotula. El recorte se pide en grados y tiene que salir con la proporcion
-       de la caja, asi que tambien hay que medirla antes. */
-    var sat = caja.querySelector('#aw-satelite');
-    var rotulo = caja.querySelector('#aw-sat-hora');
-    var caj = sat ? medir(sat.parentNode, 452, 254) : null;
-    if (sat) { vigilar(sat, t.sateliteCaida); }
-
-    function refrescarSatelite() {
-      if (!sat) { return; }
-      horaSatelite().then(function (cuando) {
-        intercambiar(sat, urlSatelite(caj[0], caj[1], cuando));
-        if (!rotulo) { return; }
-        if (!cuando) { rotulo.textContent = ''; return; }
-        var d = new Date(cuando);
-        if (isNaN(d.getTime())) { rotulo.textContent = ''; return; }
-        var hh = ('0' + d.getUTCHours()).slice(-2) + ':' +
-                 ('0' + d.getUTCMinutes()).slice(-2);
-        var min = Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
-        rotulo.textContent = t.satHora.replace('{h}', hh).replace('{m}', min);
-      });
-    }
-
     function refrescarCamara() { if (ojo) { intercambiar(ojo, urlAllsky()); } }
 
-    refrescarSatelite();
-
-    /* Dos relojes y no uno, porque las dos fuentes laten distinto: la camara
-       manda fotograma nuevo cada pocos segundos y el satelite cada diez
-       minutos. Pedir el satelite al ritmo de la camara seria bajar la misma
-       imagen diez veces para no cambiar nada. */
     setInterval(refrescarCamara, ALLSKY_MS);
-    setInterval(refrescarSatelite, SAT_MS);
     // Volver a la pestania es justo el momento en el que lo pegado es mas
     // viejo: quien vuelve lo hace para mirar el cielo de AHORA.
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { return; }
       refrescarCamara();
-      refrescarSatelite();
     });
   }
 
