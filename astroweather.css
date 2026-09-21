@@ -511,7 +511,11 @@
 /* -- La barra de tiempo -- */
 .aw-tiempo { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .aw-tiempo[hidden] { display: none; }
-.aw-tiempo button {
+/* SOLO EL DE REPRODUCIR es redondo. Estaba puesto como `.aw-tiempo button` y
+   ahi dentro hay otro boton -- el de ir a la noche --, que por especificidad
+   se llevaba tambien los 30x30 y el radio del 50 %: una pastilla de texto
+   metida en un circulo de 30 px, con las letras desparramadas por fuera. */
+.aw-tiempo #aw-play {
   font: inherit;
   font-size: 0.7rem;
   width: 30px; height: 30px;
@@ -522,7 +526,7 @@
   background: transparent;
   border: 1px solid rgba(207, 171, 74, 0.3);
 }
-.aw-tiempo button:hover { border-color: rgba(207, 171, 74, 0.7); }
+.aw-tiempo #aw-play:hover { border-color: rgba(207, 171, 74, 0.7); }
 .aw-pista { position: relative; flex: 1 1 auto; min-width: 0; }
 .aw-pista input[type="range"] {
   display: block;

@@ -136,7 +136,8 @@
       camaraPie: '<b>La cámara.</b> Todo-cielo de AstroCamp (Nerpio), en directo.' +
         '<span class="aw-hora" id="aw-cam-hora"></span>',
       camaraHora: 'Fotograma de las {h} UTC · hace {m} min',
-      camaraCongelada: 'Fotograma de las {h} UTC · la cámara lleva {m} min sin refrescar',
+      camaraCongelada: 'Fotograma de las {h} UTC · la cámara llevaba {m} min sin refrescar',
+      camaraVieja: 'Fotograma de las {h} UTC · leído hace {m} min',
       camaraCaida: 'La cámara no responde ahora mismo.',
       mapaTitulo: 'Por qué este modelo y no otro',
       mapaNota: 'El mapa enseña el ECMWF, que es el mismo modelo del que sale el veredicto de arriba, y ' +
@@ -307,7 +308,8 @@
       camaraPie: '<b>The camera.</b> AstroCamp all-sky (Nerpio, Spain), live.' +
         '<span class="aw-hora" id="aw-cam-hora"></span>',
       camaraHora: 'Frame from {h} UTC · {m} min ago',
-      camaraCongelada: 'Frame from {h} UTC · the camera has not refreshed for {m} min',
+      camaraCongelada: 'Frame from {h} UTC · the camera had not refreshed for {m} min',
+      camaraVieja: 'Frame from {h} UTC · read {m} min ago',
       camaraCaida: 'The camera is not responding right now.',
       mapaTitulo: 'Why this model and not another',
       mapaNota: 'The map shows ECMWF, the same model the verdict above comes from, and that is not a ' +
@@ -1325,10 +1327,25 @@
      para cuando no funciona: con la camara congelada el proxy seguiria
      diciendo "hace 0 minutos" sobre la imagen de anoche.
 
-     Por encima de 20 minutos se cambia la frase. No es un umbral fino: la
-     recogida pasa cada pocos minutos, asi que un fotograma de hace mas de
-     veinte no es "un poco viejo", es una camara parada. */
+     DOS RELOJES Y NO UNO, y la diferencia importa porque el primer aviso que
+     dio esta pagina fue FALSO. Decia "la camara lleva 32 minutos sin
+     refrescar" y la camara estaba perfectamente: su ultimo fotograma era de
+     hacia medio minuto. Lo que tenia 32 minutos era NUESTRA LECTURA -- el
+     colector publica `ahora.json` cada pocos minutos y a veces se retrasa --,
+     asi que el aviso le estaba echando la culpa a la camara del retraso del
+     que la lee.
+
+     Se arregla separando las dos edades, que ya viajan las dos en el fichero:
+
+       `leido_utc - allsky_utc`  cuanto de viejo estaba el fotograma CUANDO
+                                 miramos. Esto si es la camara, y no depende
+                                 de lo puntual que sea el colector.
+       `ahora - leido_utc`       cuanto hace que miramos. Esto somos nosotros.
+
+     Solo la primera enciende el aviso rojo. La segunda cambia la frase para
+     decir que la informacion es vieja, que no es lo mismo ni de lejos. */
   var CAMARA_PARADA_MIN = 20;
+  var LECTURA_VIEJA_MIN = 25;
 
   function rotularCamara(caja, t, sensores) {
     var rot = caja.querySelector('#aw-cam-hora');
@@ -1336,11 +1353,30 @@
     var iso = sensores && sensores.allsky_utc;
     var d = iso ? new Date(iso) : null;
     if (!d || isNaN(d.getTime())) { rot.textContent = ''; return; }
-    var min = Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
-    var parada = min > CAMARA_PARADA_MIN;
-    rot.className = 'aw-hora' + (parada ? ' alerta' : '');
-    rot.textContent = (parada ? t.camaraCongelada : t.camaraHora)
-      .replace('{h}', hhmmUtc(d)).replace('{m}', min);
+    var leido = sensores.leido_utc ? new Date(sensores.leido_utc) : null;
+    if (leido && isNaN(leido.getTime())) { leido = null; }
+
+    // Cuanto de viejo estaba el fotograma cuando lo miramos: la camara.
+    var retraso = leido
+      ? Math.max(0, Math.round((leido.getTime() - d.getTime()) / 60000)) : null;
+    // Cuanto hace que lo miramos: nosotros.
+    var nuestra = leido
+      ? Math.max(0, Math.round((Date.now() - leido.getTime()) / 60000))
+      : Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
+
+    var plantilla, minutos;
+    if (retraso !== null && retraso > CAMARA_PARADA_MIN) {
+      plantilla = t.camaraCongelada; minutos = retraso;
+      rot.className = 'aw-hora alerta';
+    } else if (nuestra > LECTURA_VIEJA_MIN) {
+      plantilla = t.camaraVieja; minutos = nuestra;
+      rot.className = 'aw-hora';
+    } else {
+      plantilla = t.camaraHora; minutos = nuestra;
+      rot.className = 'aw-hora';
+    }
+    rot.textContent = plantilla
+      .replace('{h}', hhmmUtc(d)).replace('{m}', minutos);
   }
 
   /* Las noches, sobre la barra de 48 horas. De esas 48, las que deciden si se
@@ -1809,7 +1845,13 @@
   }
 
   function montarPestanias(caja, t) {
-    var botones = caja.querySelectorAll('.aw-tab');
+    /* `[data-vista]` Y NO `.aw-tab` A SECAS. La etiqueta "En directo" de la
+       camara comparte la clase para que las dos filas queden a la misma
+       altura, pero no es una pestania: no hay nada que elegir ahi. Cogiendola
+       en este selector, al pulsarla se buscaba una vista llamada `null`, no
+       la encontraba ninguna capa, se ocultaban TODAS y el mapa de al lado se
+       quedaba en negro. */
+    var botones = caja.querySelectorAll('.aw-tab[data-vista]');
     var capas = caja.querySelectorAll('.aw-capa');
     var tiempo = caja.querySelector('.aw-tiempo');
     for (var i = 0; i < botones.length; i++) {
