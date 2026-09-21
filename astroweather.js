@@ -122,7 +122,8 @@
       fuentePrevisto: 'Lo que se ESPERA · ECMWF',
       mapaNoche: 'Ir a la noche', mapaOscura: 'oscuridad astronómica',
       mapaCrepusculo: 'crepúsculo',
-      nubesPie: '<b>El mapa.</b> Nubes previstas por el ECMWF sobre el satélite, pintadas por nosotros.',
+      nubesPie: '<b>El mapa.</b> Nubes previstas por el ECMWF, pintadas por nosotros. Fondo sin nubes: ' +
+        '<a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA EOSDIS GIBS</a>.',
       nubesSin: 'La previsión de nubes no ha llegado; se queda el satélite solo.',
       nubesTitulo: 'Por qué este mapa es nuestro y no de nadie',
       nubesNota: 'UNA SOLA FUENTE CADA VEZ, y la barra es el interruptor. En «ahora» ves el Meteosat limpio, ' +
@@ -300,7 +301,8 @@
       fuentePrevisto: 'What is EXPECTED · ECMWF',
       mapaNoche: 'Jump to the night', mapaOscura: 'astronomical darkness',
       mapaCrepusculo: 'twilight',
-      nubesPie: '<b>The map.</b> ECMWF forecast cloud over the satellite, drawn by us.',
+      nubesPie: '<b>The map.</b> ECMWF forecast cloud, drawn by us. Cloud-free background: ' +
+        '<a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA EOSDIS GIBS</a>.',
       nubesSin: 'The cloud forecast did not arrive; the satellite is shown on its own.',
       nubesTitulo: 'Why this map is ours and nobody else’s',
       nubesNota: 'ONE SOURCE AT A TIME, and the slider is the switch. At “now” you see the satellite ' +
@@ -1297,7 +1299,10 @@
   // discrepando del veredicto que tiene tres bloques mas arriba.
   var URL_NUBES = 'https://raw.githubusercontent.com/Ninocabra/' +
     'CabraSpace-AstroWeather-Data/main/nubes.json';
-  var MAPA_PASO_MS = 350;
+  // 110 ms por cuarto de hora: una hora de modelo cada 0,44 s y las 48 en
+  // unos veinte segundos. A 350 y saltando horas enteras aquello era un pase
+  // de diapositivas.
+  var MAPA_PASO_MS = 110;
 
   function urlAllsky() {
     return ALLSKY_PROXY + encodeURIComponent(ALLSKY_ORIGEN) +
@@ -1358,6 +1363,11 @@
                un cuarto de grado, la nube saldria desplazada 25 km y el mapa
                seguiria pareciendo correcto. */
             '<div class="aw-capa" data-vista="propio">' +
+              // El orden importa: dia debajo, noche encima fundiendose con
+              // su opacidad, el Meteosat encima de los dos para la casilla de
+              // AHORA, y el lienzo por encima de todo.
+              '<img id="aw-base-dia" alt="" decoding="async">' +
+              '<img id="aw-base-noche" alt="" decoding="async">' +
               '<img id="aw-mapa-sat" alt="' + esc(t.sateliteAlt) +
               '" decoding="async" referrerpolicy="no-referrer">' +
               '<canvas id="aw-mapa-nubes"></canvas>' +
@@ -1544,6 +1554,55 @@
      La proyeccion es la misma que la del satelite y la del campo -- lineal en
      longitud y latitud, que es lo que sirve EUMETSAT con `crs=CRS:84` --, asi
      que las tres capas cuadran sin nada que ajustar. */
+  /* LAS DOS BASES SIN NUBES. Este era el nudo de todo el bloque: el fondo no
+     puede ser una imagen que YA tiene nubes, porque entonces pintar encima las
+     previstas obliga a distinguir dos cosas blancas sin decir cual es cual.
+     Pero quitar el fondo y dejar solo la costa tiraba lo que hacia bonito al
+     mapa -- la tierra como es -- y con ella la referencia.
+
+     La salida es un fondo que es tierra DE VERDAD y no tiene ni una nube: los
+     mosaicos de la NASA, que son composiciones de muchos dias justamente para
+     quitarlas. Via GIBS, sin clave, sin coste y con el recorte que le pidas.
+     Comprobado el 21-09-2026 sobre nuestra caja: 83 kB el de dia, 100 kB el de
+     noche.
+
+     Y son DOS porque la pagina se usa de noche: `BlueMarble_NextGeneration` es
+     color natural a 500 m, y `VIIRS_Black_Marble` son las luces. Esa segunda
+     no es decoracion en una web de astronomia -- esas luces SON la
+     contaminacion luminica, y Nerpio es el hueco oscuro del centro. Se funden
+     con la hora que toque, que la sabemos porque el motor publica el
+     crepusculo. */
+  var GIBS = 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi';
+  var GIBS_DIA = 'BlueMarble_NextGeneration';
+  var GIBS_NOCHE = 'VIIRS_Black_Marble';
+
+  function urlBase(capa, bbox, ancho, alto) {
+    var px = Math.min(Math.round(ancho * 2), 1400);
+    return GIBS + '?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&SRS=EPSG:4326' +
+      '&FORMAT=image/jpeg&LAYERS=' + encodeURIComponent(capa) +
+      '&WIDTH=' + px + '&HEIGHT=' + Math.round(px * alto / ancho) +
+      // WMS 1.1.1 con EPSG:4326 va en orden longitud, latitud. En 1.3.0 es al
+      // reves, y ese cambio de orden es el clasico que deja el mapa en el mar.
+      '&BBOX=' + bbox.map(function (v) { return v.toFixed(4); }).join(',');
+  }
+
+  /* Cuanto de noche es, de 0 a 1, en un instante. No se calcula aqui ninguna
+     efemeride: se interpola entre el ocaso y la oscuridad astronomica que
+     publica el motor, que son los mismos limites con los que estan pintadas
+     las bandas de la barra y el veredicto de arriba. */
+  function nocturnidad(ms, noches) {
+    for (var k = 0; k < (noches || []).length; k++) {
+      var c = noches[k].crepusculo || {};
+      var ocaso = +new Date(c.ocaso), d0 = +new Date(c.astronomico_desde);
+      var d1 = +new Date(c.astronomico_hasta), orto = +new Date(c.orto);
+      if (!(ms >= ocaso - 1 && ms <= orto + 1)) { continue; }
+      if (ms >= d0 && ms <= d1) { return 1; }
+      if (ms < d0) { return d0 > ocaso ? (ms - ocaso) / (d0 - ocaso) : 1; }
+      return orto > d1 ? 1 - (ms - d1) / (orto - d1) : 1;
+    }
+    return 0;
+  }
+
   var URL_COSTA = 'astroweather-costa.json';
 
   function pintarCosta(ctx, costa, bbox, ancho, alto) {
@@ -1636,11 +1695,44 @@
 
         var ctx = lienzo.getContext('2d');
         var chip = caja.querySelector('#aw-fuente');
+        var baseDia = capa.querySelector('#aw-base-dia');
+        var baseNoche = capa.querySelector('#aw-base-noche');
         var costa = null;
+        if (baseDia) { baseDia.src = urlBase(GIBS_DIA, bbox, medida[0], medida[1]); }
+        if (baseNoche) { baseNoche.src = urlBase(GIBS_NOCHE, bbox, medida[0], medida[1]); }
         fetch(URL_COSTA, { cache: 'force-cache' })
           .then(function (c) { return c.ok ? c.json() : null; })
           .catch(function () { return null; })
           .then(function (c) { costa = c; pintar(+barra.value); });
+
+        /* PASOS DE CUARTO DE HORA. El modelo es HORARIO: lo que va en medio se
+           interpola en el tiempo entre las dos horas vecinas, y eso no es
+           ciencia nueva -- no inventa estructura espacial, solo cruza dos
+           campos del mismo modelo --, pero hay que decirlo y esta dicho en la
+           nota. A cambio, la reproduccion deja de ser un pase de diapositivas
+           de 48 saltos y se mueve. */
+        barra.step = '0.25';
+        var campos = {};
+        function campoDe(k) {
+          if (!campos[k]) {
+            campos[k] = window.AWNubes.descodificar(nubes.campos.total[k],
+                                                    nubes.codificacion);
+          }
+          return campos[k];
+        }
+        function mezcla(k) {
+          var k0 = Math.floor(k), f = k - k0;
+          var a = campoDe(k0);
+          if (f < 0.001 || k0 + 1 >= horas.length) { return a; }
+          var b = campoDe(k0 + 1), salida = new Array(a.length);
+          for (var i = 0; i < a.length; i++) {
+            // Un hueco en cualquiera de las dos puntas sigue siendo un hueco:
+            // promediar con "no se sabe" produciria un numero que nadie dijo.
+            salida[i] = (a[i] === null || b[i] === null)
+              ? null : a[i] * (1 - f) + b[i] * f;
+          }
+          return salida;
+        }
 
         /* EL INTERRUPTOR. En la casilla 0 manda la MEDIDA: el satelite entero y
            el lienzo vacio, sin un solo pixel de modelo encima. A partir de la
@@ -1651,10 +1743,18 @@
            previstas sobre nubes observadas obliga a distinguir dos cosas
            blancas sin decir cual es cual, y ademas mentia: al mover la barra a
            +12 h, la foto de debajo seguia siendo la de ahora. */
+        var t0ms = +new Date(horas[0]);
         function pintar(k) {
-          k = Math.max(0, Math.min(horas.length - 1, k | 0));
-          var esAhora = (k === 0);
+          k = Math.max(0, Math.min(horas.length - 1, +k || 0));
+          var esAhora = (k < 0.001);
+          var cuando = t0ms + k * 3600000;
           img.classList.toggle('apagado', !esAhora);
+          // Las bases de la NASA se funden con la hora que se esta mirando: de
+          // dia el color natural, de noche las luces. Debajo del Meteosat
+          // cuando manda el Meteosat, asi que el cambio no se ve en "ahora".
+          if (baseNoche) {
+            baseNoche.style.opacity = nocturnidad(cuando, datos && datos.noches);
+          }
           if (chip) {
             chip.textContent = esAhora ? t.fuenteAhora : t.fuentePrevisto;
             chip.className = 'aw-fuente' + (esAhora ? ' medida' : '');
@@ -1662,12 +1762,11 @@
           ctx.clearRect(0, 0, lienzo.width, lienzo.height);
           // La primera casilla es AHORA, y se dice: una barra que empieza en
           // una hora cualquiera invita a leer el mapa como si fuera medida.
-          rotulo.textContent = hora(horas[k]) + (esAhora ? ' · ' + t.mapaAhora : '');
+          rotulo.textContent = hora(new Date(cuando).toISOString()) +
+            (esAhora ? ' · ' + t.mapaAhora : '');
           if (esAhora) { return; }
-          var campo = window.AWNubes.descodificar(nubes.campos.total[k],
-                                                  nubes.codificacion);
           window.AWNubes.pintar(ctx, {
-            campo: campo, nx: r.nx, ny: r.ny,
+            campo: mezcla(k), nx: r.nx, ny: r.ny,
             ancho: lienzo.width, alto: lienzo.height,
           });
           /* LA COSTA VA ENCIMA DEL CAMPO, no debajo, y se vio midiendo: con
@@ -1693,7 +1792,8 @@
           boton.textContent = '❘❘';
           boton.setAttribute('aria-label', t.mapaPausar);
           reloj = setInterval(function () {
-            var k = (+barra.value + 1) % horas.length;
+            var k = +barra.value + 0.25;
+            if (k > horas.length - 1) { k = 0; }
             barra.value = String(k);
             pintar(k);
           }, MAPA_PASO_MS);

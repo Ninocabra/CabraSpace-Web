@@ -462,6 +462,17 @@
   filter: saturate(0.9) contrast(1.05) brightness(0.9);
   transition: opacity 0.35s ease;
 }
+/* Las dos bases SIN NUBES de la NASA. Van debajo del Meteosat, asi que en
+   "ahora" ni se ven; al avanzar la barra, el Meteosat se apaga y quedan ellas.
+   La de noche se funde encima de la de dia con la opacidad que le pone la
+   hora. Sin transicion en esa opacidad: durante la reproduccion se recalcula
+   cuatro veces por segundo y una transicion de 0,35 s la dejaria siempre
+   persiguiendo al valor anterior. */
+#aw-base-dia, #aw-base-noche { object-fit: cover; }
+#aw-base-noche { opacity: 0; }
+#aw-base-dia { filter: saturate(0.85) brightness(0.82) contrast(1.05); }
+#aw-base-noche { filter: saturate(0.9) brightness(1.05) contrast(1.05); }
+
 /* APAGADO DEL TODO y no atenuado. Atenuar dejaria sus nubes -- que son lo mas
    claro de la imagen -- como lo ultimo en desaparecer, justo lo que hay que
    quitar de en medio: una foto del presente no puede seguir puesta debajo de
