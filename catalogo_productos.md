@@ -53,7 +53,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: CPC Deluxe HD**
   - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
-  - [Presentación del Celestron CPC Deluxe HD en NEAF 2026](https://www.youtube.com/watch?v=9GxG-uaFUI4) (2026-06-16)
 - **Modelo: Ed Ting**
   - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
 - **Modelo: RASA 6**
@@ -174,6 +173,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: OUTPOST 3M**
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
+- **Modelo: mounting**
+  - [PrimaLuceLab: Menos montaje, más cielo](https://www.youtube.com/shorts/1a3E0RDQdVo) (2026-09-21)
 
 ### MOUNTS
 - **Modelo: ASTRO-RES**
