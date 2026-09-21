@@ -1,5 +1,26 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=h-ZsygHFPaY",
+    "title_es": "Secuencia avanzada de NINA para Seestar S50 Pro y S30 Pro",
+    "title_en": "Advanced NINA Sequence for Seestar S50 Pro and S30 Pro",
+    "summary_es": "Este video de YouTube muestra cómo configurar una secuencia avanzada en el software N.I.N.A. para su uso con los telescopios inteligentes Seestar S50 Pro y S30 Pro. Se detallan los pasos para optimizar la captura de imágenes astronómicas con estos dispositivos integrados.",
+    "summary_en": "This YouTube video demonstrates how to set up an advanced sequence within N.I.N.A. software for use with the Seestar S50 Pro and S30 Pro smart telescopes. It details the steps for optimizing astrophotographic image capture with these integrated devices.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-09-20",
+    "url": "https://www.youtube.com/watch?v=h-ZsygHFPaY",
+    "tags": [
+      "N.I.N.A.",
+      "Seestar",
+      "S50 Pro",
+      "S30 Pro",
+      "Astrocity",
+      "Astrophotography Software"
+    ],
+    "source_type": "reviewer",
+    "source": "Astrocity"
+  },
+  {
     "id": "https://www.youtube.com/watch?v=Tp08gy1xJZ8",
     "title_es": "Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)",
     "title_en": "Keep Your Software, Lose the Windows PC at the Mount (Joey Troy)",
@@ -3060,26 +3081,5 @@
     ],
     "source_type": "official",
     "source": "Celestron (YouTube)"
-  },
-  {
-    "id": "https://gitlab.com/free-astro/siril/-/releases/1.4.4",
-    "title_es": "Siril Versión 1.4.4: Correcciones y Mejoras",
-    "title_en": "Siril Version 1.4.4: Fixes and Improvements",
-    "summary_es": "La versión 1.4.4 de Siril introduce correcciones importantes para la corrupción de archivos seq, fallos al cargar secuencias con imágenes de referencia fuera de rango y errores de espacio en disco en macOS. También mejora la visualización de scripts personalizados en Windows y la búsqueda en el repositorio de scripts.",
-    "summary_en": "Siril version 1.4.4 brings crucial fixes for seq file corruption, crashes when loading sequences with out-of-range reference images, and disk space errors on macOS. It also improves the display of custom scripts on Windows and enhances script repository searching.",
-    "category_es": "SOFTWARE",
-    "category_en": "SOFTWARE",
-    "date": "2026-06-16",
-    "url": "https://gitlab.com/free-astro/siril/-/releases/1.4.4",
-    "tags": [
-      "Siril",
-      "Software",
-      "Astrofotografía",
-      "Procesamiento de Imágenes",
-      "Actualización",
-      "Bug Fix"
-    ],
-    "source_type": "official",
-    "source": "GitLab Releases (Siril)"
   }
 ]

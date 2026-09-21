@@ -191,12 +191,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: seguridad**
   - [Advertencia de seguridad de QHYCCD sobre código malicioso en su sitio web](https://www.qhyccd.com/security-advisory-malicious-code-on-www-qhyccd-com-10-12-august-2026/) (2026-08-12)
 
-## Siril
-
-### SOFTWARE
-- **Modelo: Procesamiento de Imágenes**
-  - [Siril Versión 1.4.4: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.4) (2026-06-16)
-
 ## Skywatcher
 
 ### ACCESSORIES
@@ -375,6 +369,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
 - **Modelo: N.I.N.A.**
+  - [Secuencia avanzada de NINA para Seestar S50 Pro y S30 Pro](https://www.youtube.com/watch?v=h-ZsygHFPaY) (2026-09-20)
   - [Integración de N.I.N.A. con Seestar S50 Pro y S30 Pro](https://www.youtube.com/watch?v=uCdWJET7YZc) (2026-09-06)
 - **Modelo: PHD2 Guiding**
   - [PHD2 Guiding v2.6.14dev1: Novedades en Binning, Soporte Alpaca y Mejoras para Cámaras ZWO/ToupTek](https://github.com/OpenPHDGuiding/phd2/releases/tag/v2.6.14dev1) (2026-08-30)
