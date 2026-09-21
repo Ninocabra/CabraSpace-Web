@@ -1347,26 +1347,57 @@
   var CAMARA_PARADA_MIN = 20;
   var LECTURA_VIEJA_MIN = 25;
 
-  function rotularCamara(caja, t, sensores) {
+  /* LA HORA TIENE QUE DESCRIBIR LA IMAGEN QUE HAY DEBAJO, y durante un rato
+     no lo hizo. El rotulo salia de `allsky_utc`, que viene del motor y por
+     tanto es tan viejo como la ultima publicacion -- diez minutos o mas --,
+     mientras que la imagen que se ensenia se baja en cada refresco y es de
+     hace segundos. Resultado: un pie que decia "hace 10 min" bajo una foto de
+     hace uno. Lo pillo Nino, no yo, y mirando la foto: "no estoy seguro de que
+     esto sea de hace diez minutos".
+
+     Asi que la hora del rotulo pasa a salir del `Last-Modified` de la imagen
+     QUE SE ESTA VIENDO. Sigue siendo la del proxy y no la de la camara -- son
+     segundos de diferencia --, pero es la de ESA imagen.
+
+     Y el aviso de camara parada se queda donde estaba, en la comparacion del
+     motor, porque ahi el proxy no sirve: con la camara congelada seguiria
+     sellando con la hora de ahora. Cada reloj para lo suyo. */
+  function horaDeLaImagen(url) {
+    return fetch(url, { method: 'HEAD' })
+      .then(function (r) {
+        var lm = r.ok ? r.headers.get('last-modified') : null;
+        var d = lm ? new Date(lm) : null;
+        return (d && !isNaN(d.getTime())) ? d : null;
+      })
+      .catch(function () { return null; });
+  }
+
+  function rotularCamara(caja, t, sensores, deLaImagen) {
     var rot = caja.querySelector('#aw-cam-hora');
     if (!rot) { return; }
     var iso = sensores && sensores.allsky_utc;
     var d = iso ? new Date(iso) : null;
+    if (deLaImagen) { d = deLaImagen; }
     if (!d || isNaN(d.getTime())) { rot.textContent = ''; return; }
-    var leido = sensores.leido_utc ? new Date(sensores.leido_utc) : null;
+    var leido = sensores && sensores.leido_utc ? new Date(sensores.leido_utc) : null;
     if (leido && isNaN(leido.getTime())) { leido = null; }
 
-    // Cuanto de viejo estaba el fotograma cuando lo miramos: la camara.
-    var retraso = leido
-      ? Math.max(0, Math.round((leido.getTime() - d.getTime()) / 60000)) : null;
-    // Cuanto hace que lo miramos: nosotros.
-    var nuestra = leido
-      ? Math.max(0, Math.round((Date.now() - leido.getTime()) / 60000))
-      : Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
+    /* El aviso de camara parada sigue saliendo del motor: es la unica fuente
+       que puede detectarlo, porque compara la hora de la camara con la de la
+       lectura. El proxy no sirve para eso -- con la camara congelada seguiria
+       sellando la hora de ahora -- pero si sirve, y mejor que nadie, para
+       decir de cuando es la imagen que se esta viendo. */
+    var cam = (sensores && sensores.allsky_utc) ? new Date(sensores.allsky_utc) : null;
+    if (cam && isNaN(cam.getTime())) { cam = null; }
+    var retraso = (leido && cam)
+      ? Math.max(0, Math.round((leido.getTime() - cam.getTime()) / 60000)) : null;
+    // Y la edad que se rotula es la de la imagen de debajo, no la del motor.
+    var nuestra = Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
 
     var plantilla, minutos;
     if (retraso !== null && retraso > CAMARA_PARADA_MIN) {
       plantilla = t.camaraCongelada; minutos = retraso;
+      if (cam) { d = cam; }
       rot.className = 'aw-hora alerta';
     } else if (nuestra > LECTURA_VIEJA_MIN) {
       plantilla = t.camaraVieja; minutos = nuestra;
@@ -1391,8 +1422,7 @@
     var t0 = new Date(horas[0]).getTime();
     var t1 = new Date(horas[horas.length - 1]).getTime();
     if (!(t1 > t0)) { return null; }
-    var ahora = Date.now();
-    var saltoA = null;
+    var arranques = [];
 
     function banda(desde, hasta, clase, titulo) {
       if (!desde || !hasta) { return; }
@@ -1407,8 +1437,10 @@
       d.style.width = ((f - i) * 100).toFixed(2) + '%';
       d.title = titulo;
       tira.appendChild(d);
-      if (clase === 'oscura' && saltoA === null && b > ahora) {
-        saltoA = Math.round((Math.max(a, ahora) - t0) / 3600000);
+      // Todos los arranques de oscuridad, no solo el primero: el boton tiene
+      // que poder llevar a la noche SIGUIENTE cuando ya estas en una.
+      if (clase === 'oscura') {
+        arranques.push((a - t0) / 3600000);
       }
     }
 
@@ -1419,7 +1451,8 @@
       banda(c.astronomico_desde, c.astronomico_hasta, 'oscura', t.mapaOscura);
       banda(c.astronomico_hasta, c.orto, 'crepusculo', t.mapaCrepusculo);
     }
-    return saltoA;
+    arranques.sort(function (a, b) { return a - b; });
+    return arranques;
   }
 
   /* LA COSTA, dibujada por nosotros. Existe porque el fondo del futuro no
@@ -1703,16 +1736,35 @@
         // Las noches se pintan con el crepusculo del motor, que viene en la
         // prevision, no en el campo de nubes. Si la prevision no llego, la
         // barra sigue funcionando: simplemente sale lisa.
-        var saltoNoche = pintarNoches(caja, t, datos, horas);
+        var nochesDe = pintarNoches(caja, t, datos, horas) || [];
         pintarMarcas(caja, horas, LANG);
         var sello = capa.querySelector('#aw-sello');
+        /* LA SIGUIENTE NOCHE QUE TENGA POR DELANTE, no siempre la primera.
+           Estando ya dentro de una noche, un boton que te deja donde estas no
+           hace nada, y con dos noches en 48 horas lo que se quiere es saltar
+           de una a la otra. Se busca el primer arranque de oscuridad que este
+           por delante de donde estas; si no queda ninguno, vuelve al primero,
+           que es lo que hace util pulsarlo dos veces. */
         var irNoche = caja.querySelector('#aw-ir-noche');
-        if (irNoche && saltoNoche !== null && saltoNoche !== undefined) {
+        if (irNoche && nochesDe.length) {
           irNoche.hidden = false;
           irNoche.addEventListener('click', function () {
             parar();
-            barra.value = String(Math.min(saltoNoche, horas.length - 1));
-            pintar(+barra.value);
+            var aqui = +barra.value;
+            var destino = null;
+            for (var i = 0; i < nochesDe.length; i++) {
+              // Un margen de un cuarto de hora para que, parado justo en el
+              // arranque, el boton lleve a la siguiente y no se quede quieto.
+              if (nochesDe[i] > aqui + 0.25) { destino = nochesDe[i]; break; }
+            }
+            if (destino === null) { destino = nochesDe[0]; }
+            // Al cuarto de hora HACIA ARRIBA, no al mas cercano: redondeando
+            // al mas cercano, una oscuridad que empieza a las 21:36 dejaba el
+            // mapa en las 21:30, seis minutos antes de que empezara. Un boton
+            // que dice "ir a la noche" no puede dejarte en el crepusculo.
+            destino = Math.max(0, Math.min(horas.length - 1, Math.ceil(destino * 4) / 4));
+            barra.value = String(destino);
+            pintar(destino);
           });
         }
 
@@ -1888,7 +1940,18 @@
     var ojo = caja.querySelector('#aw-allsky');
     if (ojo) { vigilar(ojo, t.camaraCaida); }
 
-    function refrescarCamara() { if (ojo) { intercambiar(ojo, urlAllsky()); } }
+    function refrescarCamara() {
+      if (!ojo) { return; }
+      var url = urlAllsky();
+      intercambiar(ojo, url);
+      // La hora, de la MISMA url que se acaba de pedir. El HEAD sale de cache
+      // -- es la imagen que el navegador ya tiene -- asi que no es una
+      // descarga mas, son unas cabeceras.
+      horaDeLaImagen(url).then(function (cuando) {
+        rotularCamara(caja, t, datos && datos.sensores, cuando);
+      });
+    }
+    refrescarCamara();
 
     setInterval(refrescarCamara, ALLSKY_MS);
     // Volver a la pestania es justo el momento en el que lo pegado es mas
