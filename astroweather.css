@@ -321,6 +321,293 @@
   color: var(--text-muted, #777);
 }
 
+/* ========================== Mirar afuera ============================
+   Dos ventanas abiertas en la misma pared: la cámara (lo que HAY) y el mapa
+   (lo que VIENE). El problema de meterlas aquí es que las dos son rectángulos
+   brillantes en una página casi negra con filetes de oro, y chocan.
+
+   Se resuelve en tres capas, y NO con la misma receta para las dos:
+
+   1. El MARCO es idéntico -- mismo radio, mismo filete, misma proporción -- y
+      eso es lo que las hermana. La armonía la pone la geometría, no el color.
+   2. La VIÑETA funde el borde del rectángulo con el fondo del panel. Sin ella
+      hay un canto duro entre la imagen y la página, y ese canto es casi todo
+      el ruido visual: una imagen que se desvanece deja de parecer pegada.
+   3. La GRADACIÓN sí es distinta en cada una, a propósito. El mapa es interfaz
+      ajena: se le baja el color hasta que el terreno pasa de verde oliva a un
+      bronce que convive con el oro de la página, y la nube -- que es gris --
+      sobrevive intacta. La cámara NO: es una MEDIDA, y a una medida no se le
+      cambia el tono. Solo se le baja un punto la saturación, que es lo que
+      apaga el HUD de colores neon que la cámara quema encima, y una curva
+      global de brillo, que no inventa color donde no lo hay. Teme la noche:
+      de madrugada esa imagen ya es casi negra y cualquier sepia la ensuciaría.
+
+   El modo noche de `index.css` pisa los dos filtros con `!important`, que es
+   justo lo que tiene que pasar: ahí manda la adaptación a la oscuridad. */
+.aw-outside { margin-top: 30px; }
+.aw-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.aw-pane { margin: 0; min-width: 0; }
+.aw-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #050506;
+  border: 1px solid rgba(207, 171, 74, 0.14);
+  /* La proporción nativa de la cámara (1932x1088). El mapa la copia para que
+     las dos cajas midan lo mismo: dos alturas distintas al lado dejan la fila
+     de pies de foto en escalera. */
+  aspect-ratio: 16 / 9;
+}
+.aw-frame > img,
+.aw-frame > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+.aw-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 46px 10px rgba(5, 5, 6, 0.85);
+}
+.aw-eye > img { filter: saturate(0.8) brightness(0.94) contrast(1.03); }
+/* SIN SEPIA, y esto se vio mirando y no razonando. La nube de Windy es un velo
+   GRIS-AZUL sobre un mapa amarillo: es lo unico frio que hay en la imagen, asi
+   que la sepia -- que empuja todo hacia el marron -- la fundia justo con el
+   terreno. Se estaba borrando el dato para domar la decoracion. Ahora se deja
+   el color casi entero y se BAJA LA LUZ.
+
+   CUANTA luz se baja tambien se decidio mirando, y con una referencia al lado:
+   el IR de 10,5 um del propio Meteosat, que es tierra casi negra y nube
+   blanca. Con el terreno a media luz seguia leyendose como un dato marron que
+   no significa nada -- lo dijo Nino en cuanto lo vio, y tenia razon. Bajado
+   hasta aqui, el terreno se hunde al negro de la pagina, la nube y el viento
+   quedan como lo unico claro de la caja, y el mapa se PARECE al satelite de
+   arriba en vez de pelearse con el. Que es, ademas, lo que hace que las dos
+   vistas se puedan leer seguidas sin cambiar de idioma visual. */
+.aw-map .aw-capa[data-vista="windy"] > iframe { filter: saturate(0.6) brightness(0.42) contrast(1.7); }
+/* Al pasar por encima vuelve a su color. El mapa apagado se lee de un vistazo,
+   pero si alguien se para a mirar dónde está la nube quiere el contraste de
+   verdad, no nuestro bronce. */
+.aw-frame > img, .aw-frame > iframe,
+.aw-capa > img, .aw-capa > iframe { transition: filter 0.5s ease; }
+/* Al pasar por encima vuelve casi a su color. El mapa apagado se lee de un
+   vistazo, pero quien se para a mirar donde esta la nube quiere el contraste
+   de verdad, no nuestro carbon. */
+.aw-map:hover .aw-capa[data-vista="windy"] > iframe { filter: saturate(1) brightness(0.85) contrast(1.12); }
+
+/* La fila de abajo: el modelo, a todo lo ancho. Una tira ancha y no un
+   cuadrado porque lo que se mira en un mapa desde aqui es de DONDE viene el
+   tiempo, y aqui viene del oeste: los grados que valen la pena son los de
+   longitud. */
+.aw-panes.ancho { grid-template-columns: 1fr; margin-top: 18px; }
+/* 16:9, la misma proporcion que el satelite de arriba. A lo ancho del panel y
+   al zoom que pide `urlMapa`, eso son unos 890 x 500 km contra los 800 x 450
+   del recorte de EUMETSAT: la MISMA ZONA. Antes era una tira de 2,6:1 que
+   ensenaba de Lisboa a Oran, el doble de terreno, y poner dos vistas de la
+   misma cosa a escalas distintas una encima de otra es pedirle a quien mira
+   que haga la conversion en la cabeza. */
+/* 1,686:1 y no 16:9, y el numero no es de gusto: es la proporcion EN TERRENO
+   de la rejilla que publica el motor -- 31 x 15 celdas de 0,35 grados son 919
+   por 545 km aqui. Con la caja de esa forma, el recorte del satelite se pide
+   tal cual y el campo de nubes se pinta encima sin estirar ninguno de los dos.
+   Cualquier otra proporcion obliga a deformar algo, y deformar un mapa para
+   que quepa es como se acaba pintando la nube donde no esta. */
+.aw-panes.ancho .aw-frame { aspect-ratio: 1.686 / 1; }
+
+/* -- Las dos vistas del mapa: la nuestra y la de Windy -- */
+.aw-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.aw-tab {
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-muted, #777);
+  background: transparent;
+  border: 1px solid rgba(207, 171, 74, 0.18);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.aw-tab:hover { color: var(--text-secondary, #9f9c94); }
+.aw-tab.on {
+  color: var(--gold-primary, #cfab4a);
+  border-color: rgba(207, 171, 74, 0.55);
+  background: rgba(207, 171, 74, 0.06);
+}
+.aw-capa { position: absolute; inset: 0; }
+.aw-capa[hidden] { display: none; }
+.aw-capa > img, .aw-capa > canvas, .aw-capa > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+/* El lienzo va ENCIMA del satelite y no lo tapa: lo que pinta es un velo con
+   alfa, asi que no lleva fondo. */
+#aw-mapa-nubes { background: transparent; }
+#aw-mapa-sat { object-fit: cover; filter: saturate(0.9) contrast(1.05) brightness(0.9); }
+
+/* -- La barra de tiempo -- */
+.aw-tiempo { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.aw-tiempo[hidden] { display: none; }
+.aw-tiempo button {
+  font: inherit;
+  font-size: 0.7rem;
+  width: 30px; height: 30px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--gold-primary, #cfab4a);
+  background: transparent;
+  border: 1px solid rgba(207, 171, 74, 0.3);
+}
+.aw-tiempo button:hover { border-color: rgba(207, 171, 74, 0.7); }
+.aw-pista { position: relative; flex: 1 1 auto; min-width: 0; }
+.aw-pista input[type="range"] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--gold-primary, #cfab4a);
+}
+/* La tira de noches, DEBAJO del deslizador. Es una leyenda alineada, no un
+   fondo: dejar transparente la pista nativa de un `range` para pintar detras
+   se rompe en un navegador de cada tres. */
+.aw-bandas {
+  position: relative;
+  height: 6px;
+  margin-top: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.aw-banda { position: absolute; top: 0; bottom: 0; display: block; }
+/* Crepusculo en ambar y oscuridad astronomica en azul, los mismos colores con
+   los que las franjas de arriba pintan lo mismo. Dos codigos para el mismo
+   concepto en la misma pagina es como se consigue que nadie se fie de ninguno. */
+.aw-banda.crepusculo { background: rgba(207, 171, 74, 0.38); }
+.aw-banda.oscura { background: rgba(110, 150, 220, 0.55); }
+.aw-noche {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-secondary, #9f9c94);
+  background: transparent;
+  border: 1px solid rgba(110, 150, 220, 0.35);
+}
+.aw-noche:hover { color: #9ec0f0; border-color: rgba(110, 150, 220, 0.7); }
+.aw-noche[hidden] { display: none; }
+/* Una camara parada NO puede leerse igual que una al dia: es la unica pega que
+   el rotulo existe para cantar. */
+.aw-hora.alerta { color: #d8a53c; }
+#aw-hora-rot {
+  flex: 0 0 auto;
+  min-width: 7.5em;
+  text-align: right;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #9f9c94);
+}
+
+/* LA BARRA DE COLORES DE WINDY SE QUEDA FUERA. Es lo mas estridente de toda
+   la pagina -- un arcoiris a plena saturacion -- y encima rotula milimetros de
+   lluvia, que NO es lo que pinta la capa de nubes que estamos ensenando: con
+   ella puesta, la unica leyenda visible explicaba otra cosa. Se deja crecer el
+   iframe por debajo del marco y el marco, que recorta, se la come. La linea de
+   tiempo y la firma de Windy quedan dentro, que es lo que tiene que quedarse.
+   El precio son 9 px: el centro de lo que se ve queda esa media leyenda por
+   encima del centro del iframe, y Nerpio con el. Sobre 519 px es el 1,7 %. */
+.aw-map .aw-capa[data-vista="windy"] > iframe { height: calc(100% + 18px); }
+
+/* El satelite casi no se toca. Llega ya sobrio -- mar azul oscuro, tierra
+   ocre, nube blanca -- porque es el planeta y no la interfaz de nadie, y
+   ademas es una MEDIDA, igual que la camara. Solo un punto de contraste para
+   que la nube se despegue del mar. */
+.aw-sat > img { filter: saturate(0.9) contrast(1.05) brightness(0.96); }
+
+/* La marca del observatorio. Va en el centro exacto porque el recorte se pide
+   centrado en Nerpio, y es lo unico que la imagen cruda no trae: sin ella,
+   800 km de sierra no dicen cual es la de uno. El halo negro alrededor del
+   punto es para que se vea igual sobre mar oscuro que sobre nube blanca. */
+.aw-sitio {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  z-index: 2;
+  pointer-events: none;
+}
+.aw-sitio i {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-primary, #cfab4a);
+  box-shadow: 0 0 0 3px rgba(5, 5, 6, 0.5), 0 0 9px rgba(207, 171, 74, 0.7);
+}
+.aw-sitio span {
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-light, #e5cc8a);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+.aw-cap {
+  margin-top: 8px;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text-muted, #777);
+}
+.aw-cap b { color: var(--text-secondary, #9f9c94); font-weight: 600; }
+/* La hora de la pasada, en su propia linea y con cifras de ancho fijo: cambia
+   cada diez minutos y sin `tabular-nums` el pie entero da un saltito. */
+.aw-hora {
+  display: block;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #777);
+}
+.aw-hora:empty { display: none; }
+.aw-cap a { color: var(--text-secondary, #9f9c94); text-decoration: none;
+            border-bottom: 1px solid rgba(207, 171, 74, 0.25); }
+.aw-cap a:hover { color: var(--gold-primary, #cfab4a); }
+/* Cuando la cámara no llega. Ocupa el hueco en vez de dejar un rectángulo
+   negro sin explicación: un fallo mudo parece un fallo nuestro. */
+.aw-caida {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-muted, #777);
+}
+@media (max-width: 720px) {
+  .aw-panes { grid-template-columns: 1fr; gap: 20px; }
+  /* A 330 px de ancho, 2,6:1 son 127 px de alto: eso no es un mapa, es una
+     rendija. En vertical la tira ancha pierde su razon de ser. */
+  .aw-panes.ancho .aw-frame { aspect-ratio: 16 / 9; }
+}
+
 /* ==================== Qué quieres apuntar =========================== */
 .aw-pick { margin-top: 30px; }
 .aw-search { position: relative; max-width: 420px; }
@@ -671,7 +958,7 @@
   border-radius: 12px;
   background: rgba(207, 171, 74, 0.045);
 }
-.aw-plan h3, .aw-sensors h3, .aw-pick h3 {
+.aw-plan h3, .aw-sensors h3, .aw-pick h3, .aw-outside h3 {
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
