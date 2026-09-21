@@ -1,6 +1,8 @@
 /**
  * astroweather-nubes.js
  * Pintor del campo de nubes ECMWF para CabraSpace.
+ * Base: entrega de Gemini (21-09-2026). Modificado despues: los pesos de la
+ * interpolacion pasaron de lineales a smoothstep.
  * Compatible con ES5, sin dependencias.
  */
 (function (root) {
@@ -95,6 +97,14 @@
         }
         var i1 = (i0 < nx - 1) ? i0 + 1 : i0;
         var fx = gx - i0;
+        // SMOOTHSTEP en vez del peso lineal. La bilineal pura tiene la
+        // derivada rota justo en los bordes de celda, y sobre una rejilla de
+        // 55 km eso se ve: rombos y estrellas donde se cruzan cuatro celdas.
+        // `f*f*(3-2f)` llega a los nodos con pendiente cero, asi que el campo
+        // sale continuo en la primera derivada y el ojo deja de encontrar la
+        // cuadricula. No anade informacion -- en los nodos vale exactamente lo
+        // mismo --, solo quita el artefacto de la interpolacion.
+        fx = fx * fx * (3 - 2 * fx);
         xi0[px] = i0;
         xi1[px] = i1;
         xfx[px] = fx;
@@ -115,6 +125,7 @@
         var j1 = (j0 < ny - 1) ? j0 + 1 : j0;
         var fy = gy - j0;
         var ry = (fy < 0.5) ? j0 : j1;
+        fy = fy * fy * (3 - 2 * fy);
 
         var row0 = j0 * nx;
         var row1 = j1 * nx;

@@ -134,7 +134,12 @@
         'que su rejilla de 39 km, y afilarlo sería inventar detalle. La rejilla la publica el motor, no la ' +
         'baja tu navegador: son 465 puntos y el proveedor cobra por punto. La celda del centro es Nerpio ' +
         'exacto, no una interpolación. Y donde el modelo no manda valor se ve una trama dorada, que ' +
-        'significa «aquí no sabemos» y NO «aquí está despejado».',
+        'significa «aquí no sabemos» y NO «aquí está despejado». ' +
+        'LAS FLECHAS son el viento, y su color no es una escala inventada para el mapa: sale de los ' +
+        'mismos umbrales de racha con los que el motor decide si se abre. Oro apagado es contexto; ' +
+        'ámbar, rachas por encima de 30 km/h, donde el guiado sufre en focal larga; rojo, por encima de ' +
+        '40, donde el techo cierra. Apuntan con el viento medio y se pintan con la racha: la dirección la ' +
+        'marca el flujo, pero lo que cierra el techo es el golpe.',
       sateliteCaida: 'El satélite no responde ahora mismo.',
       camaraAlt: 'Cámara todo-cielo de AstroCamp, en directo',
       camaraTitulo: 'Esto es la comprobación, no la previsión',
@@ -314,7 +319,12 @@
         'sharpening it would be inventing detail. The grid is published by the engine, not fetched by your ' +
         'browser: it is 465 points and the provider charges per point. The centre cell is Nerpio exactly, ' +
         'not an interpolation. And where the model sends no value you see a gold hatch, which means “we ' +
-        'do not know here” and NOT “it is clear here”.',
+        'do not know here” and NOT “it is clear here”. ' +
+        'THE ARROWS are the wind, and their colour is not a scale invented for the map: it comes from the ' +
+        'same gust thresholds the engine opens the roof by. Dim gold is context; amber, gusts above ' +
+        '30 km/h, where guiding suffers at long focal length; red, above 40, where the roof closes. They ' +
+        'point with the mean wind and are coloured by the gust: the flow sets the direction, but it is ' +
+        'the gust that closes the roof.',
       sateliteCaida: 'The satellite is not responding right now.',
       camaraAlt: 'AstroCamp all-sky camera, live',
       camaraTitulo: 'This is the check, not the forecast',
@@ -1626,6 +1636,80 @@
     ctx.restore();
   }
 
+  /* LAS FLECHAS DEL VIENTO. Menos que Windy a proposito: 16 x 8 sobre el mapa
+     entero, una cada ~60 px. Windy llena la pantalla y a partir de cierta
+     densidad las flechas dejan de informar y se convierten en textura.
+
+     El color NO sale de una escala inventada para el mapa: sale de los
+     umbrales de racha del motor, que viajan dentro del fichero. Por debajo del
+     primero, oro apagado -- es contexto, no aviso. Del primero al segundo,
+     ambar: ahi el guiado sufre en focal larga. Del segundo para arriba, rojo:
+     ahi el techo cierra. Son los mismos numeros y los mismos colores que el
+     veredicto de la cabecera, para que no puedan contarse dos historias.
+
+     Y apuntan con el viento MEDIO mientras se pintan con la RACHA, que no es
+     un descuido: la direccion la marca el flujo, pero lo que cierra el techo
+     es el golpe. */
+  function pintarViento(ctx, viento, k, base, ancho, alto) {
+    if (!viento || !viento.campos) { return; }
+    var k0 = Math.floor(k), f = k - k0;
+    var serieU = viento.campos.u, serieV = viento.campos.v, serieR = viento.campos.racha;
+    if (!serieU[k0]) { return; }
+    var k1 = (f > 0.001 && serieU[k0 + 1]) ? k0 + 1 : k0;
+    var g = f > 0.001 ? f : 0;
+
+    function val(serie, i, off) {
+      var a = serie[k0].charCodeAt(i) - base - off;
+      var b = serie[k1].charCodeAt(i) - base - off;
+      return a * (1 - g) + b * g;
+    }
+
+    // Una de cada dos cuando la caja es estrecha: en un movil, 128 flechas
+    // sobre 340 px no son un mapa de viento, son ruido.
+    var salto = ancho < 1200 ? 2 : 1;
+    var paso = ancho / viento.nx;
+    var largoMax = Math.min(paso * 0.42, 26) * (salto > 1 ? 1.5 : 1);
+    var umbral = viento.umbrales || {};
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (var j = 0; j < viento.ny; j += salto) {
+      for (var i = 0; i < viento.nx; i += salto) {
+        var idx = j * viento.nx + i;
+        var u = val(serieU, idx, viento.offset);
+        var v = val(serieV, idx, viento.offset);
+        var racha = val(serieR, idx, 0);
+        var vel = Math.sqrt(u * u + v * v);
+        if (!(vel > 0.3)) { continue; }
+        // La fila j = 0 es la del SUR, y en el lienzo el sur esta abajo.
+        var x = (i + 0.5) * paso;
+        var y = alto - (j + 0.5) * (alto / viento.ny);
+        // 12 m/s ya es la flecha entera: por encima lo que informa es el
+        // color, y seguir alargando solo emborrona el mapa.
+        var largo = largoMax * Math.min(1, vel / 12);
+        var nx = u / vel, ny = -v / vel;   // v hacia el norte = hacia arriba
+        var peligro = racha >= (umbral.cierre || 11.1);
+        var aviso = !peligro && racha >= (umbral.degradado || 8.3);
+        ctx.strokeStyle = peligro ? 'rgba(209, 95, 95, 0.95)'
+                        : aviso ? 'rgba(216, 165, 60, 0.9)'
+                        : 'rgba(229, 204, 138, 0.42)';
+        ctx.lineWidth = peligro || aviso ? 1.8 : 1.2;
+        var x0 = x - nx * largo / 2, y0 = y - ny * largo / 2;
+        var x1 = x + nx * largo / 2, y1 = y + ny * largo / 2;
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        // La punta, para que se vea HACIA donde sopla y no solo el eje.
+        var p = Math.max(3, largo * 0.32), a = 2.5;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 - nx * p + ny * p / a, y1 - ny * p - nx * p / a);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 - nx * p - ny * p / a, y1 - ny * p + nx * p / a);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function montarMapa(caja, t, datos) {
     var capa = caja.querySelector('.aw-capa[data-vista="propio"]');
     if (!capa) { return; }
@@ -1776,6 +1860,8 @@
              Justo donde hay nubes, que es donde uno mira, desaparecia la unica
              referencia geografica que queda con el satelite apagado. */
           pintarCosta(ctx, costa, bbox, lienzo.width, lienzo.height);
+          pintarViento(ctx, nubes.viento, k, nubes.codificacion.base,
+                       lienzo.width, lienzo.height);
         }
         pintar(0);
         barra.addEventListener('input', function () { parar(); pintar(+barra.value); });
