@@ -159,8 +159,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Modelo: Lukomatico**
   - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
-- **Modelo: Marketing**
-  - [La Gran Mentira del Marketing de Telescopios](https://www.youtube.com/watch?v=vRipPHq7Jqw) (2026-06-21)
 - **Modelo: Sightron**
   - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
 - **Modelo: Telescopio Principiante**
@@ -349,6 +347,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [De Bortle 8 a las Estrellas - Andrea Arbizzi desafía la polución lumínica](https://www.zwoastro.com/2026/08/04/light-pollution-astrophotography-andrea-arbizzi/) (2026-08-04)
 
 ### CAMERAS
+- **Modelo: ASI2600MC Duo**
+  - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
 - **Modelo: S50**
   - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 - **Modelo: Seestar S30 Pro**
