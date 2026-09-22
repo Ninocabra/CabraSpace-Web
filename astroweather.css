@@ -35,100 +35,114 @@
 
 .aw-body { padding: 20px 28px 28px; }
 
-/* -- La cifra que responde a la primera pregunta -- */
+/* -- EL SEMAFORO: tres cupulas gemelas -- */
+/* Las tres cosas que responden a la unica pregunta que trae a alguien aqui:
+   ¿preparo el telescopio? Lo que el observatorio hace AHORA, lo que se espera
+   ESTA NOCHE y lo que se espera MANANA, en columnas iguales y en orden de
+   tiempo. Iguales A PROPOSITO: el estado real de los techos no es una
+   prevision de segunda, es la senal mas fuerte que hay. */
 .aw-headline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 14px 28px;
-  padding: 18px 0 22px;
+  padding: 14px 0 12px;
   border-bottom: 1px solid rgba(207, 171, 74, 0.12);
 }
-
-/* Los tres bloques que responden a la unica pregunta que trae a alguien aqui:
-   ¿preparo el telescopio? Dos son PREVISION -- esta noche grande, manana
-   pequenio al lado -- y el tercero, del mismo tamanio que el primero, no es
-   prevision: es lo que el observatorio esta haciendo ahora mismo. */
-.aw-decision {
+.aw-semaforo { display: flex; align-items: stretch; }
+.aw-sem-col {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 14px 2px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 16px 34px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* EL TONO DE LA COLUMNA MANDA SOBRE EL DIBUJO. La cupula se pinta con
+     `currentColor`, asi que el color vive aqui y no en el SVG: cerrado AHORA y
+     de dia es lo normal (gris) y cerrado PREVISTO para esta noche es malo
+     (rojo), y es el mismo dibujo. */
+  color: var(--text-secondary, #9f9c94);
 }
-.aw-decision .rotulo {
+.aw-sem-col + .aw-sem-col { border-left: 1px solid rgba(207, 171, 74, 0.08); }
+/* La columna de esta noche, con halo y letra mayor: se ve de un vistazo cual
+   manda sin romper la simetria de las tres. */
+.aw-sem-col.hoy {
+  background: radial-gradient(120% 100% at 50% 0%, rgba(207, 171, 74, 0.07), transparent 70%);
+  border-radius: 12px;
+}
+.aw-sem-col .rotulo {
   display: block;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted, #777);
-  margin-bottom: 6px;
-  white-space: nowrap;
+  line-height: 1.45;
 }
-/* La palabra arriba y el porcentaje debajo en pequeño. Un 47 % no le dice a
-   nadie si conviene subir al observatorio: obliga a poner el umbral en la
-   cabeza de quien lee. La probabilidad no se esconde -- va justo debajo, con
-   su definición a un clic -- pero deja de ser lo primero que se ve. */
-.aw-verdict { max-width: 340px; }
-
-/* El estado real de los techos, a la misma escala que la prevision. Verde solo
-   cuando hay alguno abierto: cerrados de dia es lo normal, no una alarma. */
-.aw-techos { max-width: 260px; }
-.aw-techos .palabra {
+/* El segundo trozo del rotulo -- la fecha de la noche, la hora de la lectura o
+   "no responde" -- va en la misma linea, con su punto delante. Separado asi y
+   no concatenado en el texto porque cuando la fuente se cae tiene que poder
+   cambiar de color el sin tocar lo demas. */
+.aw-sem-col .rotulo .cuando::before { content: ' · '; }
+.aw-cupula { margin: 7px 0 5px; }
+.aw-sem-col .palabra {
   font-family: 'Inter', sans-serif;
-  font-size: 3.2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-secondary, #aaa);
-  font-variant-numeric: tabular-nums;
-}
-.aw-techos.hay .palabra { color: #6ec177; }
-.aw-techos .palabra {
-  /* Con la palabra delante, el recuento necesita aire y la caja necesita poder
-     partir: "Cerrado" a 3,2rem mas "0/18" no cabe en 260 px en una linea. */
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 10px;
-}
-.aw-techos .palabra .de {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-muted, #777);
-}
-.aw-techos .prob {
-  margin-top: 8px;
-  font-size: 0.85rem;
-  color: var(--text-muted, #888);
-  line-height: 1.5;
-}
-.aw-verdict .palabra {
-  font-family: 'Inter', sans-serif;
-  font-size: 3.2rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   line-height: 1;
   letter-spacing: -0.01em;
-  color: var(--gold-primary, #cfab4a);
 }
-.aw-verdict.abierto .palabra { color: #6ec177; }
-.aw-verdict.cerrado .palabra { color: #d15f5f; }
-.aw-verdict .prob {
-  margin-top: 8px;
-  font-size: 0.85rem;
+.aw-sem-col.hoy .palabra { font-size: 1.8rem; }
+.aw-sem-col .pie {
+  margin-top: 5px;
+  font-size: 0.75rem;
   color: var(--text-muted, #888);
-  line-height: 1.5;
+  line-height: 1.45;
 }
-.aw-verdict .prob b {
+.aw-sem-col .pie .n {
   color: var(--text-secondary, #aaa);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.aw-when {
-  margin-left: auto;
-  text-align: right;
-  font-size: 0.85rem;
-  color: var(--text-muted, #777);
+/* Una zona por linea, siempre: en el ancho de una columna las dos no caben, y
+   dejandolo al azar del texto el salto caia en mitad de un rango -- "05:00-" y
+   en la linea siguiente "07:00 local". Fijo, se leen como dos lecturas de lo
+   mismo, una debajo de otra. */
+.aw-sem-col .pie .z { display: block; white-space: nowrap; }
+.aw-sem-col .pie .cuando {
+  display: block;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
 }
-.aw-when strong { color: var(--text-secondary, #aaa); font-weight: 600; }
+.aw-sem-col.ok { color: #6ec177; }
+.aw-sem-col.no { color: #d15f5f; }
+.aw-sem-col.neu { color: var(--text-secondary, #9f9c94); }
+.aw-sem-col.oro { color: var(--gold-primary, #cfab4a); }
+/* Sin dato en ambar, que es el color que esta pagina ya tiene reservado para
+   "la fuente no responde". La raya no es un estado: es la ausencia de uno. */
+.aw-sem-col.sin { color: #e8ad52; }
+.aw-sem-col.sin .pie, .aw-sem-col.sin .pie .n { color: #e8ad52; }
+
+@media (max-width: 820px) {
+  /* EN MOVIL LAS TRES COLUMNAS SE APILAN, pero no una debajo de otra con
+     la cupula centrada: eso son tres pantallas de scroll antes de la
+     franja. Cada una pasa a fila -- cupula a la izquierda, texto a la
+     derecha -- y las tres caben juntas, que es el sentido del semaforo. */
+  .aw-semaforo { flex-direction: column; }
+  .aw-sem-col {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    grid-template-areas: 'dome rotulo' 'dome palabra' 'dome pie';
+    align-items: center;
+    column-gap: 14px;
+    text-align: left;
+    padding: 12px 2px;
+  }
+  .aw-sem-col > .rotulo { grid-area: rotulo; }
+  .aw-sem-col > .aw-cupula { grid-area: dome; margin: 0; justify-self: center; }
+  .aw-sem-col > .palabra { grid-area: palabra; margin-top: 3px; }
+  .aw-sem-col > .pie { grid-area: pie; }
+  .aw-sem-col + .aw-sem-col {
+    border-left: 0;
+    border-top: 1px solid rgba(207, 171, 74, 0.08);
+  }
+}
 
 /* -- Rejilla de condiciones -- */
 .aw-grid {
@@ -241,11 +255,6 @@
 
 @media (max-width: 600px) {
   .aw-head, .aw-body { padding-left: 18px; padding-right: 18px; }
-  .aw-verdict .palabra, .aw-techos .palabra { font-size: 2.4rem; }
-  .aw-techos .palabra .de { font-size: 1.2rem; }
-  .aw-decision { gap: 18px; }
-  .aw-manana { align-self: flex-start; }
-  .aw-when { margin-left: 0; text-align: left; width: 100%; }
 }
 
 /* La seccion que hospeda el panel. El padding superior salva la barra fija,
@@ -804,22 +813,6 @@
 }
 .aw-sensor.caido .v { color: var(--text-secondary, #bbb); }
 .aw-sensor.caido .cuando { color: #e8ad52; }
-/* La misma marca en la casilla de techos de la cabecera, que no es un sensor
-   mas -- va con el tamanio de la prevision -- pero se cae igual. */
-.aw-techos.caido .no-responde {
-  display: block;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #e8ad52;
-  margin-bottom: 4px;
-}
-.aw-techos.caido .palabra { color: var(--text-secondary, #bbb); }
-/* La raya del "no se sabe": tiene que leerse como ausencia y no como un valor,
-   asi que va en gris apagado y no en el color de un estado. */
-.aw-techos .palabra.sin-dato { color: var(--text-muted, #777); font-weight: 400; }
-.aw-techos.caido .prob { color: #e8ad52; }
-
 /* ============== El selector de vista de la cupula ==================
    Encima del dibujo y no en un panel aparte: es una propiedad de lo que estas
    mirando, no un ajuste de la pagina. */
@@ -922,7 +915,12 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
 }
 .aw-franja .pct { top: 5px; color: rgba(10, 10, 12, 0.85); transform: translateX(-50%); }
-.aw-franja .hh { position: absolute; top: 25px; font-size: 0.62rem; color: var(--text-muted, #777); }
+.aw-franja .hh {
+  position: absolute; top: 25px; font-size: 0.62rem; color: var(--text-muted, #777);
+  /* La etiqueta de zona no se cae a una segunda linea: en movil la marca de
+     la derecha parte "04:29" y "UTC" en dos renglones y parecen dos datos. */
+  white-space: nowrap;
+}
 .aw-franja .hh.izq { left: 0; }
 .aw-franja .hh.der { right: 0; }
 /* Las de la oscuridad astronomica, centradas bajo su marca y mas claras que
@@ -1371,26 +1369,6 @@
    lateral: su cursor y el de los perfiles tienen que caer en la misma vertical. */
 .aw-timeline { margin: 22px 0 0; }
 
-/* ---- Mañana, en la cabecera ---- */
-/* Manana: pequenio y al lado. Es contexto de la decision de hoy -- si hoy no
-   sale, ¿espero a manana? -- y no una segunda prevision que compita con ella,
-   asi que se lee en un vistazo lateral y no ocupa el centro. */
-.aw-manana {
-  align-self: flex-end;
-  padding-bottom: 4px;
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-.aw-manana b {
-  display: block;
-  color: var(--gold-primary, #cfab4a);
-  font-weight: 700;
-  font-size: 1.15rem;
-}
-.aw-manana.abierto b { color: #6ec177; }
-.aw-manana.cerrado b { color: #d15f5f; }
-.aw-manana .p { color: var(--text-muted, #777); font-variant-numeric: tabular-nums; }
-
 /* ---- El "?" que abre la explicación ---- */
 .aw-info {
   position: relative;
@@ -1502,7 +1480,3 @@
 .aw-reco optgroup { background: #101013; color: var(--gold-primary, #cfab4a); }
 .aw-reco option { background: #101013; color: var(--text-secondary, #bbb); }
 
-/* La ventana de dos horas en la que se apoya el veredicto (05-09-2026). Mismo
-   tono que el porcentaje de debajo de la palabra, no el apagado: es parte de
-   la decisión, no una nota al pie. */
-.aw-verdict .ventana { font-size: .85em; margin-top: .25em; opacity: .85; }

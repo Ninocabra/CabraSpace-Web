@@ -37,12 +37,10 @@
       error: 'No se ha podido leer la previsión ahora mismo. Se actualiza cada 6 horas; vuelve a intentarlo en un rato.',
       titulo: 'Nerpio, <span>esta noche</span>',
       sitio: 'AstroCamp · Nerpio (Albacete) · 1.650 m · MPC I79',
-      probLabel: 'de probabilidad de que haya condiciones para abrir',
       probTitulo: 'Condiciones, no comportamiento',
       abierto: 'Abierto', cerrado: 'Cerrado',
-      ventana: 'ventana',
+      ventana: 'ventana', local: 'local', localLargo: 'hora local de Nerpio',
       veredictoTitulo: 'De dónde sale esta palabra',
-      previsionTecho: 'Previsión apertura de techo', estaNoche: 'esta noche',
       franjaTitulo: 'Cómo evoluciona la noche',
       vistaBoveda: 'Bóveda', vistaCupula: 'Cúpula 3D',
       sinDatoDesde: 'sin dato desde',
@@ -57,8 +55,13 @@
         'con el color que tiene en la cúpula: gris la nube, azul la Luna, rojo la calima, amarillo el crepúsculo. ' +
         'Cuanto más claro, más tapado el cielo. La línea de abajo marca las horas en las que el motor dice que ' +
         'quien limita es la Luna, y la de arriba es el seeing: casi invisible cuando es bueno, clara cuando ' +
-        'pasa de 1,9 segundos de arco. La zona central es la oscuridad astronómica.',
-      estadoTechos: 'Estado actual de techos', abiertosDe: 'abiertos de',
+        'pasa de 1,9 segundos de arco. La zona central es la oscuridad astronómica. '+
+        'Las horas del dibujo van en UTC, como todo lo medido de esta página; pasando '+
+        'el ratón por encima sale la hora local de Nerpio.',
+      ahoraTechos: 'Ahora · techos abiertos', noResponde: 'no responde',
+      deN: 'de', techosPl: 'techos',
+      probCorta: 'de probabilidad de abrir',
+      techoEstaNoche: 'Esta noche', techoManana: 'Mañana',
       sinDatoTechos: 'el sitio no lo está diciendo ahora',
       techosTitulo: 'Esto es medida, no previsión',
       techosNota: 'Cuántos techos hay abiertos AHORA MISMO en el observatorio, leído de su propia página. No es una previsión ni tiene nada que ver con la de al lado: es lo que está pasando. Que estén cerrados de día es lo normal, y que estén abiertos es la señal más fuerte que hay de que la noche está saliendo bien — la abren personas que están mirando el cielo.',
@@ -151,7 +154,7 @@
       horaCupula: 'Hora', maxAlt: 'Altura máxima', sepLuna: 'Separación a la Luna',
       mejorHora: 'Mejor momento', sobreMin: 'Horas sobre el mínimo',
       siDespeja: 'h si despeja', esperadas: 'h esperadas',
-      manana: 'Mañana', pie: PIE_ES, generado: 'Generado',
+      pie: PIE_ES, generado: 'Generado',
       notaViento: 'La puerta de viento no está calibrada y el modelo se queda corto: trata el veredicto de abrir como optimista en viento.',
       notaVientoTitulo: 'La puerta de viento',
       tercil: { favorable: 'favorable', normal: 'normal', desfavorable: 'desfavorable' },
@@ -196,12 +199,10 @@
       error: 'The forecast could not be read right now. It refreshes every 6 hours; try again shortly.',
       titulo: 'Nerpio, <span>tonight</span>',
       sitio: 'AstroCamp · Nerpio (Albacete, Spain) · 1,650 m · MPC I79',
-      probLabel: 'chance there will be CONDITIONS to open',
       probTitulo: 'Conditions, not behaviour',
       abierto: 'Open', cerrado: 'Closed',
-      ventana: 'window',
+      ventana: 'window', local: 'local', localLargo: 'Nerpio local time',
       veredictoTitulo: 'Where this word comes from',
-      previsionTecho: 'Roof opening forecast', estaNoche: 'tonight',
       franjaTitulo: 'How the night unfolds',
       vistaBoveda: 'Zenith', vistaCupula: '3D dome',
       sinDatoDesde: 'no data since',
@@ -216,8 +217,12 @@
         'cloud, blue for the Moon, red for dust, yellow for twilight. The lighter it gets, the more blocked the ' +
         'sky. The lower line marks the hours where the engine says the Moon is the limit, and the upper one is ' +
         'seeing: nearly invisible when good, clear once it passes 1.9 arcseconds. The central zone is ' +
-        'astronomical darkness.',
-      estadoTechos: 'Roofs right now', abiertosDe: 'open of',
+        'astronomical darkness. All hours on the strip are UTC, like everything '+
+        'measured on this page; hover over one to get Nerpio local time.',
+      ahoraTechos: 'Now · roofs open', noResponde: 'not responding',
+      deN: 'of', techosPl: 'roofs',
+      probCorta: 'chance of opening',
+      techoEstaNoche: 'Tonight', techoManana: 'Tomorrow',
       sinDatoTechos: 'the site is not reporting it right now',
       techosTitulo: 'This is measurement, not forecast',
       techosNota: 'How many roofs are open AT THIS MOMENT at the observatory, read from its own page. It is not a forecast and has nothing to do with the one next to it: it is what is happening. Closed during the day is normal, and open is the strongest signal there is that the night is turning out well — they are opened by people who are looking at the sky.',
@@ -311,7 +316,7 @@
       horaCupula: 'Time', maxAlt: 'Peak altitude', sepLuna: 'Moon separation',
       mejorHora: 'Best moment', sobreMin: 'Hours above minimum',
       siDespeja: 'h if it clears', esperadas: 'h expected',
-      manana: 'Tomorrow', pie: PIE_EN, generado: 'Generated',
+      pie: PIE_EN, generado: 'Generated',
       notaViento: 'The wind gate is uncalibrated and the model runs low: treat the open/close verdict as optimistic on wind.',
       notaVientoTitulo: 'The wind gate',
       tercil: { favorable: 'favourable', normal: 'typical', desfavorable: 'poor' },
@@ -392,13 +397,48 @@
       { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
+  /* NINGUNA HORA SIN ZONA, Y LA ZONA NO ES LA DEL VISITANTE.
+     Hasta el 22-09-2026 `hora()` daba la hora del NAVEGADOR y la escribia sin
+     etiqueta, dos cosas mal a la vez. Mal la etiqueta, porque la pagina esta
+     llena de horas en UTC -- los sensores, el fotograma de la camara, el sello
+     del JSON -- y una sin marcar al lado de otra marcada se lee como la misma
+     cosa: "ventana 05:00-07:00" pegado a "10:30 UTC" invita a restar dos horas
+     que ya estaban restadas. Y mal la zona, porque quien abre esto desde
+     Chile veia la noche de Nerpio corrida seis horas.
+
+     Asi que: `hora` es UTC, que es la convencion del motor y de todo lo
+     medido, y `horaSitio` es la del observatorio -- Europe/Madrid, fija, no la
+     del visitante -- para escribirla al lado donde cabe. Los numeros pelados
+     que quedan en el dibujo de la franja son UTC como todo lo demas. */
+  var TZ_SITIO = 'Europe/Madrid';
+
   function hora(iso) {
-    // 24 h siempre. El navegador puede estar en una configuracion que devuelva
-    // "09:39 PM" y aqui la hora es la del observatorio, no la del visitante:
+    var d = new Date(iso);
+    return isNaN(d.getTime()) ? '--:--'
+      : ('0' + d.getUTCHours()).slice(-2) + ':' + ('0' + d.getUTCMinutes()).slice(-2);
+  }
+
+  function horaSitio(iso) {
+    // 24 h siempre: el navegador puede estar configurado en "09:39 PM" y
     // mezclar formatos en la misma tarjeta se lee como un error.
     var d = new Date(iso);
     return isNaN(d.getTime()) ? '--:--'
-      : d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+      : d.toLocaleTimeString('es-ES',
+          { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: TZ_SITIO });
+  }
+
+  /* Un rango en las dos zonas: "03:00-05:00 UTC · 05:00-07:00 local". El
+     separador es el guion corto dentro de cada rango y el punto entre zonas,
+     para que se vea de un golpe que son DOS lecturas de lo mismo y no cuatro
+     horas distintas. */
+  function rangoZonas(desde, hasta, t, guion) {
+    var g = guion || '\u2013';
+    return hora(desde) + g + hora(hasta) + ' UTC \u00b7 ' +
+      horaSitio(desde) + g + horaSitio(hasta) + ' ' + t.local;
+  }
+
+  function tituloLocal(iso, t) {
+    return ' title="' + esc(horaSitio(iso) + ' · ' + t.localLargo) + '"';
   }
 
   function traducirTransparencia(texto, t) {
@@ -638,10 +678,12 @@
       // cuando se acaba la oscuridad astronomica, que es la parte en la que se
       // hace cielo profundo. Van mas claras que las de los extremos a
       // proposito: son la informacion, no el marco.
-      marcas = '<span class="hh osc" style="left:' + r1(d0) + '%">' +
-                 esc(hora(cr.astronomico_desde)) + '</span>' +
-               '<span class="hh osc" style="left:' + r1(d1) + '%">' +
-                 esc(hora(cr.astronomico_hasta)) + '</span>';
+      marcas = '<span class="hh osc" style="left:' + r1(d0) + '%"' +
+                 tituloLocal(cr.astronomico_desde, t) + '>' +
+                 esc(hora(cr.astronomico_desde)) + ' UTC</span>' +
+               '<span class="hh osc" style="left:' + r1(d1) + '%"' +
+                 tituloLocal(cr.astronomico_hasta, t) + '>' +
+                 esc(hora(cr.astronomico_hasta)) + ' UTC</span>';
     }
 
     /* La Luna, por TRAMOS y no de la primera a la ultima: si alguna vez deja
@@ -698,8 +740,10 @@
           '<i class="nub" style="background:linear-gradient(90deg,' + degradado + ')"></i>' +
           velos + seeing + luna + cifras +
         '</div>' +
-        '<span class="hh izq">' + esc(hora(cr.ocaso)) + '</span>' +
-        '<span class="hh der">' + esc(hora(cr.orto)) + '</span>' + marcas +
+        '<span class="hh izq"' + tituloLocal(cr.ocaso, t) + '>' +
+          esc(hora(cr.ocaso)) + ' UTC</span>' +
+        '<span class="hh der"' + tituloLocal(cr.orto, t) + '>' +
+          esc(hora(cr.orto)) + ' UTC</span>' + marcas +
       '</div></div>';
   }
 
@@ -725,6 +769,174 @@
       filas + '</div>';
   }
 
+  /* ------------------------------------------------------- EL SEMAFORO ----
+     Tres cupulas gemelas: lo que el observatorio hace AHORA, lo que se espera
+     ESTA NOCHE y lo que se espera MANANA. Sustituye (22-09-2026) a los tres
+     bloques de tipografia grande que ocupaban 240 px y se envolvian mal --
+     "Cerrado 0/18" caia a una fila propia y competia en tamano con la decision
+     de la noche.
+
+     LA CUPULA ES EL SEMAFORO. Abierta ensena la rendija con el cielo dentro;
+     cerrada, la costura; sin dato, la costura a trazos y un "?". El color lo
+     pone la columna con `currentColor`, porque cerrado AHORA y de dia es lo
+     normal (gris) y cerrado PREVISTO para esta noche es malo (rojo): el mismo
+     dibujo con dos significados que solo distingue el tono.
+
+     Y EL ARCO DE "AHORA" NO ES UNA PROBABILIDAD. En las dos columnas de
+     prevision el arco es la probabilidad de abrir; en la primera son los techos
+     abiertos sobre el total. Es el precio de la simetria y solo se sostiene si
+     el rotulo lo dice: por eso pone "techos abiertos" y no la hora. */
+  function cupulaSVG(estado, size, pct) {
+    var abierta = estado === 'abierto';
+    // El arco va PEGADO a la silueta -- radio 28 sobre el casquete de 22 --
+    // dentro del mismo viewBox: asi la cifra se dibuja sin costar ni un pixel
+    // de alto, que es lo que hacia caro rodear la cupula con un circulo.
+    var L = Math.PI * 28;
+    var g = '<svg class="aw-cupula" width="' + size + '" height="' +
+      Math.round(size * 0.875) + '" viewBox="0 0 64 56" fill="none" aria-hidden="true">' +
+      '<path d="M4 46A28 28 0 0 1 60 46" stroke="rgba(255,255,255,.13)"' +
+        ' stroke-width="3.4" stroke-linecap="round"/>';
+    if (typeof pct === 'number' && isFinite(pct)) {
+      g += '<path d="M4 46A28 28 0 0 1 60 46" stroke="currentColor" stroke-width="3.4"' +
+        ' stroke-linecap="round" stroke-dasharray="' + L.toFixed(2) + '"' +
+        ' stroke-dashoffset="' +
+        (L * (1 - Math.max(0, Math.min(1, pct / 100)))).toFixed(2) + '" opacity=".92"/>';
+    }
+    g += '<rect x="3" y="46" width="58" height="4.5" rx="2.2" fill="currentColor" opacity=".55"/>' +
+      '<path d="M10 46a22 22 0 0 1 44 0z" fill="currentColor" opacity="' +
+        (abierta ? '.16' : '.11') + '"/>' +
+      '<path d="M10 46a22 22 0 0 1 44 0" stroke="currentColor" stroke-width="2.2"' +
+        ' stroke-linecap="round"/>';
+    if (abierta) {
+      g += '<path d="M27 30.5a5 5 0 0 1 10 0V46H27z" fill="#08080a"/>' +
+        '<path d="M27 30.5a5 5 0 0 1 10 0V46" stroke="currentColor" stroke-width="1.6" opacity=".9"/>' +
+        '<circle cx="31" cy="35" r="1" fill="#fff" opacity=".9"/>' +
+        '<circle cx="34.2" cy="40.5" r=".8" fill="#fff" opacity=".65"/>' +
+        '<circle cx="30" cy="43" r=".7" fill="#fff" opacity=".45"/>' +
+        '<path d="M21.5 34.5V46M42.5 34.5V46" stroke="currentColor" stroke-width="1.5" opacity=".45"/>';
+    } else if (estado === 'sindato') {
+      g += '<path d="M32 24v22" stroke="currentColor" stroke-width="1.6" opacity=".35" stroke-dasharray="3 3"/>' +
+        '<text x="32" y="43" text-anchor="middle" font-size="16" font-weight="800"' +
+        ' fill="currentColor" opacity=".8" font-family="Inter,sans-serif">?</text>';
+    } else if (estado === 'cerrado') {
+      g += '<path d="M32 24v22" stroke="currentColor" stroke-width="1.6" opacity=".5"/>';
+    }
+    return g + '</svg>';
+  }
+
+  // La fecha de un rotulo de columna. La larga -- "martes, 22 de septiembre" --
+  // parte en tres lineas dentro de un tercio del panel.
+  function fechaCorta(iso, lang) {
+    var d = new Date(String(iso).length === 10 ? iso + 'T12:00:00Z' : iso);
+    if (isNaN(d.getTime())) { return String(iso); }
+    return d.toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES',
+      { weekday: 'short', day: 'numeric', month: 'short' }).replace(/,/g, '');
+  }
+
+  function ayuda(titulo, texto, ladoIzq) {
+    if (!texto) { return ''; }
+    return '<span class="aw-info abajo' + (ladoIzq ? ' izq' : '') + '" tabindex="0">?' +
+      '<span class="aw-pop"><b>' + esc(titulo) + '</b>' + esc(texto) + '</span></span>';
+  }
+
+  /* EL ROTULO ES UNA SOLA LINEA -- que es, y de cuando -- y va en dos trozos
+     porque el segundo cambia de color cuando la fuente no responde. Que sea UNA
+     linea no es cosmetica: con una o dos segun el largo del texto, las tres
+     cupulas se colocaban a tres alturas distintas y la fila dejaba de leerse
+     como una sola cosa. */
+  function columnaSemaforo(o) {
+    return '<div class="aw-sem-col ' + o.tono + (o.hoy ? ' hoy' : '') + '">' +
+      '<span class="rotulo"><span class="que">' + esc(o.rotulo) + (o.ayuda || '') + '</span>' +
+        (o.cuando ? '<span class="cuando">' + esc(o.cuando) + '</span>' : '') + '</span>' +
+      cupulaSVG(o.estado, o.hoy ? 72 : 60, o.pct) +
+      '<div class="palabra">' + o.palabra + '</div>' +
+      '<div class="pie">' + o.pie + '</div>' +
+      '</div>';
+  }
+
+  /* LA COLUMNA DE LA IZQUIERDA NO ES PREVISION: es el observatorio diciendo
+     que esta haciendo. Y SIN DATO NO SE DICE NI ABIERTO NI CERRADO, se dice que
+     no se sabe: una temperatura vieja sigue acotando la de ahora, pero un techo
+     viejo no es una medida degradada -- es una DECISION discreta que toman
+     personas y que cambia en un minuto. El dato se conserva en el JSON
+     (`techos_estado_archivo`) pero aqui se pinta una raya y desde cuando
+     estamos a ciegas. */
+  function columnaTechos(datos, t) {
+    var sen = datos.sensores || {};
+    var arch = (sen.del_archivo || {}).techos;
+    var pie;
+    if (sen.techos_total) {
+      var abiertos = sen.techos_abiertos || 0;
+      pie = '<b class="n">' + abiertos + '</b> ' + esc(t.deN) + ' ' + sen.techos_total +
+        ' ' + esc(t.techosPl) +
+        (sen.medido_utc ? '<span class="cuando">' +
+          esc(String(sen.medido_utc).slice(11, 16)) + ' UTC</span>' : '');
+      return columnaSemaforo({
+        rotulo: t.ahoraTechos,
+        ayuda: ayuda(t.techosTitulo, t.techosNota, true),
+        estado: abiertos > 0 ? 'abierto' : 'cerrado',
+        tono: abiertos > 0 ? 'ok' : 'neu',
+        pct: 100 * abiertos / sen.techos_total,
+        palabra: esc(abiertos > 0 ? t.abierto : t.cerrado),
+        pie: pie
+      });
+    }
+    pie = '<b class="n">' + esc(t.noResponde) + '</b><span class="cuando">' +
+      (arch
+        ? esc(t.sinDatoDesde) + ' ' + esc(String(arch).slice(11, 16)) + ' UTC' + esc(antiguedad(arch))
+        : esc(t.sinDatoTechos)) + '</span>';
+    return columnaSemaforo({
+      rotulo: t.ahoraTechos,
+      ayuda: ayuda(t.techosTitulo, t.techosNota, true),
+      estado: 'sindato', tono: 'sin', pct: null,
+      palabra: '&mdash;', pie: pie
+    });
+  }
+
+  /* UNA COLUMNA DE PREVISION. El corte Abierto/Cerrado lo decide el MOTOR y
+     viaja en el JSON: si la palabra se decidiera aqui, el dia que el motor
+     cambiara de umbral la pagina seguiria diciendo lo contrario con el mismo
+     numero al lado. Sin `veredicto_abrir` no se inventa ninguna -- se ensena la
+     cifra sola, que es lo que habia antes -- y la cupula se queda neutra.
+     La VENTANA va debajo porque la palabra sin ella enganaba: "Abierto" con
+     100 % de nubes a las 22 h era verdad y parecia mentira, porque el numero
+     era el de las 03. */
+  function columnaPrevision(n, rotulo, t, lang, hoy) {
+    if (!n || typeof n.probabilidad_de_abrir !== 'number') { return ''; }
+    var vd = n.veredicto_abrir;
+    var pct = Math.round(n.probabilidad_de_abrir * 100);
+    var pie = '<b class="n">' + pct + '%</b> ' + esc(t.probCorta) +
+      ayuda(vd ? t.veredictoTitulo : t.probTitulo,
+        (vd && vd.regla ? vd.regla + ' ' : '') + (n.probabilidad_definicion || ''), false) +
+      /* LAS DOS ZONAS NO SE PARTEN POR LA MITAD. En la columna no caben en una
+         linea, asi que cada rango va en su propia caja `nowrap`: el salto cae
+         SIEMPRE entre UTC y local, que es donde se entiende, y nunca entre las
+         dos horas de un mismo rango. */
+      (vd && vd.ventana ? '<span class="cuando">' +
+        '<span class="z">' + esc(t.ventana + ' ' + hora(vd.ventana.desde) + '–' +
+          hora(vd.ventana.hasta) + ' UTC') + '</span>' +
+        '<span class="z">' + esc(horaSitio(vd.ventana.desde) + '–' +
+          horaSitio(vd.ventana.hasta) + ' ' + t.local) + '</span></span>' : '');
+    return columnaSemaforo({
+      rotulo: rotulo,
+      cuando: fechaCorta(n.noche, lang),
+      estado: vd ? (vd.abierto ? 'abierto' : 'cerrado') : 'neutro',
+      tono: vd ? (vd.abierto ? 'ok' : 'no') : 'oro',
+      pct: pct,
+      palabra: vd ? esc(vd.abierto ? t.abierto : t.cerrado) : pct + '%',
+      pie: pie,
+      hoy: hoy
+    });
+  }
+
+  function bloqueSemaforo(datos, noche, t, lang) {
+    return '<div class="aw-semaforo">' +
+      columnaTechos(datos, t) +
+      columnaPrevision(noche, t.techoEstaNoche, t, lang, true) +
+      columnaPrevision((datos.noches || [])[1], t.techoManana, t, lang, false) +
+      '</div>';
+  }
+
   function bloqueResumen(datos, noche, t, lang) {
     // Cual de las casillas es la que hoy estropea la noche. Lo decide el motor
     // -- la misma funcion que pinta los semaforos -- para que la casilla roja y
@@ -734,108 +946,7 @@
     var cielo = noche.cielo || {};
     var seeing = cielo.seeing || {};
     var transp = cielo.transparencia || {};
-    var html = '<div class="aw-headline"><div class="aw-decision">';
-    if (typeof p === 'number') {
-      // La palabra manda y el porcentaje va debajo. Un 47 % obliga a poner el
-      // umbral en la cabeza de quien lee, y cada uno lo pone donde quiere.
-      //
-      // El corte lo decide el MOTOR y viaja en el JSON: si la palabra se
-      // decidiera aquí, el día que el motor cambiara de umbral la página
-      // seguiría diciendo lo contrario con el mismo número al lado. Sin
-      // `veredicto_abrir` no se inventa ninguna: se enseña la cifra sola, que
-      // es lo que había antes.
-      var vd = noche.veredicto_abrir;
-      var explica = '<span class="aw-info izq abajo" tabindex="0">?<span class="aw-pop">' +
-        '<b>' + esc(vd ? t.veredictoTitulo : t.probTitulo) + '</b>' +
-        (vd && vd.regla ? esc(vd.regla) + ' ' : '') +
-        esc(noche.probabilidad_definicion || '') + '</span></span>';
-      html += '<div class="aw-verdict' + (vd ? (vd.abierto ? ' abierto' : ' cerrado') : '') + '">' +
-        '<span class="rotulo">' + esc(t.previsionTecho) + ' · ' + esc(t.estaNoche) +
-          ' · ' + fecha(noche.noche, lang) + '</span>' +
-        (vd ? '<div class="palabra">' + esc(vd.abierto ? t.abierto : t.cerrado) + '</div>'
-            : '<div class="palabra num">' + Math.round(p * 100) + '%</div>') +
-        '<div class="prob">' + (vd ? '<b>' + Math.round(p * 100) + '%</b> ' : '') +
-          esc(t.probLabel) + explica + '</div>' +
-        // La ventana en la que se apoya la palabra (05-09-2026). "Abierto" con
-        // 100 % de nubes a las 22 h era verdad y parecía mentira: el número era
-        // el de las 03. Ahora la palabra dice DÓNDE, y el lector decide si esa
-        // franja le vale.
-        (vd && vd.ventana ? '<div class="ventana">' + esc(t.ventana) + ' ' +
-          hora(vd.ventana.desde) + '–' + hora(vd.ventana.hasta) + '</div>' : '') +
-        '</div>';
-    }
-    // Mañana, pequeño y al lado: es contexto de la decisión de hoy -- si hoy no
-    // sale, ¿espero a mañana? -- y no una segunda previsión que compita con ella.
-    var manana = datos.noches && datos.noches[1];
-    if (manana && typeof manana.probabilidad_de_abrir === 'number') {
-      var vm = manana.veredicto_abrir;
-      var pm = Math.round(manana.probabilidad_de_abrir * 100);
-      html += '<div class="aw-manana' + (vm ? (vm.abierto ? ' abierto' : ' cerrado') : '') + '">' +
-        '<span class="rotulo">' + esc(t.manana) + '</span>' +
-        '<b>' + (vm ? esc(vm.abierto ? t.abierto : t.cerrado) : pm + '%') + '</b>' +
-        '<span class="p">' + (vm ? pm + '% · ' : '') + fecha(manana.noche, lang) +
-          (vm && vm.ventana ? ' · ' + hora(vm.ventana.desde) + '–' + hora(vm.ventana.hasta) : '') +
-        '</span>' +
-        '</div>';
-    }
-    /* Y AL LADO, DEL MISMO TAMAÑO, LO QUE NO ES PREVISIÓN. Las dos cosas de la
-       izquierda son un modelo diciendo qué espera; esto es el observatorio
-       diciendo qué está haciendo. Juntas responden de un vistazo la única
-       pregunta que trae aquí a nadie: ¿preparo el telescopio?
-
-       0/0 no se pinta: no es "ningún techo abierto", es "no ha llegado el
-       dato", y se leen igual. */
-    var sen = datos.sensores || {};
-    /* SIN DATO NO SE DICE NI ABIERTO NI CERRADO. Se dice que no se sabe.
-
-       Ayer se rescataba el ultimo estado conocido, como se hace con los demas
-       sensores. Nino lo vio hoy y tenia razon en que no es lo mismo, y el
-       porque merece quedarse escrito:
-
-       UNA TEMPERATURA VIEJA SIGUE DICIENDO ALGO; UN TECHO VIEJO, NO. La
-       temperatura, la presion y la humedad son magnitudes continuas: se mueven
-       despacio, asi que una lectura de hace horas sigue acotando la de ahora y
-       envejece con dignidad si va fechada. El estado del techo NO es una
-       magnitud: es una DECISION discreta que toman personas y que cambia en un
-       minuto. Un "cerrado" de hace veintidos horas no es una medida degradada,
-       es otro hecho -- y encima el que mas peso tiene de toda la pagina.
-
-       Asi que el dato se conserva en el JSON (`techos_estado_archivo`, con su
-       nombre diciendo lo que es) pero AQUI no se pinta: la casilla ensena una
-       raya y desde cuando estamos a ciegas. */
-    var techosViejo = (sen.del_archivo || {}).techos;
-    if (!sen.techos_total && techosViejo) {
-      html += '<div class="aw-techos caido">' +
-        '<span class="no-responde">NO RESPONDE</span>' +
-        '<span class="rotulo">' + esc(t.estadoTechos) +
-          '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
-          esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
-        '<div class="palabra sin-dato">&mdash;</div>' +
-        '<div class="prob">' + esc(t.sinDatoDesde) + ' ' +
-          esc(String(techosViejo).slice(11, 16)) + ' UTC' +
-          esc(antiguedad(techosViejo)) + '</div>' +
-        '</div>';
-    }
-    if (sen.techos_total) {
-      var abiertos = sen.techos_abiertos || 0;
-      html += '<div class="aw-techos' + (abiertos > 0 ? ' hay' : '') + '">' +
-        '<span class="rotulo">' + esc(t.estadoTechos) +
-          '<span class="aw-info abajo" tabindex="0">?<span class="aw-pop"><b>' +
-          esc(t.techosTitulo) + '</b>' + esc(t.techosNota) + '</span></span></span>' +
-        // LA PALABRA MANDA Y EL RECUENTO VA AL LADO. Un "0/18" a solas hay
-        // que traducirlo mentalmente, y encima se parece demasiado al "0/18"
-        // que salia cuando NO habia dato -- que es la confusion que llevamos
-        // toda la semana quitando de en medio. "Cerrado 0/18" dice lo mismo
-        // sin que nadie tenga que interpretarlo, y el guion de la version sin
-        // dato deja de poder confundirse con un cero.
-        '<div class="palabra">' + esc(abiertos > 0 ? t.abierto : t.cerrado) +
-          '<span class="de">' + abiertos + '/' + sen.techos_total +
-          '</span></div>' +
-        '<div class="prob">' + esc(t.abiertosDe) + ' ' + sen.techos_total +
-          (sen.medido_utc
-            ? ' · ' + esc(String(sen.medido_utc).slice(11, 16)) + ' UTC' : '') +
-        '</div></div>';
-    }
+    var html = '<div class="aw-headline">' + bloqueSemaforo(datos, noche, t, lang);
     /* SE VA EL BLOQUE `aw-when` ENTERO, y las dos cosas que decia por separado.
        La fecha estaba abajo a la derecha diciendo "noche del lunes 31" mientras
        arriba del todo ya ponia "esta noche": la misma cosa dos veces y en dos
@@ -843,7 +954,7 @@
        Y las horas utilizables se caen: la que vale para cielo profundo es la
        de oscuridad astronomica, que tiene su propia casilla justo debajo, y
        ahora ademas sus dos horas escritas en la base de la franja. */
-    html += '</div></div>' + bloqueFranjas(datos, t, lang) + '<div class="aw-grid">';
+    html += '</div>' + bloqueFranjas(datos, t, lang) + '<div class="aw-grid">';
     if (typeof noche.luna_iluminacion === 'number') {
       html += celda(t.luna, Math.round(noche.luna_iluminacion * 100) + '%',
         t.iluminada, limita === 'luna');
@@ -853,7 +964,7 @@
       // qué hora empieza y a qué hora se acaba.
       var cr = noche.crepusculo || {};
       var ventana = (cr.astronomico_desde && cr.astronomico_hasta)
-        ? hora(cr.astronomico_desde) + ' – ' + hora(cr.astronomico_hasta)
+        ? rangoZonas(cr.astronomico_desde, cr.astronomico_hasta, t, ' – ')
         : null;
       html += celda(t.oscuridad, num(noche.oscuridad_astronomica_h) + ' ' + t.horas,
         ventana, limita === 'oscuridad');
@@ -1758,12 +1869,12 @@
           // La primera casilla es AHORA, y se dice: una barra que empieza en
           // una hora cualquiera invita a leer el mapa como si fuera medida.
           var iso = new Date(cuando).toISOString();
-          rotulo.textContent = hora(iso) + (esAhora ? ' · ' + t.mapaAhora : '');
+          rotulo.textContent = hora(iso) + ' UTC' + (esAhora ? ' · ' + t.mapaAhora : '');
           if (sello) {
             sello.textContent =
               new Date(cuando).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'es-ES',
                 { weekday: 'short', day: 'numeric', month: 'short' }) +
-              ' · ' + hora(iso) + (esAhora ? ' · ' + t.mapaAhora : '');
+              ' · ' + hora(iso) + ' UTC' + (esAhora ? ' · ' + t.mapaAhora : '');
             sello.className = 'aw-sello' + (esAhora ? ' ahora' : '');
           }
           window.AWNubes.pintar(ctx, {
