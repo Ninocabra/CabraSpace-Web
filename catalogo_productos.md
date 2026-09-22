@@ -115,6 +115,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
 
 ### MOUNTS
+- **Modelo: ML Astro**
+  - [Nueva Montura Modular de Viaje Trinity de ML Astro](https://stargazerslounge.com/topic/448549-new-modular-travel-mount-from-ml-astro-trinity/) (2026-09-22)
 - **Modelo: SetiAstro**
   - [La Precisión Absurda de las Monturas de Telescopio: Una Maravilla de Ingeniería en tu Patio Trasero](https://www.youtube.com/watch?v=xHlWtuJ0LJk) (2026-09-18)
 - **Modelo: montura armónica**
@@ -276,7 +278,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
-  - [Prueba de banco SV555 de Svbony: ¿realmente gana en viñeteado en formato completo?](https://www.youtube.com/watch?v=FmHPlYecI7c) (2026-06-21)
 
 ## Takahashi
 
@@ -307,6 +308,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SkyEye Plus**
   - [Presentación de la nueva serie SkyEye Plus de ToupTek](https://www.youtube.com/shorts/qcLCoQFmPq4) (2026-09-07)
 - **Modelo: ToupTek Astro**
+  - [Cámara ToupTek Astro: Herramienta Esencial para la Fotografía del Universo](https://www.youtube.com/shorts/YywiILPX9fs) (2026-09-20)
   - [Nuevo Kit de Imagen Mono Versátil ToupTek Astro: AE676M y AFW-mini](https://www.youtube.com/watch?v=mehD122BGW4) (2026-09-10)
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
@@ -321,12 +323,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: comet**
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
-
-## Vaonis
-
-### TELESCOPES
-- **Modelo: Vespera Pro II**
-  - [Análisis del Telescopio Inteligente Vaonis Vespera Pro II de $3000](https://www.youtube.com/watch?v=HqQunRqZO0A) (2026-06-20)
 
 ## ZWO
 
