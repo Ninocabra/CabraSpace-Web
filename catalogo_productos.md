@@ -93,6 +93,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis del Explorador Científico ED80 con Montura iEXOS-100](https://www.youtube.com/watch?v=O44ZN0Y8_OQ) (2026-09-14)
 - **Modelo: FirstLight 80**
   - [Alerta de Oferta: Explore Scientific FirstLight 80 con Montura Twilight Nano por solo $129](https://www.youtube.com/watch?v=Z2NhRXisJKg) (2026-09-06)
+- **Modelo: astrógrafo**
+  - [Prototipo de astrógrafo de Explore Scientific captura Andrómeda](https://www.youtube.com/shorts/LplDNf5p_xs) (2026-09-22)
 
 ## INDI Library
 
@@ -220,7 +222,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Prime Day**
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
   - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
-  - [¡Ofertas Prime Day de SVBONY Oficialmente Disponibles!](https://www.youtube.com/watch?v=zdSooTA6StY) (2026-06-22)
 - **Modelo: Rumak**
   - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
