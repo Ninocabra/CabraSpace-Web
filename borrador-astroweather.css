@@ -1,0 +1,1484 @@
+/* BORRADOR — astroweather.css traducido a los tokens de cabra.css (generado; no editar).
+   Las piezas nuevas del estilo Atlas van en borrador-aw-atlas.css. */
+/* AstroWeather -- panel de la noche en Nerpio.
+   Consume el JSON publico del motor (repo CabraSpace-AstroWeather-Data).
+   Se apoya en las variables de index.css: --gold-primary, --text-*. */
+
+.aw-panel {
+  max-width: 980px;
+  margin: 0 auto 48px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(229, 181, 63, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(229, 181, 63, 0.04);
+  overflow: hidden;
+}
+
+.aw-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 26px 28px 0;
+}
+.aw-head h2 {
+  font-family: var(--cb-font-text);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-primary, #eee);
+  margin: 0;
+}
+.aw-head h2 span { color: var(--gold-primary, var(--cb-gold)); }
+.aw-site {
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+
+.aw-body { padding: 20px 28px 28px; }
+
+/* -- EL SEMAFORO: tres cupulas gemelas -- */
+/* Las tres cosas que responden a la unica pregunta que trae a alguien aqui:
+   ¿preparo el telescopio? Lo que el observatorio hace AHORA, lo que se espera
+   ESTA NOCHE y lo que se espera MANANA, en columnas iguales y en orden de
+   tiempo. Iguales A PROPOSITO: el estado real de los techos no es una
+   prevision de segunda, es la senal mas fuerte que hay. */
+.aw-headline {
+  padding: 14px 0 12px;
+  border-bottom: 1px solid rgba(229, 181, 63, 0.12);
+}
+.aw-semaforo { display: flex; align-items: stretch; }
+.aw-sem-col {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 14px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* EL TONO DE LA COLUMNA MANDA SOBRE EL DIBUJO. La cupula se pinta con
+     `currentColor`, asi que el color vive aqui y no en el SVG: cerrado AHORA y
+     de dia es lo normal (gris) y cerrado PREVISTO para esta noche es malo
+     (rojo), y es el mismo dibujo. */
+  color: var(--text-secondary, #9f9c94);
+}
+.aw-sem-col + .aw-sem-col { border-left: 1px solid rgba(229, 181, 63, 0.08); }
+/* La columna de esta noche, con halo y letra mayor: se ve de un vistazo cual
+   manda sin romper la simetria de las tres. */
+.aw-sem-col.hoy {
+  background: radial-gradient(120% 100% at 50% 0%, rgba(229, 181, 63, 0.07), transparent 70%);
+  border-radius: 12px;
+}
+.aw-sem-col .rotulo {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  line-height: 1.45;
+}
+/* El segundo trozo del rotulo -- la fecha de la noche, la hora de la lectura o
+   "no responde" -- va en la misma linea, con su punto delante. Separado asi y
+   no concatenado en el texto porque cuando la fuente se cae tiene que poder
+   cambiar de color el sin tocar lo demas. */
+.aw-sem-col .rotulo .cuando::before { content: ' · '; }
+.aw-cupula { margin: 7px 0 5px; }
+.aw-sem-col .palabra {
+  font-family: var(--cb-font-text);
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.aw-sem-col.hoy .palabra { font-size: 1.8rem; }
+.aw-sem-col .pie {
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+  line-height: 1.45;
+}
+.aw-sem-col .pie .n {
+  color: var(--text-secondary, #aaa);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* Una zona por linea, siempre: en el ancho de una columna las dos no caben, y
+   dejandolo al azar del texto el salto caia en mitad de un rango -- "05:00-" y
+   en la linea siguiente "07:00 local". Fijo, se leen como dos lecturas de lo
+   mismo, una debajo de otra. */
+.aw-sem-col .pie .z { display: block; white-space: nowrap; }
+.aw-sem-col .pie .cuando {
+  display: block;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+.aw-sem-col.ok { color: #6ec177; }
+.aw-sem-col.no { color: #d15f5f; }
+.aw-sem-col.neu { color: var(--text-secondary, #9f9c94); }
+.aw-sem-col.oro { color: var(--gold-primary, var(--cb-gold)); }
+/* Sin dato en ambar, que es el color que esta pagina ya tiene reservado para
+   "la fuente no responde". La raya no es un estado: es la ausencia de uno. */
+.aw-sem-col.sin { color: #e8ad52; }
+.aw-sem-col.sin .pie, .aw-sem-col.sin .pie .n { color: #e8ad52; }
+
+@media (max-width: 820px) {
+  /* EN MOVIL LAS TRES COLUMNAS SE APILAN, pero no una debajo de otra con
+     la cupula centrada: eso son tres pantallas de scroll antes de la
+     franja. Cada una pasa a fila -- cupula a la izquierda, texto a la
+     derecha -- y las tres caben juntas, que es el sentido del semaforo. */
+  .aw-semaforo { flex-direction: column; }
+  .aw-sem-col {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    grid-template-areas: 'dome rotulo' 'dome palabra' 'dome pie';
+    align-items: center;
+    column-gap: 14px;
+    text-align: left;
+    padding: 12px 2px;
+  }
+  .aw-sem-col > .rotulo { grid-area: rotulo; }
+  .aw-sem-col > .aw-cupula { grid-area: dome; margin: 0; justify-self: center; }
+  .aw-sem-col > .palabra { grid-area: palabra; margin-top: 3px; }
+  .aw-sem-col > .pie { grid-area: pie; }
+  .aw-sem-col + .aw-sem-col {
+    border-left: 0;
+    border-top: 1px solid rgba(229, 181, 63, 0.08);
+  }
+}
+
+/* -- Rejilla de condiciones -- */
+.aw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: rgba(229, 181, 63, 0.12);
+  border: 1px solid rgba(229, 181, 63, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 22px 0;
+}
+.aw-cell {
+  background: #0d0d0f;
+  padding: 14px 16px;
+}
+.aw-cell .k {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 6px;
+}
+.aw-cell .v {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+}
+.aw-cell .n {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted, #777);
+}
+
+/* -- Objetos recomendados -- */
+.aw-targets { margin: 26px 0 0; }
+.aw-targets h3 {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+.aw-target {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  padding: 11px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.aw-target .name {
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+  flex: 1 1 200px;
+}
+.aw-target .hours {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #aaa);
+  font-size: 0.9rem;
+}
+.aw-target .hours b { color: var(--gold-primary, var(--cb-gold)); font-weight: 600; }
+.aw-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+.aw-tag.ok { color: #7fc98a; }
+.aw-tag.mid { color: var(--cb-gold); }
+.aw-tag.low { color: #8a8a92; }
+
+/* -- Segunda noche, compacta -- */
+.aw-next {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #aaa);
+}
+.aw-next .d { color: var(--text-muted, #777); }
+.aw-next b { color: var(--gold-primary, var(--cb-gold)); }
+
+.aw-foot {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  line-height: 1.65;
+  color: var(--text-muted, #777);
+}
+.aw-foot a { color: var(--text-secondary, #aaa); }
+
+.aw-state {
+  padding: 34px 28px;
+  text-align: center;
+  color: var(--text-muted, #777);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .aw-head, .aw-body { padding-left: 18px; padding-right: 18px; }
+}
+
+/* La seccion que hospeda el panel. El padding superior salva la barra fija,
+   igual que hace .tool-hero en estas paginas. */
+.aw-section {
+  padding: 120px 24px 0;
+  position: relative;
+  z-index: 10;
+}
+@media (max-width: 600px) {
+  .aw-section { padding: 100px 16px 0; }
+}
+
+/* ===================== Consejos de adquisición ====================== */
+
+/* ========================= Sensores en vivo ========================= */
+.aw-sensors { margin-top: 28px; }
+.aw-sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 10px;
+}
+.aw-sensor {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.aw-sensor .k {
+  display: block;
+  font-size: 0.63rem;
+  line-height: 1.25;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 3px;
+  /* Dos lineas de alto siempre: «MARGEN DE ROCIO» y «TECHOS ABIERTOS» parten
+     en dos y las demas no, asi que sin esto los valores de la fila salian a
+     alturas distintas. */
+  min-height: 2.5em;
+}
+.aw-sensor .v {
+  /* En bloque, y esto NO es cosmetico: en linea, la hora que va detras heredaba
+     el tamano del valor y se le montaba encima -- «20.15 mag/arcsec²19:50». */
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary, #bbb);
+  font-variant-numeric: tabular-nums;
+}
+/* La unidad, mas pequena y apagada que el numero: el numero es el dato y la
+   unidad solo dice en que esta. Ademas asi cabe, que es lo que evita que la
+   casilla del fotometro parta en dos lineas y descuadre la fila. */
+.aw-sensor .v .u {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted, #777);
+}
+/* La hora de la medida: pequena y apagada. Esta para poder mirarla, no para
+   competir con el numero. */
+.aw-sensor .cuando {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.63rem;
+  color: var(--text-muted, #777);
+  font-variant-numeric: tabular-nums;
+}
+.aw-sensor.alert .v { color: #e08b8b; }
+.aw-sensor.good .v { color: #8fd39c; }
+.aw-stale {
+  margin-top: 9px;
+  font-size: 0.74rem;
+  color: var(--text-muted, #777);
+}
+
+/* ========================== Mirar afuera ============================
+   Dos ventanas abiertas en la misma pared: la cámara (lo que HAY) y el mapa
+   (lo que VIENE). El problema de meterlas aquí es que las dos son rectángulos
+   brillantes en una página casi negra con filetes de oro, y chocan.
+
+   Se resuelve en tres capas, y NO con la misma receta para las dos:
+
+   1. El MARCO es idéntico -- mismo radio, mismo filete, misma proporción -- y
+      eso es lo que las hermana. La armonía la pone la geometría, no el color.
+   2. La VIÑETA funde el borde del rectángulo con el fondo del panel. Sin ella
+      hay un canto duro entre la imagen y la página, y ese canto es casi todo
+      el ruido visual: una imagen que se desvanece deja de parecer pegada.
+   3. La GRADACIÓN sí es distinta en cada una, a propósito. El mapa es interfaz
+      ajena: se le baja el color hasta que el terreno pasa de verde oliva a un
+      bronce que convive con el oro de la página, y la nube -- que es gris --
+      sobrevive intacta. La cámara NO: es una MEDIDA, y a una medida no se le
+      cambia el tono. Solo se le baja un punto la saturación, que es lo que
+      apaga el HUD de colores neon que la cámara quema encima, y una curva
+      global de brillo, que no inventa color donde no lo hay. Teme la noche:
+      de madrugada esa imagen ya es casi negra y cualquier sepia la ensuciaría.
+
+   El modo noche de `index.css` pisa los dos filtros con `!important`, que es
+   justo lo que tiene que pasar: ahí manda la adaptación a la oscuridad. */
+.aw-outside { margin-top: 30px; }
+.aw-panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.aw-pane { margin: 0; min-width: 0; }
+.aw-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #050506;
+  border: 1px solid rgba(229, 181, 63, 0.14);
+  /* La proporción nativa de la cámara (1932x1088). El mapa la copia para que
+     las dos cajas midan lo mismo: dos alturas distintas al lado dejan la fila
+     de pies de foto en escalera. */
+  aspect-ratio: 16 / 9;
+}
+.aw-frame > img,
+.aw-frame > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+.aw-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 46px 10px rgba(5, 5, 6, 0.85);
+}
+.aw-eye > img { filter: saturate(0.8) brightness(0.94) contrast(1.03); }
+.aw-frame > img { transition: filter 0.5s ease; }
+
+/* 1,686:1, y el numero no es de gusto: es la proporcion EN TERRENO de la
+   rejilla que publica el motor -- 31 x 15 celdas de 0,5 grados son 1.313 por
+   779 km aqui. Con la caja de esa forma, las bases de la NASA se piden tal
+   cual y el campo se pinta encima sin estirar ninguno de los dos. Cualquier
+   otra proporcion obliga a deformar algo, y deformar un mapa para que quepa
+   es como se acaba pintando la nube donde no esta. */
+/* Las dos cajas de la fila comparten proporcion para que los pies queden
+   alineados, y la que manda es la del MAPA: sale de la rejilla del modelo y
+   estirarla moveria las nubes de sitio. La camara se adapta con `contain` --
+   dos filetes negros invisibles sobre un marco negro -- en vez de recortarse
+   horizonte, que es lo que haria `cover`. */
+.aw-frame.aw-eye, .aw-frame.aw-map { aspect-ratio: 1.686 / 1; }
+.aw-frame.aw-eye > img { object-fit: contain; }
+
+/* -- Los rotulos de las dos cajas -- */
+.aw-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.aw-tab {
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-muted, #777);
+  background: transparent;
+  border: 1px solid rgba(229, 181, 63, 0.18);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+/* Las dos etiquetas son FIJAS desde que se retiro Windy: ya no hay nada que
+   elegir. Se quedan porque rotulan cada caja y porque son lo que mantiene las
+   dos a la misma altura. Sin borde, para que no inviten a pulsarlas. */
+.aw-tab.fija {
+  border-color: transparent;
+  cursor: default;
+  color: var(--text-muted, #5e5b54);
+}
+.aw-map > img, .aw-map > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+/* El lienzo va ENCIMA de las bases y no las tapa: lo que pinta es un velo con
+   alfa, asi que no lleva fondo. */
+#aw-mapa-nubes { background: transparent; }
+/* Las dos bases SIN NUBES de la NASA. La de noche se funde encima de la de dia
+   con la opacidad que le pone la hora que se esta mirando. Sin transicion en
+   esa opacidad: durante la reproduccion se recalcula cuatro veces por segundo
+   y una transicion de 0,35 s la dejaria siempre persiguiendo al valor
+   anterior. */
+#aw-base-dia, #aw-base-noche { object-fit: cover; }
+#aw-base-noche { opacity: 0; }
+#aw-base-dia { filter: saturate(0.85) brightness(0.82) contrast(1.05); }
+#aw-base-noche { filter: saturate(0.9) brightness(1.05) contrast(1.05); }
+
+/* Dice que esto es una PREVISION. Desde que se retiro el Meteosat todo lo que
+   hay en este mapa sale de un modelo, y un mapa que se parece tanto a una foto
+   tiene que decir que no lo es. */
+.aw-fuente {
+  position: absolute;
+  left: 12px; bottom: 10px;
+  z-index: 3;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #9f9c94);
+  background: rgba(5, 5, 6, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* El dia y la hora, EN la imagen. Arriba a la derecha: abajo a la izquierda
+   ya esta el rotulo de la fuente, y las esquinas de abajo son donde cae la
+   costa de Africa. */
+.aw-sello {
+  position: absolute;
+  right: 12px; top: 10px;
+  z-index: 3;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-primary, #f5f4f0);
+  background: rgba(5, 5, 6, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* En "ahora" se distingue sin leer: el oro de la pagina es de lo que ya es. */
+.aw-sello.ahora {
+  color: var(--gold-light, var(--cb-gold-light));
+  border-color: rgba(229, 181, 63, 0.4);
+}
+
+/* -- La barra de tiempo -- */
+.aw-tiempo { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.aw-tiempo[hidden] { display: none; }
+/* SOLO EL DE REPRODUCIR es redondo. Estaba puesto como `.aw-tiempo button` y
+   ahi dentro hay otro boton -- el de ir a la noche --, que por especificidad
+   se llevaba tambien los 30x30 y el radio del 50 %: una pastilla de texto
+   metida en un circulo de 30 px, con las letras desparramadas por fuera. */
+.aw-tiempo #aw-play {
+  font: inherit;
+  font-size: 0.7rem;
+  width: 30px; height: 30px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--gold-primary, var(--cb-gold));
+  background: transparent;
+  border: 1px solid rgba(229, 181, 63, 0.3);
+}
+.aw-tiempo #aw-play:hover { border-color: rgba(229, 181, 63, 0.7); }
+.aw-pista { position: relative; flex: 1 1 auto; min-width: 0; }
+.aw-pista input[type="range"] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--gold-primary, var(--cb-gold));
+}
+/* La tira de noches, DEBAJO del deslizador. Es una leyenda alineada, no un
+   fondo: dejar transparente la pista nativa de un `range` para pintar detras
+   se rompe en un navegador de cada tres. */
+.aw-bandas {
+  position: relative;
+  height: 6px;
+  margin-top: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.aw-banda { position: absolute; top: 0; bottom: 0; display: block; }
+/* Crepusculo en ambar y oscuridad astronomica en azul, los mismos colores con
+   los que las franjas de arriba pintan lo mismo. Dos codigos para el mismo
+   concepto en la misma pagina es como se consigue que nadie se fie de ninguno. */
+.aw-banda.crepusculo { background: rgba(229, 181, 63, 0.38); }
+.aw-banda.oscura { background: rgba(110, 150, 220, 0.55); }
+
+/* Las horas y los dias debajo de las bandas. Una barra de 48 horas sin
+   rotulos obliga a contar cuadraditos para saber si estas en esta noche o en
+   la siguiente, que es justo la pregunta que trae a alguien aqui. */
+.aw-marcas { position: relative; height: 13px; margin-top: 2px; }
+.aw-marca {
+  position: absolute;
+  top: -2px;
+  width: 1px; height: 4px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.aw-marca.dia { height: 6px; background: rgba(229, 181, 63, 0.55); }
+.aw-rot {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #5e5b54);
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* El dia a la derecha de su marca y no centrado: centrado, el rotulo de la
+   primera medianoche se sale por la izquierda y el de la ultima por la
+   derecha, y recortado deja "mie" en "ie". */
+.aw-rot.dia {
+  transform: none;
+  margin-left: 3px;
+  color: var(--gold-secondary, var(--cb-gold));
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.aw-noche {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-secondary, #9f9c94);
+  background: transparent;
+  border: 1px solid rgba(110, 150, 220, 0.35);
+}
+.aw-noche:hover { color: #9ec0f0; border-color: rgba(110, 150, 220, 0.7); }
+.aw-noche[hidden] { display: none; }
+/* Una camara parada NO puede leerse igual que una al dia: es la unica pega que
+   el rotulo existe para cantar. */
+.aw-hora.alerta { color: #d8a53c; }
+#aw-hora-rot {
+  flex: 0 0 auto;
+  min-width: 7.5em;
+  text-align: right;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #9f9c94);
+}
+
+/* El satelite casi no se toca. Llega ya sobrio -- mar azul oscuro, tierra
+   ocre, nube blanca -- porque es el planeta y no la interfaz de nadie, y
+   ademas es una MEDIDA, igual que la camara. Solo un punto de contraste para
+   que la nube se despegue del mar. */
+.aw-sat > img { filter: saturate(0.9) contrast(1.05) brightness(0.96); }
+
+/* La marca del observatorio. Va en el centro exacto porque el recorte se pide
+   centrado en Nerpio, y es lo unico que la imagen cruda no trae: sin ella,
+   800 km de sierra no dicen cual es la de uno. El halo negro alrededor del
+   punto es para que se vea igual sobre mar oscuro que sobre nube blanca. */
+.aw-sitio {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  z-index: 2;
+  pointer-events: none;
+}
+.aw-sitio i {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-primary, var(--cb-gold));
+  box-shadow: 0 0 0 3px rgba(5, 5, 6, 0.5), 0 0 9px rgba(229, 181, 63, 0.7);
+}
+.aw-sitio span {
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-light, var(--cb-gold-light));
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+.aw-cap {
+  margin-top: 8px;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text-muted, #777);
+}
+.aw-cap b { color: var(--text-secondary, #9f9c94); font-weight: 600; }
+/* La hora de la pasada, en su propia linea y con cifras de ancho fijo: cambia
+   cada diez minutos y sin `tabular-nums` el pie entero da un saltito. */
+.aw-hora {
+  display: block;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #777);
+}
+.aw-hora:empty { display: none; }
+.aw-cap a { color: var(--text-secondary, #9f9c94); text-decoration: none;
+            border-bottom: 1px solid rgba(229, 181, 63, 0.25); }
+.aw-cap a:hover { color: var(--gold-primary, var(--cb-gold)); }
+/* Cuando la cámara no llega. Ocupa el hueco en vez de dejar un rectángulo
+   negro sin explicación: un fallo mudo parece un fallo nuestro. */
+.aw-caida {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-muted, #777);
+}
+@media (max-width: 720px) {
+  .aw-panes { grid-template-columns: 1fr; gap: 20px; }
+}
+
+/* ==================== Qué quieres apuntar =========================== */
+.aw-pick { margin-top: 30px; }
+.aw-search { position: relative; max-width: 420px; }
+.aw-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary, #eee);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(229, 181, 63, 0.22);
+  border-radius: 9px;
+  outline: none;
+}
+.aw-search input:focus { border-color: rgba(229, 181, 63, 0.55); }
+.aw-search input::placeholder { color: var(--text-muted, #777); }
+.aw-results {
+  position: absolute;
+  z-index: 40;
+  left: 0; right: 0;
+  top: calc(100% + 6px);
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--cb-surface);
+  border: 1px solid rgba(229, 181, 63, 0.22);
+  border-radius: 9px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+.aw-results button {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 13px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #aaa);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.aw-results button:hover, .aw-results button:focus { background: rgba(229, 181, 63, 0.09); }
+.aw-results button .n { color: var(--text-primary, #eee); font-weight: 600; }
+.aw-results button .h { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.aw-results .none { padding: 12px 13px; color: var(--text-muted, #777); font-size: 0.88rem; }
+
+/* La cúpula es el dibujo y la clave es su pie: estaban a dos columnas donde la
+   leyenda se llevaba la más ancha, así que un cuadro de texto salía más grande
+   que el cielo que explica. Ahora la cúpula se queda con todo lo que sobra y la
+   clave con una columna estrecha y fija. */
+.aw-chosen {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 230px);
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 720px) { .aw-chosen { grid-template-columns: 1fr; } }
+
+.aw-dome-wrap { position: relative; }
+/* Dos lienzos apilados: el cielo, que se pinta pixel a pixel y es caro, y lo
+   de encima, que cambia con cada cuadro. */
+.aw-dome-stack {
+  position: relative;
+  width: 100%;
+  /* Tope para que en pantallas anchas no se coma la página entera: es un
+     círculo, y lo que crece de ancho crece igual de alto. */
+  max-width: 660px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+}
+.aw-dome {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.aw-play {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(229, 181, 63, 0.35);
+  background: rgba(229, 181, 63, 0.09);
+  color: var(--gold-primary, var(--cb-gold));
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.aw-play:hover { background: rgba(229, 181, 63, 0.18); }
+
+.aw-obj h4 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  color: var(--text-primary, #eee);
+}
+.aw-obj .sub { font-size: 0.8rem; color: var(--text-muted, #777); margin-bottom: 14px; }
+.aw-obj .why {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #aaa);
+  margin: 0 0 14px;
+}
+.aw-obj-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.aw-obj-facts .f {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.aw-obj-facts .k {
+  display: block;
+  font-size: 0.63rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 3px;
+}
+.aw-obj-facts .v {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+  font-variant-numeric: tabular-nums;
+}
+.aw-hint { font-size: 0.85rem; color: var(--text-muted, #777); margin-top: 14px; }
+
+/* ------- El sensor que no responde: se conserva y se marca -------
+   El aviso va ARRIBA del nombre para que no se pueda leer el numero sin haber
+   leido antes que no es de ahora. Ambar y no rojo: el dato sigue siendo bueno,
+   lo que ha caducado es su hora. */
+.aw-sensor.caido {
+  border-color: rgba(232, 173, 82, 0.35);
+  background: rgba(232, 173, 82, 0.04);
+}
+.aw-sensor .no-responde {
+  display: block;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #e8ad52;
+  margin-bottom: 5px;
+}
+.aw-sensor.caido .v { color: var(--text-secondary, #bbb); }
+.aw-sensor.caido .cuando { color: #e8ad52; }
+/* ============== El selector de vista de la cupula ==================
+   Encima del dibujo y no en un panel aparte: es una propiedad de lo que estas
+   mirando, no un ajuste de la pagina. */
+.aw-vista { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+.aw-vista button {
+  font: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(150, 164, 192, 0.22);
+  background: transparent;
+  color: var(--text-muted, #777);
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+.aw-vista button:hover { color: var(--text-primary, #eee); border-color: rgba(229, 181, 63, 0.45); }
+.aw-vista button.on {
+  color: var(--gold-primary, var(--cb-gold));
+  border-color: rgba(229, 181, 63, 0.55);
+  background: rgba(229, 181, 63, 0.08);
+}
+/* En perspectiva el dibujo se agarra y se orienta; el cursor tiene que decirlo.
+   `touch-action: none` y no `pan-y`: el gesto vertical AHORA significa cambiar
+   la elevacion, asi que dejarselo al scroll de la pagina se lo quitaria al
+   dibujo justo en la mitad de los arrastres. */
+.aw-dome-stack.gira { cursor: grab; touch-action: none; }
+.aw-dome-stack.gira:active { cursor: grabbing; }
+
+/* ================== Las dos franjas de la noche ====================
+   Poco alto a propósito: es una primera impresión, no un gráfico. El detalle
+   está en las casillas de debajo y en la cúpula del final. El ANCHO de cada
+   pista es la duración real de esa noche, así que las dos son comparables a
+   ojo sin leer una sola cifra. */
+.aw-franjas { margin: 20px 0 2px; }
+.aw-franjas > .rotulo {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 12px;
+}
+.aw-franja { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+.aw-franja .dia {
+  flex: 0 0 92px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+  line-height: 1.3;
+  padding-top: 3px;
+}
+.aw-franja .dia em {
+  display: block;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted, #777);
+}
+.aw-franja .pista { position: relative; padding-bottom: 15px; min-width: 0; }
+.aw-franja .barra {
+  position: relative;
+  height: 22px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--cb-surface);
+}
+.aw-franja .barra > i { position: absolute; top: 0; bottom: 0; display: block; }
+.aw-franja .nub { left: 0; right: 0; opacity: 0.88; }
+/* El crepúsculo, apagado: sigue siendo noche utilizable para planetaria, pero
+   no es donde se hace cielo profundo y no debe competir con el centro. */
+.aw-franja .crep { background: rgba(8, 9, 12, 0.5); }
+.aw-franja .lin { width: 1px; background: rgba(255, 255, 255, 0.3); }
+/* La Luna va de subrayado y no de relleno: limita la noche, no la cierra.
+   El selector lleva `> i` a proposito: la regla de arriba que pone todas las
+   capas a `top:0; bottom:0` tiene una etiqueta ademas de las dos clases, y sin
+   igualarla el `top:auto` de aqui pierde y el subrayado se va ARRIBA, encima
+   de los numeros de nubes. */
+.aw-franja .barra > i.luna {
+  top: auto;
+  bottom: 0;
+  height: 3px;
+  background: var(--gold-primary, var(--cb-gold));
+  opacity: 0.92;
+}
+.aw-franja .glifo, .aw-franja .pct {
+  position: absolute;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.aw-franja .glifo {
+  top: 3px;
+  color: var(--gold-primary, var(--cb-gold));
+  transform: translateX(4px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.aw-franja .pct { top: 5px; color: rgba(10, 10, 12, 0.85); transform: translateX(-50%); }
+.aw-franja .hh {
+  position: absolute; top: 25px; font-size: 0.62rem; color: var(--text-muted, #777);
+  /* La etiqueta de zona no se cae a una segunda linea: en movil la marca de
+     la derecha parte "04:29" y "UTC" en dos renglones y parecen dos datos. */
+  white-space: nowrap;
+}
+.aw-franja .hh.izq { left: 0; }
+.aw-franja .hh.der { right: 0; }
+/* Las de la oscuridad astronomica, centradas bajo su marca y mas claras que
+   el ocaso y el orto: son las que se apuntan en la agenda, y las de los
+   extremos solo dicen donde empieza y acaba el dibujo. */
+.aw-franja .hh.osc {
+  transform: translateX(-50%);
+  color: var(--text-secondary, #bbb);
+  font-weight: 600;
+}
+
+/* ---- Paleta de la cupula: base negra y cada estorbo con SU color ----
+   Se activa sola con la clase que pone `PALETA_FRANJA` en el JS. Quitando ese
+   interruptor -- una linea -- estas reglas dejan de aplicarse y vuelve el
+   semaforo sin tocar nada mas. Los tres colores son los de `AWDome.paleta`:
+   dia (255,204,56), Luna (82,140,255) y nube (219,224,235). */
+.paleta-cupula .aw-franja .barra { background: #0a0b0e; }
+.paleta-cupula .aw-franja .nub { opacity: 1; }
+/* El crepusculo deja de ser un velo oscuro y pasa a ser lo que ES: luz de dia
+   que todavia estorba. En la boveda ese amarillo significa exactamente esto. */
+.paleta-cupula .aw-franja .crep { background: rgba(255, 204, 56, 0.16); }
+.paleta-cupula .aw-franja .lin { background: rgba(255, 255, 255, 0.35); }
+.paleta-cupula .aw-franja .barra > i.luna { background: rgb(82, 140, 255); opacity: 1; }
+/* El carril del seeing, arriba del todo y separado del color: la turbulencia
+   no ilumina el cielo, lo emborrona, y meterla en la paleta de brillo diria
+   otra cosa. La Luna se queda abajo; asi los dos carriles se leen a la vez. */
+.aw-franja .barra > i.see { top: 0; bottom: auto; height: 3px; }
+.paleta-cupula .aw-franja .glifo { color: rgb(140, 178, 255); }
+/* Los numeros van sobre una banda que recorre de casi negro a casi BLANCO --
+   negro es cielo limpio y blanco es tapado del todo -- asi que ni texto claro
+   ni texto oscuro valen para todo el recorrido. La pastilla lo resuelve de una
+   vez y no depende del valor que haya debajo. */
+.paleta-cupula .aw-franja .pct {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(8, 9, 12, 0.62);
+  padding: 1px 4px;
+  border-radius: 4px;
+  top: 3px;
+}
+
+@media (max-width: 620px) {
+  .aw-franja { flex-direction: column; gap: 4px; }
+  .aw-franja .dia { flex: none; padding-top: 0; }
+  /* El ancho proporcional NO se pisa aqui: es el que hace comparables las dos
+     noches de un vistazo, y en columna sigue siendo legible. */
+  /* Con la barra corta, el ocaso y el orto se comen a las horas de oscuridad,
+     que son las que importan. Se van los extremos, no las buenas. */
+  .aw-franja .hh.izq, .aw-franja .hh.der { display: none; }
+}
+
+/* Las dos plegables hermanas, en paralelo, y la procedencia en el "?" del
+   extremo derecho de esa misma linea. Flex y no grid para que en pantalla
+   estrecha caigan solas una debajo de otra sin tener que redefinir columnas. */
+.aw-lane-pair { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 24px; }
+.aw-lane-pair > .aw-lane-row { flex: 1 1 250px; min-width: 0; }
+.aw-lane-pair > .aw-info { flex: 0 0 auto; margin-top: 4px; }
+/* Pegado al borde derecho, el globo tiene que abrirse hacia DENTRO o se sale
+   de la pagina. */
+.aw-lane-pair > .aw-info.refs .aw-pop { left: auto; right: 0; }
+.aw-pop .ref { display: block; margin-top: 9px; font-size: 0.8rem; }
+.aw-pop .ref b { color: var(--text-primary, #eee); }
+
+/* ======================= Semáforo de la noche ======================= */
+/* MARCO DORADO, y no es decoración: "Qué hacer esta noche" son cinco cosas
+   distintas -- el titular, los semáforos por filtro, los de familia de objeto,
+   los avisos y las referencias -- que hasta ahora flotaban sueltas entre el
+   bloque de sensores y el buscador, sin nada que dijera dónde empieza y dónde
+   acaba el consejo. El borde las declara un grupo. Se usa el dorado de la
+   casa, --gold-primary, que ya marca en esta página lo que el motor DICE
+   frente a lo que el motor MIDE. */
+.aw-plan {
+  margin: 26px 0 0;
+  padding: 20px 22px 6px;
+  border: 1px solid rgba(229, 181, 63, 0.38);
+  border-radius: 12px;
+  background: rgba(229, 181, 63, 0.045);
+}
+.aw-plan h3, .aw-sensors h3, .aw-pick h3, .aw-outside h3 {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+/* El título, del color del marco: es la etiqueta del grupo, no un rótulo más
+   de los que hay arriba y abajo. Va DESPUÉS de la regla compartida para poder
+   pisarle el color sin tocar a `.aw-sensors` ni a `.aw-pick`. */
+.aw-plan h3 { color: var(--gold-primary, var(--cb-gold)); }
+.aw-headline-tip {
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--text-primary, #eee);
+  margin: 0 0 18px;
+}
+.aw-lane-row { margin-bottom: 16px; }
+.aw-lane-row > .lbl {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 8px;
+}
+.aw-lights { display: flex; flex-wrap: wrap; gap: 8px; }
+.aw-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 0.86rem;
+  color: var(--text-secondary, #bbb);
+  cursor: help;
+  position: relative;
+}
+.aw-light:hover, .aw-light.open { border-color: rgba(229, 181, 63, 0.4); }
+.aw-light .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.aw-light.verde .dot { background: #6ec177; box-shadow: 0 0 8px rgba(110, 193, 119, 0.5); }
+.aw-light.ambar .dot { background: #d8a53c; box-shadow: 0 0 8px rgba(216, 165, 60, 0.5); }
+.aw-light.rojo  .dot { background: #d15f5f; box-shadow: 0 0 8px rgba(209, 95, 95, 0.5); }
+.aw-light .name { font-weight: 600; color: var(--text-primary, #eee); }
+.aw-light .short { color: var(--text-muted, #888); }
+
+/* El detalle. Aparece al pasar el cursor y al tocar, que en movil no hay
+   cursor que pasar. */
+.aw-pop {
+  position: absolute;
+  z-index: 60;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: min(340px, 78vw);
+  padding: 12px 14px;
+  background: #121216;
+  border: 1px solid rgba(229, 181, 63, 0.3);
+  border-radius: 9px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.7);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #bbb);
+  cursor: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+  /* El globo no hereda el estilo de la etiqueta que lo hospeda: colgado de un
+     rotulo en versalitas salia el parrafo entero EN MAYUSCULAS. */
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  text-align: left;
+}
+.aw-light:hover .aw-pop, .aw-light.open .aw-pop { opacity: 1; pointer-events: auto; }
+.aw-pop b { color: var(--text-primary, #eee); display: block; margin-bottom: 4px; }
+
+
+/* ======================= Línea de tiempo ============================ */
+/* Los mandos arriba y la pista sola en su linea: es lo que le da a la pista
+   EXACTAMENTE el ancho de las graficas de los objetos, que es la condicion
+   para que los dos cursores caigan en la misma vertical. En fila con el boton
+   y la hora, la pista era mas estrecha y no habia forma de cuadrarlos. */
+.aw-timeline { margin-top: 12px; }
+.aw-timeline .mandos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+.aw-timeline .track {
+  position: relative;
+  width: 100%;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.aw-timeline .track:focus-visible { outline: 2px solid rgba(229, 181, 63, 0.6); }
+/* Los tres regímenes de la noche, con el mismo código de color que el domo:
+   naranja el día, un azul intermedio el crepúsculo y el azul profundo la
+   oscuridad astronómica. Dejar los extremos en negro los pintaba del color de
+   lo contrario de lo que son. */
+.aw-timeline .dia {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(224, 132, 52, 0.30), rgba(170, 92, 34, 0.22));
+}
+.aw-timeline .crepusculo {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(150, 120, 150, 0.22), rgba(80, 80, 150, 0.24));
+}
+.aw-timeline .noche {
+  position: absolute; top: 0; bottom: 0;
+  background: linear-gradient(rgba(90, 120, 200, 0.22), rgba(40, 60, 120, 0.30));
+  border-left: 1px solid rgba(140, 170, 240, 0.35);
+  border-right: 1px solid rgba(140, 170, 240, 0.35);
+}
+.aw-timeline .tick {
+  position: absolute; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.10);
+}
+.aw-timeline .lbl {
+  position: absolute;
+  bottom: 1px;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--text-muted, #777);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.aw-timeline .cur {
+  position: absolute; top: -2px; bottom: -2px;
+  width: 2px;
+  background: var(--gold-primary, var(--cb-gold));
+  box-shadow: 0 0 8px rgba(229, 181, 63, 0.8);
+}
+.aw-timeline .now {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #bbb);
+  font-size: 0.85rem;
+}
+
+/* ======================== Clave de color ============================ */
+.aw-side { min-width: 0; }
+.aw-key .lbl {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin-bottom: 8px;
+}
+.aw-key .sw {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #aaa);
+}
+.aw-key .sw i {
+  width: 18px; height: 11px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  flex: 0 0 auto;
+}
+/* El aviso de "sin desglose de polvo". Va DEBAJO de las muestras y no encima:
+   no es una advertencia sobre la pagina, es una nota sobre lo que se acaba de
+   leer -- en concreto sobre el rojo, que sin especies se pinta corto. */
+.aw-key .aviso {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  /* `--text-secondary` y no `--text-muted`, que es el tono del resto de las
+     notas de este bloque. Medido sobre el fondo compuesto (rgb 18,18,20): el
+     tono apagado da 2,76 de contraste y este 6,82. Para una etiqueta de
+     seccion en mayusculas 2,76 pasa; para cuatro lineas de prosa que corrigen
+     como se lee el rojo, es enterrar el aviso donde nadie lo lee. */
+  color: var(--text-secondary, #aaa);
+}
+.aw-key .sw b {
+  margin-left: auto;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.68rem;
+  color: var(--text-muted, #777);
+}
+
+/* ===================== Carriles por objeto ========================== */
+.aw-lanes { margin-top: 20px; }
+.aw-lane {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px 0 6px;
+}
+.aw-lane .head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.aw-lane .head .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.aw-lane .head .n { font-weight: 600; color: var(--text-primary, #eee); }
+.aw-lane .head .q {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #aaa);
+  font-variant-numeric: tabular-nums;
+}
+.aw-lane .head .quitar {
+  margin-left: auto;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: none;
+  color: var(--text-muted, #888);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.aw-lane .head .quitar:hover {
+  border-color: rgba(209, 95, 95, 0.6);
+  color: #e08b8b;
+}
+.aw-profile { margin-top: 8px; position: relative; }
+.aw-profile svg { width: 100%; height: 104px; display: block; overflow: visible; }
+.aw-profile .grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
+.aw-profile .min { stroke: rgba(209, 95, 95, 0.34); stroke-dasharray: 3 4; }
+/* El eje de alturas, en HTML y encima del SVG. Pegado al borde izquierdo
+   porque la grafica no puede llevar margen lateral: ese margen es justo lo que
+   la desalinearia de la linea de tiempo. La sombra es para que se lea cuando
+   la curva pasa por detras. */
+.aw-eje {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.aw-eje span {
+  position: absolute;
+  left: 2px;
+  transform: translateY(-50%);
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+  /* Chapa oscura detras: las de 30 y 0 caen DENTRO del relleno, que es la parte
+     mas saturada de la grafica, y con sombra sola no se leian. */
+  color: rgba(190, 196, 210, 0.72);
+  background: rgba(10, 12, 16, 0.62);
+  padding: 0 3px;
+  border-radius: 3px;
+  line-height: 1.35;
+}
+.aw-profile .cursor { stroke: rgba(229, 181, 63, 0.75); stroke-width: 1.5; }
+.aw-profile rect.hit { fill: transparent; cursor: pointer; }
+.aw-profile rect.hit:hover { fill: rgba(255, 255, 255, 0.05); }
+.aw-detail {
+  margin-top: 8px;
+  min-height: 20px;
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--text-secondary, #aaa);
+}
+.aw-detail b { color: var(--text-primary, #eee); }
+
+/* ---- Lo que hoy limita, en rojo dentro del resumen ---- */
+.aw-cell.limita .v { color: #e06b6b; }
+.aw-cell.limita .k { color: #b56b6b; }
+
+/* ---- Filas plegables del semáforo ---- */
+.aw-lane-row.fold { margin-bottom: 10px; }
+.aw-lane-row.fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  padding: 7px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.aw-lane-row.fold > summary::-webkit-details-marker { display: none; }
+.aw-lane-row.fold > summary::after {
+  content: '▾';
+  margin-left: auto;
+  color: var(--text-muted, #777);
+  font-size: 0.75rem;
+  transition: transform 0.15s ease;
+}
+.aw-lane-row.fold[open] > summary::after { transform: rotate(180deg); }
+.aw-lane-row.fold > summary .lbl { margin: 0; }
+.aw-lane-row.fold > summary .cuenta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #888);
+  font-variant-numeric: tabular-nums;
+}
+.aw-lane-row.fold > summary .cuenta i {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+.aw-lane-row.fold > summary .cuenta i.verde { background: #6ec177; }
+.aw-lane-row.fold > summary .cuenta i.ambar { background: #d8a53c; }
+.aw-lane-row.fold > summary .cuenta i.rojo { background: #d15f5f; }
+.aw-lane-row.fold[open] .aw-lights { padding: 4px 0 10px; }
+
+/* ---- Hitos del perfil ---- */
+.aw-profile .hito { stroke-width: 1; }
+.aw-profile .hito.max { stroke: rgba(110, 193, 119, 0.5); }
+.aw-hitos {
+  position: relative;
+  height: 14px;
+  margin: 6px 0 -4px;
+}
+.aw-hitos .hito {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+.aw-hitos .hito.max { color: #6ec177; font-weight: 600; }
+
+/* ---- Objetos que el motor no ha puntuado ---- */
+.aw-lane .head .q.externo { font-variant-numeric: tabular-nums; color: var(--text-muted, #888); }
+/* Las coordenadas en monoespaciada: se leen para copiarlas, no para leerlas. */
+.aw-lane .head .q.coord {
+  font-family: var(--cb-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #888);
+  letter-spacing: -.01em;
+}
+.aw-externo {
+  margin: 8px 0 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-muted, #888);
+  border-left: 2px solid rgba(229, 181, 63, 0.35);
+  padding-left: 10px;
+}
+
+/* ---- Salida al buscador externo ---- */
+.aw-results button.fuera {
+  color: var(--gold-primary, var(--cb-gold));
+  border-bottom: none;
+}
+.aw-results .pista {
+  padding: 8px 13px 10px;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--text-muted, #777);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* La línea de tiempo va a lo ancho, encima de los carriles, y sin margen
+   lateral: su cursor y el de los perfiles tienen que caer en la misma vertical. */
+.aw-timeline { margin: 22px 0 0; }
+
+/* ---- El "?" que abre la explicación ---- */
+.aw-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px; height: 15px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--text-muted, #888);
+  font-size: 0.62rem;
+  cursor: help;
+  vertical-align: middle;
+}
+.aw-info:hover, .aw-info:focus { border-color: rgba(229, 181, 63, 0.6); color: var(--gold-primary, var(--cb-gold)); }
+.aw-info .aw-pop { bottom: calc(100% + 8px); left: auto; right: 0; }
+/* Cuando el "?" vive al principio de una línea, el globo tiene que abrirse
+   hacia la derecha o se sale de la pantalla por la izquierda. Y cuando vive
+   arriba del todo, hacia abajo, o se sale por el techo. */
+.aw-info.izq .aw-pop { left: 0; right: auto; }
+.aw-info.abajo .aw-pop { top: calc(100% + 8px); bottom: auto; }
+
+/* En móvil no hay anclaje que valga: el globo mide 340 px y la pantalla 375, así
+   que colgado de un "?" que no esté justo en el centro se sale por un lado.
+   Fijado a la ventana se queda donde estaba en vertical y ocupa el ancho útil,
+   que es lo único que cabe. */
+@media (max-width: 600px) {
+  .aw-info .aw-pop,
+  .aw-info.izq .aw-pop,
+  .aw-info.abajo .aw-pop {
+    position: fixed;
+    left: 12px; right: 12px;
+    top: auto; bottom: 12px;
+    width: auto;
+    max-height: 58vh;
+    overflow-y: auto;
+  }
+}
+.aw-info:hover .aw-pop, .aw-info:focus .aw-pop { opacity: 1; pointer-events: auto; }
+
+/* El porqué del veredicto, en el carril del objeto. */
+.aw-porque {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #aaa);
+}
+
+/* El veredicto al lado de las horas en la lista de resultados: "0,0 h" a secas
+   se lee como un fallo del buscador, y es una respuesta. */
+.aw-results button .h i {
+  font-style: normal;
+  font-size: 0.78rem;
+  margin-left: 6px;
+}
+.aw-results button .h i.ok { color: #7fc98a; }
+.aw-results button .h i.mid { color: var(--cb-gold); }
+.aw-results button .h i.low { color: #8a8a92; }
+
+/* ---- Referencias ---- */
+.aw-refs { margin-top: 14px; }
+.aw-refs > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.aw-refs > summary::-webkit-details-marker { display: none; }
+.aw-refs > summary::after { content: ' ▾'; }
+.aw-refs[open] > summary::after { content: ' ▴'; }
+.aw-refs .ref {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #aaa);
+  padding: 6px 0;
+}
+.aw-refs .ref b { color: var(--text-primary, #eee); display: block; }
+
+/* ---- Separación a la Luna en la cabecera del carril ---- */
+.aw-lane .head .q.luna { color: var(--text-secondary, #aaa); }
+.aw-lane .head .q.luna.cerca { color: #e0a06b; }
+
+/* La descarga del sitio vuelve incompleta a ratos. Decirlo es obligatorio:
+   un panel de dos casillas sin explicacion se lee como "el sitio esta asi". */
+.aw-stale.incompleta { color: #d8a53c; }
+
+/* ---- Buscador + desplegable de recomendados ---- */
+.aw-buscador { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+.aw-buscador .aw-search { flex: 1 1 260px; max-width: 400px; }
+.aw-reco {
+  flex: 1 1 320px;
+  max-width: 540px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #bbb);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(229, 181, 63, 0.22);
+  border-radius: 9px;
+  outline: none;
+  cursor: pointer;
+}
+.aw-reco:focus { border-color: rgba(229, 181, 63, 0.55); }
+.aw-reco optgroup { background: var(--cb-surface); color: var(--gold-primary, var(--cb-gold)); }
+.aw-reco option { background: var(--cb-surface); color: var(--text-secondary, #bbb); }
+
