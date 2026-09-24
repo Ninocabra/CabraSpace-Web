@@ -165,7 +165,7 @@ def page(lang, base, title, desc, body, og_image=None, extra_head="", extra_js="
   <title>{esc(title)}</title>
   <meta name="description" content="{esc(desc)}">{og}
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.3">
+  <link rel="stylesheet" href="index.css?v=1.4">
   <link rel="stylesheet" href="atlas/atlas.css">{extra_head}
 </head>
 <body>
