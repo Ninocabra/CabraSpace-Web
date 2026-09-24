@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitácora · maqueta Atlas</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Figtree:wght@300..700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="atlas.css">
+<link rel="stylesheet" href="maqueta.css">
+<style>
+.fb{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:48px;padding:0 18px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--t2);font-family:'Figtree',sans-serif;font-size:15.5px;font-weight:500;text-align:left;cursor:pointer;transition:border-color .6s cubic-bezier(.16,1,.3,1),color .6s cubic-bezier(.16,1,.3,1)}
+.fb:hover{border-color:var(--line);color:var(--tx)}
+.fb.on{border-color:rgba(229,181,63,.5);color:var(--gold2)}
+.fb small{font-family:'Bodoni Moda',Georgia,serif;font-style:italic;font-size:15px;color:var(--t3)}
+.mi{display:flex;flex-direction:column;gap:4px;padding:14px 18px;border-radius:16px;color:var(--tx)!important;transition:background-color .6s cubic-bezier(.16,1,.3,1)}
+.mi:hover{background:var(--s2)}
+.mi b{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:22px}
+.mi span{font-size:14px;color:var(--t3)}
+.mi:hover b{color:var(--gold2)}
+.ti{display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:16px;color:var(--tx)!important;transition:background-color .6s cubic-bezier(.16,1,.3,1)}
+.ti:hover{background:var(--s2)}
+.ti:hover .med{background:var(--gold);color:var(--ink)}
+.ti b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:20px}
+.ti small{display:block;font-size:13.5px;color:var(--t3);margin-top:2px}
+.ti .go{margin-left:auto}
+.ti:hover .go{color:var(--gold2)}
+.tile{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;min-height:100px;box-sizing:border-box;background:var(--s1);border:1px solid var(--line);border-radius:18px;color:var(--tx)!important;font-size:14.5px;font-weight:600}
+.tile::after{content:'';position:absolute;inset:5px;border:1px solid rgba(229,181,63,.14);border-radius:13px;pointer-events:none}
+.acc{display:flex;align-items:baseline;gap:14px;min-height:64px;padding:14px 4px;box-sizing:border-box;border-bottom:1px dotted rgba(199,191,169,.32);color:var(--tx)!important}
+.acc b{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;font-size:28px}
+.acc i{font-family:'Bodoni Moda',Georgia,serif;font-size:16px;color:var(--gold)}
+.acc small{margin-left:auto;font-size:13px;color:var(--t3)}
+</style>
+</head>
+<body>
+<a class="maq" href="index.html" title="Maqueta: no es la web publicada">Maqueta Atlas</a>
+<div class="a3 page" style="display: flex; flex-direction: column; background: #110d09; color: #fbf2e0; font-family: 'Figtree', sans-serif">
+<div class="grain" aria-hidden="true"></div>
+<div class="hdr" style="display: flex; flex-direction: column; font-family: 'Figtree', sans-serif; color: #fbf2e0; background: #110d09">
+<header class="jb" style="display: flex; align-items: center; justify-content: space-between; height: 96px; padding: 0 var(--gx); box-sizing: border-box">
+<a href="index.html" style="display: flex; align-items: center; gap: 14px" aria-label="CabraSpace, inicio">
+<img src="img/logo-gold.png" alt="" style="height: 40px; width: auto; display: block">
+<span class="bd" style="font-size: 27px; font-weight: 500; letter-spacing: 0.005em; color: var(--tx)">CabraSpace</span>
+</a>
+<nav class="navd" aria-label="Principal" style="display: flex; align-items: center; gap: 38px; margin-left: 120px; flex-grow: 1">
+<span class="mt mt-obs"><a href="observaciones.html" class="nl">Observaciones<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a><div class="mega mega-obs"><div class="card g12" style="padding: 40px var(--gb) 44px; border-radius: 0 0 28px 28px; border-top: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.9); transform: none">
+<div class="c3" style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px">
+<span class="caps" style="color: var(--gold); padding: 0 18px 10px">Fotografía</span>
+<a href="observaciones.html" class="mi"><b>Cielo profundo</b><span>Nebulosas, galaxias, cúmulos</span></a>
+<a href="observaciones.html" class="mi"><b>Sol en H-alfa</b><span>Protuberancias y superficie</span></a>
+<a href="eclipse-2026.html" class="mi"><b>Eclipses</b><span>12 · VIII · 2026, fotos y vídeo</span></a>
+</div>
+<div class="c3" style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px">
+<span class="caps" style="color: var(--gold); padding: 0 18px 10px">Medidas</span>
+<a href="ficha-tres3b.html" class="mi"><b>Exoplanetas</b><span>Curvas de luz de tránsitos</span></a>
+<a href="observaciones.html" class="mi"><b>Fotometría</b><span>Series y estrellas variables</span></a>
+<a href="observaciones.html" class="mi"><b>Tránsitos por el Sol y la Luna</b><span>Aviones y satélites, en vídeo</span></a>
+</div>
+<div class="c6" style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 14px; padding-left: 32px; border-left: 1px solid var(--line)">
+<span class="caps" style="color: var(--t3)">Lo último</span>
+<a href="ficha-tres3b.html" class="zbox g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: center; color: var(--tx)">
+<div class="plate" style="height: 210px; background: var(--bg)"><div class="plate-in" style="background: #1b140e"><img class="zoom" src="img/tres3b_curva.png" alt="Curva de luz de TrES-3 b" style="object-fit: contain; filter: none"></div></div>
+<span style="display: flex; flex-direction: column; gap: 10px"><span class="cap" style="padding: 0"><span class="caps">Lám. II</span><span class="bd">15 · IX</span></span><span class="bd" style="font-size: 30px; line-height: 1.1">Tránsito de <em class="gi">TrES-3 b</em></span></span>
+</a>
+<a class="lnk" href="observaciones.html" style="margin-top: 8px">Todas las observaciones<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</div></div></span>
+<a href="programas.html" class="nl">Programas</a>
+<a href="bitacora.html" class="nl on">Bitácora</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 22px">
+<span class="mt mt-herr"><a href="herramientas.html" class="hw"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span class="hwl">Herramientas web</span></a><div class="mega mega-herr"><div class="card gold" style="width: min(760px, 100%); padding: 30px 26px 24px; border-radius: 0 0 28px 28px; border-top: 0; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.9); transform: none">
+<span class="caps" style="color: var(--gold); padding: 0 16px 12px">Se abren en el navegador · sin instalar</span>
+<div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px">
+<a href="herramientas.html" class="ti"><span class="med" style="width: 44px; height: 44px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span><b>CabraSpace Web</b><small>Procesado en el navegador · beta</small></span><span class="go">Abrir</span></a>
+<a href="herramientas.html" class="ti"><span class="med" style="width: 44px; height: 44px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg></span><span><b>Astro Forecast</b><small>La noche en AstroCamp</small></span><span class="go">Abrir</span></a>
+<a href="herramientas.html" class="ti"><span class="med" style="width: 44px; height: 44px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg></span><span><b>AutoGHS</b><small>Estirado GHS automático</small></span><span class="go">Abrir</span></a>
+<a href="herramientas.html" class="ti"><span class="med" style="width: 44px; height: 44px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span><b>Contaminación</b><small>Brillo del cielo por zonas</small></span><span class="go">Abrir</span></a>
+<a href="herramientas.html" class="ti"><span class="med" style="width: 44px; height: 44px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg></span><span><b>PixelMath-teca</b><small>Fórmulas para copiar</small></span><span class="go">Abrir</span></a>
+<a href="herramientas.html" class="ti" style="opacity: 0.55"><span class="med" style="width: 44px; height: 44px; border-style: dashed"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"></circle><path d="M2 20 22 4"></path></svg></span><span><b>CabraPlanes</b><small>Próximamente</small></span></a>
+</div>
+<div class="jb" style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 16px 16px 0; border-top: 1px dotted rgba(199,191,169,0.32)"><span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3)">¿Algo para instalar en PixInsight?</span><a class="lnk" href="programas.html">Programas</a></div>
+</div></div></span>
+<button class="ic navd" type="button" aria-label="Modo noche"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+<span class="caps navd" style="font-size: 12px; letter-spacing: 0.2em"><span style="color: var(--tx)">ES</span><span style="color: var(--t3)"> · EN</span></span>
+</div>
+<button class="ic hamb" type="button" aria-label="Abrir menú" aria-controls="mmenu" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></header>
+<div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
+</div><div class="mmenu" id="mmenu" hidden><div class="mmenu-in a3"><div class="ret" aria-hidden="true" style="opacity: 0.6"></div><div class="mm-top"><a href="index.html" style="display: flex; align-items: center; gap: 10px"><img src="img/logo-gold.png" alt="" style="height: 30px; width: auto; display: block"><span class="bd" style="font-size: 22px; font-weight: 500; color: var(--tx)">CabraSpace</span></a><button class="ic" type="button" aria-label="Cerrar menú"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div><div style="position: relative; padding: 26px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<span class="caps" style="font-size: 11.5px; color: var(--gold)">Úsalas ahora · sin instalar</span>
+<div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<a href="herramientas.html" class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5b53f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>CabraSpace Web</a>
+<a href="herramientas.html" class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5b53f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg>Astro Forecast</a>
+<a href="herramientas.html" class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5b53f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg>AutoGHS</a>
+<a href="herramientas.html" class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e5b53f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>Contaminación</a>
+</div>
+<a class="lnk" href="herramientas.html" style="font-size: 14px">Todas las herramientas</a>
+</div>
+<nav aria-label="Principal" style="position: relative; padding: 22px 16px 0; display: flex; flex-direction: column">
+<a href="observaciones.html" class="acc"><i>I.</i><b>Observaciones</b><small>Fotografía · Medidas</small></a>
+<a href="programas.html" class="acc"><i>II.</i><b>Programas</b><small>Para instalar</small></a>
+<a href="bitacora.html" class="acc"><i>III.</i><b style="font-size: 23px; color: var(--t2)">Bitácora</b><small>Novedades</small></a>
+</nav>
+<div class="jb" style="position: relative; padding: 28px 16px; display: flex; justify-content: space-between; align-items: center"><span class="bd" style="font-size: 22px; font-style: italic; color: var(--t2)">Cielos despejados.</span><span class="caps" style="font-size: 12px; letter-spacing: 0.2em"><span style="color: var(--tx)">ES</span><span style="color: var(--t3)"> · EN</span></span></div></div></div>
+
+<section class="jb" style="padding: clamp(32px, 5.56vw, 80px) var(--gx) clamp(22px, 3.89vw, 56px); display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Nº IV</span><span class="caps" style="color: var(--t2)">Registro</span></div>
+<h1 class="bd" style="margin: 0; font-size: clamp(32px, 5.0vw, 72px); font-weight: 400; line-height: 1; letter-spacing: -0.02em; color: var(--t2)">Bitá<em class="gi">cora</em></h1>
+</div>
+<p style="margin: 0 0 8px; max-width: min(440px, 100%); font-size: 16.5px; line-height: 1.7; color: var(--t3)">Novedades de equipo y de software, cursos y archivo. Recopilado cada día; se consulta, no se anuncia.</p>
+</section>
+
+<section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 0 var(--gx) clamp(48px, 8.33vw, 120px)">
+<aside class="c3" aria-label="Filtros" style="grid-column: span 3; display: flex; flex-direction: column; gap: 6px">
+<button type="button" class="fb on" data-k="Todo">Todo<small>IX</small></button>
+<button type="button" class="fb" data-k="Equipo">Equipo<small>III</small></button>
+<button type="button" class="fb" data-k="Software">Software<small>II</small></button>
+<button type="button" class="fb" data-k="Mis programas">Mis programas<small>I</small></button>
+<button type="button" class="fb" data-k="Cursos">Cursos<small>I</small></button>
+<button type="button" class="fb" data-k="Contaminación">Contaminación<small>I</small></button>
+<button type="button" class="fb" data-k="Archivo">Archivo<small>I</small></button>
+<p class="bd" style="margin: 28px 18px 0; font-size: 15px; font-style: italic; line-height: 1.6; color: var(--t3)">Sustituye a los menús de hoy: Novedades, Equipamiento, Cursos, Vídeos y guías y Divulgación.</p>
+</aside>
+<div class="c8" style="grid-column: 5 / span 8; display: flex; flex-direction: column">
+<h3 class="bd" style="margin: 0; padding: 0 8px 14px; font-size: 22px; font-weight: 400; font-style: italic; color: var(--t2); border-bottom: 1px solid var(--line)"><span id="bh">Todo, lo más reciente primero</span></h3>
+<a class="row gfix" data-kind="Equipo" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">22 · IX</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Anuncio de la cámara ZWO ASI2600MC Duo</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">ZWO</span></span><span class="tg" style="align-self: center">Equipo</span></a>
+<a class="row gfix" data-kind="Equipo" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">22 · IX</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Trinity, la nueva montura modular de viaje de ML Astro</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">Stargazers Lounge</span></span><span class="tg" style="align-self: center">Equipo</span></a>
+<a class="row gfix" data-kind="Software" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">19 · IX</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Análisis de PixInsight 1.9.5 y novedades en astrofotografía</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">YouTube</span></span><span class="tg" style="align-self: center">Software</span></a>
+<a class="row gfix" data-kind="Software" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">18 · IX</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Comparativa de MLDenoise de PixInsight frente a NoiseXTerminator</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">YouTube</span></span><span class="tg" style="align-self: center">Software</span></a>
+<a class="row gfix" data-kind="Mis programas" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">[fecha]</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">[PI Workflow vX.Y: qué cambia]</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">Historial de cambios</span></span><span class="tg" style="align-self: center">Mis programas</span></a>
+<a class="row gfix" data-kind="Equipo" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">14 · IX</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Nuevo astrógrafo Celestron RASA 6</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">Stargazers Lounge</span></span><span class="tg" style="align-self: center">Equipo</span></a>
+<a class="row gfix" data-kind="Cursos" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">[fecha]</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">[Curso de PixInsight en YouTube]</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">YouTube</span></span><span class="tg" style="align-self: center">Cursos</span></a>
+<a class="row gfix" data-kind="Contaminación" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">[fecha]</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">[Vídeo o guía sobre contaminación lumínica]</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">[fuente]</span></span><span class="tg" style="align-self: center">Contaminación</span></a>
+<a class="row gfix" data-kind="Archivo" href="#" style="grid-template-columns: 84px minmax(0, 1fr) auto"><span class="bd rd" style="font-size: 17px; padding-top: 1px">[fecha]</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="rt" style="font-size: 17.5px; line-height: 1.5">Coffee Break: señal y ruido</span><span class="bd" style="font-size: 14.5px; font-style: italic; color: var(--t3)">CabraSpace</span></span><span class="tg" style="align-self: center">Archivo</span></a>
+<div style="display: flex; justify-content: center; padding-top: 36px"><a class="ghost" href="bitacora.html">Cargar más</a></div>
+</div>
+</section>
+<div style="flex-grow: 1"></div>
+<footer style="box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: clamp(29px, 5.0vw, 72px) var(--gx) 48px; font-family: 'Figtree', sans-serif; color: #fbf2e0; background: #110d09">
+<span class="bd" style="margin-top: 0; font-size: clamp(28px, 4.44vw, 64px); font-weight: 400; font-style: italic; line-height: 1; letter-spacing: -0.02em; color: var(--tx)">Cielos despejados.</span>
+<div style="display: flex; gap: 18px; margin-top: 36px">
+<a class="ghost" href="#">YouTube</a>
+<a class="ghost" href="#">Contacto</a>
+</div>
+<div class="dbl" aria-hidden="true" style="width: 100%; margin-top: clamp(22px, 3.89vw, 56px)"></div>
+<div class="jb" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding-top: 24px">
+<span style="display: flex; align-items: center; gap: 12px"><img src="img/logo-gold.png" alt="" style="height: 28px; width: auto; display: block"><span class="caps" style="font-size: 11.5px; color: var(--t3)">CabraSpace · MMXXVI</span></span>
+<nav aria-label="Pie de página" style="display: flex; gap: 32px">
+<a class="nl" href="observaciones.html" style="font-size: 14px">Observaciones</a>
+<a class="nl" href="herramientas.html" style="font-size: 14px">Herramientas web</a>
+<a class="nl" href="programas.html" style="font-size: 14px">Programas</a>
+<a class="nl" href="bitacora.html" style="font-size: 14px">Bitácora</a>
+<a class="nl" href="#" style="font-size: 14px">English</a>
+</nav>
+</div>
+</footer>
+</div>
+<script src="maqueta.js"></script>
+<script>
+(function(){var fb=document.querySelectorAll('[data-k]');fb.forEach(function(b){b.addEventListener('click',function(){
+var k=b.getAttribute('data-k');fb.forEach(function(x){x.classList.toggle('on',x===b)});
+document.getElementById('bh').textContent=k==='Todo'?'Todo, lo más reciente primero':k;
+document.querySelectorAll('[data-kind]').forEach(function(r){r.style.display=(k==='Todo'||r.getAttribute('data-kind')===k)?'':'none'});});});})();
+</script>
+</body>
+</html>
