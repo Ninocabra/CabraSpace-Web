@@ -18,6 +18,9 @@ obs/<slug>/) y vuelve a ejecutar los tres comandos.
 import html
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://cabraspace.com"
@@ -67,34 +70,12 @@ ICON = {
 }
 ARROW = ICON["arrow"]
 
-# Constellation of Capricornus for the home page (star positions from the Atlas style study).
-STARS = [(285, 30, 2.6), (277, 58, 3), (206, 184, 2), (191, 203, 2), (93, 149, 2.5), (62, 114, 1.8), (35, 73, 3.3), (54, 80, 2.5), (105, 82, 1.9), (150, 86, 2.1)]
-GREEK = [(293, 26, "α"), (286, 64, "β"), (21, 67, "δ"), (56, 70, "γ"), (87, 167, "ζ"), (199, 215, "ω")]
-LINES = ["M285 30 L277 58", "M277 58 L150 86 L105 82 L54 80 L35 73", "M277 58 L206 184 L191 203 L93 149 L62 114 L35 73"]
+import capricornus as capri  # noqa: E402  (tools/capricornus.py: chart + animation)
 
 
 def capricornus(lang):
-    o = ['<svg class="carta" width="430" height="290" viewBox="-20 -10 370 250" role="img" aria-label="'
-         + esc(T("Carta de la constelación de Capricornio", "Chart of the constellation Capricornus")(lang)) + '">']
-    for x in (40, 165, 290):
-        o.append(f'<path d="M{x} -10 L{x} 240" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path>')
-    for y in (40, 140):
-        o.append(f'<path d="M-20 {y} L350 {y}" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path>')
-    for x, t in ((290, "XX h"), (165, "XXI h"), (40, "XXII h")):
-        o.append(f'<text x="{x + 4}" y="236" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">{t}</text>')
-    for y, t in ((40, "−15°"), (140, "−25°")):
-        o.append(f'<text x="-16" y="{y - 4}" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">{t}</text>')
-    o.append('<path d="M340 128 Q175 92 -18 22" fill="none" stroke="rgba(224,96,63,0.45)" stroke-width="1" stroke-dasharray="5 5"></path>')
-    o.append('<text x="262" y="140" font-family="Bodoni Moda, serif" font-style="italic" font-size="11" fill="rgba(224,96,63,0.5)">'
-             + T("eclíptica", "ecliptic")(lang) + '</text>')
-    for d in LINES:
-        o.append(f'<path d="{d}" fill="none" stroke="rgba(229,181,63,0.5)" stroke-width="1"></path>')
-    for x, y, r in STARS:
-        o.append(f'<circle cx="{x}" cy="{y}" r="{r + 3}" fill="#110d09"></circle><circle cx="{x}" cy="{y}" r="{r * 0.85:.2f}" fill="rgba(248,241,226,0.85)"></circle>')
-    for x, y, t in GREEK:
-        o.append(f'<text x="{x}" y="{y}" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">{t}</text>')
-    o.append("</svg>")
-    return "".join(o)
+    svg, _ = capri.chart(lang)
+    return svg
 
 
 # ---------------------------------------------------------------- shared text
@@ -310,6 +291,7 @@ def build_home(lang, obs):
       <figure class="c5" style="position: relative; grid-column: 8 / span 5; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 18px">
         {capricornus(lang)}
         <figcaption class="cap"><span class="caps">{T("Carta I", "Chart I")(lang)}</span><span class="bd">{T("Capricornus, la cabra del cielo", "Capricornus, the sky goat")(lang)}</span></figcaption>
+        {capri.chart(lang)[1]}
       </figure>
     </section>
 
@@ -360,7 +342,7 @@ def build_home(lang, obs):
     title = T("CabraSpace · Fotografía y medidas del cielo", "CabraSpace · Photographing and measuring the sky")(lang)
     desc = T("Astrofotografía de cielo profundo, tránsitos de exoplanetas y el eclipse de 2026 desde Nerpio, y herramientas web gratuitas para procesar y planificar.",
              "Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from Nerpio, plus free web tools to process and plan.")(lang)
-    return page(lang, "index.html", title, desc, body, extra_js=js)
+    return page(lang, "index.html", title, desc, body, extra_js=js + "\n" + capri.script(lang))
 
 
 def build_observaciones(lang, obs):
