@@ -21,10 +21,14 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20260924"
+VERSION = "20260924b"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
+EXTRA_CSS = {  # capa de estilo propia de algunas páginas, enlazada justo después de atlas.css
+    "cabraspace-imaging-workflow": "atlas/tools.css", "autoghs": "atlas/tools.css", "pixelmath": "atlas/tools.css",
+    "astroforecast": "atlas/astroforecast.css",
+}
 WITH_FOOTER = {"astroforecast.html", "astroforecast-en.html"}  # no tenían pie; lo reciben
 
 MARKER = "<!-- NAV-AUTO: cabecera, cajón y pie generados por tools/sync_nav.py; editar ahí y re-ejecutar -->"
@@ -239,6 +243,12 @@ def process(fname, txt):
         txt = css_re.sub(CSS_LINK, txt)
     elif "</head>" in txt:
         txt = txt.replace("</head>", f"  {CSS_LINK}\n</head>", 1)
+    base = fname[:-len("-en.html")] if fname.endswith("-en.html") else fname[:-len(".html")]
+    extra = EXTRA_CSS.get(base)
+    if extra:
+        link = f'<link rel="stylesheet" href="{extra}?v={VERSION}">'
+        txt = re.sub(r'\s*<link rel="stylesheet" href="' + re.escape(extra) + r'[^"]*">', "", txt)
+        txt = txt.replace(CSS_LINK, CSS_LINK + "\n  " + link, 1)
     # header + drawer
     txt = drawer_re.sub("", txt)
     txt = overlay_re.sub("", txt)

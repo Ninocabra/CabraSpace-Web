@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Herramientas web en estilo Atlas: CabraSpace Web, AutoGHS y PixelMath-teca.
+   Se carga después de atlas/atlas.css (lo enlaza tools/sync_nav.py) y SOLO cambia el aspecto:
+   ningún id, ninguna clase que lea el JavaScript, ningún tamaño que use el lienzo.
+   ========================================================================== */
+
+/* ---------- tarjetas (el filete dorado interior del Atlas) ---------- */
+.simulator-card, .library-card, .piw-card {
+  background: var(--s1) !important; border: 1px solid var(--line) !important; border-radius: 22px !important;
+  box-shadow: 0 30px 70px -40px rgba(0,0,0,.9) !important;
+}
+.simulator-card, .library-card { position: relative; }
+.simulator-card::after, .library-card::after, .piw-card::after {
+  content: ''; position: absolute; inset: 7px; border: 1px solid rgba(229,181,63,.14); border-radius: 16px; pointer-events: none;
+}
+.piw-container { --piw-panel: var(--s1); --piw-panel-border: var(--line); --piw-radius: 22px; }
+
+/* ---------- cajas interiores oscuras ---------- */
+.canvas-wrapper, .pm-console, .detail-code-box, .file-upload-zone, .detail-empty-state,
+.piw-console, .piw-subcard, .piw-action-card, .piw-channel-row {
+  background: #0d0a07 !important; border-color: var(--line) !important; border-radius: 14px !important;
+}
+.file-upload-zone { border-style: dashed !important; }
+.file-upload-zone:hover, .piw-action-card:hover { border-color: rgba(229,181,63,.45) !important; }
+.library-search-wrapper input, .piw-select {
+  background: #0d0a07 !important; border: 1px solid var(--line) !important; border-radius: 999px !important;
+  font-family: var(--a-sans) !important; color: var(--tx) !important;
+}
+.library-search-wrapper input:focus, .piw-select:focus { border-color: rgba(229,181,63,.55) !important; }
+.piw-select { border-radius: 12px !important; }
+
+/* ---------- rótulos: versalitas Bodoni, no mayúsculas de máquina ---------- */
+.console-header, .inputs-title, .detail-code-title, .category-group-header, .piw-subcard-header, .piw-eyebrow,
+.detail-category-badge, .piw-slots-label, .piw-readout-lbl {
+  font-family: var(--a-disp) !important; font-weight: 500 !important; letter-spacing: .2em !important;
+  font-size: 11px !important; color: var(--t3) !important;
+}
+.console-header, .detail-code-title, .piw-subcard-header { border-color: var(--line) !important; }
+.detail-category-badge { border-radius: 999px !important; border-color: rgba(229,181,63,.4) !important; color: var(--gold2) !important; }
+
+/* títulos de sección de CabraSpace Web: Bodoni, sin mayúsculas */
+.piw-section-title {
+  font-family: var(--a-disp) !important; font-size: 1.12rem !important; font-weight: 500 !important;
+  text-transform: none !important; letter-spacing: -.005em !important; color: var(--tx) !important;
+}
+.piw-section { border-bottom: 1px dotted rgba(199,191,169,.3) !important; }
+.control-title, .piw-label { color: var(--tx); }
+.control-val, .piw-value { font-family: var(--a-mono) !important; color: var(--gold2) !important; font-weight: 500 !important; }
+
+/* ---------- botones: píldoras, sin mayúsculas forzadas ---------- */
+.btn-action, .btn-primary-action, .piw-btn, .btn-reset-inputs {
+  border-radius: 999px !important; text-transform: none !important; letter-spacing: .01em !important;
+  font-family: var(--a-sans) !important; border-color: var(--line) !important;
+  transition: background-color .6s var(--ease), border-color .6s var(--ease), color .6s var(--ease) !important;
+}
+.btn-action:hover:not(:disabled), .piw-btn:hover:not(:disabled), .btn-reset-inputs:hover {
+  border-color: rgba(229,181,63,.55) !important; color: var(--tx) !important;
+}
+.btn-primary-action, .piw-btn.primary {
+  border-color: rgba(229,181,63,.7) !important; color: var(--gold2) !important; background: rgba(229,181,63,.06) !important;
+}
+.btn-primary-action:hover:not(:disabled), .piw-btn.primary:hover:not(:disabled) {
+  background: var(--gold) !important; color: var(--ink) !important; border-color: var(--gold) !important;
+}
+.btn-reset-inputs { border-color: rgba(229,181,63,.35) !important; color: var(--gold2) !important; background: transparent !important; cursor: pointer; }
+.piw-tool-btn, .piw-slot-btn, .piw-segment-btn { border-radius: 999px !important; }
+/* los botones de acción pueden partir el texto en dos líneas: redondeo moderado, no píldora */
+.btn-action, .btn-primary-action { border-radius: 16px !important; }
+.piw-tabs-nav { border-radius: 14px !important; border-color: var(--line) !important; background: #0d0a07 !important; }
+.piw-tab-btn { font-family: var(--a-sans) !important; }  /* su forma de flecha (clip-path) se respeta */
+
+/* estados que marca el JavaScript: se respetan encima de las cajas oscuras */
+.piw-channel-row.loaded { border-color: var(--gold) !important; background: rgba(229,181,63,.07) !important; }
+.piw-channel-row:hover { border-color: rgba(229,181,63,.4) !important; }
+.piw-action-card.active-cc { border-color: var(--gold) !important; background: rgba(229,181,63,.06) !important; }
+.piw-action-card.disabled:hover { border-color: var(--line) !important; }
+
+/* ---------- listas de la biblioteca de fórmulas ---------- */
+.formula-list-item { border-radius: 12px !important; background: #0d0a07 !important; border-color: var(--line) !important; }
+.formula-list-item:hover { border-color: rgba(229,181,63,.4) !important; }
+.formula-list-item.active { background: rgba(229,181,63,.07) !important; border-color: var(--gold) !important; }
+.pm-console, .piw-console, .detail-code-box { font-family: var(--a-mono) !important; }
+
+/* ---------- CabraSpace Web: rótulos en una línea ---------- */
+.piw-slots-label { letter-spacing: .12em !important; }
+@media (min-width: 1101px) { .piw-slots-label { white-space: nowrap; } }
+.piw-channel-name { font-size: .78rem; line-height: 1.25; min-width: 0; margin-left: 6px !important; }
+.piw-channel-file { flex-shrink: 1; min-width: 0; max-width: 62px !important; font-size: .64rem !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.piw-channel-dot, .piw-drop-icon { flex-shrink: 0; }
