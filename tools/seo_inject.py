@@ -47,6 +47,7 @@ def build_block(fname):
     txt = open(path, encoding="utf-8", errors="replace").read()
     title = extract(txt, r"<title>(.*?)</title>")
     desc = extract(txt, r'<meta name="description" content="([^"]*)"')
+    og_image = extract(txt, r'<meta name="cabra:og-image" content="([^"]*)"') or DEFAULT_OG_IMAGE
 
     lang = lang_of(fname)
     twin = twin_of(fname)
@@ -69,17 +70,28 @@ def build_block(fname):
   <meta property="og:url" content="{self_url}">
   <meta property="og:title" content="{title}">
   <meta property="og:description" content="{desc}">
-  <meta property="og:image" content="{DEFAULT_OG_IMAGE}">
+  <meta property="og:image" content="{og_image}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{title}">
   <meta name="twitter:description" content="{desc}">
-  <meta name="twitter:image" content="{DEFAULT_OG_IMAGE}">
+  <meta name="twitter:image" content="{og_image}">
   <!-- SEO-AUTO-END -->
 """
 
 
+def pages():
+    """Páginas públicas: todas las *.html de la raíz salvo borradores y redirecciones."""
+    out = []
+    for path in sorted(glob.glob(os.path.join(ROOT, "*.html"))):
+        f = os.path.basename(path)
+        if f.startswith("borrador-") or f in ("pi-workflow.html", "pi-workflow-en.html"):
+            continue
+        out.append(path)
+    return out
+
+
 def inject_all():
-    files = sorted(glob.glob(os.path.join(ROOT, "*.html")))
+    files = pages()
     changed = 0
     for path in files:
         fname = os.path.basename(path)
@@ -99,7 +111,7 @@ def inject_all():
 
 
 def write_sitemap():
-    files = sorted(glob.glob(os.path.join(ROOT, "*.html")))
+    files = pages()
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
              '        xmlns:xhtml="http://www.w3.org/1999/xhtml">']

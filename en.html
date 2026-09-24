@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
 <head>
   <link rel="icon" href="favicon_cabra.png" type="image/png">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CabraSpace - Exploring the cosmos through the lens</title>
-  <meta name="description" content="Deep-sky astrophotography, astronomical outreach, and equipment reviews. Welcome to CabraSpace.">
+  <title>CabraSpace · Photographing and measuring the sky</title>
+  <meta name="description" content="Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from Nerpio, plus free web tools to process and plan.">
+  <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
   <link rel="stylesheet" href="index.css?v=1.3">
-  <link rel="stylesheet" href="support.css">
+  <link rel="stylesheet" href="atlas/atlas.css?v=20260924">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/en.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/">
@@ -18,239 +18,109 @@
   <meta property="og:site_name" content="CabraSpace">
   <meta property="og:locale" content="en_GB">
   <meta property="og:url" content="https://cabraspace.com/en.html">
-  <meta property="og:title" content="CabraSpace - Exploring the cosmos through the lens">
-  <meta property="og:description" content="Deep-sky astrophotography, astronomical outreach, and equipment reviews. Welcome to CabraSpace.">
+  <meta property="og:title" content="CabraSpace · Photographing and measuring the sky">
+  <meta property="og:description" content="Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from Nerpio, plus free web tools to process and plan.">
   <meta property="og:image" content="https://cabraspace.com/logo.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CabraSpace - Exploring the cosmos through the lens">
-  <meta name="twitter:description" content="Deep-sky astrophotography, astronomical outreach, and equipment reviews. Welcome to CabraSpace.">
+  <meta name="twitter:title" content="CabraSpace · Photographing and measuring the sky">
+  <meta name="twitter:description" content="Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from Nerpio, plus free web tools to process and plan.">
   <meta name="twitter:image" content="https://cabraspace.com/logo.png">
   <!-- SEO-AUTO-END -->
 </head>
 <body>
-  <!-- FOUC Preventer for Night Mode -->
   <script>
-    if (localStorage.getItem('night-vision') === 'enabled') {
-      document.body.classList.add('night-vision');
-    }
+    if (localStorage.getItem('night-vision') === 'enabled') { document.body.classList.add('night-vision'); }
   </script>
-
-  <!-- Background Overlays for Resend Aesthetic -->
-  <div class="grid-overlay"></div>
-  <div class="radial-glow"></div>
-
-  <!-- Header / Navigation -->
-  <header id="navbar">
-    <!-- NAV-AUTO: menu generado por tools/sync_nav.py; editar ahi y re-ejecutar -->
-    <div class="container nav-container">
-      <a href="en.html" class="logo-link">
-        <img src="logo.webp" alt="CabraSpace Logo">
-        <span>CabraSpace</span>
-      </a>
-
-      <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-
-      <ul class="nav-menu">
-        <li><a href="en.html" class="nav-link">Home</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
-            <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
-          </ul>
-        </li>
-        <li><a href="pi-workflow-en.html" class="nav-link">PI Workflow (BETA)</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast AstroCamp</a></li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
-                <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
-                <li><a href="cursos-youtube-en.html" class="dropdown-item">YouTube Courses</a></li>
-
-                <li><a href="autoghs-en.html" class="dropdown-item">AutoGHS</a></li>
-              </ul>
-            </li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="contaminacion-mapa-en.html" class="dropdown-item">Light Pollution Map</a></li>
-                <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
-          </ul>
-        </li>
-      </ul>
-
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Night Mode" title="Astronomical Night Mode">
-          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        </button>
-        <div class="lang-switcher">
-          <a href="index.html" class="lang-link">ES</a>
-          <span class="lang-separator">|</span>
-          <a href="en.html" class="lang-link active">EN</a>
-        </div>
+  <header id="navbar" class="ah">
+    <!-- NAV-AUTO: cabecera, cajón y pie generados por tools/sync_nav.py; editar ahí y re-ejecutar -->
+    <div class="ah-bar">
+      <a href="en.html" class="ah-logo" aria-label="CabraSpace, home"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a>
+      <nav class="ah-nav" aria-label="Main">
+        <div class="mt"><a href="observaciones-en.html" class="nl" data-sec="obs">Observations<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a><div class="mega mega-obs"><div class="card" style="padding: 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px"><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Photography</span><a href="observaciones-en.html#cielo-profundo" class="mi"><b>Deep sky</b><span>Galaxies and nebulae</span></a><a href="eclipse-2026-en.html" class="mi"><b>Eclipses</b><span>12 Aug 2026, on video</span></a></div><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Measurements</span><a href="observaciones-en.html#exoplanetas" class="mi"><b>Exoplanets</b><span>Transit light curves</span></a></div><div style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 14px; padding-left: 32px; border-left: 1px solid var(--line)"><span class="caps" style="color: var(--t3)">Latest</span><a href="transito-qatar1b-2026-09-22-en.html" class="zbox" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: center; color: var(--tx)"><span class="plate" style="display: block; height: 190px; background: var(--bg)"><span class="plate-in" style="display: block; background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></span></span><span style="display: flex; flex-direction: column; gap: 10px"><span class="cap" style="padding: 0"><span class="caps">Pl. IX</span><span class="bd">22 Sep</span></span><span class="bd" style="font-size: 28px; line-height: 1.1">Transit of <em class="gi">Qatar-1 b</em></span></span></a><a class="lnk" href="observaciones-en.html" style="margin-top: 6px">All observations<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div></div></div></div>
+        <a href="programas-en.html" class="nl" data-sec="prog">Software</a>
+        <a href="bitacora-en.html" class="nl" data-sec="bit">Logbook</a>
+      </nav>
+      <div class="ah-right">
+        <div class="mt"><a href="herramientas-en.html" class="hw" data-sec="herr"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span class="hwl">Web tools</span></a><div class="mega mega-herr"><div class="card gold" style="padding: 28px 24px 22px"><span class="caps" style="color: var(--gold); padding: 0 16px 12px">Open in your browser · nothing to install</span><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px"><a href="cabraspace-imaging-workflow-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span><b>CabraSpace Web</b><small>Processing in the browser · beta</small></span><span class="go">Open</span></a><a href="astroforecast-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg></span><span><b>Astro Forecast</b><small>Tonight at AstroCamp</small></span><span class="go">Open</span></a><a href="autoghs-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg></span><span><b>AutoGHS</b><small>Automatic GHS stretch</small></span><span class="go">Open</span></a><a href="contaminacion-mapa-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span><b>Light pollution</b><small>Sky brightness map</small></span><span class="go">Open</span></a><a href="pixelmath-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg></span><span><b>PixelMath-teca</b><small>Formulas ready to copy</small></span><span class="go">Open</span></a><span class="ti" style="opacity: .55"><span class="med" style="border-style: dashed"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"></circle><path d="M2 20 22 4"></path></svg></span><span><b>CabraPlanes</b><small>Coming soon</small></span></span></div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 16px 16px 0; border-top: 1px dotted rgba(199,191,169,.32)"><span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3)">Looking for something to install in PixInsight?</span><a class="lnk" href="programas-en.html">Software</a></div></div></div></div>
+        <button class="ic ah-night" type="button" aria-label="Night mode" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+        <span class="caps ah-lang"><a href="index.html" lang="es">ES</a> · <a href="en.html" lang="en" class="on">EN</a></span>
+        <button class="ic ah-burger" type="button" aria-label="Open menu" aria-controls="atlas-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
       </div>
     </div>
+    <div class="dbl" aria-hidden="true"></div>
   </header>
+  <div class="ad" id="atlas-drawer" hidden><div class="ad-in">
+    <div class="ad-top"><a href="en.html"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a><button class="ic ad-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+    <div class="ad-sec"><span class="caps" style="font-size: 11.5px; color: var(--gold)">Use them now · nothing to install</span><div class="ad-tiles"><a href="cabraspace-imaging-workflow-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>CabraSpace Web</a><a href="astroforecast-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg>Astro Forecast</a><a href="autoghs-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg>AutoGHS</a><a href="contaminacion-mapa-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>Light pollution</a></div><a class="lnk" href="herramientas-en.html" style="font-size: 14px">All web tools</a></div>
+    <nav class="ad-sec" aria-label="Main" style="padding-top: 8px; gap: 0"><a href="observaciones-en.html" class="acc"><i>I.</i><b>Observations</b><small>Photography · Measurements</small></a><a href="programas-en.html" class="acc"><i>II.</i><b>Software</b><small>Desktop software</small></a><a href="bitacora-en.html" class="acc sub"><i>III.</i><b>Logbook</b><small>News</small></a></nav>
+    <div class="ad-foot"><button class="ic ah-night" type="button" aria-label="Night mode" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button><span class="caps ah-lang"><a href="index.html" lang="es">ES</a> · <a href="en.html" lang="en" class="on">EN</a></span></div>
+  </div></div>
+  <main class="a3 page">
+    <div class="grain" aria-hidden="true"></div>
 
-  <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
-
-  <!-- Live Dashboard Section -->
-  <section id="dashboard" class="dashboard-section container">
-    <h2 class="section-title">Latest Updates</h2>
-    <p class="section-subtitle">Real-time updates from our software and astronomical equipment databases.</p>
-    
-    <!-- Web Site Updates (Horizontal Updates) -->
-    <div class="dashboard-col" style="margin-bottom: 40px; width: 100%;">
-      <h3 class="col-title" style="margin-bottom: 24px;">Web Site Updates</h3>
-      <div class="dashboard-list">
-        <div class="dashboard-item" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
-          <div class="dashboard-meta">
-            <span style="color: var(--gold-primary); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;">Web Update</span>
-          </div>
-          <h4 style="text-transform: none; font-size: 0.9rem; font-weight: normal; margin-top: 8px; line-height: 1.5; color: var(--text-secondary);">
-            <strong style="color: var(--text-primary); font-weight: 600;">PI Workflow</strong> is now available for <strong style="color: var(--text-primary); font-weight: 600;">PixInsight 1.9.4</strong>, with compatibility for Windows and macOS.
-            <a href="cabrascripts-en.html#pi-workflow" class="update-link" style="color: var(--gold-primary); text-decoration: none; font-weight: 500; margin-left: 8px; display: inline-block; white-space: nowrap;">Installation & details →</a>
-          </h4>
-        </div>
-        <div class="dashboard-item" style="padding-bottom: 8px;">
-          <div class="dashboard-meta">
-            <span style="color: var(--gold-primary); font-weight: 600; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;">PixelMath</span>
-          </div>
-          <h4 style="text-transform: none; font-size: 0.9rem; font-weight: normal; margin-top: 8px; line-height: 1.5; color: var(--text-secondary);">
-            We have added new formulas and automatic functions to our <strong style="color: var(--text-primary); font-weight: 600;">PixelMath-teca</strong> to simplify your SHO and RGB processing.
-            <a href="pixelmath-en.html" class="update-link" style="color: var(--gold-primary); text-decoration: none; font-weight: 500; margin-left: 8px; display: inline-block; white-space: nowrap;">Explore formulas →</a>
-          </h4>
-        </div>
+    <section class="g12" style="position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: center; padding: clamp(40px, 6vw, 88px) var(--gx) clamp(40px, 5vw, 72px)">
+      <div class="glow" aria-hidden="true"></div><div class="ret" aria-hidden="true"></div>
+      <div class="c7" style="position: relative; grid-column: span 7; display: flex; flex-direction: column; align-items: flex-start">
+        <div style="display: flex; align-items: center; gap: 14px"><span style="width: 32px; height: 1px; background: var(--gold)"></span><span class="caps" style="color: var(--gold)">Photography · Measurements · Tools</span></div>
+        <h1 class="bd" style="margin-top: 34px; font-size: clamp(46px, 7.2vw, 104px); font-weight: 400; line-height: 0.96; letter-spacing: -0.02em">Photographing and <em class="gi">measuring</em> the sky</h1>
+        <p style="margin-top: 32px; max-width: 540px; font-size: 19px; line-height: 1.7; color: var(--t2)">Deep sky, the eclipse and exoplanet light curves from the Nerpio observatory. And the tools I use to do it, open to everyone.</p>
+        <a class="ann" href="eclipse-2026-en.html" style="display: flex; align-items: center; gap: 16px; margin-top: 44px; padding: 16px 22px 16px 18px; max-width: 540px; box-sizing: border-box"><span class="bd" style="flex-shrink: 0; font-size: 15px; font-style: italic; color: var(--gold2)">New</span><span style="width: 1px; height: 30px; background: var(--line); flex-shrink: 0"></span><span style="font-size: 15px; line-height: 1.5; color: var(--t2)">Solar eclipse of 12 August: the Moon crossing the Sun, on video.</span><span style="flex-shrink: 0; color: var(--gold)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
       </div>
-    </div>
+      <figure class="c5" style="position: relative; grid-column: 8 / span 5; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 18px">
+        <svg class="carta" width="430" height="290" viewBox="-20 -10 370 250" role="img" aria-label="Chart of the constellation Capricornus"><path d="M40 -10 L40 240" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path><path d="M165 -10 L165 240" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path><path d="M290 -10 L290 240" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path><path d="M-20 40 L350 40" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path><path d="M-20 140 L350 140" stroke="rgba(229,181,63,0.10)" stroke-width="0.6"></path><text x="294" y="236" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">XX h</text><text x="169" y="236" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">XXI h</text><text x="44" y="236" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">XXII h</text><text x="-16" y="36" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">−15°</text><text x="-16" y="136" font-family="Bodoni Moda, serif" font-style="italic" font-size="9" fill="rgba(229,181,63,0.45)">−25°</text><path d="M340 128 Q175 92 -18 22" fill="none" stroke="rgba(224,96,63,0.45)" stroke-width="1" stroke-dasharray="5 5"></path><text x="262" y="140" font-family="Bodoni Moda, serif" font-style="italic" font-size="11" fill="rgba(224,96,63,0.5)">ecliptic</text><path d="M285 30 L277 58" fill="none" stroke="rgba(229,181,63,0.5)" stroke-width="1"></path><path d="M277 58 L150 86 L105 82 L54 80 L35 73" fill="none" stroke="rgba(229,181,63,0.5)" stroke-width="1"></path><path d="M277 58 L206 184 L191 203 L93 149 L62 114 L35 73" fill="none" stroke="rgba(229,181,63,0.5)" stroke-width="1"></path><circle cx="285" cy="30" r="5.6" fill="#110d09"></circle><circle cx="285" cy="30" r="2.21" fill="rgba(248,241,226,0.85)"></circle><circle cx="277" cy="58" r="6" fill="#110d09"></circle><circle cx="277" cy="58" r="2.55" fill="rgba(248,241,226,0.85)"></circle><circle cx="206" cy="184" r="5" fill="#110d09"></circle><circle cx="206" cy="184" r="1.70" fill="rgba(248,241,226,0.85)"></circle><circle cx="191" cy="203" r="5" fill="#110d09"></circle><circle cx="191" cy="203" r="1.70" fill="rgba(248,241,226,0.85)"></circle><circle cx="93" cy="149" r="5.5" fill="#110d09"></circle><circle cx="93" cy="149" r="2.12" fill="rgba(248,241,226,0.85)"></circle><circle cx="62" cy="114" r="4.8" fill="#110d09"></circle><circle cx="62" cy="114" r="1.53" fill="rgba(248,241,226,0.85)"></circle><circle cx="35" cy="73" r="6.3" fill="#110d09"></circle><circle cx="35" cy="73" r="2.80" fill="rgba(248,241,226,0.85)"></circle><circle cx="54" cy="80" r="5.5" fill="#110d09"></circle><circle cx="54" cy="80" r="2.12" fill="rgba(248,241,226,0.85)"></circle><circle cx="105" cy="82" r="4.9" fill="#110d09"></circle><circle cx="105" cy="82" r="1.61" fill="rgba(248,241,226,0.85)"></circle><circle cx="150" cy="86" r="5.1" fill="#110d09"></circle><circle cx="150" cy="86" r="1.78" fill="rgba(248,241,226,0.85)"></circle><text x="293" y="26" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">α</text><text x="286" y="64" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">β</text><text x="21" y="67" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">δ</text><text x="56" y="70" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">γ</text><text x="87" y="167" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">ζ</text><text x="199" y="215" font-family="Bodoni Moda, serif" font-style="italic" font-size="12" fill="rgba(199,191,169,0.7)">ω</text></svg>
+        <figcaption class="cap"><span class="caps">Chart I</span><span class="bd">Capricornus, the sky goat</span></figcaption>
+      </figure>
+    </section>
 
-    <div class="dashboard-grid">
-      <!-- PixInsight & Software Column -->
-      <div class="dashboard-col">
-        <h3 class="col-title">PixInsight & Software</h3>
-        <div id="softwareDashboardContainer" class="dashboard-list">
-          <div class="dashboard-loading">Loading updates...</div>
-        </div>
-        <a href="novedades-en.html" class="dashboard-view-all">View all software updates →</a>
+    <section class="g3" style="padding: 0 var(--gx) clamp(56px, 8vw, 112px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">
+      <a class="card" href="observaciones-en.html" style="padding: 30px; min-height: 250px"><span style="display: flex; justify-content: space-between; align-items: center"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2"></path></svg></span><span style="display: flex; gap: 12px; align-items: center"><span class="no">Nº I</span></span></span><span class="bd" style="margin-top: 24px; font-size: 30px; font-weight: 500">Observations</span><span style="margin-top: 8px; font-size: 15.5px; line-height: 1.6; color: var(--t2)">Photography and measurements: deep sky, exoplanet transits and the eclipse.</span></a><a class="card gold" href="herramientas-en.html" style="padding: 30px; min-height: 250px"><span style="display: flex; justify-content: space-between; align-items: center"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span style="display: flex; gap: 12px; align-items: center"><span class="tg g">No installation</span><span class="no">Nº II</span></span></span><span class="bd" style="margin-top: 24px; font-size: 30px; font-weight: 500">Web <em class="gi">tools</em></span><span style="margin-top: 8px; font-size: 15.5px; line-height: 1.6; color: var(--t2)">CabraSpace Web, Astro Forecast, AutoGHS, light pollution and PixelMath-teca.</span></a><a class="card" href="programas-en.html" style="padding: 30px; min-height: 250px"><span style="display: flex; justify-content: space-between; align-items: center"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"></path></svg></span><span style="display: flex; gap: 12px; align-items: center"><span class="no">Nº III</span></span></span><span class="bd" style="margin-top: 24px; font-size: 30px; font-weight: 500">Software</span><span style="margin-top: 8px; font-size: 15.5px; line-height: 1.6; color: var(--t2)">For PixInsight: PI Workflow.</span></a>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 44px; margin: 0 var(--gb); padding: clamp(40px, 6vw, 80px) var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
+      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px"><div style="display: flex; flex-direction: column; gap: 18px"><div style="display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">I.</span><span class="caps" style="color: var(--t2)">Web tools</span></div><h2 class="bd" style="font-size: clamp(34px, 4vw, 58px); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em">Use them <em class="gi">now</em></h2></div><div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px; margin-bottom: 8px"><span style="font-size: 15px; color: var(--t3)">Open in your browser, nothing to install</span><a class="lnk" href="herramientas-en.html">All web tools<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div></div>
+      <div class="g5" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px"><a class="card" href="cabraspace-imaging-workflow-en.html" style="padding: 28px; min-height: 270px; background: var(--bg)"><div style="display: flex; align-items: center; justify-content: space-between"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span class="tg g">Beta</span></div><span class="bd" style="margin-top: 26px; font-size: 24px; font-weight: 500; line-height: 1.12">CabraSpace Web</span><span style="margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--t2)">Process your image in the browser.</span><span class="go" style="margin-top: auto; padding-top: 20px">Open<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="card" href="astroforecast-en.html" style="padding: 28px; min-height: 270px; background: var(--bg)"><div style="display: flex; align-items: center; justify-content: space-between"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg></span></div><span class="bd" style="margin-top: 26px; font-size: 24px; font-weight: 500; line-height: 1.12">Astro Forecast</span><span style="margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--t2)">Tonight at AstroCamp.</span><span class="go" style="margin-top: auto; padding-top: 20px">Open<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="card" href="autoghs-en.html" style="padding: 28px; min-height: 270px; background: var(--bg)"><div style="display: flex; align-items: center; justify-content: space-between"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg></span></div><span class="bd" style="margin-top: 26px; font-size: 24px; font-weight: 500; line-height: 1.12">AutoGHS</span><span style="margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--t2)">Automatic GHS stretch.</span><span class="go" style="margin-top: auto; padding-top: 20px">Open<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="card" href="contaminacion-mapa-en.html" style="padding: 28px; min-height: 270px; background: var(--bg)"><div style="display: flex; align-items: center; justify-content: space-between"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span></div><span class="bd" style="margin-top: 26px; font-size: 24px; font-weight: 500; line-height: 1.12">Light pollution</span><span style="margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--t2)">Sky brightness near you.</span><span class="go" style="margin-top: auto; padding-top: 20px">Open<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="card" href="pixelmath-en.html" style="padding: 28px; min-height: 270px; background: var(--bg)"><div style="display: flex; align-items: center; justify-content: space-between"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg></span></div><span class="bd" style="margin-top: 26px; font-size: 24px; font-weight: 500; line-height: 1.12">PixelMath-teca</span><span style="margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--t2)">Formulas ready to copy.</span><span class="go" style="margin-top: auto; padding-top: 20px">Open<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 56px; padding: clamp(64px, 9vw, 128px) var(--gx) clamp(56px, 8vw, 112px)">
+      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px"><div style="display: flex; flex-direction: column; gap: 18px"><div style="display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">II.</span><span class="caps" style="color: var(--t2)">Observations</span></div><h2 class="bd" style="font-size: clamp(34px, 4vw, 58px); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em">Latest in <em class="gi">the notebook</em></h2></div><a class="lnk" href="observaciones-en.html" style="margin-bottom: 8px">See all<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px"><a href="transito-qatar1b-2026-09-22-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 300px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. IX</span><span class="bd">Exoplanets · 22 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of Qatar-1 b</span></a><a href="eclipse-2026-en.html" class="zbox obs-card" data-fam="foto" data-kind="eclipse" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 300px"><div class="plate-in"><img class="zoom" src="obs/eclipse-2026/fase-4.jpg" alt="Solar eclipse of 12 August" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. III</span><span class="bd">Eclipses · 12 Aug</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Solar eclipse of 12 August</span></a><a href="cielo-pk164-en.html" class="zbox obs-card" data-fam="foto" data-kind="deep-sky" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 300px"><div class="plate-in"><img class="zoom" src="obs/pk164/thumb.jpg" alt="PK 164+31.1, planetary nebula" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. II</span><span class="bd">Deep sky · 24 Apr</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">PK 164+31.1, planetary nebula</span></a></div>
+    </section>
+
+    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 0 var(--gx) 120px">
+      <div class="c7" style="grid-column: span 7; display: flex; flex-direction: column; gap: 24px">
+        <div class="jb" style="display: flex; align-items: center; justify-content: space-between"><div style="display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">III.</span><span class="caps" style="color: var(--t2)">Software to install</span></div>
+        <a class="lnk" href="programas-en.html">View software<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div>
+        <a class="card frow" href="programas-en.html" style="flex-direction: row; align-items: center; gap: 18px; padding: 24px"><span class="med"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"></path></svg></span><span style="display: flex; flex-direction: column; gap: 4px"><span class="bd" style="font-size: 24px; font-weight: 500">PI Workflow</span><span style="font-size: 14.5px; color: var(--t3)">PixInsight script · Windows and macOS</span></span></a>
       </div>
-      
-      <!-- Equipment & Hardware Column -->
-      <div class="dashboard-col">
-        <h3 class="col-title">Equipment & Hardware</h3>
-        <div id="hardwareDashboardContainer" class="dashboard-list">
-          <div class="dashboard-loading">Loading updates...</div>
-        </div>
-        <a href="equipamiento-en.html" class="dashboard-view-all">View all equipment updates →</a>
+      <div class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--line)"><span class="caps" style="color: var(--t3)">Logbook</span><a class="lnk" href="bitacora-en.html" style="font-size: 14px">All</a></div>
+        <div id="home-log" data-lang="en"></div>
       </div>
-    </div>
-  </section>
-
-  <!-- Vintage Divider -->
-  <div class="vintage-divider">
-    <span class="divider-line"></span>
-    <svg class="star-decor" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z"/></svg>
-    <span class="divider-line"></span>
-  </div>
-
-  <!-- Hero Section -->
-  <section class="hero container">
-    <h1 class="hero-title">Exploring the Universe</h1>
-    
-    <p class="hero-description">
-      Deep-sky astrophotography, scientific outreach, and equipment analysis. A space created to share the beauty of the stars and learn to capture the universe together.
-    </p>
-
-    <!-- Beautiful logo container with vintage double dashed borders -->
-    <div class="logo-showcase-container">
-      <div class="logo-showcase-inner">
-        <img src="logo.webp" class="logo-img" alt="CabraSpace Logo Sketch">
-      </div>
-    </div>
-  </section>
-
-  <!-- Vintage Divider -->
-  <div class="vintage-divider">
-    <span class="divider-line"></span>
-    <svg class="star-decor" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8L12 0Z"/></svg>
-    <span class="divider-line"></span>
-  </div>
-
-  <!-- Content Features Section -->
-  <section id="features" class="container" style="padding: 40px 0;">
-    <h2 class="section-title">The Project</h2>
-    <p class="section-subtitle">Three pillars uniting modern science and the classical contemplation of the night sky.</p>
-
-    <div class="features-grid">
-      <!-- Card 1 -->
-      <div class="feature-card">
-        <div class="feature-card-content">
-          <div class="feature-icon">
-            <!-- Astronomical Star Symbol / Compass -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M12 2l3 7h-6zM12 22l3-7h-6zM2 12l7-3v6zM22 12l-7-3v6z"/></svg>
-          </div>
-          <h3>Astrophotography</h3>
-          <p>Detailed captures of nebulae, galaxies, and star clusters. Advanced calibration techniques using PixInsight to reveal the hidden light in the cosmos.</p>
-          <a href="https://www.youtube.com/@CuivTheLazyGeek/search?query=PixInsight" target="_blank" rel="noopener noreferrer" class="card-link">Learn PixInsight with Cuiv ↗</a>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="feature-card">
-        <div class="feature-card-content">
-          <div class="feature-icon">
-            <!-- Book / Astronomy Map Icon -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          </div>
-          <h3>Outreach</h3>
-          <p>Accessible explanations of astrophysics, the history of astronomy, and practical stargazing from a clear and engaging perspective.</p>
-          <a href="contaminacion-mapa-en.html" class="card-link">Light Pollution Map</a>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="feature-card">
-        <div class="feature-card-content">
-          <div class="feature-icon">
-            <!-- Telescope/Lens Focus Icon -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </div>
-          <h3>Equipment</h3>
-          <p>Objective reviews of telescopes, astronomical cameras (CMOS/CCD), equatorial mounts, and software. Optimisation guides for capture sessions.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container footer-container">
-      <a href="#" class="footer-logo">
-        <img src="logo.webp" style="height: 34px; width: auto; mix-blend-mode: screen; filter: brightness(1.1);" alt="CabraSpace">
-        <span>CabraSpace.com</span>
-      </a>
-      <span class="copyright">© 2026 CabraSpace. All rights reserved.</span>
-      <ul class="footer-links">
-        <li><a href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-        <li><a href="#" onclick="alert('info@cabraspace.com')">Contact</a></li>
-      </ul>
-    </div>
+    </section>
+  </main>
+  <footer class="af">
+    <span class="af-sign">Clear skies.</span>
+    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a><a class="ghost" href="mailto:info@cabraspace.com">Contact</a></div>
+    <div class="dbl" aria-hidden="true"></div>
+    <div class="af-bottom"><span><img src="atlas/img/logo-gold.png" alt=""><span class="caps" style="font-size: 11.5px">CabraSpace · MMXXVI</span></span><nav aria-label="Footer"><a class="nl" href="observaciones-en.html">Observations</a><a class="nl" href="herramientas-en.html">Web tools</a><a class="nl" href="programas-en.html">Software</a><a class="nl" href="bitacora-en.html">Logbook</a></nav></div>
   </footer>
-
-  <script src="index.js"></script>
-  <script src="mobile-menu.js"></script>
+  <script>
+  (function () {
+    var box = document.getElementById('home-log'); if (!box) return;
+    var en = box.getAttribute('data-lang') === 'en';
+    var M = en ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] : ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+    function d(s) { var p = (s || '').split('-'); return p.length < 3 ? '' : (en ? (+p[2]) + ' ' + M[+p[1] - 1] : (+p[2]) + ' · ' + M[+p[1] - 1]); }
+    function esc(s) { var e = document.createElement('span'); e.textContent = s || ''; return e.innerHTML; }
+    fetch('latest.json').then(function (r) { return r.json(); }).then(function (j) {
+      var all = (j.software || []).concat(j.hardware || []).sort(function (a, b) { return (b.date || '').localeCompare(a.date || ''); }).slice(0, 3);
+      box.innerHTML = all.map(function (x) {
+        return '<a class="row" href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer" style="grid-template-columns: 64px minmax(0, 1fr); padding: 14px 4px">'
+          + '<span class="bd rd" style="font-size: 15px">' + d(x.date) + '</span><span class="rt" style="font-size: 15px; line-height: 1.45; color: var(--t2)">'
+          + esc(en ? x.title_en : x.title_es) + '</span></a>';
+      }).join('');
+    }).catch(function () { box.innerHTML = ''; });
+  })();
+  </script>
+  <script src="atlas/atlas.js?v=20260924"></script>
 </body>
 </html>

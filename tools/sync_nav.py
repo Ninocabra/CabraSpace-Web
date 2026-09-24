@@ -1,153 +1,96 @@
 """
-Fuente unica del menu de navegacion. Reemplaza el <header id="navbar"> de las 24 paginas con
-el menu canonico (ES/EN) definido aqui. El resaltado de la seccion activa lo hace mobile-menu.js
-por URL (no se incrusta `active` en el HTML), asi el menu es identico en todas las paginas salvo
-el conmutador de idioma (que apunta al gemelo de cada pagina).
+Fuente única de la cabecera, el cajón móvil y el pie (estilo Atlas) de TODAS las páginas.
 
-Para cambiar el menu: edita ES_TEMPLATE / EN_TEMPLATE aqui y ejecuta:
-    python tools/sync_nav.py     (desde la raiz del repo)
-Idempotente: re-ejecutar regenera el bloque.
+Qué hace en cada *.html de la raíz (idempotente):
+  - <head>: asegura <link rel="stylesheet" href="atlas/atlas.css?v=..."> (después de index.css).
+  - Sustituye el <header id="navbar">…</header> por la cabecera Atlas (ES o EN).
+  - Sustituye/inserta el cajón móvil <div class="ad" id="atlas-drawer">…</div> justo después.
+  - Quita el antiguo <div class="mobile-menu-overlay">.
+  - Sustituye el primer <footer>…</footer> por el pie Atlas (las páginas sin pie no lo reciben,
+    salvo las de WITH_FOOTER).
+  - Cambia <script src="mobile-menu.js"> por <script src="atlas/atlas.js?v=...">.
+
+La sección activa la marca atlas/atlas.js por la URL, así el bloque es idéntico en todas las
+páginas salvo el conmutador de idioma (que apunta al gemelo de cada página).
+
+Para cambiar el menú o el pie: edita las plantillas de aquí y ejecuta, desde la raíz del repo:
+    python tools/sync_nav.py
 """
+import glob
 import os
 import re
-import glob
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VERSION = "20260924"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
+SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
+SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
+WITH_FOOTER = {"astroforecast.html", "astroforecast-en.html"}  # no tenían pie; lo reciben
 
-MARKER = '<!-- NAV-AUTO: menu generado por tools/sync_nav.py; editar ahi y re-ejecutar -->'
+MARKER = "<!-- NAV-AUTO: cabecera, cajón y pie generados por tools/sync_nav.py; editar ahí y re-ejecutar -->"
 
-ES_TEMPLATE = '''<header id="navbar">
-    ''' + MARKER + '''
-    <div class="container nav-container">
-      <a href="__HOME_HREF__" class="logo-link">
-        <img src="logo.webp" alt="CabraSpace Logo">
-        <span>CabraSpace</span>
-      </a>
+ICON = {
+    "chev": '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>',
+    "grid": '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg>',
+    "moon": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>',
+    "menu": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>',
+    "close": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>',
+    "arrow": '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>',
+    "web": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>',
+    "cloud": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg>',
+    "ghs": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg>',
+    "globe": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>',
+    "pm": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg>',
+    "planes": '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"></circle><path d="M2 20 22 4"></path></svg>',
+}
 
-      <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-
-      <ul class="nav-menu">
-        <li><a href="__HOME_HREF__" class="nav-link">Inicio</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Novedades <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="equipamiento.html" class="dropdown-item">Equipamiento</a></li>
-            <li><a href="novedades.html" class="dropdown-item">PixInsight</a></li>
-          </ul>
-        </li>
-        <li><a href="pi-workflow.html" class="nav-link">PI Workflow (BETA)</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Astrofotografía <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="astroforecast.html" class="dropdown-item">Astro Forecast AstroCamp</a></li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Recursos PixInsight <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="cabrascripts.html" class="dropdown-item">CabraScripts</a></li>
-                <li><a href="pixelmath.html" class="dropdown-item">PixelMath-teca</a></li>
-                <li><a href="cursos-youtube.html" class="dropdown-item">Cursos Youtube</a></li>
-
-                <li><a href="autoghs.html" class="dropdown-item">AutoGHS</a></li>
-              </ul>
-            </li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Contaminación Lumínica <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="contaminacion-mapa.html" class="dropdown-item">Mapa de Contaminación</a></li>
-                <li><a href="contaminacion.html" class="dropdown-item">Vídeos y Guías</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Divulgación <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="divulgacion-coffeebreak.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
-          </ul>
-        </li>
-      </ul>
-
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Modo Noche" title="Modo Noche Astronómico">
-          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        </button>
-        <div class="lang-switcher">
-          <a href="__ES_HREF__" class="lang-link active">ES</a>
-          <span class="lang-separator">|</span>
-          <a href="__EN_HREF__" class="lang-link">EN</a>
-        </div>
-      </div>
-    </div>
-  </header>'''
-
-EN_TEMPLATE = '''<header id="navbar">
-    ''' + MARKER + '''
-    <div class="container nav-container">
-      <a href="__HOME_HREF__" class="logo-link">
-        <img src="logo.webp" alt="CabraSpace Logo">
-        <span>CabraSpace</span>
-      </a>
-
-      <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-
-      <ul class="nav-menu">
-        <li><a href="__HOME_HREF__" class="nav-link">Home</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Latest News <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="equipamiento-en.html" class="dropdown-item">Equipment</a></li>
-            <li><a href="novedades-en.html" class="dropdown-item">PixInsight</a></li>
-          </ul>
-        </li>
-        <li><a href="pi-workflow-en.html" class="nav-link">PI Workflow (BETA)</a></li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Astrophotography <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="astroforecast-en.html" class="dropdown-item">Astro Forecast AstroCamp</a></li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">PixInsight Resources <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="cabrascripts-en.html" class="dropdown-item">CabraScripts</a></li>
-                <li><a href="pixelmath-en.html" class="dropdown-item">PixelMath-teca</a></li>
-                <li><a href="cursos-youtube-en.html" class="dropdown-item">YouTube Courses</a></li>
-
-                <li><a href="autoghs-en.html" class="dropdown-item">AutoGHS</a></li>
-              </ul>
-            </li>
-            <li class="dropdown-submenu">
-              <a href="#" class="dropdown-item dropdown-toggle">Light Pollution <span class="arrow">▸</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="contaminacion-mapa-en.html" class="dropdown-item">Light Pollution Map</a></li>
-                <li><a href="contaminacion-en.html" class="dropdown-item">Videos & Guides</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="nav-link dropdown-toggle">Outreach <span class="arrow">▾</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="divulgacion-coffeebreak-en.html" class="dropdown-item">Coffee Break: señal y ruido</a></li>
-          </ul>
-        </li>
-      </ul>
-
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <button id="nightmode-toggle" class="nightmode-btn" aria-label="Night Mode" title="Astronomical Night Mode">
-          <svg class="moon-red-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        </button>
-        <div class="lang-switcher">
-          <a href="__ES_HREF__" class="lang-link">ES</a>
-          <span class="lang-separator">|</span>
-          <a href="__EN_HREF__" class="lang-link active">EN</a>
-        </div>
-      </div>
-    </div>
-  </header>'''
+# Everything that differs between languages. Links are ES file names; EN twins are derived.
+TEXT = {
+    "es": {
+        "home": "index.html", "obs": "Observaciones", "prog": "Programas", "bit": "Bitácora",
+        "herr": "Herramientas web", "night": "Modo noche", "open": "Abrir menú", "close": "Cerrar menú",
+        "home_label": "CabraSpace, inicio", "main_nav": "Principal", "foot_nav": "Pie de página",
+        "foto": "Fotografía", "med": "Medidas", "latest": "Lo último", "all_obs": "Todas las observaciones",
+        "items_foto": [("observaciones.html#cielo-profundo", "Cielo profundo", "Galaxias y nebulosas"),
+                       ("eclipse-2026.html", "Eclipses", "12 · VIII · 2026, en vídeo")],
+        "items_med": [("observaciones.html#exoplanetas", "Exoplanetas", "Curvas de luz de tránsitos")],
+        "tools_head": "Se abren en el navegador · sin instalar", "open_tool": "Abrir", "soon": "Próximamente",
+        "tools": [("cabraspace-imaging-workflow.html", "web", "CabraSpace Web", "Procesado en el navegador · beta"),
+                  ("astroforecast.html", "cloud", "Astro Forecast", "La noche en AstroCamp"),
+                  ("autoghs.html", "ghs", "AutoGHS", "Estirado GHS automático"),
+                  ("contaminacion-mapa.html", "globe", "Contaminación", "Brillo del cielo por zonas"),
+                  ("pixelmath.html", "pm", "PixelMath-teca", "Fórmulas para copiar")],
+        "planes": ("CabraPlanes", "Próximamente"),
+        "install_q": "¿Algo para instalar en PixInsight?",
+        "drawer_tools": "Úsalas ahora · sin instalar", "all_tools": "Todas las herramientas",
+        "drawer_sub": ("Fotografía · Medidas", "Para instalar", "Novedades"),
+        "sign": "Cielos despejados.", "contact": "Contacto",
+        "foot_links": [("observaciones.html", "Observaciones"), ("herramientas.html", "Herramientas web"),
+                       ("programas.html", "Programas"), ("bitacora.html", "Bitácora")],
+    },
+    "en": {
+        "home": "en.html", "obs": "Observations", "prog": "Software", "bit": "Logbook",
+        "herr": "Web tools", "night": "Night mode", "open": "Open menu", "close": "Close menu",
+        "home_label": "CabraSpace, home", "main_nav": "Main", "foot_nav": "Footer",
+        "foto": "Photography", "med": "Measurements", "latest": "Latest", "all_obs": "All observations",
+        "items_foto": [("observaciones.html#cielo-profundo", "Deep sky", "Galaxies and nebulae"),
+                       ("eclipse-2026.html", "Eclipses", "12 Aug 2026, on video")],
+        "items_med": [("observaciones.html#exoplanetas", "Exoplanets", "Transit light curves")],
+        "tools_head": "Open in your browser · nothing to install", "open_tool": "Open", "soon": "Coming soon",
+        "tools": [("cabraspace-imaging-workflow.html", "web", "CabraSpace Web", "Processing in the browser · beta"),
+                  ("astroforecast.html", "cloud", "Astro Forecast", "Tonight at AstroCamp"),
+                  ("autoghs.html", "ghs", "AutoGHS", "Automatic GHS stretch"),
+                  ("contaminacion-mapa.html", "globe", "Light pollution", "Sky brightness map"),
+                  ("pixelmath.html", "pm", "PixelMath-teca", "Formulas ready to copy")],
+        "planes": ("CabraPlanes", "Coming soon"),
+        "install_q": "Looking for something to install in PixInsight?",
+        "drawer_tools": "Use them now · nothing to install", "all_tools": "All web tools",
+        "drawer_sub": ("Photography · Measurements", "Desktop software", "News"),
+        "sign": "Clear skies.", "contact": "Contact",
+        "foot_links": [("observaciones.html", "Observations"), ("herramientas.html", "Web tools"),
+                       ("programas.html", "Software"), ("bitacora.html", "Logbook")],
+    },
+}
 
 
 def lang_of(f):
@@ -162,34 +105,171 @@ def twin_of(f):
     return f[:-len(".html")] + "-en.html"
 
 
-def build_header(fname):
+def L(href, lang):
+    """Localise an ES link (keeps #anchors)."""
+    if lang == "es" or href.startswith(("http", "mailto:", "#")):
+        return href
+    page, _, anchor = href.partition("#")
+    page = twin_of(page) if page else page
+    return page + ("#" + anchor if anchor else "")
+
+
+def latest_obs(lang):
+    """Most recent observation in obs/observaciones.json (same data as tools/build_atlas.py)."""
+    import json
+    data = json.load(open(os.path.join(ROOT, "obs", "observaciones.json"), encoding="utf-8"))
+    chrono = sorted(data, key=lambda o: o.get("date_iso") or "")
+    o = chrono[-1]
+    lam = ROMAN[len(chrono)]
+    page = o.get("page") or {"transit": f"transito-{o['slug']}.html", "deep-sky": f"cielo-{o['slug']}.html"}.get(o["kind"], o["slug"] + ".html")
+    y, m, d = o["date_iso"][:10].split("-")
+    em = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    date = f"{int(d)} · {ROMAN[int(m)]}" if lang == "es" else f"{int(d)} {em[int(m) - 1]}"
+    return {"href": page, "title": o.get("title_html", {}).get(lang, o["slug"]), "img": o.get("thumb"),
+            "alt": o.get("title", {}).get(lang, o["slug"]), "fit": o["kind"] == "transit",
+            "meta": (("Lám. " if lang == "es" else "Pl. ") + lam, date)}
+
+
+ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV",
+         "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX"]
+
+
+def header(fname):
     lang = lang_of(fname)
-    twin = twin_of(fname)
-    es_file = fname if lang == "es" else twin
-    en_file = fname if lang == "en" else twin
-    home_href = "index.html" if lang == "es" else "en.html"
-    tpl = ES_TEMPLATE if lang == "es" else EN_TEMPLATE
-    return (tpl.replace("__HOME_HREF__", home_href)
-               .replace("__ES_HREF__", es_file)
-               .replace("__EN_HREF__", en_file))
+    t = TEXT[lang]
+    lo = latest_obs(lang)
+    es_file = fname if lang == "es" else twin_of(fname)
+    en_file = fname if lang == "en" else twin_of(fname)
+    mi = lambda items: "".join(f'<a href="{L(h, lang)}" class="mi"><b>{a}</b><span>{b}</span></a>' for h, a, b in items)
+    tools = "".join(
+        f'<a href="{L(h, lang)}" class="ti"><span class="med">{ICON[i]}</span><span><b>{n}</b><small>{d}</small></span>'
+        f'<span class="go">{t["open_tool"]}</span></a>' for h, i, n, d in t["tools"])
+    tools += (f'<span class="ti" style="opacity: .55"><span class="med" style="border-style: dashed">{ICON["planes"]}</span>'
+              f'<span><b>{t["planes"][0]}</b><small>{t["planes"][1]}</small></span></span>')
+    obs_panel = (
+        '<div class="mega mega-obs"><div class="card" style="padding: 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px">'
+        f'<div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">{t["foto"]}</span>{mi(t["items_foto"])}</div>'
+        f'<div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">{t["med"]}</span>{mi(t["items_med"])}</div>'
+        f'<div style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 14px; padding-left: 32px; border-left: 1px solid var(--line)">'
+        f'<span class="caps" style="color: var(--t3)">{t["latest"]}</span>'
+        f'<a href="{L(lo["href"], lang)}" class="zbox" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: center; color: var(--tx)">'
+        f'<span class="plate" style="display: block; height: 190px; background: var(--bg)"><span class="plate-in" style="display: block; background: #1b140e"><img class="zoom{" fitc" if lo["fit"] else ""}" src="{lo["img"]}" alt="{lo["alt"]}" loading="lazy"></span></span>'
+        f'<span style="display: flex; flex-direction: column; gap: 10px"><span class="cap" style="padding: 0"><span class="caps">{lo["meta"][0]}</span><span class="bd">{lo["meta"][1]}</span></span>'
+        f'<span class="bd" style="font-size: 28px; line-height: 1.1">{lo["title"]}</span></span></a>'
+        f'<a class="lnk" href="{L("observaciones.html", lang)}" style="margin-top: 6px">{t["all_obs"]}{ICON["arrow"]}</a></div></div></div>')
+    herr_panel = (
+        '<div class="mega mega-herr"><div class="card gold" style="padding: 28px 24px 22px">'
+        f'<span class="caps" style="color: var(--gold); padding: 0 16px 12px">{t["tools_head"]}</span>'
+        f'<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px">{tools}</div>'
+        f'<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 16px 16px 0; border-top: 1px dotted rgba(199,191,169,.32)">'
+        f'<span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3)">{t["install_q"]}</span>'
+        f'<a class="lnk" href="{L("programas.html", lang)}">{t["prog"]}</a></div></div></div>')
+    return (
+        f'<header id="navbar" class="ah">\n    {MARKER}\n'
+        f'    <div class="ah-bar">\n'
+        f'      <a href="{t["home"]}" class="ah-logo" aria-label="{t["home_label"]}"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a>\n'
+        f'      <nav class="ah-nav" aria-label="{t["main_nav"]}">\n'
+        f'        <div class="mt"><a href="{L("observaciones.html", lang)}" class="nl" data-sec="obs">{t["obs"]}{ICON["chev"]}</a>{obs_panel}</div>\n'
+        f'        <a href="{L("programas.html", lang)}" class="nl" data-sec="prog">{t["prog"]}</a>\n'
+        f'        <a href="{L("bitacora.html", lang)}" class="nl" data-sec="bit">{t["bit"]}</a>\n'
+        f'      </nav>\n'
+        f'      <div class="ah-right">\n'
+        f'        <div class="mt"><a href="{L("herramientas.html", lang)}" class="hw" data-sec="herr">{ICON["grid"]}<span class="hwl">{t["herr"]}</span></a>{herr_panel}</div>\n'
+        f'        <button class="ic ah-night" type="button" aria-label="{t["night"]}" aria-pressed="false">{ICON["moon"]}</button>\n'
+        f'        <span class="caps ah-lang"><a href="{es_file}" lang="es"{" class=\"on\"" if lang == "es" else ""}>ES</a> · <a href="{en_file}" lang="en"{" class=\"on\"" if lang == "en" else ""}>EN</a></span>\n'
+        f'        <button class="ic ah-burger" type="button" aria-label="{t["open"]}" aria-controls="atlas-drawer" aria-expanded="false">{ICON["menu"]}</button>\n'
+        f'      </div>\n'
+        f'    </div>\n'
+        f'    <div class="dbl" aria-hidden="true"></div>\n'
+        f'  </header>')
+
+
+def drawer(fname):
+    lang = lang_of(fname)
+    t = TEXT[lang]
+    es_file = fname if lang == "es" else twin_of(fname)
+    en_file = fname if lang == "en" else twin_of(fname)
+    tiles = "".join(f'<a href="{L(h, lang)}" class="tile">{ICON[i]}{n}</a>' for h, i, n, _ in t["tools"][:4])
+    sub = t["drawer_sub"]
+    return (
+        f'<div class="ad" id="atlas-drawer" hidden><div class="ad-in">\n'
+        f'    <div class="ad-top"><a href="{t["home"]}"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a>'
+        f'<button class="ic ad-close" type="button" aria-label="{t["close"]}">{ICON["close"]}</button></div>\n'
+        f'    <div class="ad-sec"><span class="caps" style="font-size: 11.5px; color: var(--gold)">{t["drawer_tools"]}</span>'
+        f'<div class="ad-tiles">{tiles}</div><a class="lnk" href="{L("herramientas.html", lang)}" style="font-size: 14px">{t["all_tools"]}</a></div>\n'
+        f'    <nav class="ad-sec" aria-label="{t["main_nav"]}" style="padding-top: 8px; gap: 0">'
+        f'<a href="{L("observaciones.html", lang)}" class="acc"><i>I.</i><b>{t["obs"]}</b><small>{sub[0]}</small></a>'
+        f'<a href="{L("programas.html", lang)}" class="acc"><i>II.</i><b>{t["prog"]}</b><small>{sub[1]}</small></a>'
+        f'<a href="{L("bitacora.html", lang)}" class="acc sub"><i>III.</i><b>{t["bit"]}</b><small>{sub[2]}</small></a></nav>\n'
+        f'    <div class="ad-foot"><button class="ic ah-night" type="button" aria-label="{t["night"]}" aria-pressed="false">{ICON["moon"]}</button>'
+        f'<span class="caps ah-lang"><a href="{es_file}" lang="es"{" class=\"on\"" if lang == "es" else ""}>ES</a> · <a href="{en_file}" lang="en"{" class=\"on\"" if lang == "en" else ""}>EN</a></span></div>\n'
+        f'  </div></div>')
+
+
+def footer(fname):
+    lang = lang_of(fname)
+    t = TEXT[lang]
+    links = "".join(f'<a class="nl" href="{L(h, lang)}">{n}</a>' for h, n in t["foot_links"])
+    return (
+        f'<footer class="af">\n'
+        f'    <span class="af-sign">{t["sign"]}</span>\n'
+        f'    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a>'
+        f'<a class="ghost" href="mailto:info@cabraspace.com">{t["contact"]}</a></div>\n'
+        f'    <div class="dbl" aria-hidden="true"></div>\n'
+        f'    <div class="af-bottom"><span><img src="atlas/img/logo-gold.png" alt=""><span class="caps" style="font-size: 11.5px">CabraSpace · MMXXVI</span></span>'
+        f'<nav aria-label="{t["foot_nav"]}">{links}</nav></div>\n'
+        f'  </footer>')
+
+
+CSS_LINK = f'<link rel="stylesheet" href="atlas/atlas.css?v={VERSION}">'
+JS_TAG = f'<script src="atlas/atlas.js?v={VERSION}"></script>'
+header_re = re.compile(r'<header id="navbar"[^>]*>.*?</header>', re.S)
+drawer_re = re.compile(r'\s*<div class="ad" id="atlas-drawer" hidden>.*?\n  </div></div>', re.S)
+overlay_re = re.compile(r'\s*<div class="mobile-menu-overlay"[^>]*>\s*</div>', re.S)
+footer_re = re.compile(r'<footer\b[^>]*>.*?</footer>', re.S)
+css_re = re.compile(r'<link rel="stylesheet" href="atlas/atlas\.css[^"]*">')
+js_re = re.compile(r'<script src="(?:mobile-menu\.js|atlas/atlas\.js)[^"]*"></script>')
+
+
+def process(fname, txt):
+    if not header_re.search(txt):
+        return None
+    # stylesheet after index.css (or before </head>)
+    if css_re.search(txt):
+        txt = css_re.sub(CSS_LINK, txt)
+    elif "</head>" in txt:
+        txt = txt.replace("</head>", f"  {CSS_LINK}\n</head>", 1)
+    # header + drawer
+    txt = drawer_re.sub("", txt)
+    txt = overlay_re.sub("", txt)
+    txt = header_re.sub(lambda m: header(fname) + "\n  " + drawer(fname), txt, count=1)
+    # footer
+    if footer_re.search(txt):
+        txt = footer_re.sub(lambda m: footer(fname), txt, count=1)
+    elif fname in WITH_FOOTER:
+        txt = txt.replace("</body>", f"  {footer(fname)}\n</body>", 1) if "<footer" not in txt else txt
+    # script
+    txt = re.sub(r'[ \t]*' + js_re.pattern + r'[ \t]*\r?\n?', "", txt)
+    txt = txt.replace("</body>", f"  {JS_TAG}\n</body>", 1)
+    return txt
 
 
 def main():
-    files = sorted(glob.glob(os.path.join(ROOT, "*.html")))
-    header_re = re.compile(r'<header id="navbar">.*?</header>', re.S)
     changed = skipped = 0
-    for path in files:
+    for path in sorted(glob.glob(os.path.join(ROOT, "*.html"))):
         fname = os.path.basename(path)
+        if fname in SKIP or fname.startswith(SKIP_PREFIX):
+            continue
         txt = open(path, encoding="utf-8", errors="replace").read()
-        if not header_re.search(txt):
+        new = process(fname, txt)
+        if new is None:
             print(f"  (sin <header id=navbar>, omitido) {fname}")
             skipped += 1
             continue
-        new = header_re.sub(lambda m: build_header(fname), txt, count=1)
         if new != txt:
             open(path, "w", encoding="utf-8", newline="").write(new)
             changed += 1
-    print(f"Menu sincronizado: {changed} paginas actualizadas, {skipped} omitidas.")
+    print(f"Cabecera/pie sincronizados: {changed} páginas actualizadas, {skipped} omitidas.")
 
 
 if __name__ == "__main__":

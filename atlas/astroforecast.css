@@ -1,0 +1,24 @@
+/* Astro Forecast · capa Atlas (encima de astroweather.css y atlas/atlas.css).
+   Titular de la página, paneles con filete interior, rótulos en versalitas.
+   Los datos y el dibujo siguen siendo de astroweather.js; aquí solo hay estilo. */
+
+.aw-top { padding: calc(var(--ah) + clamp(32px, 5vw, 72px)) var(--gx) clamp(24px, 3vw, 40px); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+.aw-top .ret { background-position: center top; opacity: .8; }
+.aw-top .glow { background: radial-gradient(ellipse 50% 80% at 50% 30%, var(--glow), transparent 70%); }
+.aw-top > :not(.ret):not(.glow):not(.grain) { position: relative; }
+.aw-top h1 { font-family: var(--a-disp); font-size: clamp(44px, 6vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em; color: var(--tx); }
+.aw-top p { max-width: 580px; font-size: 18px; line-height: 1.7; color: var(--t2); }
+
+.aw-top + .aw-section { padding-top: 12px !important; }
+.aw-panel { position: relative; border-radius: 28px !important; border-color: var(--line) !important; background: var(--s1) !important; box-shadow: 0 30px 70px -40px rgba(0,0,0,.9); }
+.aw-panel::after { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(229,181,63,.14); border-radius: 21px; pointer-events: none; }
+.aw-head h2 { font-family: var(--a-disp) !important; font-weight: 400 !important; letter-spacing: -0.01em !important; }
+.aw-head h2 span, .aw-head h2 em { font-style: italic; color: var(--gold2); }
+.aw-site { font-family: var(--a-disp); font-style: italic; color: var(--t3); }
+.aw-panel h3 { font-family: var(--a-disp) !important; font-weight: 500 !important; letter-spacing: .2em !important; text-transform: uppercase; color: var(--t2) !important; }
+.aw-sem-col .rotulo, .aw-franjas > .rotulo { font-family: var(--a-disp) !important; letter-spacing: .18em !important; }
+.aw-headline { border-bottom: 3px double var(--line); }
+.aw-tab { border-radius: 999px !important; font-family: var(--a-sans); }
+.aw-tab.on, .aw-tab[aria-selected="true"], .aw-tab.active { background: var(--s2) !important; color: var(--gold2) !important; border-color: rgba(229,181,63,.45) !important; }
+.aw-sensor, .aw-cell, .aw-obj, .aw-target, .aw-pane { border-radius: 18px; }
+.aw-foot, .aw-fuente, .aw-refs { font-family: var(--a-disp); font-style: italic; }

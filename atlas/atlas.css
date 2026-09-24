@@ -1,0 +1,264 @@
+/* ==========================================================================
+   CabraSpace · Atlas — capa común de toda la web (carbón cálido)
+   Se carga DESPUÉS de index.css. Hace tres cosas:
+     1. Reasigna las variables de index.css a la paleta Atlas (las herramientas
+        heredan el estilo sin tocar su código).
+     2. Cabecera, menús, cajón móvil y pie comunes (markup de tools/sync_nav.py).
+     3. Componentes de las páginas Atlas (<main class="a3 page">).
+   Fuente del estilo: CabraBase/estilo/tokens.json.
+   ========================================================================== */
+
+/* ---------- 1. tokens ---------- */
+:root {
+  --bg: #110d09; --s1: #1b140e; --s2: #281d14; --line: #3d2e1f;
+  --tx: #fbf2e0; --t2: #d0c1a5; --t3: #a3957b; --glow: rgba(196,110,42,0.26);
+  --gold: #e5b53f; --gold2: #f3d27e; --ink: #1a1204; --ver: #e0603f;
+  --ease: cubic-bezier(.16,1,.3,1);
+  --ah: 81px;                      /* altura de la cabecera fija */
+  --gx: 80px; --gb: 40px; --gb2: 72px;
+
+  /* variables heredadas de index.css → Atlas */
+  --bg-color: #110d09; --bg-card: #1b140e; --bg-card-hover: #281d14;
+  --gold-primary: #e5b53f; --gold-secondary: #c9982a; --gold-light: #f3d27e; --gold-dark: #2a1f0c;
+  --gold-glow: rgba(229,181,63,0.12); --gold-border: rgba(229,181,63,0.24); --gold-border-muted: rgba(229,181,63,0.09);
+  --text-primary: #fbf2e0; --text-secondary: #d0c1a5; --text-muted: #a3957b;
+  --border-color: #3d2e1f; --border-hover: #54402b;
+  --font-sans: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Bodoni Moda', Didot, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', Consolas, monospace;
+  /* propias de la capa Atlas: una herramienta puede redefinir --font-* sin afectar a la cabecera */
+  --a-sans: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --a-disp: 'Bodoni Moda', Didot, Georgia, serif;
+  --a-mono: 'IBM Plex Mono', Consolas, monospace;
+}
+body.night-vision {
+  --bg: #050000; --s1: #0e0202; --s2: #170404; --line: #2e0808;
+  --tx: #ff4a3d; --t2: #c8241a; --t3: #8e170f; --glow: rgba(255,0,0,0.08);
+  --gold: #ff2a1a; --gold2: #ff5a4a; --ink: #0a0000; --ver: #b3140a;
+}
+body { background-color: var(--bg); color: var(--tx); }
+.grid-overlay, .radial-glow { display: none !important; }
+
+/* ---------- tipografía y utilidades (limitado a .a3/.ah/.ad/.af) ---------- */
+:is(.a3,.ah,.ad,.af) .bd { font-family: var(--a-disp); font-optical-sizing: auto; }
+:is(.a3,.ah,.ad,.af) .caps { font-family: var(--a-disp); font-size: 12.5px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; }
+:is(.a3,.ah,.ad,.af) .mono { font-family: var(--a-mono); }
+:is(.a3,.ah,.ad,.af) .gi { font-style: italic; color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .dbl { height: 3px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.a3 { position: relative; background: var(--bg); color: var(--tx); font-family: var(--a-sans); overflow: hidden; }
+.a3 a { color: var(--gold2); text-decoration: none; }
+.a3 a:hover { color: var(--tx); }
+.a3 p, .a3 h1, .a3 h2, .a3 h3 { margin: 0; }
+.a3.page { min-height: 100vh; padding-top: var(--ah); }
+:is(.a3,.ah,.ad,.af) .grain { position: absolute; inset: 0; background-image: url(img/grain.png); background-size: 180px 180px; opacity: .28; pointer-events: none; z-index: 40; }
+:is(.a3,.ah,.ad,.af) .ret { position: absolute; inset: 0; pointer-events: none; background: url(img/reticle.svg) no-repeat right top / 1440px 900px; }
+:is(.a3,.ah,.ad,.af) .glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 55% 75% at 74% 42%, var(--glow), transparent 70%); }
+body.night-vision .grain { display: none; }
+
+/* ---------- botones y enlaces ---------- */
+:is(.a3,.ah,.ad,.af) .nl { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--t2) !important; font-size: 15px; font-weight: 500; text-decoration: none; transition: color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .nl:hover, :is(.a3,.ah,.ad,.af) .nl.on { color: var(--tx) !important; }
+:is(.a3,.ah,.ad,.af) .nl.on { box-shadow: inset 0 -1px 0 var(--gold); }
+:is(.a3,.ah,.ad,.af) .ic { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--gold); cursor: pointer; outline: 1px solid transparent; outline-offset: 3px; transition: outline-color .6s var(--ease), border-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .ic:hover { border-color: rgba(229,181,63,.5); outline-color: rgba(229,181,63,.25); }
+:is(.a3,.ah,.ad,.af) .ic svg { width: 17px; height: 17px; }
+:is(.a3,.ah,.ad,.af) .hw { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(229,181,63,.6); color: var(--gold2) !important; font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap; outline: 1px solid transparent; outline-offset: 3px; transition: background-color .6s var(--ease), color .6s var(--ease), outline-offset .6s var(--ease), outline-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .hw:hover, :is(.a3,.ah,.ad,.af) .hw.on { background: var(--gold); color: var(--ink) !important; outline-color: rgba(229,181,63,.3); outline-offset: 5px; }
+:is(.a3,.ah,.ad,.af) .btn { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 28px; border-radius: 999px; background: var(--gold); color: var(--ink) !important; font-size: 15.5px; font-weight: 600; text-decoration: none; outline: 1px solid rgba(229,181,63,.45); outline-offset: 3px; transition: background-color .6s var(--ease), outline-offset .6s var(--ease), outline-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .btn:hover { background: var(--gold2); outline-offset: 6px; outline-color: rgba(229,181,63,.3); }
+:is(.a3,.ah,.ad,.af) .ghost { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 26px; border-radius: 999px; border: 1px solid var(--line); color: var(--tx) !important; font-size: 15.5px; font-weight: 500; text-decoration: none; outline: 1px solid transparent; outline-offset: 3px; transition: border-color .6s var(--ease), outline-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .ghost:hover { border-color: rgba(229,181,63,.5); outline-color: rgba(229,181,63,.22); }
+:is(.a3,.ah,.ad,.af) .lnk { display: inline-flex; align-items: center; gap: 8px; color: var(--gold2) !important; font-size: 15px; font-weight: 500; text-decoration: none; transition: color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .lnk:hover { color: var(--tx) !important; }
+:is(.a3,.ah,.ad,.af) .btn svg, :is(.a3,.ah,.ad,.af) .lnk svg, :is(.a3,.ah,.ad,.af) .go svg, :is(.a3,.ah,.ad,.af) .ann svg { transition: transform .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .btn:hover svg, :is(.a3,.ah,.ad,.af) .lnk:hover svg, :is(.a3,.ah,.ad,.af) .ann:hover svg { transform: translateX(4px); }
+:is(.a3,.ah,.ad,.af) .ann { position: relative; background: var(--s1); border: 1px solid var(--line); border-radius: 18px; color: var(--tx) !important; transition: border-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .ann:hover { border-color: rgba(229,181,63,.4); }
+
+/* ---------- tarjetas ---------- */
+:is(.a3,.ah,.ad,.af) .card { position: relative; display: flex; flex-direction: column; box-sizing: border-box; background: var(--s1); border: 1px solid var(--line); border-radius: 22px; color: var(--tx) !important; text-decoration: none; transition: background-color .6s var(--ease), border-color .6s var(--ease), transform .6s var(--ease), box-shadow .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .card::after { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(229,181,63,.16); border-radius: 16px; pointer-events: none; transition: border-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) a.card:hover { background: var(--s2); transform: translateY(-3px); box-shadow: 0 28px 50px -30px rgba(0,0,0,.8); }
+:is(.a3,.ah,.ad,.af) a.card:hover::after { border-color: rgba(229,181,63,.3); }
+:is(.a3,.ah,.ad,.af) .card.gold { border-color: rgba(229,181,63,.45); }
+:is(.a3,.ah,.ad,.af) .card.dash { border-style: dashed; background: transparent; }
+:is(.a3,.ah,.ad,.af) .card.dash::after { display: none; }
+:is(.a3,.ah,.ad,.af) .med { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 50px; height: 50px; border-radius: 999px; border: 1px solid rgba(229,181,63,.55); color: var(--gold); transition: background-color .6s var(--ease), color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) a.card:hover .med { background: var(--gold); color: var(--ink); }
+:is(.a3,.ah,.ad,.af) .go { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; color: var(--t3); transition: color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) a.card:hover .go { color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) a.card:hover .go svg { transform: translateX(4px); }
+:is(.a3,.ah,.ad,.af) .tg { display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--t2); font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+:is(.a3,.ah,.ad,.af) .tg.g { border-color: rgba(229,181,63,.4); color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .no { font-family: var(--a-disp); font-size: 17px; font-style: italic; color: var(--t3); }
+
+/* ---------- láminas (imágenes enmarcadas) ---------- */
+:is(.a3,.ah,.ad,.af) .plate { padding: 12px; border-radius: 10px; background: var(--s1); border: 1px solid var(--line); box-sizing: border-box; }
+:is(.a3,.ah,.ad,.af) .plate-in { position: relative; overflow: hidden; border-radius: 3px; outline: 1px solid rgba(243,210,126,.3); outline-offset: 5px; height: 100%; }
+:is(.a3,.ah,.ad,.af) .plate-in img, :is(.a3,.ah,.ad,.af) .plate-in video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.1) contrast(1.05); }
+:is(.a3,.ah,.ad,.af) .plate-in img.fitc, :is(.a3,.ah,.ad,.af) .plate-in video.fitc { object-fit: contain; filter: none; }
+:is(.a3,.ah,.ad,.af) .zoom { transform: scale(1); transition: transform 2.4s var(--ease); }
+:is(.a3,.ah,.ad,.af) .zbox:hover .zoom { transform: scale(1.04); }
+:is(.a3,.ah,.ad,.af) .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; background: radial-gradient(ellipse 60% 70% at 60% 40%, rgba(196,110,42,.18), transparent 70%), repeating-radial-gradient(circle at 50% 140%, transparent 0 54px, rgba(229,181,63,.08) 54px 55px), var(--s2); font-family: var(--a-disp); font-style: italic; font-size: 17px; color: var(--t3); }
+:is(.a3,.ah,.ad,.af) .cap { display: flex; align-items: baseline; gap: 14px; padding-left: 4px; }
+:is(.a3,.ah,.ad,.af) .cap .caps { font-size: 11.5px; color: var(--gold); }
+:is(.a3,.ah,.ad,.af) .cap .bd { font-size: 15px; font-style: italic; color: var(--t3); }
+:is(.a3,.ah,.ad,.af) .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 72px; height: 72px; border-radius: 999px; border: 1px solid rgba(243,210,126,.7); background: rgba(17,13,9,.55); display: flex; align-items: center; justify-content: center; outline: 1px solid rgba(243,210,126,.25); outline-offset: 5px; }
+
+/* ---------- listas ---------- */
+:is(.a3,.ah,.ad,.af) .row { display: grid; grid-template-columns: 84px minmax(0,1fr); gap: 14px; padding: 18px 8px; border-bottom: 1px dotted rgba(199,191,169,.32); color: var(--tx) !important; text-decoration: none; transition: background-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .row:hover { background: rgba(239,230,210,.025); }
+:is(.a3,.ah,.ad,.af) .rt { color: var(--tx); transition: color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .row:hover .rt { color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .rd { color: var(--t3); transition: color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .row:hover .rd { color: var(--gold); }
+:is(.a3,.ah,.ad,.af) .kv { display: flex; justify-content: space-between; gap: 16px; padding: 12px 2px; border-bottom: 1px dotted rgba(199,191,169,.32); font-size: 15px; }
+:is(.a3,.ah,.ad,.af) .kv span:first-child { color: var(--t3); }
+:is(.a3,.ah,.ad,.af) .kv span:last-child { font-family: var(--a-mono); font-size: 13.5px; color: var(--tx); text-align: right; }
+
+/* ---------- filtros ---------- */
+:is(.a3,.ah,.ad,.af) .chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--t2); font-family: var(--a-sans); font-size: 15px; font-weight: 500; cursor: pointer; transition: border-color .6s var(--ease), background-color .6s var(--ease), color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .chip:hover { border-color: rgba(229,181,63,.5); color: var(--tx); }
+:is(.a3,.ah,.ad,.af) .chip.on { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+:is(.a3,.ah,.ad,.af) .fb { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 18px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--t2); font-family: var(--a-sans); font-size: 15.5px; font-weight: 500; text-align: left; cursor: pointer; transition: border-color .6s var(--ease), color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .fb:hover { border-color: var(--line); color: var(--tx); }
+:is(.a3,.ah,.ad,.af) .fb.on { border-color: rgba(229,181,63,.5); color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .fb small { font-family: var(--a-disp); font-style: italic; font-size: 15px; color: var(--t3); }
+
+/* ==========================================================================
+   2. Cabecera, menús, cajón y pie (tools/sync_nav.py)
+   ========================================================================== */
+header.ah { position: fixed; top: 0; left: 0; right: 0; width: auto; height: var(--ah); z-index: 100; display: flex; flex-direction: column; border: 0; background: rgba(17,13,9,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: none; font-family: var(--a-sans); transition: background-color .6s var(--ease), box-shadow .6s var(--ease); }
+header.ah a, .ad a, footer.af a { text-decoration: none; }
+.mega a.zbox, .mega a.zbox:hover { color: var(--tx) !important; }
+header.ah.scrolled { background: rgba(17,13,9,0.96); box-shadow: 0 10px 40px -20px rgba(0,0,0,.9); border: 0; }
+body.night-vision header.ah { background: rgba(5,0,0,0.94); }
+.ah-bar { display: flex; align-items: center; gap: 36px; height: 78px; padding: 0 var(--gx); box-sizing: border-box; }
+.ah .dbl { margin: 0 var(--gx); }
+.ah-logo { display: flex; align-items: center; gap: 12px; color: var(--tx) !important; text-decoration: none; margin-right: 64px; }
+.ah-logo img { height: 36px; width: auto; display: block; }
+.ah-logo span { font-family: var(--a-disp); font-size: 25px; font-weight: 500; letter-spacing: .005em; }
+.ah-nav { display: flex; align-items: center; gap: 36px; flex-grow: 1; }
+.ah-right { display: flex; align-items: center; gap: 16px; }
+.ah-lang { font-size: 12px; letter-spacing: .2em; color: var(--t3); }
+.ah-lang a { color: var(--t3) !important; text-decoration: none; }
+.ah-lang a.on, .ah-lang a:hover { color: var(--tx) !important; }
+.ah .ah-burger { display: none; }
+:is(.a3,.ah,.ad,.af) .mt { position: static; display: inline-flex; }
+.mega { position: absolute; top: calc(var(--ah) - 3px); z-index: 110; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .4s var(--ease), transform .4s var(--ease), visibility 0s .4s; }
+.mega-obs { left: var(--gx); right: var(--gx); }
+.mega-herr { right: var(--gx); width: min(760px, calc(100% - 2 * var(--gx))); }
+.mega > .card { border-radius: 0 0 28px 28px; border-top: 0; box-shadow: 0 40px 80px -30px rgba(0,0,0,.9); }
+@media (min-width: 1101px) {
+  :is(.a3,.ah,.ad,.af) .mt:hover > .mega, :is(.a3,.ah,.ad,.af) .mt:focus-within > .mega { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+}
+:is(.a3,.ah,.ad,.af) .mi { display: flex; flex-direction: column; gap: 4px; padding: 13px 18px; border-radius: 16px; color: var(--tx) !important; text-decoration: none; transition: background-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .mi:hover { background: var(--s2); }
+:is(.a3,.ah,.ad,.af) .mi b { font-family: var(--a-disp); font-weight: 500; font-size: 21px; }
+:is(.a3,.ah,.ad,.af) .mi span { font-size: 14px; color: var(--t3); }
+:is(.a3,.ah,.ad,.af) .mi:hover b { color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .ti { display: flex; align-items: center; gap: 16px; padding: 11px 16px; border-radius: 16px; color: var(--tx) !important; text-decoration: none; transition: background-color .6s var(--ease); }
+:is(.a3,.ah,.ad,.af) .ti:hover { background: var(--s2); }
+:is(.a3,.ah,.ad,.af) .ti:hover .med { background: var(--gold); color: var(--ink); }
+:is(.a3,.ah,.ad,.af) .ti b { display: block; font-family: var(--a-disp); font-weight: 500; font-size: 20px; }
+:is(.a3,.ah,.ad,.af) .ti small { display: block; font-size: 13.5px; color: var(--t3); margin-top: 2px; }
+:is(.a3,.ah,.ad,.af) .ti .go { margin-left: auto; }
+:is(.a3,.ah,.ad,.af) .ti:hover .go { color: var(--gold2); }
+:is(.a3,.ah,.ad,.af) .ti .med { width: 44px; height: 44px; }
+
+/* cajón (tablet y móvil) */
+.ad { position: fixed; inset: 0; z-index: 200; background: rgba(10,7,5,.6); }
+.ad[hidden] { display: none; }
+.ad-in { position: absolute; top: 0; right: 0; bottom: 0; width: min(420px, 100%); overflow-y: auto; background: var(--bg); border-left: 1px solid var(--line); box-sizing: border-box; font-family: var(--a-sans); }
+.ad-top { position: sticky; top: 0; z-index: 2; height: 68px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px double var(--line); background: var(--bg); }
+.ad-top a { display: flex; align-items: center; gap: 10px; color: var(--tx) !important; text-decoration: none; }
+.ad-top img { height: 30px; width: auto; }
+.ad-top span { font-family: var(--a-disp); font-size: 22px; font-weight: 500; }
+.ad-sec { padding: 24px 16px 0; display: flex; flex-direction: column; gap: 14px; }
+.ad-tiles { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+:is(.a3,.ah,.ad,.af) .tile { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px; min-height: 96px; box-sizing: border-box; background: var(--s1); border: 1px solid var(--line); border-radius: 18px; color: var(--tx) !important; font-size: 14.5px; font-weight: 600; text-decoration: none; }
+:is(.a3,.ah,.ad,.af) .tile::after { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(229,181,63,.14); border-radius: 13px; pointer-events: none; }
+:is(.a3,.ah,.ad,.af) .tile svg { width: 22px; height: 22px; color: var(--gold); }
+:is(.a3,.ah,.ad,.af) .acc { display: flex; align-items: baseline; gap: 14px; min-height: 60px; padding: 14px 4px; box-sizing: border-box; border-bottom: 1px dotted rgba(199,191,169,.32); color: var(--tx) !important; text-decoration: none; }
+:is(.a3,.ah,.ad,.af) .acc b { font-family: var(--a-disp); font-weight: 400; font-size: 27px; }
+:is(.a3,.ah,.ad,.af) .acc i { font-family: var(--a-disp); font-size: 16px; color: var(--gold); }
+:is(.a3,.ah,.ad,.af) .acc small { margin-left: auto; font-size: 13px; color: var(--t3); }
+:is(.a3,.ah,.ad,.af) .acc.sub b { font-size: 21px; color: var(--t2); }
+.ad-foot { padding: 26px 16px 32px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+body.menu-open { overflow: hidden; }
+
+/* pie */
+footer.af { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 72px var(--gx) 44px; border: 0; background: var(--bg); font-family: var(--a-sans); color: var(--tx); }
+.af-sign { font-family: var(--a-disp); font-size: clamp(40px, 4.45vw, 64px); font-weight: 400; font-style: italic; line-height: 1; letter-spacing: -.02em; color: var(--tx); text-align: center; }
+.af-links { display: flex; gap: 18px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
+.af .dbl { width: 100%; margin-top: 56px; }
+.af-bottom { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 24px; }
+.af-bottom > span { display: flex; align-items: center; gap: 12px; color: var(--t3); }
+.af-bottom img { height: 28px; width: auto; display: block; }
+.af-bottom nav { display: flex; flex-wrap: wrap; gap: 14px 30px; }
+.af-bottom nav a { font-size: 14px; }
+
+/* páginas anteriores al Atlas: sus títulos pasan al estilo Atlas (sin mayúsculas forzadas) */
+h1:is(.courses-title, .db-title, .divulgacion-title, .pm-title, .scripts-title, .sec-title, .hero-title) {
+  font-family: var(--a-disp) !important; font-weight: 400 !important; text-transform: none !important;
+  letter-spacing: -0.02em !important; line-height: 1.05 !important;
+}
+
+/* ==========================================================================
+   3. Adaptación: tablet (≤1100) y móvil (≤700)
+   ========================================================================== */
+.a3 svg { max-width: 100%; height: auto; }
+.a3 img { max-width: 100%; }
+.page [class*="g"] > *, .page .jb > *, .page section > * { min-width: 0; max-width: 100%; }
+.page h1, .page h2 { overflow-wrap: break-word; }
+
+@media (max-width: 1100px) {
+  :root { --gx: 40px; --gb: 20px; --gb2: 40px; }
+  .ah-nav, .ah-night, .ah-lang { display: none !important; }
+  .ah .ah-burger { display: inline-flex; }
+  .ah-bar { gap: 14px; }
+  .ah-logo { margin-right: auto; }
+  .mega { display: none; }
+  :is(.a3,.ah,.ad,.af) .jb { flex-wrap: wrap; row-gap: 18px; }
+  :is(.a3,.ah,.ad,.af) .ret { background-position: right top -40px; opacity: .6; }
+  :is(.a3,.ah,.ad,.af) .g12 { row-gap: 44px; }
+  :is(.a3,.ah,.ad,.af) .g12 > .c3, :is(.a3,.ah,.ad,.af) .g12 > .c4, :is(.a3,.ah,.ad,.af) .g12 > .c5, :is(.a3,.ah,.ad,.af) .g12 > .c6, :is(.a3,.ah,.ad,.af) .g12 > .c7, :is(.a3,.ah,.ad,.af) .g12 > .c8, :is(.a3,.ah,.ad,.af) .g12 > .cx { grid-column: 1 / -1 !important; }
+  :is(.a3,.ah,.ad,.af) .g5 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+  :is(.a3,.ah,.ad,.af) .g4 { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  :is(.a3,.ah,.ad,.af) .g4.grows { grid-template-rows: auto !important; }
+  :is(.a3,.ah,.ad,.af) .g4.grows > .r2 { grid-column: 1 / -1 !important; grid-row: auto !important; min-height: 360px; }
+  :is(.a3,.ah,.ad,.af) .g4.grows > * { min-height: 220px; }
+  :is(.a3,.ah,.ad,.af) .card.g12 > div[style*="padding"] { padding: 32px 24px !important; }
+  :is(.a3,.ah,.ad,.af) .card.g12 > div[style*="height: 4"] { height: 320px !important; }
+}
+@media (max-width: 700px) {
+  :root { --gx: 18px; --gb: 10px; --gb2: 22px; }
+  :is(.a3,.ah,.ad,.af) .hwl { display: none; }
+  :is(.a3,.ah,.ad,.af) .hw { padding: 0 13px; }
+  .ah-logo span { font-size: 22px; }
+  .ah-logo img { height: 32px; }
+  :is(.a3,.ah,.ad,.af) .g2, :is(.a3,.ah,.ad,.af) .g3, :is(.a3,.ah,.ad,.af) .g4, :is(.a3,.ah,.ad,.af) .g5, :is(.a3,.ah,.ad,.af) .g12 { grid-template-columns: 1fr !important; }
+  :is(.a3,.ah,.ad,.af) .g2 > *, :is(.a3,.ah,.ad,.af) .g3 > *, :is(.a3,.ah,.ad,.af) .g4 > *, :is(.a3,.ah,.ad,.af) .g5 > * { grid-column: auto !important; }
+  :is(.a3,.ah,.ad,.af) .g5 > .card { min-height: 0 !important; }
+  :is(.a3,.ah,.ad,.af) .g4.grows > .r2 { min-height: 260px; }
+  :is(.a3,.ah,.ad,.af) .frow { flex-direction: column !important; align-items: flex-start !important; }
+  :is(.a3,.ah,.ad,.af) .frow > span[style*="width: 210px"] { width: 100% !important; height: 160px; }
+  :is(.a3,.ah,.ad,.af) .gfix { grid-template-columns: 110px minmax(0,1fr) !important; gap: 14px !important; }
+  :is(.a3,.ah,.ad,.af) .row.gfix[style*="84px"] { grid-template-columns: 64px minmax(0,1fr) !important; }
+  :is(.a3,.ah,.ad,.af) .row .tg { display: none; }
+  :is(.a3,.ah,.ad,.af) .card { border-radius: 18px; }
+  :is(.a3,.ah,.ad,.af) .card.g12[style*="border-radius: 36px"] { border-radius: 24px !important; }
+  :is(.a3,.ah,.ad,.af) .card.g12 > div[style*="height: 4"], :is(.a3,.ah,.ad,.af) .card.g12 > div[style*="height: 3"] { height: 220px !important; }
+  :is(.a3,.ah,.ad,.af) .plate[style*="height: 470px"] { height: 260px !important; }
+  :is(.a3,.ah,.ad,.af) .plate[style*="height: 520px"] { height: 240px !important; }
+  :is(.a3,.ah,.ad,.af) .plate[style*="height: 310px"], :is(.a3,.ah,.ad,.af) .plate[style*="height: 300px"] { height: 240px !important; }
+  :is(.a3,.ah,.ad,.af) .btn, :is(.a3,.ah,.ad,.af) .ghost { height: 46px; padding: 0 20px; }
+  :is(.a3,.ah,.ad,.af) .ann { max-width: 100% !important; }
+  :is(.a3,.ah,.ad,.af) section[style*="border-radius: 36px"] { border-radius: 24px !important; }
+  :is(.a3,.ah,.ad,.af) .kv span:last-child { font-size: 12.5px; }
+  :is(.a3,.ah,.ad,.af) aside[aria-label="Filtros"], :is(.a3,.ah,.ad,.af) aside[aria-label="Filters"] { flex-direction: row !important; flex-wrap: wrap; gap: 8px !important; }
+  :is(.a3,.ah,.ad,.af) aside[aria-label="Filtros"] .fb, :is(.a3,.ah,.ad,.af) aside[aria-label="Filters"] .fb { width: auto; border-color: var(--line); }
+  :is(.a3,.ah,.ad,.af) aside[aria-label="Filtros"] p, :is(.a3,.ah,.ad,.af) aside[aria-label="Filters"] p { display: none; }
+  .af-bottom { flex-direction: column; align-items: flex-start; }
+  .phases { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+}
