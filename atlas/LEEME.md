@@ -31,6 +31,24 @@ Las páginas generadas llevan la marca `ATLAS-PAGE`: no se editan a mano, se edi
 3. Ejecuta los tres comandos. La portada, el menú («Lo último»), Observaciones y los «Más en…» se
    actualizan solos.
 
+### O por el buzón (lo que usan los programas)
+
+Un programa deja `inbox/<slug>/` con `ficha.json` (una entrada como las de `observaciones.json`,
+con los ficheros **sin ruta**: `"curva.png"`) y sus ficheros. Luego:
+
+```
+python tools/publish_from_inbox.py --comprobar   # solo valida
+python tools/publish_from_inbox.py               # valida, copia, regenera y SE PARA
+python tools/publish_from_inbox.py --subir       # commit + push, tras revisar en local
+```
+
+Rechaza (a `inbox/_rechazados/`, con `MOTIVO.txt`) lo que no cuadra: un dato con valor sin
+`source`, ficheros que faltan o sobran, fechas imposibles, textos sin ES o EN, imágenes de más de
+8 MB o vídeos de más de 30 MB, y un slug que ya existe sin `"_publicador": {"reemplazar": true}`.
+Exige el repo limpio para no mezclar cambios, y `--subir` solo sube `obs/`, páginas y sitemap.
+Que una observación nueva cambie casi todas las páginas es normal: el menú y los «Más en…» la
+llevan. `inbox/` no se sube (está en `.gitignore`).
+
 ## Reglas del estilo
 
 Fuente única de colores y tipografías: `CabraBase/estilo/tokens.json`. Bermellón solo para la
