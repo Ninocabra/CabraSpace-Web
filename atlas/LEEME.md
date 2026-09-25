@@ -33,6 +33,7 @@ Las páginas generadas llevan la marca `ATLAS-PAGE`: no se editan a mano, se edi
 
 ### O por el buzón (lo que usan los programas)
 
+Tránsitos: `python tools/paquete_web.py <carpeta analisis>` en el repo de CabraTransit.
 Un programa deja `inbox/<slug>/` con `ficha.json` (una entrada como las de `observaciones.json`,
 con los ficheros **sin ruta**: `"curva.png"`) y sus ficheros. Luego:
 
