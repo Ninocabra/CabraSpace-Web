@@ -36,3 +36,29 @@ Las páginas generadas llevan la marca `ATLAS-PAGE`: no se editan a mano, se edi
 Fuente única de colores y tipografías: `CabraBase/estilo/tokens.json`. Bermellón solo para la
 eclíptica y los errores. Una palabra en cursiva dorada por titular. Números romanos para secciones
 (I., Nº I, Lám. I) y fechas en titulares (15 · IX).
+
+## Láminas del siglo XIX en las cabeceras de las herramientas
+
+Cada herramienta lleva un dibujo de grabado (líneas claras sobre fondo oscuro) generado por un script:
+observatorio (`tools/observatorio.py`, Astro Forecast), pizarra (`tools/pizarra.py`, PixelMath-teca),
+histograma con el punto de simetría (`tools/histograma.py`, AutoGHS), placa de la Carte du Ciel
+(`tools/placa.py`, CabraSpace Web) y fábricas con humo (`tools/factorias.py`, Contaminación).
+Cada uno escribe su SVG en `atlas/img/`. El SVG es negro sobre transparente y la página lo usa como
+**máscara** pintada con `var(--gold)`, así el modo noche lo vuelve rojo sin tocarlo. Dentro de un SVG
+usado como imagen no cargan las fuentes web: los textos van en fuentes del sistema (Times).
+Estilos: `.tl-top` / `.tl-art.art-<nombre>` en `atlas/tools.css` (Astro Forecast: `.aw-obs`).
+
+CabraSpace Web es un cockpit sin scroll: su franja es compacta (88 px bajo la barra) y la rejilla se
+encoge esa misma altura. Si cambias la franja, mide que la rejilla sigue acabando dentro de la pantalla.
+
+## Versión de las hojas de estilo
+
+`tools/sync_nav.py` pone `?v=VERSION` a `atlas.css`, `atlas.js` y a las capas de `EXTRA_CSS`. Si
+cambias un CSS, **sube `VERSION` en sync_nav.py y re-ejecútalo**: si subes el `?v=` a mano en las
+páginas, la siguiente ejecución lo devuelve al valor viejo y los navegadores siguen con la copia antigua.
+
+## Fases del eclipse
+
+`tools/fases_eclipse.py` rehace `obs/eclipse-2026/fase-*.jpg` desde los fotogramas de la Vespera (disco
+E:) con los centros medidos por el pipeline del timelapse (`centros2.csv`, solo `cal >= 0.8`), y la
+totalidad desde la corona de CabraEclipse. Imprime la lista de fases para `observaciones.json`.
