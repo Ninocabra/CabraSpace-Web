@@ -22,7 +22,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
 - **Modelo: N160**
   - [Video de demostración de los Askar N160 y N210: ¿Qué reflector Newton de gran apertura elegir?](https://www.youtube.com/watch?v=6ba0GKdDPeY) (2026-08-21)
-  - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
 - **Modelo: N210**
   - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
 
@@ -154,6 +153,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
   - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
+- **Modelo: SyQon Studio**
+  - [SyQon Studio ya está disponible: cómo usarlo con SASpro y PixInsight](https://www.youtube.com/watch?v=ov2L5AErUMQ) (2026-09-25)
 - **Modelo: TAIC**
   - [Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)](https://www.youtube.com/watch?v=Tp08gy1xJZ8) (2026-09-19)
 - **Modelo: Veil**
