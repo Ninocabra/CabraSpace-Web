@@ -202,6 +202,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: seguridad**
   - [Advertencia de seguridad de QHYCCD sobre código malicioso en su sitio web](https://www.qhyccd.com/security-advisory-malicious-code-on-www-qhyccd-com-10-12-august-2026/) (2026-08-12)
 
+## Sky-Watcher
+
+### MOUNTS
+- **Modelo: HEQ5-R Pro**
+  - [Sky-Watcher HEQ5-R Pro: ¿Siguen importando las monturas tradicionales?](https://www.youtube.com/watch?v=_xrPt5XbQT4) (2026-09-25)
+
 ## Skywatcher
 
 ### ACCESSORIES
@@ -230,8 +236,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Prime Day**
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
   - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
-- **Modelo: Rumak**
-  - [Kit "Rumak" de Deep-Sky: ¿Qué Tan Poderoso Es?](https://www.youtube.com/shorts/Ejy41M9MCtw) (2026-06-23)
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
 - **Modelo: SA207pro**
