@@ -48,6 +48,7 @@
       vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en Nerpio mirando al horizonte. Arrastra para girar.',
       franjaHoy: 'Hoy', franjaManana: 'Mañana',
       franjaLuna: 'Luna', franjaNubes: 'nubes',
+      franjaSinNube: 'cobertura esperada (WeatherNext, calibrada)',
       franjaOscura: 'oscuridad astronómica',
       franjaNota: 'Cada franja va del ocaso al orto y su ancho es la duración real de esa noche. ' +
         'El color es la nubosidad prevista hora a hora — verde despejado, ámbar parcial, rojo cubierto — ' +
@@ -210,6 +211,7 @@
       vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at Nerpio looking at the horizon. Drag to turn.',
       franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
       franjaLuna: 'Moon', franjaNubes: 'clouds',
+      franjaSinNube: 'expected cover (WeatherNext, calibrated)',
       franjaOscura: 'astronomical darkness',
       franjaNota: 'Each strip runs from sunset to sunrise and its width is that night’s real duration. ' +
         'Colour is the hourly cloud forecast — green clear, amber partial, red overcast — and the numbers are ' +
@@ -590,13 +592,26 @@
     }
   }
 
+  /* LA NUBE DE UNA HORA, desde el 25-09-2026. Las noches de despues de hoy
+     salen de WeatherNext 3, y sus terminos de uso no dejan republicar su nube
+     cruda: el motor manda `nubes_previstas: null` y solo la probabilidad
+     calibrada. Pintar null como 0 dibujaria una noche tapada como si fuera
+     negra y limpia, asi que sin nube cruda se pinta lo que SI se publica:
+     1 - p_despejado. Es un grado de cobertura esperado, no un porcentaje de
+     nube, y por eso tampoco se rotula con cifras de nube. */
+  function nubeHora(h) {
+    if (typeof h.nubes_previstas === 'number') { return h.nubes_previstas / 100; }
+    if (typeof h.p_despejado === 'number') { return 1 - h.p_despejado; }
+    return 0;
+  }
+
   function colorHora(h, noche) {
     var pal = paletaCupula();
     if (PALETA_FRANJA !== 'cupula' || !pal) {
-      return colorNube((h.nubes_previstas || 0) / 100);
+      return colorNube(nubeHora(h));
     }
     var c = [10, 11, 14];                       // noche perfecta: casi negro
-    sumarTinte(c, pal.nube, (h.nubes_previstas || 0) / 100 * 0.92);
+    sumarTinte(c, pal.nube, nubeHora(h) * 0.92);
     if (h.limita === 'luna') {
       sumarTinte(c, pal.luna, (noche.luna_iluminacion || 0) * 0.55);
     }
@@ -728,9 +743,12 @@
     var pico = dentro.reduce(function (a, h) {
       return (h.nubes_previstas || 0) > (a.nubes_previstas || 0) ? h : a;
     }, dentro[0] || horas[0]);
-    var resumen = rotulo + ': ' + t.franjaNubes + ' ' +
-      Math.round((dentro[0] || horas[0]).nubes_previstas || 0) + '% → ' +
-      Math.round(pico.nubes_previstas || 0) + '%' +
+    var conNube = horas.some(function (h) { return typeof h.nubes_previstas === 'number'; });
+    var resumen = rotulo + ': ' + (conNube
+      ? t.franjaNubes + ' ' +
+        Math.round((dentro[0] || horas[0]).nubes_previstas || 0) + '% → ' +
+        Math.round(pico.nubes_previstas || 0) + '%'
+      : t.franjaSinNube) +
       (luna ? ' · ' + t.franjaLuna : '');
 
     return '<div class="aw-franja">' +
@@ -3046,6 +3064,11 @@
     html += bloqueElegir(t);
 
     html += '<div class="aw-foot">' + t.pie;
+    (datos.atribucion || []).forEach(function (a) {
+      if (a && a.cita) {
+        html += '<br><span class="aw-cita">' + esc(a.cita) + '</span>';
+      }
+    });
     if (datos.generado_utc) {
       html += '<br>' + esc(t.generado) + ': ' +
         esc(String(datos.generado_utc).replace('T', ' ').slice(0, 16)) + ' UTC.';
