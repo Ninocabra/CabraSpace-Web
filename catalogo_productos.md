@@ -20,7 +20,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis a fondo del Askar N160: ¿Un Newton de alto valor F3.4?](https://www.youtube.com/watch?v=vyTPlmoWHEk) (2026-08-19)
 - **Actualizaciones Generales / Revisiones:**
   - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
-  - [Reemplazo de Celestron SCT por Askar 131F: ¿Un Error?](https://www.youtube.com/watch?v=3zh_7IxWO14) (2026-06-22)
 - **Modelo: N160**
   - [Video de demostración de los Askar N160 y N210: ¿Qué reflector Newton de gran apertura elegir?](https://www.youtube.com/watch?v=6ba0GKdDPeY) (2026-08-21)
   - [Video promocional del telescopio Askar N160](https://www.youtube.com/watch?v=6KelEc6BBUU) (2026-06-23)
@@ -178,6 +177,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASTRO-RES**
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
+- **Modelo: ESATTO**
+  - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
 - **Modelo: OUTPOST 3M**
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
   - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
