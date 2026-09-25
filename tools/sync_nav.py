@@ -21,7 +21,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20260925d"
+VERSION = "20260925e"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
@@ -69,7 +69,7 @@ TEXT = {
         "install_q": "¿Algo para instalar en PixInsight?",
         "drawer_tools": "Úsalas ahora · sin instalar", "all_tools": "Todas las herramientas",
         "drawer_sub": ("Fotografía · Medidas", "Para instalar", "Novedades"),
-        "sign": "Cielos despejados.", "contact": "Contacto",
+        "contact": "Contacto",
         "foot_links": [("observaciones.html", "Observaciones"), ("herramientas.html", "Herramientas web"),
                        ("programas.html", "Programas"), ("bitacora.html", "Bitácora")],
     },
@@ -91,7 +91,7 @@ TEXT = {
         "install_q": "Looking for something to install in PixInsight?",
         "drawer_tools": "Use them now · nothing to install", "all_tools": "All web tools",
         "drawer_sub": ("Photography · Measurements", "Desktop software", "News"),
-        "sign": "Clear skies.", "contact": "Contact",
+        "contact": "Contact",
         "foot_links": [("observaciones.html", "Observations"), ("herramientas.html", "Web tools"),
                        ("programas.html", "Software"), ("bitacora.html", "Logbook")],
     },
@@ -211,13 +211,25 @@ def drawer(fname):
         f'  </div></div>')
 
 
+# Latin sign-off at the foot of each page, the same in ES and EN (Nino, 25-09-2026).
+SIGNS = {
+    "index.html": "Et lux in tenebris lucet, et tenebrae eam non comprehenderunt.",  # Jn 1,5 (Vulgata)
+    "programas.html": "Os homini sublime dedit caelumque tueri iussit "
+                      "et erectos ad sidera tollere vultus.",                         # Ovidio, Met. I, 85-86
+    "bitacora.html": "Sic itur ad astra.",                                            # Virgilio, En. IX, 641
+}
+SIGN_DEFAULT = "Caelum tueri."
+
+
 def footer(fname):
     lang = lang_of(fname)
     t = TEXT[lang]
+    sign = SIGNS.get(fname if lang == "es" else twin_of(fname), SIGN_DEFAULT)
+    long_ = " long" if len(sign) > 40 else ""
     links = "".join(f'<a class="nl" href="{L(h, lang)}">{n}</a>' for h, n in t["foot_links"])
     return (
         f'<footer class="af">\n'
-        f'    <span class="af-sign">{t["sign"]}</span>\n'
+        f'    <span class="af-sign{long_}" lang="la">{sign}</span>\n'
         f'    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a>'
         f'<a class="ghost" href="mailto:info@cabraspace.com">{t["contact"]}</a></div>\n'
         f'    <div class="dbl" aria-hidden="true"></div>\n'

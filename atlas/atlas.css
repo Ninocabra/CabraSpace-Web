@@ -190,6 +190,7 @@ body.menu-open { overflow: hidden; }
 /* pie */
 footer.af { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 72px var(--gx) 44px; border: 0; background: var(--bg); font-family: var(--a-sans); color: var(--tx); }
 .af-sign { font-family: var(--a-disp); font-size: clamp(40px, 4.45vw, 64px); font-weight: 400; font-style: italic; line-height: 1; letter-spacing: -.02em; color: var(--tx); text-align: center; }
+.af-sign.long { max-width: 22ch; font-size: clamp(28px, 3vw, 42px); line-height: 1.15; }
 .af-links { display: flex; gap: 18px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
 .af .dbl { width: 100%; margin-top: 56px; }
 .af-bottom { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 24px; }
