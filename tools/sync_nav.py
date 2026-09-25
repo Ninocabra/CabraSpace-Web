@@ -213,24 +213,29 @@ def drawer(fname):
 
 # Latin sign-off at the foot of each page, the same in ES and EN, with its translation and source in the
 # page's language (Nino, 25-09-2026). Page -> (latin, {lang: (translation, source)}).
+# Translations are quoted verbatim from published editions (checked 25-09-2026 on Bible Gateway,
+# Wikisource, theoi.com and Project Gutenberg); the source line names the translator.
 SIGNS = {
     "index.html": ("Et lux in tenebris lucet, et tenebrae eam non comprehenderunt.", {
-        "es": ("Y la luz brilla en las tinieblas, y las tinieblas no la comprendieron.",
-               "Evangelio de Juan 1, 5 · Vulgata"),
-        "en": ("And the light shines in the darkness, and the darkness did not comprehend it.",
-               "Gospel of John 1:5 · Vulgate")}),
+        "es": ("Y la luz en las tinieblas resplandece; mas las tinieblas no la comprendieron.",
+               "Evangelio de Juan 1, 5 · Reina-Valera, 1909"),
+        "en": ("And the light shineth in darkness; and the darkness comprehended it not.",
+               "Gospel of John 1:5 · King James Version, 1611")}),
     "programas.html": ("Os homini sublime dedit caelumque tueri iussit et erectos ad sidera tollere vultus.", {
-        "es": ("Dio al hombre un rostro erguido y le mandó mirar al cielo y alzar la cara hacia las estrellas.",
-               "Ovidio · Metamorfosis I, 85-86"),
-        "en": ("He gave man an uplifted face and bade him behold the sky and raise his eyes to the stars.",
-               "Ovid · Metamorphoses I, 85–86")}),
+        "es": ("Un rostro sublime al hombre dio y el cielo ver le ordenó y erguido hacia las estrellas "
+               "levantar su semblante.",
+               "Ovidio · Metamorfosis I, 85-86 · trad. Ana Pérez Vega"),
+        "en": ("Man was given a lofty countenance and was commanded to behold the skies; "
+               "and with an upright face may view the stars.",
+               "Ovid · Metamorphoses I, 85–86 · tr. Brookes More, 1922")}),
     "bitacora.html": ("Sic itur ad astra.", {
-        "es": ("Así se llega a las estrellas.", "Virgilio · Eneida IX, 641"),
-        "en": ("Thus one goes to the stars.", "Virgil · Aeneid IX, 641")}),
+        "es": ("¡Sigue! ¡ése es de los astros el camino!",
+               "Virgilio · Eneida IX, 641 · trad. Miguel Antonio Caro"),
+        "en": ("This is the Way to Heav'n.", "Virgil · Aeneid IX, 641 · tr. John Dryden, 1697")}),
 }
 SIGN_DEFAULT = ("Caelum tueri.", {
-    "es": ("Mirar al cielo.", "Ovidio · Metamorfosis I, 85"),
-    "en": ("To behold the sky.", "Ovid · Metamorphoses I, 85")})
+    "es": ("Contemplar el cielo.", "Ovidio · Metamorfosis I, 85 · trad. Francisco Crivell, 1805"),
+    "en": ("To behold the skies.", "Ovid · Metamorphoses I, 85 · tr. Brookes More, 1922")})
 
 
 def footer(fname):
