@@ -270,7 +270,7 @@ def publish(check_only):
     for script in BUILD:
         r = subprocess.run([sys.executable, script], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
         if r.returncode:
-            sys.exit(f"{script} falló (el buzón sigue intacto; deshaz con 'git checkout -- . && git clean -fd obs'):\n"
+            sys.exit(f"{script} falló (el buzón sigue intacto; deshaz con 'git checkout -- . && git clean -fd -- obs "*.html"'):\n"
                      f"{r.stdout}\n{r.stderr}")
 
     # Did each observation really get its page? Exit 0 is not proof.
@@ -295,7 +295,7 @@ def publish(check_only):
     for p in changed:
         print(f"  {p}")
     print("\nRevisa en local (páginas de arriba). Si está bien:  python tools/publish_from_inbox.py --subir")
-    print("Si no:  git checkout -- . && git clean -fd obs   (el paquete sigue en inbox/_publicados/)")
+    print("Si no:  git checkout -- . && git clean -fd -- obs "*.html"   (el paquete sigue en inbox/_publicados/)")
     return 0
 
 
