@@ -1693,19 +1693,29 @@
  {
   "slug": "eclipse-2026",
   "kind": "eclipse",
-  "object": "Eclipse solar del 12-08-2026 (parcial profundo visto desde el sitio de observacion)",
+  "object": "Eclipse solar total del 12-08-2026 desde el mirador del Cabrero, entre Fortanete y Villarroya de los Pinares (Teruel)",
   "date_iso": "2026-08-12",
   "nights": null,
   "files": [
    "eclipse-2026/video.mp4",
    "eclipse-2026/poster.jpg",
+   "eclipse-2026/corona.jpg",
+   "eclipse-2026/corona-4k.jpg",
+   "eclipse-2026/corona-thumb.jpg",
    "eclipse-2026/fase-1.jpg",
    "eclipse-2026/fase-2.jpg",
    "eclipse-2026/fase-3.jpg",
    "eclipse-2026/fase-4.jpg",
    "eclipse-2026/fase-5.jpg",
    "eclipse-2026/fase-6.jpg",
-   "eclipse-2026/fase-7.jpg"
+   "eclipse-2026/fase-7.jpg",
+   "eclipse-2026/fase-8.jpg",
+   "eclipse-2026/fase-9.jpg",
+   "eclipse-2026/fase-10.jpg",
+   "eclipse-2026/fase-11.jpg",
+   "eclipse-2026/fase-12.jpg",
+   "eclipse-2026/fase-13.jpg",
+   "eclipse-2026/fase-14.jpg"
   ],
   "facts": {
    "equipo": {
@@ -1721,24 +1731,39 @@
     "source": "E:\\ASTRO Sin Procesar\\Vespera PRO\\Imagenes\\Eclipse Agosto 2026\\video\\LEEME.md"
    },
    "totalidad": {
-    "value": null,
-    "source": "No declarada en video/LEEME.md. Los fotogramas son continuos (22-29 por minuto entre 18:20 y 18:50 UTC, contado en 02-observation/01-images); en la ocultación el Sol vale 5-10 DN (LEEME.md, apartado \"Qué falló en la v3\"). Revisado el 24-09-2026."
-   },
-   "poster_frame": {
-    "value": "2026-08-12_18-26-07_1453.jpeg (18:26:07 UTC, creciente mas fino con buena señal antes del hueco de datos 18:27-18:38)",
-    "source": "E:\\ASTRO Sin Procesar\\Vespera PRO\\Imagenes\\Eclipse Agosto 2026\\02-observation\\01-images\\2026-08-12_18-26-07_1453.jpeg"
+    "value": "18:30:30-18:32:30 UTC en el reloj de la Vespera",
+    "source": "Medido el 25-09-2026 en 02-observation/01-images: el maximo de brillo (reduccion x8) cae a 16-19 DN entre 18:31:01 y 18:32:30 y el fotograma estirado es solo ruido desde 18:30:31; antes, 18:30:01 = 30 DN con creciente; despues, 18:33:00 = 30 DN"
    },
    "fase_frames": {
     "value": {
-     "fase-1": "2026-08-12_17-37-38_1.jpeg (17:37:38 UTC, primer contacto / disco casi completo)",
-     "fase-2": "2026-08-12_17-52-00_434.jpeg (17:52:00 UTC)",
-     "fase-3": "2026-08-12_18-05-02_828.jpeg (18:05:02 UTC)",
-     "fase-4": "2026-08-12_18-15-01_1127.jpeg (18:15:01 UTC)",
-     "fase-5": "2026-08-12_18-22-00_1339.jpeg (18:22:00 UTC)",
-     "fase-6": "2026-08-12_18-26-07_1453.jpeg (18:26:07 UTC, maxima fase observada)",
-     "fase-7": "2026-08-12_18-48-01_2106.jpeg (18:48:01 UTC, ultimo creciente limpio antes de perderse en el horizonte)"
+     "fase-1": "2026-08-12_17-37-38_1.jpeg",
+     "fase-2": "2026-08-12_17-52-00_434.jpeg",
+     "fase-3": "2026-08-12_18-04-59_826.jpeg",
+     "fase-4": "2026-08-12_18-14-59_1126.jpeg",
+     "fase-5": "2026-08-12_18-22-00_1339.jpeg",
+     "fase-6": "2026-08-12_18-27-59_1504.jpeg",
+     "fase-7": "CabraEclipse_v3.45.0_final.jpg (Fuji X-T5)",
+     "fase-8": "2026-08-12_18-35-00_1724.jpeg",
+     "fase-9": "2026-08-12_18-38-01_1818.jpeg",
+     "fase-10": "2026-08-12_18-41-01_1897.jpeg",
+     "fase-11": "2026-08-12_18-44-00_1988.jpeg",
+     "fase-12": "2026-08-12_18-46-59_2080.jpeg",
+     "fase-13": "2026-08-12_18-48-59_2131.jpeg",
+     "fase-14": "2026-08-12_18-50-59_2189.jpeg"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Vespera PRO\\Imagenes\\Eclipse Agosto 2026\\02-observation\\01-images\\ (nombres de fichero, timestamp UTC)"
+    "source": "tools/fases_eclipse.py: fotograma mas cercano a cada hora con centro fiable (centros2.csv, cal >= 0.8) de E:/ASTRO Sin Procesar/Vespera PRO/Imagenes/Eclipse Agosto 2026/02-observation/01-images; la totalidad, recortada de CabraEclipse_v3.45.0_final.jpg"
+   },
+   "corona": {
+    "value": "Fuji X-T5 a 300 mm; 99 tomas (_DSF1658-_DSF1756) en 25 s; HDR con CabraEclipse v3.45.0; salida 6680x4360",
+    "source": "CabraEclipse/CONTINUAR_AQUI.md (EXIF X-T5, 300 mm; 'La serie dura 25 SEGUNDOS'); CabraEclipse/Imagenes/195_FUJI/CabraEclipse_seleccion.json (99 fotogramas marcados); CabraBase/PROYECTOS.md (CabraEclipse: v3.45.0, salida 6680x4360); fichero entregado por Nino el 25-09-2026: CabraEclipse_v3.45.0_final.jpg"
+   },
+   "corona_color": {
+    "value": "el dorado es una decision de procesado; la corona K es blanca",
+    "source": "CabraBase/DIARIO.md, entrada 2026-08-29 'CabraEclipse: la franja del borde era COBERTURA'"
+   },
+   "lugar": {
+    "value": "el mirador del Cabrero, entre Fortanete y Villarroya de los Pinares (Teruel)",
+    "source": "Nino, 25-09-2026: la Fuji y la Vespera estaban en el mismo sitio"
    }
   },
   "page": "eclipse-2026.html",
@@ -1751,18 +1776,32 @@
    "en": "Solar eclipse, <em class=\"gi\">twelfth of August</em>"
   },
   "subtitle": {
-   "es": "Serie · 12 · VIII · 2026 · Vaonis Vespera Pro",
-   "en": "Series · 12 Aug 2026 · Vaonis Vespera Pro"
+   "es": "Eclipse total · 12 · VIII · 2026 · Mirador del Cabrero",
+   "en": "Total eclipse · 12 Aug 2026 · Cabrero viewpoint"
   },
-  "thumb": "obs/eclipse-2026/fase-4.jpg",
-  "poster": "obs/eclipse-2026/fase-5.jpg",
-  "og": "obs/eclipse-2026/fase-4.jpg",
+  "thumb": "obs/eclipse-2026/corona-thumb.jpg",
+  "poster": "obs/eclipse-2026/corona.jpg",
+  "og": "obs/eclipse-2026/corona.jpg",
   "media": [
+   {
+    "type": "image",
+    "src": "obs/eclipse-2026/corona.jpg",
+    "full": "obs/eclipse-2026/corona-4k.jpg",
+    "height": 560,
+    "alt": {
+     "es": "La corona solar durante la totalidad del eclipse del 12 de agosto de 2026, con una protuberancia roja en el borde izquierdo",
+     "en": "The solar corona during totality of the 12 August 2026 eclipse, with a red prominence on the left limb"
+    },
+    "caption": {
+     "es": "La corona en totalidad: 99 tomas con una Fuji X-T5 a 300 mm en 25 s, combinadas en HDR con CabraEclipse. A la izquierda, una protuberancia. El dorado es una elección de procesado: la corona interna es blanca.",
+     "en": "The corona in totality: 99 frames with a Fuji X-T5 at 300 mm over 25 s, merged into HDR with CabraEclipse. On the left, a prominence. The gold is a processing choice: the inner corona is white."
+    }
+   },
    {
     "type": "video",
     "src": "obs/eclipse-2026/video.mp4",
     "poster": "obs/eclipse-2026/fase-5.jpg",
-    "height": 560,
+    "height": 460,
     "caption": {
      "es": "Timelapse de 60 s hecho con 2193 fotografías.",
      "en": "60-second timelapse made from 2,193 photographs."
@@ -1772,7 +1811,7 @@
   "phases": [
    {
     "src": "obs/eclipse-2026/fase-1.jpg",
-    "time": "17:37"
+    "time": "17:38"
    },
    {
     "src": "obs/eclipse-2026/fase-2.jpg",
@@ -1792,11 +1831,43 @@
    },
    {
     "src": "obs/eclipse-2026/fase-6.jpg",
-    "time": "18:26"
+    "time": "18:28"
    },
    {
     "src": "obs/eclipse-2026/fase-7.jpg",
-    "time": "18:48"
+    "time": "18:31",
+    "label": {
+     "es": "18:31 · totalidad",
+     "en": "18:31 · totality"
+    }
+   },
+   {
+    "src": "obs/eclipse-2026/fase-8.jpg",
+    "time": "18:35"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-9.jpg",
+    "time": "18:38"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-10.jpg",
+    "time": "18:41"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-11.jpg",
+    "time": "18:44"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-12.jpg",
+    "time": "18:47"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-13.jpg",
+    "time": "18:49"
+   },
+   {
+    "src": "obs/eclipse-2026/fase-14.jpg",
+    "time": "18:51"
    }
   ],
   "facts_display": {
@@ -1806,7 +1877,19 @@
      "12 · VIII · 2026"
     ],
     [
-     "Equipo",
+     "Lugar",
+     "Mirador del Cabrero (Teruel)"
+    ],
+    [
+     "Corona",
+     "Fuji X-T5 · 300 mm · 99 tomas"
+    ],
+    [
+     "Totalidad",
+     "18:30:30 – 18:32:30 UTC"
+    ],
+    [
+     "Timelapse",
      "Vaonis Vespera Pro"
     ],
     [
@@ -1815,11 +1898,11 @@
     ],
     [
      "Primera",
-     "17:37 UTC"
+     "17:37:38 UTC"
     ],
     [
-     "Última lámina de fase",
-     "18:48 UTC"
+     "Última fase",
+     "18:51 UTC, ya en el horizonte"
     ],
     [
      "Vídeo",
@@ -1832,7 +1915,19 @@
      "12 Aug 2026"
     ],
     [
-     "Equipment",
+     "Site",
+     "Cabrero viewpoint (Teruel)"
+    ],
+    [
+     "Corona",
+     "Fuji X-T5 · 300 mm · 99 frames"
+    ],
+    [
+     "Totality",
+     "18:30:30 – 18:32:30 UTC"
+    ],
+    [
+     "Timelapse",
      "Vaonis Vespera Pro"
     ],
     [
@@ -1841,11 +1936,11 @@
     ],
     [
      "First",
-     "17:37 UTC"
+     "17:37:38 UTC"
     ],
     [
-     "Last phase plate",
-     "18:48 UTC"
+     "Last phase",
+     "18:51 UTC, already on the horizon"
     ],
     [
      "Video",
@@ -1854,12 +1949,12 @@
    ]
   },
   "notes": {
-   "es": "<p>El paso de la Luna por delante del Sol, desde el primer contacto hasta la puesta, en fotografías cada 2 s aproximadamente. En la fase central el Sol queda casi oculto y la imagen se oscurece mucho; después, a las 18:48, el creciente ya asoma por el otro lado.</p><p>La imagen de la corona, procesada con CabraEclipse, se añadirá aquí cuando esté terminada.</p>",
-   "en": "<p>The Moon passing in front of the Sun, from first contact until sunset, photographed roughly every 2 s. In the central phase the Sun is almost hidden and the image gets very dark; later, at 18:48, the crescent shows on the other side.</p><p>The image of the corona, processed with CabraEclipse, will be added here once it is finished.</p>"
+   "es": "<p>Desde el mirador del Cabrero, entre Fortanete y Villarroya de los Pinares (Teruel), con dos equipos en el mismo sitio. La Vaonis Vespera Pro fotografió el paso de la Luna por delante del Sol cada 2 s aproximadamente, del primer contacto a la puesta. Durante la totalidad, entre las 18:30:30 y las 18:32:30 UTC, su filtro solar solo deja pasar ruido; después el creciente reaparece por el otro lado y el Sol se pone, todavía eclipsado, hacia las 18:51.</p><p>La corona (Fig. 1 y el disco de las 18:31 en la serie de fases) es de la otra cámara: una Fuji X-T5 a 300 mm de focal. Son 99 tomas de exposiciones distintas en 25 s, combinadas en una sola imagen de alto rango dinámico con CabraEclipse, para que se vean a la vez la corona exterior, muy débil, y el borde de la Luna.</p><p>Todos los discos de fase se han recortado igual, centrados en el Sol, y pintados con el mismo color para que la serie se lea de un vistazo.</p>",
+   "en": "<p>From the Cabrero viewpoint, between Fortanete and Villarroya de los Pinares (Teruel, Spain), with two instruments at the same spot. The Vaonis Vespera Pro photographed the Moon crossing the Sun roughly every 2 s, from first contact until sunset. During totality, between 18:30:30 and 18:32:30 UTC, its solar filter lets only noise through; then the crescent reappears on the other side and the Sun sets, still eclipsed, at about 18:51.</p><p>The corona (Fig. 1, and the 18:31 disc in the phase series) comes from the other camera: a Fuji X-T5 at 300 mm focal length. It is 99 frames at different exposures over 25 s, merged into a single high-dynamic-range image with CabraEclipse, so that the faint outer corona and the edge of the Moon show at the same time.</p><p>All the phase discs are cut the same way, centred on the Sun, and painted in the same colour so the series reads at a glance.</p>"
   },
   "description": {
-   "es": "El eclipse solar del 12 de agosto de 2026 en un timelapse de 2193 fotografías con la Vaonis Vespera Pro.",
-   "en": "The solar eclipse of 12 August 2026 in a timelapse of 2,193 photographs taken with the Vaonis Vespera Pro."
+   "es": "El eclipse total del 12 de agosto de 2026 desde el mirador del Cabrero (Teruel): la corona (Fuji X-T5, HDR con CabraEclipse) y un timelapse de 2193 fotografías con la Vaonis Vespera Pro.",
+   "en": "The 12 August 2026 total eclipse from the Cabrero viewpoint (Teruel, Spain): the corona (Fuji X-T5, HDR with CabraEclipse) and a timelapse of 2,193 photographs with the Vaonis Vespera Pro."
   }
  }
 ]

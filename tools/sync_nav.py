@@ -21,12 +21,13 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20260924b"
+VERSION = "20260925d"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
 EXTRA_CSS = {  # capa de estilo propia de algunas páginas, enlazada justo después de atlas.css
     "cabraspace-imaging-workflow": "atlas/tools.css", "autoghs": "atlas/tools.css", "pixelmath": "atlas/tools.css",
+    "contaminacion-mapa": "atlas/tools.css",
     "astroforecast": "atlas/astroforecast.css",
 }
 WITH_FOOTER = {"astroforecast.html", "astroforecast-en.html"}  # no tenían pie; lo reciben

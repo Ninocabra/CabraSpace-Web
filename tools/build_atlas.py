@@ -640,13 +640,13 @@ def build_obs_page(o, obs, lang):
             f'<a href="{ph["src"]}" target="_blank" rel="noopener" style="display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--t3)">'
             f'<img src="{ph["src"]}" alt="{T("El Sol a las", "The Sun at")(lang)} {ph["time"]} UTC" loading="lazy" '
             f'style="width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 50%; object-fit: cover; border: 1px solid var(--line)">'
-            f'<span class="bd" style="font-style: italic; font-size: 14px">{ph["time"]}</span></a>' for ph in o["phases"])
+            f'<span class="bd" style="font-style: italic; font-size: 14px; text-align: center">{(ph.get("label") or {}).get(lang, ph["time"])}</span></a>' for ph in o["phases"])
         main_col += (f'<div style="display: flex; flex-direction: column; gap: 18px; padding: 28px; border-radius: 22px; background: var(--s1); border: 1px solid var(--line)">'
                      f'<span class="caps" style="color: var(--t2)">{T("Las fases · hora UTC", "The phases · UTC time")(lang)}</span>'
-                     f'<div class="phases" style="display: grid; grid-template-columns: repeat({len(o["phases"])}, minmax(0, 1fr)); gap: 12px">{discs}</div></div>')
+                     f'<div class="phases" style="display: grid; grid-template-columns: repeat({min(7, len(o["phases"]))}, minmax(0, 1fr)); gap: 18px 12px">{discs}</div></div>')
     more_media = ""
     if len(blocks) > 1:
-        more_media = f'<div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px">{"".join(blocks[1:])}</div>'
+        more_media = f'<div class="g2" style="display: grid; grid-template-columns: repeat({min(2, len(blocks) - 1)}, minmax(0, 1fr)); gap: 28px">{"".join(blocks[1:])}</div>'  # a lone second figure takes the full width
     tool = o.get("made_with")
     tool_card = ""
     if tool:

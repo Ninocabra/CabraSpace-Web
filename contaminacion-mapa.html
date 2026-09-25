@@ -6,120 +6,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa de Contaminación Lumínica - CabraSpace</title>
-  <meta name="description" content="Consulta el mapa interactivo de contaminación lumínica de LightPollutionMap.info para planificar tus noches de astrofotografía.">
+  <meta name="description" content="Encuentra cielos oscuros para astrofotografía con DarkSkySites (mapa VIIRS y simulador APEX) o con Light Pollution Map (escala Bortle con decimales).">
   <link rel="stylesheet" href="index.css?v=1.4">
   <link rel="stylesheet" href="support.css">
-  <style>
-    .tool-hero {
-      min-height: calc(100vh - 76px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 24px 60px;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 10;
-    }
-
-    .tool-card {
-      max-width: 780px;
-      width: 100%;
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(207,171,74,0.15);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(207,171,74,0.04);
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
-    }
-    .tool-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 60px rgba(207,171,74,0.12), 0 0 80px rgba(207,171,74,0.06);
-      border-color: rgba(207,171,74,0.25);
-    }
-
-    .tool-card-img-wrapper {
-      padding: 20px 20px 0;
-    }
-
-    .tool-card-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 10px;
-      border: 1px solid rgba(207,171,74,0.12);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 20px rgba(207,171,74,0.05);
-    }
-
-    .tool-card-body {
-      padding: 36px 32px 40px;
-      text-align: center;
-    }
-
-    .tool-card-body h1 {
-      font-family: 'Inter', sans-serif;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 0 0 8px;
-    }
-    .tool-card-body h1 span {
-      color: var(--gold-primary);
-    }
-
-
-
-    .tool-card-body p {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: var(--text-secondary);
-      margin: 0 0 28px;
-      max-width: 560px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .tool-card-body .tool-sources {
-      font-size: 0.82rem;
-      color: var(--text-muted, #666);
-      margin-bottom: 28px;
-    }
-    .tool-card-body .tool-sources strong {
-      color: var(--text-secondary);
-    }
-
-    .tool-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 36px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #000;
-      background: linear-gradient(135deg, var(--gold-primary), var(--gold-light, #e8c84a));
-      border: none;
-      border-radius: 10px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: 0 4px 20px rgba(207,171,74,0.3);
-    }
-    .tool-cta:hover {
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 8px 32px rgba(207,171,74,0.45);
-    }
-    .tool-cta svg {
-      width: 18px;
-      height: 18px;
-      fill: currentColor;
-    }
-
-    @media (max-width: 600px) {
-      .tool-card-img-wrapper { padding: 12px 12px 0; }
-      .tool-card-body { padding: 24px 20px 32px; }
-      .tool-card-body h1 { font-size: 1.35rem; }
-      .tool-cta { padding: 12px 28px; font-size: 0.95rem; }
-    }
-  </style>
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/contaminacion-mapa.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/contaminacion-mapa.html">
@@ -130,14 +19,15 @@
   <meta property="og:locale" content="es_ES">
   <meta property="og:url" content="https://cabraspace.com/contaminacion-mapa.html">
   <meta property="og:title" content="Mapa de Contaminación Lumínica - CabraSpace">
-  <meta property="og:description" content="Consulta el mapa interactivo de contaminación lumínica de LightPollutionMap.info para planificar tus noches de astrofotografía.">
+  <meta property="og:description" content="Encuentra cielos oscuros para astrofotografía con DarkSkySites (mapa VIIRS y simulador APEX) o con Light Pollution Map (escala Bortle con decimales).">
   <meta property="og:image" content="https://cabraspace.com/logo.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mapa de Contaminación Lumínica - CabraSpace">
-  <meta name="twitter:description" content="Consulta el mapa interactivo de contaminación lumínica de LightPollutionMap.info para planificar tus noches de astrofotografía.">
+  <meta name="twitter:description" content="Encuentra cielos oscuros para astrofotografía con DarkSkySites (mapa VIIRS y simulador APEX) o con Light Pollution Map (escala Bortle con decimales).">
   <meta name="twitter:image" content="https://cabraspace.com/logo.png">
   <!-- SEO-AUTO-END -->
-  <link rel="stylesheet" href="atlas/atlas.css?v=20260924b">
+  <link rel="stylesheet" href="atlas/atlas.css?v=20260925d">
+  <link rel="stylesheet" href="atlas/tools.css?v=20260925d">
 </head>
 <body>
   <script>
@@ -174,22 +64,26 @@
     <div class="ad-foot"><button class="ic ah-night" type="button" aria-label="Modo noche" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button><span class="caps ah-lang"><a href="contaminacion-mapa.html" lang="es" class="on">ES</a> · <a href="contaminacion-mapa-en.html" lang="en">EN</a></span></div>
   </div></div>
 
-  <section class="tool-hero">
-    <div class="tool-card">
-      <div class="tool-card-img-wrapper">
-        <img loading="lazy" src="img/lightpollution-preview.webp" alt="Light Pollution Map - Mapa de contaminación lumínica" class="tool-card-img">
-      </div>
-      <div class="tool-card-body">
-
-        <h1>Mapa de <span>Contaminación Lumínica</span></h1>
-        <p>Explora el mapa interactivo mundial de contaminación lumínica de <strong>LightPollutionMap.info</strong>. Descubre las zonas más oscuras cerca de tu ubicación para planificar tus sesiones de astrofotografía y observación con los mejores cielos posibles.</p>
-        <div class="tool-sources">Datos satelitales del sensor <strong>VIIRS / DMSP</strong></div>
-        <a href="https://www.lightpollutionmap.info/" target="_blank" rel="noopener noreferrer" class="tool-cta" id="cta-lightpollution">
-          Abrir Mapa
-          <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zm-2 16H5V7h7V5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7h-2v7a0 0 0 0 1 0 0H7z"/></svg>
-        </a>
-      </div>
+  <section class="a3 tl-top">
+    <div class="glow" aria-hidden="true"></div><div class="ret" aria-hidden="true"></div><div class="tl-art art-factorias" aria-hidden="true"></div>
+    <div style="display: flex; align-items: center; gap: 14px"><span style="width: 32px; height: 1px; background: var(--gold)"></span><span class="caps" style="color: var(--gold)">Nº IV · Contaminación · Brillo del cielo</span><span style="width: 32px; height: 1px; background: var(--gold)"></span></div>
+    <h1>Mapa de <em class="gi">contaminación</em> lumínica</h1>
+    <p>Encuentra los cielos más oscuros cerca de ti antes de cargar el coche: dónde montar para fotografiar o para observar a simple vista.</p>
+  </section>
+  <section class="a3 cm-maps">
+    <div class="card gold">
+      <span class="caps" style="color: var(--gold)">Principal</span>
+      <h2>DarkSky<em class="gi">Sites</em></h2>
+      <p>Mapa mundial del brillo artificial del cielo con los datos del satélite VIIRS, que puedes recorrer mes a mes, y lecturas SQM enviadas por observadores. Su simulador <strong>APEX</strong> enseña cómo se verá el cielo desde un lugar concreto (bóveda completa o vista en primera persona) antes de desplazarte.</p>
+      <div class="cm-go"><a class="btn" href="https://darkskysites.com/" target="_blank" rel="noopener noreferrer" id="cta-darkskysites">Abrir DarkSkySites<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg></a></div>
     </div>
+    <div class="card">
+      <span class="caps" style="color: var(--t3)">Alternativa</span>
+      <h2>Light Pollution <em class="gi">Map</em></h2>
+      <p>Da la escala Bortle con decimales, calculada a partir del brillo SQM modelado, y una simulación del brillo de todo el cielo. Incluye una capa de probabilidad de aurora y está en español.</p>
+      <div class="cm-go"><a class="ghost" href="https://lightpollutionmap.app/es/" target="_blank" rel="noopener noreferrer" id="cta-lightpollution">Abrir Light Pollution Map<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg></a></div>
+    </div>
+    <p class="cm-note">Los dos mapas parten de los datos nocturnos del satélite VIIRS. Se abren en una pestaña nueva.</p>
   </section>
 
   <script>
@@ -209,6 +103,6 @@
   </script>
   
   
-  <script src="atlas/atlas.js?v=20260924b"></script>
+  <script src="atlas/atlas.js?v=20260925d"></script>
 </body>
 </html>
