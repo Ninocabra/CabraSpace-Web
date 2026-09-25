@@ -256,74 +256,66 @@
   "facts": {
    "filtro": {
     "value": "R",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:5,6"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:7 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:9"
    },
    "exposures": {
     "value": {
      "2026-08-29": "291 tomas de 60 s",
      "2026-09-15": "357 tomas de 30 s"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:5-6"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:7 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:9"
    },
    "Rp_Rs_conjunto": {
     "value": "0.1702 +/- 0.0062 (estad.) +/- 0.0069 (sist.)",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:12"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:15"
    },
    "Rp_Rs_por_noche": {
     "value": {
      "2026-08-29": "0.1668 +/- 0.0072",
      "2026-09-15": "0.1748 +/- 0.0082"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15.json (rp_sola / rp_sola_err)"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:7 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:9"
    },
    "Rp_Rs_literatura": {
     "value": "0.1655 +/- 0.0020",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:13"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:15"
    },
    "T_mid": {
     "value": {
      "2026-08-29": "BJD_TDB 2461282.41970 +/- 1.1 min (2026-08-29 22:01:45 UTC)",
      "2026-09-15": "BJD_TDB 2461299.40050 +/- 1.2 min (2026-09-15 21:35:15 UTC)"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:17-18"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:20 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:21"
    },
    "O_C": {
     "value": {
      "2026-08-29": "-3.1 min (ExoClock)",
      "2026-09-15": "-2.5 min (ExoClock)"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:17-18"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:20 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:21"
    },
-   "depth": {
-    "value": "caida 2.60 % (28.2 mmag)",
-    "source": "tres3b-2026/curva.png (texto renderizado en el grafico)"
-   },
-   "duration_T14": {
-    "value": "84 min",
-    "source": "tres3b-2026/curva.png (texto renderizado en el grafico)"
+   "concordancia": {
+    "value": "las noches concuerdan entre sí (chi2 = 0.23 con 1 grado de libertad, p = 0.63)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:17"
    },
    "verdict": {
     "value": {
-     "2026-08-29": "USABLE - pasa los tres criterios de ExoClock",
-     "2026-09-15": "USABLE - pasa los tres criterios de ExoClock"
+     "2026-08-29": "USABLE - T_mid para O-C sí, profundidad sí",
+     "2026-09-15": "USABLE - T_mid para O-C sí, profundidad sí"
     },
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\2026-08-29\\analisis\\TrES-3-b_2026-08-29_informe.txt:151-155 ; E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\2026-09-15\\analisis\\TrES-3-b_2026-09-15_informe.txt:152-155"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/2026-08-29/analisis/TrES-3-b_2026-08-29_informe.txt:149-154 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-15/analisis/TrES-3-b_2026-09-15_informe.txt:150-155"
    },
    "telescope": {
     "value": "Celestron C9.25 (235 mm apertura)",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\2026-09-15\\analisis\\TrES-3-b_2026-09-15_informe.txt (bloque PROCEDENCIA, diametro_cm)"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-15/analisis/TrES-3-b_2026-09-15_informe.txt:172"
    },
    "site": {
-    "value": "Observatorio Nerpio, 38.1656 -2.3269, 1600 m (fuente: informe.txt de cada noche, linea 'sitio ...')",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\2026-09-15\\analisis\\TrES-3-b_2026-09-15_informe.txt:7"
-   },
-   "gain": {
-    "value": "0.259 e-/ADU medida (cabecera EGAIN dice 0.243)",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\2026-09-15\\analisis\\TrES-3-b_2026-09-15_informe.txt:9"
+    "value": "Observatorio Nerpio, 38.1656 -2.3269, 1600 m",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-15/analisis/TrES-3-b_2026-09-15_informe.txt:7"
    },
    "software": {
-    "value": "CabraTransit v1.0-1-g4380053, commit 2026-09-23 (captura: N.I.N.A.)",
-    "source": "E:\\ASTRO Sin Procesar\\Observatorio Nerpio\\Imagenes\\TrES-3b\\combinado\\TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:1"
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/TrES-3b/combinado/TrES-3-b_combinado_2026-08-29_2026-09-15_informe.txt:1"
    }
   },
   "facts_display": {
@@ -351,14 +343,6 @@
     [
      "Rp/R★ publicado",
      "0.1655 ± 0.0020"
-    ],
-    [
-     "Profundidad",
-     "2.60 % (28.2 mmag)"
-    ],
-    [
-     "Duración",
-     "84 min"
     ],
     [
      "Centro · 29 · VIII",
@@ -409,14 +393,6 @@
     [
      "Rp/R★ published",
      "0.1655 ± 0.0020"
-    ],
-    [
-     "Depth",
-     "2.60 % (28.2 mmag)"
-    ],
-    [
-     "Duration",
-     "84 min"
     ],
     [
      "Mid-transit · 29 Aug",
@@ -479,8 +455,8 @@
     "poster": "obs/tres3b-2026/poster.jpg",
     "height": 320,
     "caption": {
-     "es": "La noche entera en vídeo.",
-     "en": "The whole night on video."
+     "es": "La noche del 15 · IX entera en vídeo.",
+     "en": "The night of 15 Sep on video."
     }
    },
    {
@@ -799,55 +775,55 @@
   "facts": {
    "filtro": {
     "value": "R",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:9"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:6"
    },
    "exposures": {
     "value": "482 tomas de 30 s, 20:10:55 -> 00:36:35 UTC",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:9"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:6"
    },
    "Rp_Rs": {
-    "value": "0.1481 +/- 0.0043 (estad.) +/- 0.0105 (sist.)",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:68 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:71"
+    "value": "0.1482 +/- 0.0044 (estad.) +/- 0.0105 (sist.)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:64 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:67"
    },
    "Rp_Rs_literatura": {
     "value": "0.1463 +/- 0.0006",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_ajuste.json: planeta.rp, planeta.rp_err (ExoClock)"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:151"
    },
    "T_mid": {
-    "value": "22:15:40 UTC +/- 1.3 min",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:68"
+    "value": "22:15:31 UTC +/- 1.3 min",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:64"
    },
    "O_C": {
-    "value": "-1.1 min",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:68"
+    "value": "-1.2 min",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:64"
    },
    "depth": {
-    "value": null,
-    "source": null
+    "value": "2.20 % (medida) vs 2.14 % (literatura)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:153"
    },
    "duration_T14_prevista": {
     "value": "100 min",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:61"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:57"
    },
    "verdict": {
     "value": "USABLE - T_mid para O-C sí, profundidad sí",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.html (tarjeta «Veredicto de uso»)"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:166-171"
    },
    "telescope": {
     "value": "Celestron C9.25 (235 mm apertura)",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:92"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:188"
    },
    "site": {
     "value": "Observatorio Nerpio, 38.1656 -2.3269, 1600 m",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:10"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:7"
    },
    "software": {
-    "value": "CabraTransit v1.0, git 34a0640329, ejecutable compilado el 2026-09-23 10:30",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:81"
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:177"
    },
    "gain": {
     "value": "0.259 e-/ADU medida (cabecera EGAIN dice 0.243)",
-    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:12"
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-22/analisis\\Qatar-1-b_2026-09-22_informe.txt:9"
    }
   },
   "facts_display": {
@@ -870,11 +846,15 @@
     ],
     [
      "Rp/R★ medido",
-     "0.1481 ± 0.0043 (estad.) ± 0.0105 (sist.)"
+     "0.1482 ± 0.0044 (estad.) ± 0.0105 (sist.)"
     ],
     [
      "Rp/R★ publicado",
      "0.1463 ± 0.0006"
+    ],
+    [
+     "Profundidad",
+     "2.20 % (medida) vs 2.14 % (literatura)"
     ],
     [
      "Duración prevista",
@@ -882,11 +862,11 @@
     ],
     [
      "Centro del tránsito",
-     "22:15:40 UTC ± 1.3 min"
+     "22:15:31 UTC ± 1.3 min"
     ],
     [
      "O−C",
-     "-1.1 min"
+     "-1.2 min"
     ],
     [
      "Telescopio",
@@ -916,11 +896,15 @@
     ],
     [
      "Rp/R★ measured",
-     "0.1481 ± 0.0043 (estad.) ± 0.0105 (sist.)"
+     "0.1482 ± 0.0044 (stat.) ± 0.0105 (sys.)"
     ],
     [
      "Rp/R★ published",
      "0.1463 ± 0.0006"
+    ],
+    [
+     "Depth",
+     "2.20 % (measured) vs 2.14 % (literature)"
     ],
     [
      "Predicted duration",
@@ -928,11 +912,11 @@
     ],
     [
      "Mid-transit",
-     "22:15:40 UTC ± 1.3 min"
+     "22:15:31 UTC ± 1.3 min"
     ],
     [
      "O−C",
-     "-1.1 min"
+     "-1.2 min"
     ],
     [
      "Telescope",
@@ -1074,7 +1058,7 @@
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-06/analisis\\TrES-2-b_2026-09-06_informe.txt:7"
    },
    "software": {
-    "value": "CabraTransit v1.0-1-g4380053, commit del 2026-09-23",
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-06/analisis\\TrES-2-b_2026-09-06_informe.txt:178"
    },
    "gain": {
@@ -1152,7 +1136,7 @@
     ],
     [
      "Rp/R★ measured (indicative)",
-     "0.1281 ± 0.0065 (estad.) ± 0.0122 (sist.)"
+     "0.1281 ± 0.0065 (stat.) ± 0.0122 (sys.)"
     ],
     [
      "Rp/R★ published",
@@ -1314,7 +1298,7 @@
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-13/analisis\\Qatar-3-b_2026-09-13_informe.txt:7"
    },
    "software": {
-    "value": "CabraTransit v1.0-1-g4380053, commit del 2026-09-23",
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-13/analisis\\Qatar-3-b_2026-09-13_informe.txt:182"
    },
    "gain": {
@@ -1392,7 +1376,7 @@
     ],
     [
      "Rp/R★ measured (indicative)",
-     "0.0828 ± 0.0102 (estad.) ± 0.0188 (sist.)"
+     "0.0828 ± 0.0102 (stat.) ± 0.0188 (sys.)"
     ],
     [
      "Rp/R★ published",
@@ -1504,7 +1488,9 @@
   ],
   "files": [
    "wasp59b-2026-09-03/curva.png",
-   "wasp59b-2026-09-03/campo.jpg"
+   "wasp59b-2026-09-03/campo.jpg",
+   "wasp59b-2026-09-03/video.mp4",
+   "wasp59b-2026-09-03/poster.jpg"
   ],
   "facts": {
    "filtro": {
@@ -1552,7 +1538,7 @@
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/WASP-59 b/2026-09-03/analisis\\WASP-59-b_2026-09-03_informe.txt:7"
    },
    "software": {
-    "value": "CabraTransit v1.0-1-g4380053, commit del 2026-09-23",
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
     "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/WASP-59 b/2026-09-03/analisis\\WASP-59-b_2026-09-03_informe.txt:179"
    },
    "gain": {
@@ -1630,7 +1616,7 @@
     ],
     [
      "Rp/R★ measured (indicative)",
-     "0.1397 ± 0.0052 (estad.) ± 0.0112 (sist.)"
+     "0.1397 ± 0.0052 (stat.) ± 0.0112 (sys.)"
     ],
     [
      "Rp/R★ published",
@@ -1689,6 +1675,16 @@
     "caption": {
      "es": "Flujo relativo frente al tiempo, con el modelo ajustado.",
      "en": "Relative flux against time, with the fitted model."
+    }
+   },
+   {
+    "type": "video",
+    "src": "obs/wasp59b-2026-09-03/video.mp4",
+    "poster": "obs/wasp59b-2026-09-03/poster.jpg",
+    "height": 320,
+    "caption": {
+     "es": "La noche entera en vídeo.",
+     "en": "The whole night on video."
     }
    },
    {
@@ -1987,6 +1983,246 @@
   "description": {
    "es": "El eclipse total del 12 de agosto de 2026 desde el mirador del Cabrero (Teruel): la corona (Fuji X-T5, HDR con CabraEclipse) y un timelapse de 2193 fotografías con la Vaonis Vespera Pro.",
    "en": "The 12 August 2026 total eclipse from the Cabrero viewpoint (Teruel, Spain): the corona (Fuji X-T5, HDR with CabraEclipse) and a timelapse of 2,193 photographs with the Vaonis Vespera Pro."
+  }
+ },
+ {
+  "slug": "wasp52b-2026-09-07",
+  "kind": "transit",
+  "object": "WASP-52 b",
+  "date_iso": "2026-09-07",
+  "nights": [
+   "2026-09-07"
+  ],
+  "files": [
+   "wasp52b-2026-09-07/curva.png",
+   "wasp52b-2026-09-07/campo.jpg",
+   "wasp52b-2026-09-07/video.mp4",
+   "wasp52b-2026-09-07/poster.jpg"
+  ],
+  "facts": {
+   "filtro": {
+    "value": "R",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:6"
+   },
+   "exposures": {
+    "value": "652 tomas de 30 s, 20:22:31 -> 04:12:14 UTC",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:6"
+   },
+   "Rp_Rs": {
+    "value": "0.1731 +/- 0.0033 (estad.) +/- 0.0090 (sist.)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:68 ; E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:71"
+   },
+   "Rp_Rs_literatura": {
+    "value": "0.1629 +/- 0.0044",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:164"
+   },
+   "T_mid": {
+    "value": "23:40:20 UTC +/- 1.1 min",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:68"
+   },
+   "O_C": {
+    "value": "-1.5 min",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:68"
+   },
+   "depth": {
+    "value": "3.00 % (medida) vs 2.65 % (literatura)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:166"
+   },
+   "duration_T14_prevista": {
+    "value": "109 min",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:59"
+   },
+   "verdict": {
+    "value": "PARCIALMENTE USABLE - T_mid para O-C sí, profundidad no (volteo dentro del tránsito)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:179-184"
+   },
+   "telescope": {
+    "value": "Celestron C9.25 (235 mm apertura)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:201"
+   },
+   "site": {
+    "value": "Observatorio Nerpio, 38.1656 -2.3269, 1600 m",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:7"
+   },
+   "software": {
+    "value": "CabraTransit v1.1-3-gad84b1c, commit del 2026-09-25",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:190"
+   },
+   "gain": {
+    "value": "0.259 e-/ADU medida (cabecera EGAIN dice 0.243)",
+    "source": "E:/ASTRO Sin Procesar/Observatorio Nerpio/Imagenes/2026-09-07/analisis\\WASP-52-b_2026-09-07_informe.txt:9"
+   }
+  },
+  "facts_display": {
+   "es": [
+    [
+     "Planeta",
+     "WASP-52 b"
+    ],
+    [
+     "Noche",
+     "7 · IX · 2026"
+    ],
+    [
+     "Filtro",
+     "R"
+    ],
+    [
+     "Tomas",
+     "652 × 30 s"
+    ],
+    [
+     "Rp/R★ medido (orientativo)",
+     "0.1731 ± 0.0033 (estad.) ± 0.0090 (sist.)"
+    ],
+    [
+     "Rp/R★ publicado",
+     "0.1629 ± 0.0044"
+    ],
+    [
+     "Profundidad (orientativo)",
+     "3.00 % (medida) vs 2.65 % (literatura)"
+    ],
+    [
+     "Duración prevista",
+     "109 min"
+    ],
+    [
+     "Centro del tránsito",
+     "23:40:20 UTC ± 1.1 min"
+    ],
+    [
+     "O−C",
+     "-1.5 min"
+    ],
+    [
+     "Telescopio",
+     "Celestron C9.25"
+    ],
+    [
+     "Lugar",
+     "Nerpio · 1600 m"
+    ]
+   ],
+   "en": [
+    [
+     "Planet",
+     "WASP-52 b"
+    ],
+    [
+     "Night",
+     "7 Sep · 2026"
+    ],
+    [
+     "Filter",
+     "R"
+    ],
+    [
+     "Frames",
+     "652 × 30 s"
+    ],
+    [
+     "Rp/R★ measured (indicative)",
+     "0.1731 ± 0.0033 (stat.) ± 0.0090 (sys.)"
+    ],
+    [
+     "Rp/R★ published",
+     "0.1629 ± 0.0044"
+    ],
+    [
+     "Depth (indicative)",
+     "3.00 % (measured) vs 2.65 % (literature)"
+    ],
+    [
+     "Predicted duration",
+     "109 min"
+    ],
+    [
+     "Mid-transit",
+     "23:40:20 UTC ± 1.1 min"
+    ],
+    [
+     "O−C",
+     "-1.5 min"
+    ],
+    [
+     "Telescope",
+     "Celestron C9.25"
+    ],
+    [
+     "Site",
+     "Nerpio · 1600 m"
+    ]
+   ]
+  },
+  "status": "parcial",
+  "title": {
+   "es": "Tránsito de WASP-52 b",
+   "en": "Transit of WASP-52 b"
+  },
+  "title_html": {
+   "es": "Tránsito de <em class=\"gi\">WASP-52 b</em>",
+   "en": "Transit of <em class=\"gi\">WASP-52 b</em>"
+  },
+  "subtitle": {
+   "es": "Curva de luz · una noche",
+   "en": "Light curve · one night"
+  },
+  "thumb": "obs/wasp52b-2026-09-07/curva.png",
+  "og": "obs/wasp52b-2026-09-07/curva.png",
+  "media": [
+   {
+    "type": "plot",
+    "src": "obs/wasp52b-2026-09-07/curva.png",
+    "height": 520,
+    "alt": {
+     "es": "Curva de luz del tránsito de WASP-52 b: el brillo de la estrella baja mientras el planeta pasa por delante",
+     "en": "Light curve of the WASP-52 b transit: the star dims while the planet passes in front"
+    },
+    "caption": {
+     "es": "Flujo relativo frente al tiempo, con el modelo ajustado.",
+     "en": "Relative flux against time, with the fitted model."
+    }
+   },
+   {
+    "type": "video",
+    "src": "obs/wasp52b-2026-09-07/video.mp4",
+    "poster": "obs/wasp52b-2026-09-07/poster.jpg",
+    "height": 320,
+    "caption": {
+     "es": "La noche entera en vídeo.",
+     "en": "The whole night on video."
+    }
+   },
+   {
+    "type": "image",
+    "src": "obs/wasp52b-2026-09-07/campo.jpg",
+    "height": 320,
+    "fit": true,
+    "alt": {
+     "es": "Campo de estrellas con el objetivo y las estrellas de comparación marcadas",
+     "en": "Star field with the target and comparison stars marked"
+    },
+    "caption": {
+     "es": "El campo: objetivo y estrellas de comparación.",
+     "en": "The field: target and comparison stars."
+    }
+   }
+  ],
+  "notes": {
+   "es": "<p><em class=\"gi\">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque hubo volteo de meridiano en mitad del tránsito.</p>",
+   "en": "<p><em class=\"gi\">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because there was a meridian flip in the middle of the transit.</p>"
+  },
+  "made_with": {
+   "name": "Cabra<em class=\"gi\">Transit</em>",
+   "desc": {
+    "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
+    "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
+   }
+  },
+  "description": {
+   "es": "Curva de luz del tránsito del exoplaneta WASP-52 b, medida desde el observatorio de Nerpio.",
+   "en": "Light curve of the WASP-52 b exoplanet transit, measured from the Nerpio observatory."
   }
  }
 ]
