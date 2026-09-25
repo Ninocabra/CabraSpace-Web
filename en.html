@@ -159,7 +159,8 @@
     var D = {"stars":[{"n":"alf02","r":[18.488816,-26.887755,-7.260942],"v":[8.618531e-06,4.975238e-06,2.26082e-07],"m":3.58,"d":33.42916},{"n":"bet01","r":[66.465421,-94.036724,-30.385157],"v":[9.995203e-06,3.000748e-05,5.158588e-06],"m":3.08,"d":119.09582},{"n":"del","r":[9.534465,-6.248646,-3.296217],"v":[1.493304e-06,1.702247e-05,-1.5431836e-05],"m":2.83,"d":11.86662},{"n":"eps","r":[208.11305,-149.708978,-90.613049],"v":[-9.153375e-06,2.6035741e-05,8.69507e-06],"m":4.55,"d":271.90907},{"n":"gam","r":[41.090167,-28.747401,-15.009208],"v":[3.505538e-06,5.9551702e-05,6.820562e-06],"m":3.67,"d":52.34588},{"n":"iot","r":[45.616812,-37.521234,-17.871798],"v":[1.5193496e-05,-1.106902e-06,-2.228775e-06],"m":4.27,"d":61.71011},{"n":"ome","r":[103.025573,-110.654054,-76.766853],"v":[-2.89266e-07,-1.0566099e-05,-5.714606e-06],"m":4.12,"d":169.56337},{"n":"psi","r":[8.772543,-9.90723,-6.246961],"v":[1.0936345e-05,-1.7975364e-05,-2.2087626e-05],"m":4.122,"d":14.63336},{"n":"tet","r":[31.621219,-30.02128,-13.524641],"v":[1.887403e-06,2.3323177e-05,-9.730565e-06],"m":4.07,"d":45.65189},{"n":"zet","r":[98.380241,-77.788653,-51.722679],"v":[4.6423e-06,-6.913061e-06,1.3593675e-05],"m":3.74,"d":135.66496}],"lines":[["alf02","bet01"],["bet01","tet","iot","gam","del"],["bet01","psi","ome","zet","eps","del"]],"greek":{"alf02":[8,-4],"bet01":[9,6],"del":[-14,-6],"gam":[2,-10],"zet":[-6,18],"ome":[8,12]},"proj":{"ra0":315.5,"de0":-19.5,"k":673.14,"x0":161.25,"y0":112.11},"view":[-20,-10,370,250],"maxAge":7000000.0,"lang":"en"};
     var svg = document.getElementById('cap-chart'); if (!svg) return;
     var ui = document.getElementById('cap-time'), note = document.getElementById('cap-note');
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // reduced motion: no autoplay, but the button is there to start it by hand
+    var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     ui.hidden = false; note.hidden = false;
     var en = D.lang === 'en', P = D.proj, V = D.view;
     var r0 = P.ra0 * Math.PI / 180, d0 = P.de0 * Math.PI / 180;
@@ -238,7 +239,12 @@
         if (visible && !was && !paused) requestAnimationFrame(frame);
       }).observe(svg);
     }
-    requestAnimationFrame(frame);
+    if (reduced) {
+      paused = true; btn.classList.add('paused'); btn.setAttribute('aria-label', btn.getAttribute('data-play'));
+      ageEl.textContent = fmt(0); eraEl.textContent = era(0); dotEl.style.left = '100%';
+    } else {
+      requestAnimationFrame(frame);
+    }
   })();
   </script>
   <script src="atlas/atlas.js?v=20260925d"></script>

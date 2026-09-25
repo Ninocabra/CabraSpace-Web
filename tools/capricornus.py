@@ -138,7 +138,8 @@ def script(lang):
     var D = %s;
     var svg = document.getElementById('cap-chart'); if (!svg) return;
     var ui = document.getElementById('cap-time'), note = document.getElementById('cap-note');
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // reduced motion: no autoplay, but the button is there to start it by hand
+    var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     ui.hidden = false; note.hidden = false;
     var en = D.lang === 'en', P = D.proj, V = D.view;
     var r0 = P.ra0 * Math.PI / 180, d0 = P.de0 * Math.PI / 180;
@@ -217,6 +218,11 @@ def script(lang):
         if (visible && !was && !paused) requestAnimationFrame(frame);
       }).observe(svg);
     }
-    requestAnimationFrame(frame);
+    if (reduced) {
+      paused = true; btn.classList.add('paused'); btn.setAttribute('aria-label', btn.getAttribute('data-play'));
+      ageEl.textContent = fmt(0); eraEl.textContent = era(0); dotEl.style.left = '100%%';
+    } else {
+      requestAnimationFrame(frame);
+    }
   })();
   </script>""" % json.dumps(data, separators=(",", ":"))
