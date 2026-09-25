@@ -105,6 +105,7 @@ section.simulator-card { position: relative; }   /* la de AutoGHS no es sticky: 
 .tl-art { position: absolute; left: max(8px, calc(50% - 704px)); bottom: 0; width: clamp(200px, 18vw, 265px); aspect-ratio: 480 / 420; pointer-events: none; opacity: .27; background: var(--gold); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center bottom; mask-position: center bottom; -webkit-mask-size: contain; mask-size: contain; }
 .tl-art.art-pizarra { -webkit-mask-image: url(img/pizarra.svg); mask-image: url(img/pizarra.svg); }
 .tl-art.art-histograma { -webkit-mask-image: url(img/histograma.svg); mask-image: url(img/histograma.svg); width: clamp(170px, 15vw, 225px); }
+.tl-art.art-placa { -webkit-mask-image: url(img/placa.svg); mask-image: url(img/placa.svg); width: 108px; }
 @media (max-width: 1100px) { .tl-art { width: 150px; left: 6px; opacity: .24; } }
 @media (max-width: 700px) { .tl-art { width: min(76%, 290px); left: 50%; transform: translateX(-50%); opacity: .08; } }
 @media (max-width: 1100px) { .tl-art.art-histograma { width: 130px; } }
@@ -113,3 +114,13 @@ section.simulator-card { position: relative; }   /* la de AutoGHS no es sticky: 
 /* la biblioteca (lista 290 px + detalle) no cabía en su columna y se salía 90 px del contenedor */
 .tl-top + main.container:has(aside.simulator-card) { max-width: 1320px; }   /* solo PixelMath-teca */
 .tl-top h1 .nw { white-space: nowrap; }
+
+/* ---------- CabraSpace Web: franja compacta. El cockpit ocupa la pantalla sin scroll, así que la
+   franja mide 88 px bajo la barra y la rejilla se encoge exactamente eso (+1 px del margen) ---------- */
+.tl-top.tl-compact { height: calc(var(--ah) + 88px); box-sizing: border-box; padding: calc(var(--ah) + 10px) var(--gx) 10px; gap: 6px; justify-content: center; }
+.tl-compact h1 { font-size: clamp(30px, 3vw, 44px); }
+.tl-top + main.piw-container { padding-top: 6px; min-height: calc(100vh - 217px); }
+@media (min-width: 768px) { .tl-top + main .piw-grid { height: calc(100vh - 207px); } }
+@media (max-width: 1100px) { .tl-art.art-placa { width: 92px; } }
+@media (max-width: 700px) { .tl-art.art-placa { width: 120px; opacity: .12; } }
+@media (max-width: 767px) { .tl-top.tl-compact { height: auto; } }   /* en móvil el cockpit ya hace scroll */
