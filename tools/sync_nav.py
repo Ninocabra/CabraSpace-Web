@@ -221,7 +221,7 @@ SIGNS = {
                "Evangelio de Juan 1, 5 · Reina-Valera, 1909"),
         "en": ("And the light shineth in darkness; and the darkness comprehended it not.",
                "Gospel of John 1:5 · King James Version, 1611")}),
-    "programas.html": ("Os homini sublime dedit caelumque tueri iussit et erectos ad sidera tollere vultus.", {
+    "programas.html": ("Os homini sublime dedit caelumque videre iussit et erectos ad sidera tollere vultus.", {
         "es": ("Un rostro sublime al hombre dio y el cielo ver le ordenó y erguido hacia las estrellas "
                "levantar su semblante.",
                "Ovidio · Metamorfosis I, 85-86 · trad. Ana Pérez Vega"),
@@ -233,7 +233,7 @@ SIGNS = {
                "Virgilio · Eneida IX, 641 · trad. Miguel Antonio Caro"),
         "en": ("This is the Way to Heav'n.", "Virgil · Aeneid IX, 641 · tr. John Dryden, 1697")}),
 }
-SIGN_DEFAULT = ("Caelum tueri.", {
+SIGN_DEFAULT = ("Caelum videre.", {
     "es": ("Contemplar el cielo.", "Ovidio · Metamorfosis I, 85 · trad. Francisco Crivell, 1805"),
     "en": ("To behold the skies.", "Ovid · Metamorphoses I, 85 · tr. Brookes More, 1922")})
 
