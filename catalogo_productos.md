@@ -104,6 +104,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Linux**
   - [INDI Library v2.2.4.1: Corrección de errores menores](https://github.com/indilib/indi/releases/tag/v2.2.4.1) (2026-08-02)
 
+## MLAstro
+
+### TELESCOPES
+- **Modelo: Dwarf DRACO**
+  - [Noticias de Astro: Nuevo Telescopio Dwarf DRACO, MLAstro TRINITY y AAPA Pro](https://www.youtube.com/watch?v=_i8YYt5_WNM) (2026-09-23)
+
 ## Otros / No especificado
 
 ### ACCESSORIES
@@ -297,7 +303,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
-  - [Instalación de la cámara ToupTek AE676C para imágenes astronómicas versátiles](https://www.youtube.com/watch?v=o34qIRXuNHo) (2026-06-22)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: Cámaras Astronómicas**
