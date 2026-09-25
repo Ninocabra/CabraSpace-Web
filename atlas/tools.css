@@ -12,6 +12,7 @@
 /* la del simulador es sticky (se queda a la vista al bajar por la biblioteca): no pisarla con relative,
    que dejaba su top:100px como desplazamiento fijo */
 .library-card { position: relative; }
+section.simulator-card { position: relative; }   /* la de AutoGHS no es sticky: sin esto su filete se iba al contenedor */
 @media (max-width: 1199px) { .simulator-card { position: relative !important; top: 0 !important; } }
 .simulator-card::after, .library-card::after, .piw-card::after {
   content: ''; position: absolute; inset: 7px; border: 1px solid rgba(229,181,63,.14); border-radius: 16px; pointer-events: none;
@@ -99,11 +100,16 @@
 .tl-top h1 { font-family: var(--a-disp); font-size: clamp(44px, 6vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em; color: var(--tx); }
 .tl-top p { max-width: 640px; font-size: 18px; line-height: 1.7; color: var(--t2); }
 .tl-top p strong { color: var(--tx); font-weight: 500; }
-/* pizarra del siglo XIX (tools/pizarra.py): máscara pintada con el oro; en modo noche, roja */
-.tl-art { position: absolute; left: max(8px, calc(50% - 704px)); bottom: 0; width: clamp(200px, 18vw, 265px); aspect-ratio: 480 / 420; pointer-events: none; opacity: .27; background: var(--gold); -webkit-mask: url(img/pizarra.svg) no-repeat center bottom / contain; mask: url(img/pizarra.svg) no-repeat center bottom / contain; }
+/* lámina de cada herramienta (tools/pizarra.py, tools/histograma.py): máscara pintada con el oro;
+   en modo noche, roja */
+.tl-art { position: absolute; left: max(8px, calc(50% - 704px)); bottom: 0; width: clamp(200px, 18vw, 265px); aspect-ratio: 480 / 420; pointer-events: none; opacity: .27; background: var(--gold); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center bottom; mask-position: center bottom; -webkit-mask-size: contain; mask-size: contain; }
+.tl-art.art-pizarra { -webkit-mask-image: url(img/pizarra.svg); mask-image: url(img/pizarra.svg); }
+.tl-art.art-histograma { -webkit-mask-image: url(img/histograma.svg); mask-image: url(img/histograma.svg); width: clamp(170px, 15vw, 225px); }
 @media (max-width: 1100px) { .tl-art { width: 150px; left: 6px; opacity: .24; } }
 @media (max-width: 700px) { .tl-art { width: min(76%, 290px); left: 50%; transform: translateX(-50%); opacity: .08; } }
+@media (max-width: 1100px) { .tl-art.art-histograma { width: 130px; } }
+@media (max-width: 700px) { .tl-art.art-histograma { width: min(64%, 250px); } }
 .tl-top + main .pm-grid { margin-top: 12px; }
 /* la biblioteca (lista 290 px + detalle) no cabía en su columna y se salía 90 px del contenedor */
-.tl-top + main.container { max-width: 1320px; }
+.tl-top + main.container:has(aside.simulator-card) { max-width: 1320px; }   /* solo PixelMath-teca */
 .tl-top h1 .nw { white-space: nowrap; }
