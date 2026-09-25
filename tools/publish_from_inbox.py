@@ -53,7 +53,7 @@ def bilingual(o, key, errors, required=True):
         errors.append(f"'{key}' debe tener texto en 'es' y en 'en'")
 
 
-def validate(pkg_dir, ficha, known_slugs):
+def validate(pkg_dir, ficha, known_slugs, published=()):
     """Returns the list of problems (empty = valid). Never modifies anything."""
     e = []
     slug = ficha.get("slug")
@@ -140,6 +140,14 @@ def validate(pkg_dir, ficha, known_slugs):
         if name not in listed:
             e.append(f"'{where}' = {name!r} no está en 'files'")
 
+    # Nights that are part of a combined page live only there (Nino, 25-09-2026).
+    nights = ficha.get("nights") or []
+    for o in published:
+        if (o.get("slug") != slug and o.get("kind") == "transit" == ficha.get("kind")
+                and o.get("object") == ficha.get("object") and len(o.get("nights") or []) > 1
+                and set(nights) & set(o["nights"])):
+            e.append(f"la noche {', '.join(sorted(set(nights) & set(o['nights'])))} ya está en la página "
+                     f"combinada '{o['slug']}'; las noches de un combinado solo se publican allí")
     meta = ficha.get("_publicador", {})
     if slug in known_slugs and not meta.get("reemplazar"):
         e.append(f"'{slug}' ya está en la web; para sustituirla, pon \"_publicador\": {{\"reemplazar\": true}}")
@@ -219,7 +227,7 @@ def publish(check_only):
     for pkg in pkgs:
         try:
             ficha = json.load(open(os.path.join(pkg, "ficha.json"), encoding="utf-8"))
-            errors = validate(pkg, ficha, known) if isinstance(ficha, dict) else ["ficha.json no es un objeto"]
+            errors = validate(pkg, ficha, known, data) if isinstance(ficha, dict) else ["ficha.json no es un objeto"]
         except FileNotFoundError:
             ficha, errors = None, ["falta ficha.json"]
         except json.JSONDecodeError as ex:
@@ -253,7 +261,10 @@ def publish(check_only):
         for n in ficha["files"]:
             shutil.copy2(os.path.join(pkg, n), os.path.join(dest, n))
         entry = to_site_paths(ficha)
-        data = [o for o in data if o["slug"] != slug] + [entry]
+        if slug in known:   # replace in place: the diff of observaciones.json shows only what changed
+            data = [entry if o["slug"] == slug else o for o in data]
+        else:
+            data.append(entry)
     open(OBS_JSON, "w", encoding="utf-8", newline="\n").write(dump(data))
 
     for script in BUILD:
