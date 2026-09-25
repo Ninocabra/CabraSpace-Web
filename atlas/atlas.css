@@ -190,6 +190,12 @@ body.menu-open { overflow: hidden; }
 /* pie */
 footer.af { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 72px var(--gx) 44px; border: 0; background: var(--bg); font-family: var(--a-sans); color: var(--tx); }
 .af-sign { font-family: var(--a-disp); font-size: clamp(40px, 4.45vw, 64px); font-weight: 400; font-style: italic; line-height: 1; letter-spacing: -.02em; color: var(--tx); text-align: center; }
+.af-epi { margin: 0; display: flex; flex-direction: column; align-items: center; }
+.af-epi blockquote.af-sign { margin: 0; padding: 0; border: 0; }
+.af-epi figcaption { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 22px; text-align: center; }
+.af-epi figcaption::before { content: ""; width: 44px; height: 1px; background: var(--gold); opacity: .55; margin-bottom: 6px; }
+.af-tr { max-width: 44ch; font-family: var(--a-disp); font-size: clamp(16px, 1.35vw, 19px); line-height: 1.5; color: var(--t2); }
+.af-src { font-size: 11px; color: var(--gold); }
 .af-sign.long { max-width: 22ch; font-size: clamp(28px, 3vw, 42px); line-height: 1.15; }
 .af-links { display: flex; gap: 18px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
 .af .dbl { width: 100%; margin-top: 56px; }

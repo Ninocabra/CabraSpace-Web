@@ -21,7 +21,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20260925e"
+VERSION = "20260925f"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
@@ -211,25 +211,39 @@ def drawer(fname):
         f'  </div></div>')
 
 
-# Latin sign-off at the foot of each page, the same in ES and EN (Nino, 25-09-2026).
+# Latin sign-off at the foot of each page, the same in ES and EN, with its translation and source in the
+# page's language (Nino, 25-09-2026). Page -> (latin, {lang: (translation, source)}).
 SIGNS = {
-    "index.html": "Et lux in tenebris lucet, et tenebrae eam non comprehenderunt.",  # Jn 1,5 (Vulgata)
-    "programas.html": "Os homini sublime dedit caelumque tueri iussit "
-                      "et erectos ad sidera tollere vultus.",                         # Ovidio, Met. I, 85-86
-    "bitacora.html": "Sic itur ad astra.",                                            # Virgilio, En. IX, 641
+    "index.html": ("Et lux in tenebris lucet, et tenebrae eam non comprehenderunt.", {
+        "es": ("Y la luz brilla en las tinieblas, y las tinieblas no la comprendieron.",
+               "Evangelio de Juan 1, 5 · Vulgata"),
+        "en": ("And the light shines in the darkness, and the darkness did not comprehend it.",
+               "Gospel of John 1:5 · Vulgate")}),
+    "programas.html": ("Os homini sublime dedit caelumque tueri iussit et erectos ad sidera tollere vultus.", {
+        "es": ("Dio al hombre un rostro erguido y le mandó mirar al cielo y alzar la cara hacia las estrellas.",
+               "Ovidio · Metamorfosis I, 85-86"),
+        "en": ("He gave man an uplifted face and bade him behold the sky and raise his eyes to the stars.",
+               "Ovid · Metamorphoses I, 85–86")}),
+    "bitacora.html": ("Sic itur ad astra.", {
+        "es": ("Así se llega a las estrellas.", "Virgilio · Eneida IX, 641"),
+        "en": ("Thus one goes to the stars.", "Virgil · Aeneid IX, 641")}),
 }
-SIGN_DEFAULT = "Caelum tueri."
+SIGN_DEFAULT = ("Caelum tueri.", {
+    "es": ("Mirar al cielo.", "Ovidio · Metamorfosis I, 85"),
+    "en": ("To behold the sky.", "Ovid · Metamorphoses I, 85")})
 
 
 def footer(fname):
     lang = lang_of(fname)
     t = TEXT[lang]
-    sign = SIGNS.get(fname if lang == "es" else twin_of(fname), SIGN_DEFAULT)
+    sign, tr = SIGNS.get(fname if lang == "es" else twin_of(fname), SIGN_DEFAULT)
+    trans, source = tr[lang]
     long_ = " long" if len(sign) > 40 else ""
     links = "".join(f'<a class="nl" href="{L(h, lang)}">{n}</a>' for h, n in t["foot_links"])
     return (
         f'<footer class="af">\n'
-        f'    <span class="af-sign{long_}" lang="la">{sign}</span>\n'
+        f'    <figure class="af-epi"><blockquote class="af-sign{long_}" lang="la">{sign}</blockquote>'
+        f'<figcaption><span class="af-tr">{trans}</span><span class="caps af-src">{source}</span></figcaption></figure>\n'
         f'    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a>'
         f'<a class="ghost" href="mailto:info@cabraspace.com">{t["contact"]}</a></div>\n'
         f'    <div class="dbl" aria-hidden="true"></div>\n'
