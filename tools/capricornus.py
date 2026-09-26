@@ -125,8 +125,7 @@ def chart(lang):
         '<path class="i-play" d="M8 5v14l11-7z" fill="currentColor"></path></svg></button>'
         '<div class="cap-track"><span class="cap-bar"></span><span class="cap-dot" id="cap-dot"></span>'
         + "".join(f'<span class="cap-tick" data-age="{a}"></span>' for a in (7.0e6, 2.8e6, 3.0e5, 0))
-        + f'</div><span class="cap-txt"><span class="cap-age" id="cap-age" aria-live="off"></span><span class="cap-era" id="cap-era"></span></span></div>'
-        f'<p class="cap-note" id="cap-note" hidden>{"Cada estrella se mueve en línea recta según su distancia, movimiento propio y velocidad radial (SIMBAD). Más allá de un millón de años es solo orientativo." if es else "Each star moves in a straight line from its distance, proper motion and radial velocity (SIMBAD). Beyond a million years it is only indicative."}</p>')
+        + f'</div><span class="cap-txt"><span class="cap-age" id="cap-age" aria-live="off"></span><span class="cap-era" id="cap-era"></span></span></div>')
     return "\n".join(o), ctrl
 
 
@@ -137,10 +136,10 @@ def script(lang):
   (function () {
     var D = %s;
     var svg = document.getElementById('cap-chart'); if (!svg) return;
-    var ui = document.getElementById('cap-time'), note = document.getElementById('cap-note');
+    var ui = document.getElementById('cap-time');
     // reduced motion: no autoplay, but the button is there to start it by hand
     var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    ui.hidden = false; note.hidden = false;
+    ui.hidden = false;
     var en = D.lang === 'en', P = D.proj, V = D.view;
     var r0 = P.ra0 * Math.PI / 180, d0 = P.de0 * Math.PI / 180;
     var C = [Math.cos(d0) * Math.cos(r0), Math.cos(d0) * Math.sin(r0), Math.sin(d0)];
