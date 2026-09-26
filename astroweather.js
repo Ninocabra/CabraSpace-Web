@@ -35,17 +35,17 @@
     es: {
       cargando: 'Consultando la previsión…',
       error: 'No se ha podido leer la previsión ahora mismo. Se actualiza cada 6 horas; vuelve a intentarlo en un rato.',
-      titulo: 'Nerpio, <span>esta noche</span>',
+      titulo: 'AstroCamp, <span>esta noche</span>',
       sitio: 'AstroCamp · Nerpio (Albacete) · 1.650 m · MPC I79',
       probTitulo: 'Condiciones, no comportamiento',
       abierto: 'Abierto', cerrado: 'Cerrado',
-      ventana: 'ventana', local: 'local', localLargo: 'hora local de Nerpio',
+      ventana: 'ventana', local: 'local', localLargo: 'hora local de AstroCamp',
       veredictoTitulo: 'De dónde sale esta palabra',
       franjaTitulo: 'Cómo evoluciona la noche',
       vistaBoveda: 'Bóveda', vistaCupula: 'Cúpula 3D',
       sinDatoDesde: 'sin dato desde',
       sinNubes: 'La rejilla de nubes no llegó en la pasada que generó esta noche, así que la cúpula NO dibuja nubes: un cielo limpio aquí no significa que lo esté. Las franjas de arriba sí llevan la nubosidad prevista, que viene por otro camino.',
-      vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en Nerpio mirando al horizonte. Arrastra para girar.',
+      vistaNota: 'La misma noche con otra proyección: la bóveda mira hacia arriba, con el cenit en el centro; la cúpula te pone de pie en AstroCamp mirando al horizonte. Arrastra para girar.',
       franjaHoy: 'Hoy', franjaManana: 'Mañana',
       franjaLuna: 'Luna', franjaNubes: 'nubes',
       franjaSinNube: 'cobertura esperada (WeatherNext, calibrada)',
@@ -58,7 +58,7 @@
         'quien limita es la Luna, y la de arriba es el seeing: casi invisible cuando es bueno, clara cuando ' +
         'pasa de 1,9 segundos de arco. La zona central es la oscuridad astronómica. '+
         'Las horas del dibujo van en UTC, como todo lo medido de esta página; pasando '+
-        'el ratón por encima sale la hora local de Nerpio.',
+        'el ratón por encima sale la hora local de AstroCamp.',
       ahoraTechos: 'Ahora · techos abiertos', noResponde: 'no responde',
       deN: 'de', techosPl: 'techos',
       probCorta: 'de probabilidad de abrir',
@@ -89,7 +89,7 @@
       yAdemas: 'y además el objeto está a', yTampocoNoche: 'y tampoco es noche cerrada',
       limita: { c: 'el cielo', l: 'la Luna', f: 'el fondo', a: 'la altura',
                 n: 'nada', '-': 'la altura', x: 'sin puntuar' },
-      sensores: 'Ahora mismo en Nerpio',
+      sensores: 'Ahora mismo en AstroCamp',
       sinSensores: 'Los sensores del sitio no responden en este momento.',
       fotometro: 'Cielo medido', calibrado: 'calibrado',
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
@@ -123,7 +123,7 @@
         'nosotros. Así nunca hay dos nubes discutiendo: la foto del presente no se mezcla con el pronóstico ' +
         'del futuro. El campo se ve suave porque LO ES: la resolución efectiva del modelo es aún más gruesa ' +
         'que su rejilla de 39 km, y afilarlo sería inventar detalle. La rejilla la publica el motor, no la ' +
-        'baja tu navegador: son 465 puntos y el proveedor cobra por punto. La celda del centro es Nerpio ' +
+        'baja tu navegador: son 465 puntos y el proveedor cobra por punto. La celda del centro es AstroCamp ' +
         'exacto, no una interpolación. Y donde el modelo no manda valor se ve una trama dorada, que ' +
         'significa «aquí no sabemos» y NO «aquí está despejado». ' +
         'LAS FLECHAS son el viento, y su color no es una escala inventada para el mapa: sale de los ' +
@@ -198,17 +198,17 @@
     en: {
       cargando: 'Fetching the forecast…',
       error: 'The forecast could not be read right now. It refreshes every 6 hours; try again shortly.',
-      titulo: 'Nerpio, <span>tonight</span>',
+      titulo: 'AstroCamp, <span>tonight</span>',
       sitio: 'AstroCamp · Nerpio (Albacete, Spain) · 1,650 m · MPC I79',
       probTitulo: 'Conditions, not behaviour',
       abierto: 'Open', cerrado: 'Closed',
-      ventana: 'window', local: 'local', localLargo: 'Nerpio local time',
+      ventana: 'window', local: 'local', localLargo: 'AstroCamp local time',
       veredictoTitulo: 'Where this word comes from',
       franjaTitulo: 'How the night unfolds',
       vistaBoveda: 'Zenith', vistaCupula: '3D dome',
       sinDatoDesde: 'no data since',
       sinNubes: 'The cloud grid did not arrive in the pass that generated tonight, so the dome draws NO clouds: a clear sky here does not mean the sky is clear. The strips above do carry the cloud forecast, which comes by another route.',
-      vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at Nerpio looking at the horizon. Drag to turn.',
+      vistaNota: 'The same night in another projection: the zenith view looks straight up, with the zenith at the centre; the dome puts you standing at AstroCamp looking at the horizon. Drag to turn.',
       franjaHoy: 'Tonight', franjaManana: 'Tomorrow',
       franjaLuna: 'Moon', franjaNubes: 'clouds',
       franjaSinNube: 'expected cover (WeatherNext, calibrated)',
@@ -220,7 +220,7 @@
         'sky. The lower line marks the hours where the engine says the Moon is the limit, and the upper one is ' +
         'seeing: nearly invisible when good, clear once it passes 1.9 arcseconds. The central zone is ' +
         'astronomical darkness. All hours on the strip are UTC, like everything '+
-        'measured on this page; hover over one to get Nerpio local time.',
+        'measured on this page; hover over one to get AstroCamp local time.',
       ahoraTechos: 'Now · roofs open', noResponde: 'not responding',
       deN: 'of', techosPl: 'roofs',
       probCorta: 'chance of opening',
@@ -251,7 +251,7 @@
       yAdemas: 'and the target is at', yTampocoNoche: 'and it is not full night either',
       limita: { c: 'the sky', l: 'the Moon', f: 'the background', a: 'altitude',
                 n: 'nothing', '-': 'altitude', x: 'not scored' },
-      sensores: 'Right now at Nerpio',
+      sensores: 'Right now at AstroCamp',
       sinSensores: 'The site sensors are not responding at the moment.',
       fotometro: 'Measured sky', calibrado: 'calibrated',
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
@@ -286,7 +286,7 @@
         'the photograph of the present is not mixed with the forecast of the future. The field looks ' +
         'smooth because IT IS: the model’s effective resolution is coarser still than its 39 km grid, and ' +
         'sharpening it would be inventing detail. The grid is published by the engine, not fetched by your ' +
-        'browser: it is 465 points and the provider charges per point. The centre cell is Nerpio exactly, ' +
+        'browser: it is 465 points and the provider charges per point. The centre cell is AstroCamp exactly, ' +
         'not an interpolation. And where the model sends no value you see a gold hatch, which means “we ' +
         'do not know here” and NOT “it is clear here”. ' +
         'THE ARROWS are the wind, and their colour is not a scale invented for the map: it comes from the ' +
