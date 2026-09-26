@@ -62,6 +62,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Electronic Focusers**
   - [Día de NEAF 2026: Filtros Daystar, enfocador electrónico, capas planas y Quark Smart](https://www.youtube.com/watch?v=v0H1_hFQvGg) (2026-07-17)
 
+## DwarfLab
+
+### TELESCOPES
+- **Modelo: DRACO**
+  - [Análisis del Telescopio DWARFLAB DRACO](https://www.youtube.com/watch?v=85uc8z6ucFw) (2026-09-25)
+
 ## Ekos
 
 ### SOFTWARE
@@ -269,7 +275,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: MK127**
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
-  - [Análisis: ¿Puede el Telescopio Rumak MK127 Capturar Imágenes de Cielo Profundo con el Kit Maestro SVBONY?](https://www.youtube.com/watch?v=YTXlROt5zUk) (2026-06-23)
 - **Modelo: SA401 Pro**
   - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
 - **Modelo: SV503**
