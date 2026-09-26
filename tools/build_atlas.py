@@ -87,8 +87,8 @@ TOOLS = [  # href, icon, name, short, long, tag
      T("Beta", "Beta")),
     ("astroforecast.html", "cloud", "Astro Forecast",
      T("Cómo será la noche en AstroCamp.", "Tonight at AstroCamp."),
-     T("Probabilidad de abrir, consejos de adquisición y sensores en vivo para AstroCamp, en Nerpio.",
-       "Chance of opening, acquisition advice and live sensors for AstroCamp, in Nerpio (Spain)."),
+     T("Probabilidad de abrir, consejos de adquisición y sensores en vivo para AstroCamp.",
+       "Chance of opening, acquisition advice and live sensors for AstroCamp (Spain)."),
      T("Planificación", "Planning")),
     ("autoghs.html", "ghs", "AutoGHS",
      T("Estirado GHS automático.", "Automatic GHS stretch."),
@@ -285,7 +285,7 @@ def build_home(lang, obs):
       <div class="c7" style="position: relative; grid-column: span 7; display: flex; flex-direction: column; align-items: flex-start">
         {kicker(T("Fotografía · Medidas · Herramientas", "Photography · Measurements · Tools")(lang))}
         <h1 class="bd" style="margin-top: 34px; font-size: clamp(46px, 7.2vw, 104px); font-weight: 400; line-height: 0.96; letter-spacing: -0.02em">{T('Fotografía y <em class="gi">medidas</em> del cielo', 'Photographing and <em class="gi">measuring</em> the sky')(lang)}</h1>
-        <p style="margin-top: 32px; max-width: 540px; font-size: 19px; line-height: 1.7; color: var(--t2)">{T("Cielo profundo, el eclipse y curvas de luz de exoplanetas desde el observatorio de Nerpio. Y las herramientas con que lo hago, abiertas a todos.", "Deep sky, the eclipse and exoplanet light curves from the Nerpio observatory. And the tools I use to do it, open to everyone.")(lang)}</p>
+        <p style="margin-top: 32px; max-width: 540px; font-size: 19px; line-height: 1.7; color: var(--t2)">{T("Cielo profundo, el eclipse y curvas de luz de exoplanetas desde el observatorio AstroCamp. Y las herramientas con que lo hago, abiertas a todos.", "Deep sky, the eclipse and exoplanet light curves from the AstroCamp observatory. And the tools I use to do it, open to everyone.")(lang)}</p>
         {news}
       </div>
       <figure class="c5" style="position: relative; grid-column: 8 / span 5; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 18px">
@@ -340,8 +340,8 @@ def build_home(lang, obs):
   }})();
   </script>"""
     title = T("CabraSpace · Fotografía y medidas del cielo", "CabraSpace · Photographing and measuring the sky")(lang)
-    desc = T("Astrofotografía de cielo profundo, tránsitos de exoplanetas y el eclipse de 2026 desde Nerpio, y herramientas web gratuitas para procesar y planificar.",
-             "Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from Nerpio, plus free web tools to process and plan.")(lang)
+    desc = T("Astrofotografía de cielo profundo, tránsitos de exoplanetas y el eclipse de 2026 desde AstroCamp, y herramientas web gratuitas para procesar y planificar.",
+             "Deep-sky astrophotography, exoplanet transits and the 2026 eclipse from AstroCamp, plus free web tools to process and plan.")(lang)
     return page(lang, "index.html", title, desc, body, extra_js=js + "\n" + capri.script(lang))
 
 
@@ -377,8 +377,8 @@ def build_observaciones(lang, obs):
     grid = "\n".join(obs_card(o, lang, 310) for o in obs if o["kind"] != "eclipse")
     body = page_title(lang, "Nº I", T("Fotografía y medidas", "Photography and measurements")(lang),
                       T('El <em class="gi">cuaderno</em> de observación', 'The observing <em class="gi">notebook</em>')(lang),
-                      T("Lo que hago desde el observatorio de Nerpio: imágenes de cielo profundo, curvas de luz de tránsitos de exoplanetas y el eclipse de 2026.",
-                        "What I do from the Nerpio observatory: deep-sky images, exoplanet transit light curves and the 2026 eclipse.")(lang))
+                      T("Lo que hago desde el observatorio AstroCamp: imágenes de cielo profundo, curvas de luz de tránsitos de exoplanetas y el eclipse de 2026.",
+                        "What I do from the AstroCamp observatory: deep-sky images, exoplanet transit light curves and the 2026 eclipse.")(lang))
     body = body.replace("</section>", f'<div style="position: relative; display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap">{"".join(chips)}</div></section>', 1)
     body += feature
     body += f"""
@@ -408,8 +408,8 @@ def build_observaciones(lang, obs):
   </script>"""
     first_img = next((obs_thumb(o) for o in obs if obs_thumb(o) and o["kind"] == "deep-sky"), None)
     return page(lang, "observaciones.html", T("Observaciones · CabraSpace", "Observations · CabraSpace")(lang),
-                T("Imágenes de cielo profundo, tránsitos de exoplanetas y el eclipse de 2026 desde el observatorio de Nerpio.",
-                  "Deep-sky images, exoplanet transits and the 2026 eclipse from the Nerpio observatory.")(lang),
+                T("Imágenes de cielo profundo, tránsitos de exoplanetas y el eclipse de 2026 desde el observatorio AstroCamp.",
+                  "Deep-sky images, exoplanet transits and the 2026 eclipse from the AstroCamp observatory.")(lang),
                 body, og_image=first_img, extra_js=js)
 
 
