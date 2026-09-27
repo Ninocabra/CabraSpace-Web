@@ -139,8 +139,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Noticias Astronómicas de Julio 2026](https://www.youtube.com/watch?v=VaxOMIFMq8U) (2026-06-24)
 
 ### SOFTWARE
-- **Modelo: AI Denoise**
-  - [PixInsight Desarrolló su Propia Denoise con AI: Confrontando la Nueva Tecnología con NoiseXTerminator](https://www.youtube.com/watch?v=M5xSEAgU2U4) (2026-06-23)
 - **Modelo: Apple Silicon**
   - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
 - **Modelo: Autopalette**
@@ -175,6 +173,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
 - **Modelo: Sightron**
   - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
+- **Modelo: StellaLyra**
+  - [Anuncio de Oferta Especial: Telescopio Newtoniano StellaLyra 12" f/4](https://stargazerslounge.com/topic/448696-stellalyra-12-f4-m-lrn-newtonian-3-focuser/) (2026-09-27)
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
 
