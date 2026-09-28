@@ -223,6 +223,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Stellarium
 
 ### SOFTWARE
+- **Modelo: Astronomy Software**
+  - [Stellarium Lanza la Versión 26.3 con Nuevas Funciones y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.3) (2026-09-28)
 - **Modelo: Planetario**
   - [Lanzamiento de Stellarium v26.2: Nuevas Culturas Celestes y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.2) (2026-06-24)
 
@@ -265,8 +267,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Sv535 Sc571cc, una nueva cámara astrofotográfica de Svbony](https://www.youtube.com/watch?v=LvS19OipaJc) (2026-06-24)
 - **Modelo: Av503 70**
   - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
-- **Modelo: SC571CC**
-  - [Cámara OSC SC571CC con Lente Astro SV535: ¿Qué Nebulosas Puedes Capturar?](https://www.youtube.com/shorts/tm4juNeSzjw) (2026-06-24)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
@@ -296,10 +296,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
 
 ## Takahashi
-
-### ACCESSORIES
-- **Modelo: Hi-LE**
-  - [Anuncio de nuevos oculares Takahashi](https://stargazerslounge.com/topic/411644-new-takahashi-eyepieces-announced/) (2026-06-24)
 
 ### EYEPIECES
 - **Modelo: eyepieces**
@@ -336,6 +332,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
 
 ### TELESCOPES
+- **Modelo: ToupTek Astro**
+  - [ToupTek Astro presenta su nuevo telescopio SkyEye Plus](https://www.youtube.com/shorts/UKuUg_jNAz0) (2026-09-28)
 - **Modelo: comet**
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
 
