@@ -81,6 +81,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Presentación de la Lente ALCON para 2026](https://www.youtube.com/watch?v=CGa_wxDKjvQ) (2026-08-15)
 - **Modelo: Sale**
   - [Comienza hoy la Venta de Descubrimiento de Septiembre de Explore Scientific](https://www.youtube.com/shorts/NUBIBteTD0I) (2026-09-09)
+- **Modelo: Vidrio ED**
+  - [Nuevos oculares Explore Scientific a prueba de agua con vidrio ED listos para el lanzamiento](https://www.youtube.com/watch?v=kzm58mTjPEU) (2026-09-29)
 
 ### MOUNTS
 - **Modelo: Astronomical League**
@@ -184,6 +186,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASTRO-RES**
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
+- **Modelo: DUAL-COMPACT**
+  - [PrimaLuceLab instala una estación observatorio DUAL-COMPACT en el Planetario de Morelia, México](https://www.primalucelab.com/blog/dual-compact-observatory-station-installed-in-morelia-planetarium-mexico/) (2026-09-29)
 - **Modelo: ESATTO**
   - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
 - **Modelo: OUTPOST 3M**
@@ -225,8 +229,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Astronomy Software**
   - [Stellarium Lanza la Versión 26.3 con Nuevas Funciones y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.3) (2026-09-28)
-- **Modelo: Planetario**
-  - [Lanzamiento de Stellarium v26.2: Nuevas Culturas Celestes y Mejoras](https://github.com/Stellarium/stellarium/releases/tag/v26.2) (2026-06-24)
 
 ## Svbony
 
@@ -263,8 +265,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
 
 ### CAMERAS
-- **Modelo: Astro Camera**
-  - [Sv535 Sc571cc, una nueva cámara astrofotográfica de Svbony](https://www.youtube.com/watch?v=LvS19OipaJc) (2026-06-24)
 - **Modelo: Av503 70**
   - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
 
