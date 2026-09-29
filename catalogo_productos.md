@@ -87,6 +87,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### MOUNTS
 - **Modelo: Astronomical League**
   - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
+- **Modelo: Sidara Nano**
+  - [Explore Scientific Sidara Nano: Nueva Montura Alt-Az Portátil](https://www.youtube.com/watch?v=qTcJkLXp70M) (2026-09-29)
 
 ### SOFTWARE
 - **Modelo: Scott Roberts**
@@ -342,8 +344,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: ASI Week**
   - [ZWO ASI Semana: De Cielos Bortle 9 a Mejores Cielos](https://www.youtube.com/shorts/WJ5NkC96prs) (2026-08-22)
-- **Modelo: Benoit de Mulder**
-  - [Consejos Esenciales de ZWO para Fotografía de Eclipses Solares Totales](https://www.zwoastro.com/2026/06/25/total-solar-eclipse-photography-quebec/) (2026-06-25)
 - **Modelo: Equipamiento**
   - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
 - **Modelo: Rueda Portafiltros**
