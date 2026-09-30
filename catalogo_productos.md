@@ -167,6 +167,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)](https://www.youtube.com/watch?v=Tp08gy1xJZ8) (2026-09-19)
 - **Modelo: Veil**
   - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
+- **Modelo: View into Space**
+  - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
 
 ### TELESCOPES
 - **Modelo: Dwarf Mini**
@@ -265,10 +267,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Desmontaje rápido de telescopios: el nuevo desafío de Svbony](https://www.youtube.com/watch?v=JojqSirKXDY) (2026-08-29)
 - **Modelo: summer deals**
   - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
-
-### CAMERAS
-- **Modelo: Av503 70**
-  - [Av503 70 de Svbony](https://www.youtube.com/watch?v=SAbdHWKkSG8) (2026-06-24)
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
