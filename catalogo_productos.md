@@ -191,6 +191,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
   - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
 - **Modelo: DUAL-COMPACT**
+  - [Instalación de la Estación de Observatorio DUAL-COMPACT en el Planetario de Morelia](https://www.youtube.com/watch?v=HshLziS6bK8) (2026-09-30)
   - [PrimaLuceLab instala una estación observatorio DUAL-COMPACT en el Planetario de Morelia, México](https://www.primalucelab.com/blog/dual-compact-observatory-station-installed-in-morelia-planetarium-mexico/) (2026-09-29)
 - **Modelo: ESATTO**
   - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
@@ -346,8 +347,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
 - **Modelo: Rueda Portafiltros**
   - [Nuevas Ruedas Portafiltros ZWO P25 para Astrofotografía](https://www.youtube.com/watch?v=T1N8SeCWgO4) (2026-06-28)
-- **Modelo: S30 Pro**
-  - [La edición Total Solar Eclipse del Seestar S30 Pro está por llegar.](https://www.youtube.com/watch?v=b-9ldFcEnL0) (2026-06-25)
 - **Modelo: S50 Pro**
   - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
 - **Modelo: espacio**
