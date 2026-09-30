@@ -62,6 +62,7 @@
       ahoraTechos: 'Ahora · techos abiertos', noResponde: 'no responde',
       deN: 'de', techosPl: 'techos',
       probCorta: 'de probabilidad de abrir',
+      probCortaDespejado: 'de probabilidad de cielo despejado',
       techoEstaNoche: 'Esta noche', techoManana: 'Mañana',
       sinDatoTechos: 'el sitio no lo está diciendo ahora',
       techosTitulo: 'Esto es medida, no previsión',
@@ -224,6 +225,7 @@
       ahoraTechos: 'Now · roofs open', noResponde: 'not responding',
       deN: 'of', techosPl: 'roofs',
       probCorta: 'chance of opening',
+      probCortaDespejado: 'chance of clear sky',
       techoEstaNoche: 'Tonight', techoManana: 'Tomorrow',
       sinDatoTechos: 'the site is not reporting it right now',
       techosTitulo: 'This is measurement, not forecast',
@@ -923,7 +925,12 @@
     if (!n || typeof n.probabilidad_de_abrir !== 'number') { return ''; }
     var vd = n.veredicto_abrir;
     var pct = Math.round(n.probabilidad_de_abrir * 100);
-    var pie = '<b class="n">' + pct + '%</b> ' + esc(t.probCorta) +
+    /* Las noches con nube de WeatherNext (modelo_nubes 'weathernext3') se
+       calibran contra el fotometro de cielo: la cifra es la probabilidad de
+       cielo DESPEJADO, no la de abrir el techo (eso es el ECMWF de hoy). */
+    var esWN = /weathernext/i.test(String(n.modelo_nubes || ''));
+    var pie = '<b class="n">' + pct + '%</b> ' +
+      esc(esWN ? t.probCortaDespejado : t.probCorta) +
       ayuda(vd ? t.veredictoTitulo : t.probTitulo,
         (vd && vd.regla ? vd.regla + ' ' : '') + (n.probabilidad_definicion || ''), false) +
       /* LAS DOS ZONAS NO SE PARTEN POR LA MITAD. En la columna no caben en una
