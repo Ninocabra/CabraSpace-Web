@@ -110,6 +110,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: INDI Library**
+  - [INDI Library v2.2.5: nueva versión del ecosistema de control astronómico](https://github.com/indilib/indi/releases/tag/v2.2.5) (2026-10-01)
   - [Lanzamiento de la Biblioteca INDI v2.2.4](https://github.com/indilib/indi/releases/tag/v2.2.4) (2026-08-01)
 - **Modelo: Linux**
   - [INDI Library v2.2.4.1: Corrección de errores menores](https://github.com/indilib/indi/releases/tag/v2.2.4.1) (2026-08-02)
@@ -145,8 +146,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
 - **Modelo: Autopalette**
   - [Actualización de Autopalette y Novedades en PixInsight](https://www.youtube.com/watch?v=F8kAp3xG3Fo) (2026-07-27)
-- **Modelo: BlurXTerminator**
-  - [BlurXTerminator sin PixInsight: Llegó el Momento](https://www.youtube.com/watch?v=Vrw90sNdOyE) (2026-06-26)
 - **Modelo: Lightroom**
   - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: Luminar Neo**
@@ -193,9 +192,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [PrimaLuceLab instala una estación observatorio DUAL-COMPACT en el Planetario de Morelia, México](https://www.primalucelab.com/blog/dual-compact-observatory-station-installed-in-morelia-planetarium-mexico/) (2026-09-29)
 - **Modelo: ESATTO**
   - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
+- **Modelo: NEAST Summit**
+  - [Avance de NEAST Summit 2026](https://www.youtube.com/shorts/xH3d-PakLh8) (2026-10-01)
 - **Modelo: OUTPOST 3M**
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
-  - [Instalan cúpula OUTPOST 3M en el Observatorio Astrofísico de Asiago](https://www.primalucelab.com/blog/outpost-3m-dome-installed-at-asiago-astrophysical-observatory/) (2026-06-26)
 - **Modelo: mounting**
   - [PrimaLuceLab: Menos montaje, más cielo](https://www.youtube.com/shorts/1a3E0RDQdVo) (2026-09-21)
 
