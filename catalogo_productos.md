@@ -101,6 +101,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis del Explorador Científico ED80 con Montura iEXOS-100](https://www.youtube.com/watch?v=O44ZN0Y8_OQ) (2026-09-14)
 - **Modelo: FirstLight 80**
   - [Alerta de Oferta: Explore Scientific FirstLight 80 con Montura Twilight Nano por solo $129](https://www.youtube.com/watch?v=Z2NhRXisJKg) (2026-09-06)
+- **Modelo: Sidara Essential 102**
+  - [Explore Scientific Sidara Essential 102: Telescopio Refractor de 102mm con Montura Alt-Az](https://www.youtube.com/watch?v=IWSq2y9aMmk) (2026-09-30)
 - **Modelo: astrógrafo**
   - [Prototipo de astrógrafo de Explore Scientific captura Andrómeda](https://www.youtube.com/shorts/LplDNf5p_xs) (2026-09-22)
 
@@ -137,10 +139,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Precisión Absurda de las Monturas de Telescopio: Una Maravilla de Ingeniería en tu Patio Trasero](https://www.youtube.com/watch?v=xHlWtuJ0LJk) (2026-09-18)
 - **Modelo: montura armónica**
   - [La Nueva Generación de Monturas Armónicas Ha Llegado](https://www.youtube.com/watch?v=y9Ktz3GHPAg) (2026-06-26)
-
-### MOUNTS,CAMERAS
-- **Modelo: Askar N160**
-  - [Noticias Astronómicas de Julio 2026](https://www.youtube.com/watch?v=VaxOMIFMq8U) (2026-06-24)
 
 ### SOFTWARE
 - **Modelo: Apple Silicon**
