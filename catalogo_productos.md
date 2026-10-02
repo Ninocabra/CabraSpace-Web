@@ -138,8 +138,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nueva Montura Modular de Viaje Trinity de ML Astro](https://stargazerslounge.com/topic/448549-new-modular-travel-mount-from-ml-astro-trinity/) (2026-09-22)
 - **Modelo: SetiAstro**
   - [La Precisión Absurda de las Monturas de Telescopio: Una Maravilla de Ingeniería en tu Patio Trasero](https://www.youtube.com/watch?v=xHlWtuJ0LJk) (2026-09-18)
-- **Modelo: montura armónica**
-  - [La Nueva Generación de Monturas Armónicas Ha Llegado](https://www.youtube.com/watch?v=y9Ktz3GHPAg) (2026-06-26)
 
 ### SOFTWARE
 - **Modelo: Apple Silicon**
@@ -151,6 +149,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: MLDenoise**
+  - [PixInsight 1.9.5 y MLDenoise: Desmitificando el Procesado Astrofotográfico](https://www.youtube.com/watch?v=UIKeBB0eSXo) (2026-10-01)
   - [Comparativa: Denoise ML de PixInsight vs. NoiseXTerminator](https://www.youtube.com/watch?v=w1e3HRYUyRA) (2026-09-18)
 - **Modelo: Pleiades Astrophoto**
   - [Análisis de PixInsight 1.9.5 y nuevos desarrollos en astrofotografía](https://www.youtube.com/watch?v=L1pT3V5fR8s) (2026-09-19)
