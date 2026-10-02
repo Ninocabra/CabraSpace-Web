@@ -304,6 +304,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Touptek
 
+### ACCESSORIES
+- **Modelo: ToupTek Astro**
+  - [ToupTek Astro: Equipo Listo para la Acción Estelar](https://www.youtube.com/shorts/uS5x-LQyha0) (2026-10-01)
+
 ### CAMERAS
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
@@ -326,7 +330,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: StellaVita**
   - [Cómo Usar el Asistente de Campo Plano en ToupTek StellaVita](https://www.youtube.com/watch?v=ePd8uiMa8F4) (2026-07-13)
-  - [Habilitar puenteado cableado con StellaVita y Router](https://www.youtube.com/watch?v=Ntq01crp_Uw) (2026-06-24)
 
 ### TELESCOPES
 - **Modelo: ToupTek Astro**

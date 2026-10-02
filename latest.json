@@ -1,6 +1,14 @@
 {
   "software": [
     {
+      "title_es": "La historia de PixInsight: 25 años de genialidad y puertas cerradas",
+      "title_en": "The PixInsight Story: 25 Years of Genius and Closed Doors",
+      "category_es": "SOFTWARE",
+      "category_en": "SOFTWARE",
+      "date": "2026-10-02",
+      "url": "https://www.youtube.com/watch?v=HUS_0JsxiYU"
+    },
+    {
       "title_es": "PixInsight 1.9.5 y MLDenoise en detalle: Vicent Peris desmiente mitos de procesado",
       "title_en": "PixInsight 1.9.5 and MLDenoise in Detail: Vicent Peris Debunks Processing Myths",
       "category_es": "TALLERES",
@@ -15,17 +23,17 @@
       "category_en": "SOFTWARE",
       "date": "2026-09-25",
       "url": "https://www.youtube.com/watch?v=ov2L5AErUMQ"
-    },
-    {
-      "title_es": "Análisis de PixInsight 1.9.5 y novedades en astrofotografía",
-      "title_en": "Analyzing PixInsight 1.9.5 and New Developments in Astrophotography",
-      "category_es": "SOFTWARE",
-      "category_en": "SOFTWARE",
-      "date": "2026-09-19",
-      "url": "https://www.youtube.com/watch?v=L1pT3V5fR8s"
     }
   ],
   "hardware": [
+    {
+      "title_es": "ToupTek Astro: Equipo Listo para la Acción Estelar",
+      "title_en": "ToupTek Astro: Equipment Ready for Stellar Action",
+      "category_es": "ACCESORIOS",
+      "category_en": "ACCESSORIES",
+      "date": "2026-10-01",
+      "url": "https://www.youtube.com/shorts/uS5x-LQyha0"
+    },
     {
       "title_es": "PixInsight 1.9.5 y MLDenoise: Desmitificando el Procesado Astrofotográfico",
       "title_en": "PixInsight 1.9.5 and MLDenoise: Demystifying Astrophotographic Processing",
@@ -41,14 +49,6 @@
       "category_en": "TELESCOPES",
       "date": "2026-10-01",
       "url": "https://www.youtube.com/shorts/iMmTV-CDEkQ"
-    },
-    {
-      "title_es": "INDI Library v2.2.5: nueva versión del ecosistema de control astronómico",
-      "title_en": "INDI Library v2.2.5 Released",
-      "category_es": "SOFTWARE",
-      "category_en": "SOFTWARE",
-      "date": "2026-10-01",
-      "url": "https://github.com/indilib/indi/releases/tag/v2.2.5"
     }
   ]
 }
