@@ -279,7 +279,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV503**
   - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
   - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
-  - [Telescopio Refractor SV503 70mm de Svbony: Explorando el Cosmos sin gastar una fortuna](https://www.youtube.com/shorts/bK21vw9ipaY) (2026-06-26)
 - **Modelo: SV503 70**
   - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
 - **Modelo: SV530**
@@ -392,6 +391,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
 - **Modelo: FF131**
   - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
+- **Modelo: Pilares de la Creación**
+  - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
 - **Modelo: S50 Pro**
   - [Reseña del Seestar S50 Pro: ¿El Mejor Telescopio Inteligente Hasta la Fecha?](https://www.youtube.com/watch?v=ksk36W2vCoM) (2026-08-28)
   - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
