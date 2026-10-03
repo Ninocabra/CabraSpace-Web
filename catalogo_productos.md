@@ -254,6 +254,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV225**
   - [Presentación del Kit Visual Ultraportátil SVBONY: Montura SV225 y Telescopio MK105](https://www.youtube.com/watch?v=nZBfKjHkVXI) (2026-09-16)
+- **Modelo: SV530**
+  - [Uso del Telescopio Svbony SV530 con Cámaras DSLR para Astrofotografía](https://www.youtube.com/watch?v=mYyyXz1bGQg) (2026-10-03)
 - **Modelo: SV535**
   - [Svbony SV535: Un objetivo versátil para fotografía de cámara y astrografía de cielo profundo](https://www.youtube.com/watch?v=--XrVJALlSQ) (2026-09-11)
 - **Modelo: SV545**
@@ -278,8 +280,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV503**
   - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
   - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
-- **Modelo: SV503 70**
-  - [El Nuevo SVBONY SV503 70, un telescopio compacto para principiantes](https://www.youtube.com/watch?v=HRZPcWP5wLw) (2026-06-27)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV535**
@@ -360,12 +360,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: ASI2600MC Duo**
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
-- **Modelo: S50**
-  - [Análisis de las cámaras Seestar S50 y S30 Pro con N.I.N.A.](https://www.youtube.com/watch?v=A6WOq7Xc180) (2026-06-28)
 - **Modelo: Seestar S30 Pro**
   - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
 - **Modelo: Seestar S50 Pro**
   - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
+- **Modelo: cámara astro**
+  - [Cámara Astro ZWO: Una Inversión en Felicidad Astronómica](https://www.youtube.com/shorts/sgNAe2KIaWQ) (2026-10-03)
 - **Modelo: cámara astrofotografía**
   - [ZWO: Del Bortle 8 al APOD de la NASA](https://www.youtube.com/shorts/CvIf-bXCXuM) (2026-08-28)
 
