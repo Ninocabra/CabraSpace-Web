@@ -172,9 +172,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Ed Ting**
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Modelo: Lukomatico**
+  - [Comparativa de Telescopio Presupuestario f/3 con Sensor Grande](https://www.youtube.com/watch?v=ZeIBNH5jCVU) (2026-10-03)
   - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
-- **Modelo: Sightron**
-  - [Revisión del Refractor Sharpstar SJH-75UF de Sightron](https://www.youtube.com/watch?v=GHj-23ICVEk) (2026-06-28)
 - **Modelo: StellaLyra**
   - [Anuncio de Oferta Especial: Telescopio Newtoniano StellaLyra 12" f/4](https://stargazerslounge.com/topic/448696-stellalyra-12-f4-m-lrn-newtonian-3-focuser/) (2026-09-27)
 - **Modelo: Telescopio Principiante**
