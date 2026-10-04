@@ -48,6 +48,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [La Eclips Solar Total de Agosto de 2026: Guía para Observadores](https://www.celestron.com/blogs/news/pursuing-the-shadow-the-august-2026-total-solar-eclipse) (2026-07-01)
 
 ### TELESCOPES
+- **Modelo: C90**
+  - [Celestron C90: Una Joya Oculta y Económica para Astrofotografía](https://www.youtube.com/watch?v=MnQy75tpkVE) (2026-10-04)
 - **Modelo: CPC Deluxe HD**
   - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
@@ -343,8 +345,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO ASI Semana: De Cielos Bortle 9 a Mejores Cielos](https://www.youtube.com/shorts/WJ5NkC96prs) (2026-08-22)
 - **Modelo: Equipamiento**
   - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
-- **Modelo: Rueda Portafiltros**
-  - [Nuevas Ruedas Portafiltros ZWO P25 para Astrofotografía](https://www.youtube.com/watch?v=T1N8SeCWgO4) (2026-06-28)
 - **Modelo: S50 Pro**
   - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
 - **Modelo: espacio**
