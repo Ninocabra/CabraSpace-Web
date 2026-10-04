@@ -174,6 +174,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Ed Ting**
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Modelo: Lukomatico**
+  - [Telescopio económico f/3 vs Sensor grande: ¿Cuál es la mejor opción?](https://www.youtube.com/watch?v=aHmgWODEuA4) (2026-10-03)
   - [Comparativa de Telescopio Presupuestario f/3 con Sensor Grande](https://www.youtube.com/watch?v=ZeIBNH5jCVU) (2026-10-03)
   - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
 - **Modelo: StellaLyra**
@@ -291,7 +292,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Observación del eclipse solar en España con la SVBONY SV555](https://www.youtube.com/watch?v=b4DjxdUNjuM) (2026-09-16)
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
-  - [Tutorial de Ensamblaje y Gestión de Cables SV555](https://www.youtube.com/watch?v=UikZJ5EGH7E) (2026-06-28)
 
 ## Takahashi
 
