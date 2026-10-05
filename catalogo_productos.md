@@ -91,6 +91,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
 - **Modelo: Sidara Nano**
   - [Explore Scientific Sidara Nano: Nueva Montura Alt-Az Portátil](https://www.youtube.com/watch?v=qTcJkLXp70M) (2026-09-29)
+- **Modelo: Sidara Pro**
+  - [Primer Vistazo a la Montura Explore Scientific Sidara Pro GoTo con SkyAssist](https://www.youtube.com/watch?v=bF0HJ0NIjWA) (2026-10-05)
 
 ### SOFTWARE
 - **Modelo: Scott Roberts**
@@ -298,10 +300,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### EYEPIECES
 - **Modelo: eyepieces**
   - [Takahashi lanza nuevos oculares eyecuativo TOE de 58°](https://stargazerslounge.com/topic/447288-takahashi-released-new-toe-25mm-58%C2%B0toe-33mm-58%C2%B0toe-40mm-58%C2%B0-eyepieces/) (2026-08-05)
-
-### TELESCOPES
-- **Modelo: FC100DZ**
-  - [Reseña del Takahashi FC100DZ: la grandeza de fluorita de 4 pulgadas de Tak continúa](https://www.youtube.com/watch?v=lzJ0anAw7D8) (2026-06-28)
 
 ## Touptek
 
