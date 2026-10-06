@@ -1,5 +1,43 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=0AVIUhlrKyE",
+    "title_es": "Refinamiento de Gradientes MultiEscala: Eliminando Motes de Polvo y Gradientes Resistentes en PixInsight",
+    "title_en": "MultiScale Gradient Refinement: Eliminating Dust Motes and Stubborn Gradients in PixInsight",
+    "summary_es": "Este recurso de PixInsight enseña una técnica avanzada de refinamiento de gradientes multiescala para eliminar motes de polvo y gradientes difíciles que no se pueden corregir con métodos convencionales. Demuestra cómo aplicar herramientas como DynamicBackgroundExtraction (DBE) o MultiScaleMedianTransform (MMT) de manera sofisticada para limpiar el fondo de las imágenes astronómicas. Es un tutorial valioso para resolver problemas persistentes en el procesamiento de imágenes.",
+    "summary_en": "This PixInsight resource teaches an advanced multi-scale gradient refinement technique to eliminate persistent dust motes and stubborn gradients that cannot be corrected with conventional methods. It demonstrates how to apply tools like DynamicBackgroundExtraction (DBE) or MultiScaleMedianTransform (MMT) in a sophisticated way to clean the background of astronomical images. This valuable tutorial helps solve persistent problems in image processing.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-10-06",
+    "url": "https://www.youtube.com/watch?v=0AVIUhlrKyE",
+    "tags": [
+      "PixInsight",
+      "Gradient",
+      "DBE",
+      "MMT",
+      "BackgroundCorrection",
+      "Tutorial"
+    ]
+  },
+  {
+    "id": "https://www.youtube.com/watch?v=sIu3Wh6yLPo",
+    "title_es": "Haz que PixInsight sea un placer de usar en 5 minutos",
+    "title_en": "Make PixInsight a Joy to Use in 5 Minutes",
+    "summary_es": "Este recurso ofrece consejos y trucos para configurar PixInsight, haciendo que su interfaz sea más amigable y eficiente. Enseña cómo personalizar el entorno de trabajo y optimizar ciertas opciones para mejorar la experiencia de usuario en el procesamiento de astrofotografía.",
+    "summary_en": "This resource provides tips and tricks for configuring PixInsight, making its interface more user-friendly and efficient. It covers how to customize the workspace and optimize certain settings to enhance the user experience in astrophotography processing.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-10-06",
+    "url": "https://www.youtube.com/watch?v=sIu3Wh6yLPo",
+    "tags": [
+      "PixInsight",
+      "Interfaz",
+      "Configuración",
+      "Flujo de trabajo",
+      "Tutorial",
+      "Optimización"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=HUS_0JsxiYU",
     "title_es": "La historia de PixInsight: 25 años de genialidad y puertas cerradas",
     "title_en": "The PixInsight Story: 25 Years of Genius and Closed Doors",
@@ -1823,41 +1861,6 @@
     "tags": [
       "PixInsight",
       "Patriot Astro"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=hYAjaQvuwhI",
-    "title_es": "Flujo de trabajo completo con SASPRO para obtener mejores resultados (Patriot Astro)",
-    "title_en": "AWESOME SASPRO FULL WORKFLOW!  GETTING MY BEST RESULTS!! S30PRO (Patriot Astro)",
-    "summary_es": "Tutorial de flujo de trabajo completo usando herramientas SASPRO en PixInsight para lograr el máximo detalle y calidad en la imagen final.",
-    "summary_en": "Update or tutorial from Patriot Astro covering astrophotography: 'AWESOME SASPRO FULL WORKFLOW!  GETTING MY BEST RESULTS!! S30PRO'. Configure GEMINI_API_KEY in GitHub to enable automated AI summaries.",
-    "category_es": "TALLERES",
-    "category_en": "WORKSHOPS",
-    "date": "2026-02-15",
-    "url": "https://www.youtube.com/watch?v=hYAjaQvuwhI",
-    "tags": [
-      "PixInsight",
-      "Patriot Astro",
-      "Tutorial"
-    ]
-  },
-  {
-    "id": "https://pixinsight.com/forum/index.php?threads/gpu-acceleration-for-amd-7000-series-gpus-on-ubuntu-22-04-and-windows-11-wsl2.23615/",
-    "title_es": "Aceleración GPU para tarjetas AMD Serie 7000 en Ubuntu 22.04 y Windows 11 WSL2",
-    "title_en": "GPU Acceleration for AMD 7000 series GPUs on Ubuntu 22.04 and Windows 11 WSL2",
-    "summary_es": "PixInsight ahora soporta la aceleración GPU para las tarjetas gráficas AMD Radeon Serie 7000 en Ubuntu 22.04 y Windows 11 WSL2. Esta actualización mejora significativamente las velocidades de procesamiento para los usuarios que utilizan estas configuraciones específicas de hardware y sistema operativo. Proporciona un aumento crucial del rendimiento para tareas complejas de astrofotografía dentro de PixInsight.",
-    "summary_en": "PixInsight now supports GPU acceleration for AMD Radeon 7000 series graphics cards on Ubuntu 22.04 and Windows 11 WSL2. This update significantly enhances processing speeds for users leveraging these specific hardware and operating system configurations. It provides a crucial performance boost for complex astrophotography tasks within PixInsight.",
-    "category_es": "SOFTWARE",
-    "category_en": "SOFTWARE",
-    "date": "2025-10-17",
-    "url": "https://pixinsight.com/forum/index.php?threads/gpu-acceleration-for-amd-7000-series-gpus-on-ubuntu-22-04-and-windows-11-wsl2.23615/",
-    "tags": [
-      "GPU",
-      "AMD",
-      "Radeon",
-      "Ubuntu",
-      "WSL2",
-      "Windows"
     ]
   }
 ]
