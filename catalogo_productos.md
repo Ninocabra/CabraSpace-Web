@@ -94,10 +94,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Sidara Pro**
   - [Primer Vistazo a la Montura Explore Scientific Sidara Pro GoTo con SkyAssist](https://www.youtube.com/watch?v=bF0HJ0NIjWA) (2026-10-05)
 
-### SOFTWARE
-- **Modelo: Scott Roberts**
-  - [59º Encuentro Anual de la Sociedad Astronómica](https://www.youtube.com/watch?v=sGybg0kwgrI) (2026-06-27)
-
 ### TELESCOPES
 - **Modelo: Buzz Aldrin**
   - [El telescopio de Buzz Aldrin incluye una pieza de la Luna](https://www.youtube.com/shorts/7t8ug8sOq5c) (2026-08-26)
@@ -157,6 +153,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Comparativa: Denoise ML de PixInsight vs. NoiseXTerminator](https://www.youtube.com/watch?v=w1e3HRYUyRA) (2026-09-18)
 - **Modelo: Pleiades Astrophoto**
   - [Análisis de PixInsight 1.9.5 y nuevos desarrollos en astrofotografía](https://www.youtube.com/watch?v=L1pT3V5fR8s) (2026-09-19)
+- **Modelo: Procesamiento de Imágenes**
+  - [Optimiza PixInsight para un Uso Agradable en 5 Minutos](https://www.youtube.com/watch?v=sIu3Wh6yLPo) (2026-10-06)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
 - **Modelo: Script**
