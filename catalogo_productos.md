@@ -250,7 +250,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Ofertas de Verano Svbony: Hasta 50% de Descuento en Equipos de Astrofotografía](https://www.youtube.com/watch?v=wA0luIBeOvY) (2026-08-18)
 - **Modelo: Prime Day**
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
-  - [Última Oleada de Prime Day: Masterclass de Equipamiento en Vivo con @Naztronomy y Cupones Exclusivos de Freddie](https://www.youtube.com/watch?v=QaY4IQhOnAk) (2026-06-29)
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
 - **Modelo: SA207pro**
@@ -393,6 +392,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: S50 Pro**
   - [Reseña del Seestar S50 Pro: ¿El Mejor Telescopio Inteligente Hasta la Fecha?](https://www.youtube.com/watch?v=ksk36W2vCoM) (2026-08-28)
   - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
+- **Modelo: S50PRO**
+  - [Review a 60 días del Telescopio SEESTAR S50PRO](https://www.youtube.com/watch?v=HyE0VaF8ZWs) (2026-10-10)
 - **Modelo: Seestar S50 Pro**
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
   - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
