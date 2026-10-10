@@ -21,6 +21,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Actualizaciones Generales / Revisiones:**
   - [Análisis Profundo del Askar N160: ¿Un Telescopio Newtoniano F3.4 de Gran Valor?](https://www.youtube.com/watch?v=kvtT0upxdW4) (2026-08-11)
 - **Modelo: N160**
+  - [Askar N160: ¡Casi Demasiado Rápido!](https://www.youtube.com/watch?v=lNYTKhR1Kvg) (2026-10-09)
   - [Video de demostración de los Askar N160 y N210: ¿Qué reflector Newton de gran apertura elegir?](https://www.youtube.com/watch?v=6ba0GKdDPeY) (2026-08-21)
 - **Modelo: N210**
   - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
@@ -281,7 +282,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
 - **Modelo: SV503**
   - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
-  - [Configuración del telescopio SV503 70 Flatfield OTA: ideal para principiantes](https://www.youtube.com/shorts/C936L1ffaGc) (2026-06-28)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV535**
