@@ -39,8 +39,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Cúpula**
   - [Cúpula Baader Advanced Slit de 6,15 m para el GFZ de Potsdam](https://www.youtube.com/watch?v=MKVA8h6sR60) (2026-09-09)
-- **Modelo: Observable Space**
-  - [Lo más destacado de ASTRO Friedrichshafen 2026 de Baader, Celestron y otros](https://www.youtube.com/watch?v=7lrgVyyXj2k) (2026-06-29)
 
 ## Celestron
 
@@ -182,6 +180,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Anuncio de Oferta Especial: Telescopio Newtoniano StellaLyra 12" f/4](https://stargazerslounge.com/topic/448696-stellalyra-12-f4-m-lrn-newtonian-3-focuser/) (2026-09-27)
 - **Modelo: Telescopio Principiante**
   - [El telescopio ideal para principiantes: Sorprendente elección](https://www.youtube.com/watch?v=ge1DSqKqIKs) (2026-07-26)
+
+## Pegasus Astro
+
+### ACCESSORIES
+- **Modelo: Pocket Powerbox Advance Gen3**
+  - [Controla tu telescopio con el distribuidor Pocket Powerbox Advance Gen3 de Pegasus Astro](https://www.youtube.com/watch?v=JhS362KnbHQ) (2026-10-11)
 
 ## Primalucelab
 
