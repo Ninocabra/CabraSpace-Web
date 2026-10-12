@@ -216,6 +216,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Solución de Cámara Mosaico CMOS de QHYCCD](https://www.qhyccd.com/cmos-mosaic-camera-solution/) (2026-07-17)
 - **Modelo: QHY585**
   - [Cámara Astronómica QHY585M con Sensor Sony IMX585](https://www.qhyccd.com/qhy585-imx585/) (2026-07-16)
+- **Modelo: miniCAM8M**
+  - [Cámara QHYCCD miniCAM8M Juega un Rol Clave en el Descubrimiento de la Nebulosa Planetaria HMK 1](https://www.qhyccd.com/qhyccd-minicam8m-helps-reveal-hmk-1-a-newly-documented-planetary-nebula/) (2026-10-12)
 
 ### SOFTWARE
 - **Modelo: seguridad**
@@ -358,8 +360,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: ASI2600MC Duo**
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
-- **Modelo: Seestar S30 Pro**
-  - [Nuevo Seestar S30 Pro Edición Especial para Eclipse Solar Total](https://www.youtube.com/watch?v=s44IlLegWkg) (2026-07-02)
 - **Modelo: Seestar S50 Pro**
   - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
 - **Modelo: cámara astro**
