@@ -297,6 +297,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Observación del eclipse solar en España con la SVBONY SV555](https://www.youtube.com/watch?v=b4DjxdUNjuM) (2026-09-16)
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
+- **Modelo: SV580**
+  - [Presentamos el SVBONY SV580: Una Nueva Era en Astrofotografía Full-Frame](https://www.youtube.com/watch?v=QbBxcfESfrI) (2026-10-13)
 
 ## Takahashi
 
@@ -326,8 +328,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevo Kit de Imagen Mono Versátil ToupTek Astro: AE676M y AFW-mini](https://www.youtube.com/watch?v=mehD122BGW4) (2026-09-10)
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
-- **Modelo: astronomical camera**
-  - [Fotones de luz-años finalmente llegan a nuestros sensores](https://www.youtube.com/shorts/ADh1OmwO_Eg) (2026-06-30)
 
 ### SOFTWARE
 - **Modelo: StellaVita**
