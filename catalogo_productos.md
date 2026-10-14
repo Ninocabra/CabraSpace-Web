@@ -78,8 +78,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Explore Scientific
 
 ### ACCESSORIES
+- **Modelo: 92° FOV**
+  - [Nuevos Telescopios Explore Scientific 92° ED: ¡Vistas Ultra-Amplias!](https://www.youtube.com/shorts/yJd7n5Cby0k) (2026-10-14)
 - **Modelo: ALCON**
   - [Presentación de la Lente ALCON para 2026](https://www.youtube.com/watch?v=CGa_wxDKjvQ) (2026-08-15)
+- **Actualizaciones Generales / Revisiones:**
+  - [Explore Scientific: 8 Opciones de Telescopios Oculares ED de 72°](https://www.youtube.com/shorts/R2q0nnRKGiM) (2026-10-14)
 - **Modelo: Sale**
   - [Comienza hoy la Venta de Descubrimiento de Septiembre de Explore Scientific](https://www.youtube.com/shorts/NUBIBteTD0I) (2026-09-09)
 - **Modelo: Vidrio ED**
@@ -156,8 +160,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Optimiza PixInsight para un Uso Agradable en 5 Minutos](https://www.youtube.com/watch?v=sIu3Wh6yLPo) (2026-10-06)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
-- **Modelo: Script**
-  - [Script para mejorar el flujo de trabajo en PixInsight](https://www.youtube.com/watch?v=D-GFvIQHCkg) (2026-07-03)
 - **Modelo: SyQon Studio**
   - [SyQon Studio ya está disponible: cómo usarlo con SASpro y PixInsight](https://www.youtube.com/watch?v=ov2L5AErUMQ) (2026-09-25)
 - **Modelo: TAIC**
@@ -204,10 +206,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
 - **Modelo: mounting**
   - [PrimaLuceLab: Menos montaje, más cielo](https://www.youtube.com/shorts/1a3E0RDQdVo) (2026-09-21)
-
-### MOUNTS
-- **Modelo: ASTRO-RES**
-  - [Instalación del ASTRO-RES de la Estación Observacional en el ITS Academy G. Caboto](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-its-academy-g-caboto/) (2026-07-06)
 
 ## QHYCCD
 
