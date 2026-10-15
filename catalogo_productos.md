@@ -283,8 +283,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
 - **Modelo: SA401 Pro**
   - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
-- **Modelo: SV503**
-  - [Guía de configuración y usuario del Telescopio Svbony SV503 70mm para principiantes](https://www.youtube.com/watch?v=81pv9YhSBkw) (2026-07-05)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV535**
@@ -358,6 +356,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: ASI2600MC Duo**
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
+- **Modelo: ASI676MM**
+  - [ZWO ASI676MM: Primeras impresiones de usuarios como cámara "all-sky"](https://stargazerslounge.com/topic/441691-new-camera-zwo-asi676mm/) (2026-10-15)
 - **Modelo: Seestar S50 Pro**
   - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
 - **Modelo: cámara astro**
