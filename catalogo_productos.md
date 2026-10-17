@@ -135,6 +135,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: ToupTek Astro**
   - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
+- **Modelo: View into Space**
+  - [Midiendo la calidad del cielo con el medidor Lanternfish](https://www.youtube.com/watch?v=iKfAyqW2rqg) (2026-10-17)
 
 ### MOUNTS
 - **Modelo: ML Astro**
@@ -170,8 +172,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
 
 ### TELESCOPES
-- **Modelo: Dwarf Mini**
-  - [Telescopio Inteligente Dwarf Mini: Lo Esencial Para Principiantes Antes de Comprar](https://www.youtube.com/watch?v=rpvJgjGnFzQ) (2026-07-07)
 - **Modelo: Ed Ting**
   - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Modelo: Lukomatico**
@@ -256,8 +256,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
-- **Modelo: SA207pro**
-  - [Mejora el Rendimiento de los Binoculares SA207pro: Combinaciones Óptimas de Filtros para Observación Estelar](https://www.youtube.com/shorts/JulGJayyzsA) (2026-07-07)
 - **Modelo: SV225**
   - [Presentación del Kit Visual Ultraportátil SVBONY: Montura SV225 y Telescopio MK105](https://www.youtube.com/watch?v=nZBfKjHkVXI) (2026-09-16)
 - **Modelo: SV530**
@@ -334,6 +332,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ToupTek Astro presenta su nuevo telescopio SkyEye Plus](https://www.youtube.com/shorts/UKuUg_jNAz0) (2026-09-28)
 - **Modelo: comet**
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
+
+## Vaonis
+
+### TELESCOPES
+- **Modelo: Atlas**
+  - [Vaonis Atlas Revelado: Telescopio Dual Modular y Resultados de Imagen](https://www.youtube.com/watch?v=MwYJpWJLg9I) (2026-10-17)
 
 ## ZWO
 
