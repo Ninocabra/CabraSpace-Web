@@ -254,8 +254,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Oferta de Día de Astronomía de SVBONY #2: Construye tu Kit de Cielo Profundo con Francisco](https://www.youtube.com/watch?v=sYmor4_z7UE) (2026-09-15)
 - **Modelo: Ofertas**
   - [Ofertas de Verano Svbony: Hasta 50% de Descuento en Equipos de Astrofotografía](https://www.youtube.com/watch?v=wA0luIBeOvY) (2026-08-18)
-- **Modelo: Prime Day**
-  - [Guía Definitiva para Mejorar tu Equipo de Astrofotografía en Prime Day](https://www.youtube.com/watch?v=nDp8KgQWBj8) (2026-07-09)
 - **Modelo: SA207**
   - [SVBONY SA207 8x32 ED APO Binoculars de Exploración](https://www.youtube.com/watch?v=SYHEdKS-2h8) (2026-07-29)
 - **Modelo: SV225**
@@ -338,6 +336,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Atlas**
   - [Vaonis Atlas Revelado: Telescopio Dual Modular y Resultados de Imagen](https://www.youtube.com/watch?v=MwYJpWJLg9I) (2026-10-17)
+- **Modelo: telescopio inteligente**
+  - [Vaonis Atlas o DwarfLab Draco: análisis a fondo de los nuevos telescopios inteligentes](https://www.youtube.com/watch?v=9HedLEWT8dU) (2026-10-17)
 
 ## ZWO
 
