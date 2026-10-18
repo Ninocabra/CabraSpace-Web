@@ -129,6 +129,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Astrocitas**
   - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
+- **Modelo: Ed Ting**
+  - [El Rig de Astrofotografía de Cielo Profundo de Ed Ting: Estado del Arte](https://www.youtube.com/watch?v=bmzvuG8SsW8) (2026-10-18)
 - **Modelo: Nebula Photos**
   - [Cómo añadir autoenfoque a tu telescopio](https://www.youtube.com/watch?v=5aFmfiffPVM) (2026-07-31)
 - **Modelo: Oberwerk**
@@ -279,8 +281,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: MK127**
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
-- **Modelo: SA401 Pro**
-  - [Lanzamiento del telescopio para observatorio Svbony SA401 Pro APO](https://www.youtube.com/watch?v=dkO-lj9Go88) (2026-07-07)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV535**
