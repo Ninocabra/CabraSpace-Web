@@ -272,10 +272,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: summer deals**
   - [Svbony Presenta Ofertas Veraniegas Oficiales](https://www.youtube.com/shorts/5eX7wb6gLBQ) (2026-08-10)
 
-### SOFTWARE
-- **Modelo: ASIAIR**
-  - [Tertulia de Astronomos: Consejos y Equipos Recomendados por los Expertos](https://www.youtube.com/watch?v=-3xCc6VTfm4) (2026-07-08)
-
 ### TELESCOPES
 - **Modelo: MK127**
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
@@ -307,6 +303,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: AE676C**
   - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
+- **Modelo: AE676M**
+  - [ToupTek AE676M: Capturando la Luna con un Zoom Impresionante](https://www.youtube.com/shorts/s6878VBcidk) (2026-10-20)
 - **Modelo: Cámara CMOS**
   - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: Cámaras Astronómicas**
