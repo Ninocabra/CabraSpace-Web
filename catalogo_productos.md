@@ -82,6 +82,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevos Telescopios Explore Scientific 92° ED: ¡Vistas Ultra-Amplias!](https://www.youtube.com/shorts/yJd7n5Cby0k) (2026-10-14)
 - **Modelo: ALCON**
   - [Presentación de la Lente ALCON para 2026](https://www.youtube.com/watch?v=CGa_wxDKjvQ) (2026-08-15)
+- **Modelo: ED Eyepieces**
+  - [Nuevas series de oculares Explore Scientific 72° y 92° ED: ¿Realidad o Ficción?](https://stargazerslounge.com/topic/444080-explore-scientifics-new-72%C2%B0-ed-and-92%C2%B0-ed-series/) (2026-10-20)
 - **Actualizaciones Generales / Revisiones:**
   - [Explore Scientific: 8 Opciones de Telescopios Oculares ED de 72°](https://www.youtube.com/shorts/R2q0nnRKGiM) (2026-10-14)
 - **Modelo: Sale**
@@ -204,8 +206,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
 - **Modelo: NEAST Summit**
   - [Avance de NEAST Summit 2026](https://www.youtube.com/shorts/xH3d-PakLh8) (2026-10-01)
-- **Modelo: OUTPOST 3M**
-  - [Cúpula OUTPOST 3M de PrimaLuceLab: de la astrofotografía al seguimiento de satélites](https://www.youtube.com/watch?v=zKwWEyfs4_U) (2026-07-10)
 - **Modelo: mounting**
   - [PrimaLuceLab: Menos montaje, más cielo](https://www.youtube.com/shorts/1a3E0RDQdVo) (2026-09-21)
 
