@@ -42,6 +42,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## Celestron
 
+### ACCESSORIES
+- **Modelo: StarSense**
+  - [Configuración de StarSense AutoAlign V2 en Monturas Ecuatoriales Alemanas](https://www.youtube.com/watch?v=3QoplhzUNW4) (2026-10-21)
+- **Modelo: StarSense AutoAlign**
+  - [Cómo Configurar StarSense AutoAlign V2 en una Montura Alt-Azimuth con o sin Cuña](https://www.youtube.com/watch?v=QaKED-U9xWQ) (2026-10-21)
+
 ### GENERAL
 - **Modelo: Total Solar Eclipse**
   - [La Eclips Solar Total de Agosto de 2026: Guía para Observadores](https://www.celestron.com/blogs/news/pursuing-the-shadow-the-august-2026-total-solar-eclipse) (2026-07-01)
@@ -248,8 +254,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
 - **Modelo: Filtro Solar**
   - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
-- **Modelo: Francisco Perez**
-  - [4 Configuraciones, 1 Experto: ¡Francisco Pérez Construye los Kits de Astronomía Definitivos!](https://www.youtube.com/watch?v=aKr6k7PqqIo) (2026-07-11)
 - **Modelo: Kit de Cielo Profundo**
   - [Oferta de Día de Astronomía de SVBONY #2: Construye tu Kit de Cielo Profundo con Francisco](https://www.youtube.com/watch?v=sYmor4_z7UE) (2026-09-15)
 - **Modelo: Ofertas**
@@ -264,7 +268,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Svbony SV535: Un objetivo versátil para fotografía de cámara y astrografía de cielo profundo](https://www.youtube.com/watch?v=--XrVJALlSQ) (2026-09-11)
 - **Modelo: SV545**
   - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
-  - [Configuración del Telescopio Petzval SV545 con Enfoque Automático (EAF) y Kit Deepsky SC571CC](https://www.youtube.com/shorts/2fVHQlaS0zk) (2026-07-11)
 - **Modelo: Star Fest 2026**
   - [SVBONY en Star Fest 2026: noticias y novedades](https://www.youtube.com/shorts/Faw5jPxGfM8) (2026-08-14)
 - **Modelo: portabilidad**
