@@ -266,8 +266,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Uso del Telescopio Svbony SV530 con Cámaras DSLR para Astrofotografía](https://www.youtube.com/watch?v=mYyyXz1bGQg) (2026-10-03)
 - **Modelo: SV535**
   - [Svbony SV535: Un objetivo versátil para fotografía de cámara y astrografía de cielo profundo](https://www.youtube.com/watch?v=--XrVJALlSQ) (2026-09-11)
-- **Modelo: SV545**
-  - [Guía Completa de Instalación: SV545 + Gemini EAF + SC571CC para Astrofotografía](https://www.youtube.com/watch?v=zjy3oDWIQ30) (2026-07-12)
 - **Modelo: Star Fest 2026**
   - [SVBONY en Star Fest 2026: noticias y novedades](https://www.youtube.com/shorts/Faw5jPxGfM8) (2026-08-14)
 - **Modelo: portabilidad**
@@ -345,6 +343,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: ASI Week**
   - [ZWO ASI Semana: De Cielos Bortle 9 a Mejores Cielos](https://www.youtube.com/shorts/WJ5NkC96prs) (2026-08-22)
+- **Modelo: ASIAIR**
+  - [Equipo ZWO: De la fábrica al observatorio remoto](https://www.youtube.com/shorts/gxnVU4VNd08) (2026-10-22)
 - **Modelo: Equipamiento**
   - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
 - **Modelo: S50 Pro**
@@ -374,7 +374,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ASIAIR**
   - [Novedades en ASIAIR V3.0 de ZWO](https://www.youtube.com/shorts/jHi-yW2CYWg) (2026-08-13)
   - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
-  - [Manual esencial de ZWO ASIAIR (por Nick Loveday)](https://www.youtube.com/watch?v=i2p-Kim8fxM) (2026-07-13)
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
 - **Modelo: N.I.N.A.**
@@ -402,6 +401,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: S50PRO**
   - [Review a 60 días del Telescopio SEESTAR S50PRO](https://www.youtube.com/watch?v=HyE0VaF8ZWs) (2026-10-10)
 - **Modelo: Seestar S50 Pro**
+  - [Problemas Reales y Soluciones del Seestar S50 Pro](https://www.youtube.com/watch?v=hpHKMMM3cH0) (2026-10-22)
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
   - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
 - **Modelo: telescopio inteligente**
