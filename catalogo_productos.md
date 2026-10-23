@@ -58,6 +58,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: CPC Deluxe HD**
   - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
   - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
+- **Modelo: Celestron Origin**
+  - [Tutorial Paso a Paso de Mosaicos Celestron Origin con el Dr. Sasse](https://www.youtube.com/watch?v=H3D8Vg9UqDo) (2026-10-21)
 - **Modelo: Ed Ting**
   - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
 - **Modelo: RASA 6**
@@ -319,10 +321,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevo Kit de Imagen Mono Versátil ToupTek Astro: AE676M y AFW-mini](https://www.youtube.com/watch?v=mehD122BGW4) (2026-09-10)
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
-
-### SOFTWARE
-- **Modelo: StellaVita**
-  - [Cómo Usar el Asistente de Campo Plano en ToupTek StellaVita](https://www.youtube.com/watch?v=ePd8uiMa8F4) (2026-07-13)
 
 ### TELESCOPES
 - **Modelo: ToupTek Astro**
