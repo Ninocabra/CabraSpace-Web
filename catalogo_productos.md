@@ -159,8 +159,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
 - **Modelo: Autopalette**
   - [Actualización de Autopalette y Novedades en PixInsight](https://www.youtube.com/watch?v=F8kAp3xG3Fo) (2026-07-27)
-- **Modelo: Lightroom**
-  - [Script Gratuito de PixInsight que Ofrece los Controles Deslizantes de Lightroom](https://www.youtube.com/watch?v=OY33zCDoGv4) (2026-07-14)
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: MLDenoise**
@@ -355,6 +353,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [De Bortle 8 a las Estrellas - Andrea Arbizzi desafía la polución lumínica](https://www.zwoastro.com/2026/08/04/light-pollution-astrophotography-andrea-arbizzi/) (2026-08-04)
 
 ### CAMERAS
+- **Modelo: APY 2026**
+  - [ZWO anuncia el ganador absoluto del APY 2026](https://www.youtube.com/watch?v=nBOCBXLdWh4) (2026-10-21)
 - **Modelo: ASI2600MC Duo**
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
 - **Modelo: ASI676MM**
