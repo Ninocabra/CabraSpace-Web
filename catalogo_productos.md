@@ -137,8 +137,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Otros / No especificado
 
 ### ACCESSORIES
-- **Modelo: Astrocitas**
-  - [Guía para elegir tu primer telescopio y montura de astrofotografía](https://www.youtube.com/watch?v=1TzP6LB-7E0) (2026-07-14)
 - **Modelo: Ed Ting**
   - [El Rig de Astrofotografía de Cielo Profundo de Ed Ting: Estado del Arte](https://www.youtube.com/watch?v=bmzvuG8SsW8) (2026-10-18)
 - **Modelo: Nebula Photos**
@@ -394,6 +392,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Pilares de la Creación**
   - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
 - **Modelo: S50 Pro**
+  - [Análisis Profundo del Seestar S50 Pro: ¿Qué Puede Capturar Realmente?](https://www.youtube.com/watch?v=FFfbkIVI0LM) (2026-10-23)
   - [Reseña del Seestar S50 Pro: ¿El Mejor Telescopio Inteligente Hasta la Fecha?](https://www.youtube.com/watch?v=ksk36W2vCoM) (2026-08-28)
   - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
 - **Modelo: S50PRO**
