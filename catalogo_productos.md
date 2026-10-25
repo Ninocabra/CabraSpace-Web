@@ -73,6 +73,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## DwarfLab
 
+### CAMERAS
+- **Modelo: Draco**
+  - [Procesando datos de DWARFLAB Draco con AstroWizard gratuito](https://www.youtube.com/watch?v=XJpKD3k5elI) (2026-10-25)
+
 ### TELESCOPES
 - **Modelo: DRACO**
   - [Análisis del Telescopio DWARFLAB DRACO](https://www.youtube.com/watch?v=85uc8z6ucFw) (2026-09-25)
@@ -387,8 +391,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis del Seestar S50 Pro: ¿Está Obsoleto por el Draco?](https://www.youtube.com/watch?v=FYjgvCXXDeY) (2026-09-12)
 - **Modelo: Dwarf**
   - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
-- **Modelo: FF131**
-  - [Recreando los Pilares de la Creación con el Telescopio ZWO FF131](https://www.youtube.com/watch?v=lWDUGyMLnVI) (2026-07-15)
 - **Modelo: Pilares de la Creación**
   - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
 - **Modelo: S50 Pro**
