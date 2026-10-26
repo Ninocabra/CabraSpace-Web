@@ -3130,6 +3130,54 @@
     return html + '</div></div>';
   }
 
+  /* LO MEDIDO SE REFRESCA SOLO; LA PREVISION NO. Una pestania abierta a las
+     21:00 seguia diciendo "Abierto, 21:00 UTC" a las 03:00, que es el mismo
+     error que `lecturaCaducada` acaba de quitar, solo que esta vez lo ponia
+     el navegador y no el colector. Cada AHORA_MS se vuelve a pedir
+     `ahora.json` y se repintan SOLO los techos y los sensores: la prevision,
+     la cupula y el buscador tienen estado (vista, objeto elegido, zoom) y
+     cambian dos veces al dia, no merecen perderlo.
+     Se repinta aunque la descarga falle: con el mismo dato, el reloj sigue
+     corriendo y pasado el umbral la marca de "retrasada" tiene que salir. Y
+     solo se toca el DOM si el HTML cambia, para no cerrar un "?" abierto. */
+  var AHORA_MS = 120000;
+
+  function vigilarAhora(caja, datos, t) {
+    // Se compara con lo ultimo que se GENERO, no con `outerHTML`: el navegador
+    // normaliza el marcado (entidades, SVG) y nunca coincidiria.
+    var TECHOS = '.aw-semaforo > .aw-sem-col', SENSORES = '.aw-sensors';
+    var ultimo = {};
+    ultimo[TECHOS] = columnaTechos(datos, t);
+    ultimo[SENSORES] = bloqueSensores(datos, t);
+    function cambiar(sel, html) {
+      var el = caja.querySelector(sel);
+      if (!el || ultimo[sel] === html) { return; }
+      ultimo[sel] = html;
+      el.outerHTML = html;
+    }
+    function repintar() {
+      cambiar(TECHOS, columnaTechos(datos, t));
+      cambiar(SENSORES, bloqueSensores(datos, t));
+    }
+    function refrescar() {
+      // Sello de minuto: GitHub raw ya cachea 5 min por su lado, y un sello
+      // mas largo que el periodo haria que dos vueltas pidieran lo mismo.
+      fetch(URL_AHORA + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; })
+        .then(function (ahora) {
+          // `datos` es el mismo objeto que lee el rotulo de la camara, asi
+          // que su "leido hace" se actualiza en su proxima vuelta sin mas.
+          if (ahora && ahora.sensores) { datos.sensores = ahora.sensores; }
+          repintar();
+        });
+    }
+    setInterval(refrescar, AHORA_MS);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) { refrescar(); }
+    });
+  }
+
   function arrancar() {
     var caja = document.getElementById('astroweather');
     if (!caja) { return; }
@@ -3166,7 +3214,10 @@
         if (ahora && ahora.sensores) { datos.sensores = ahora.sensores; }
         caja.innerHTML = render(datos, t, lang);
         montarAfuera(caja, t, datos);
-        if (datos.noches && datos.noches[0]) { montarBuscador(caja, datos, t, lang); }
+        if (datos.noches && datos.noches[0]) {
+          montarBuscador(caja, datos, t, lang);
+          vigilarAhora(caja, datos, t);
+        }
       })
       .catch(function (e) {
         caja.innerHTML = soloAfuera(t);
