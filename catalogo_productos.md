@@ -222,8 +222,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: Cámara Mosaico**
   - [Solución de Cámara Mosaico CMOS de QHYCCD](https://www.qhyccd.com/cmos-mosaic-camera-solution/) (2026-07-17)
-- **Modelo: QHY585**
-  - [Cámara Astronómica QHY585M con Sensor Sony IMX585](https://www.qhyccd.com/qhy585-imx585/) (2026-07-16)
 - **Modelo: miniCAM8M**
   - [Cámara QHYCCD miniCAM8M Juega un Rol Clave en el Descubrimiento de la Nebulosa Planetaria HMK 1](https://www.qhyccd.com/qhyccd-minicam8m-helps-reveal-hmk-1-a-newly-documented-planetary-nebula/) (2026-10-12)
 
@@ -400,6 +398,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: S50PRO**
   - [Review a 60 días del Telescopio SEESTAR S50PRO](https://www.youtube.com/watch?v=HyE0VaF8ZWs) (2026-10-10)
 - **Modelo: Seestar S50 Pro**
+  - [Seestar S50 Pro, Draco y Atlas: la batalla de los telescopios inteligentes](https://www.youtube.com/watch?v=uHKKxh2gV-A) (2026-10-25)
   - [Problemas Reales y Soluciones del Seestar S50 Pro](https://www.youtube.com/watch?v=hpHKMMM3cH0) (2026-10-22)
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
   - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
