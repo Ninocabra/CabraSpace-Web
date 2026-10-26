@@ -59,7 +59,7 @@
         'pasa de 1,9 segundos de arco. La zona central es la oscuridad astronómica. '+
         'Las horas del dibujo van en UTC, como todo lo medido de esta página; pasando '+
         'el ratón por encima sale la hora local de AstroCamp.',
-      ahoraTechos: 'Ahora · techos abiertos', noResponde: 'no responde',
+      ahoraTechos: 'Ahora · techos abiertos', noResponde: 'no responde', lecturaRetrasada: 'lectura retrasada', retrasado: 'SIN ACTUALIZAR',
       deN: 'de', techosPl: 'techos',
       probCorta: 'de probabilidad de abrir',
       probCortaDespejado: 'de probabilidad de cielo despejado',
@@ -96,7 +96,7 @@
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
       viento: 'Viento', presion: 'Presión', cieloIR: 'Cielo (IR)',
       indice: 'Índice de nubes', techos: 'Techos abiertos', seguridad: 'Estado',
-      medidoHace: 'Medido hace', minutos: 'min', viejo: 'lectura antigua',
+      medidoHace: 'Medido hace', minutos: 'min', horas: 'h', viejo: 'lectura antigua',
       delArchivo: 'Completado desde nuestro archivo:',
       campos: { temperatura: 'temperatura', humedad: 'humedad', viento_ms: 'viento',
                 presion: 'presión', punto_rocio: 'punto de rocío',
@@ -222,7 +222,7 @@
         'seeing: nearly invisible when good, clear once it passes 1.9 arcseconds. The central zone is ' +
         'astronomical darkness. All hours on the strip are UTC, like everything '+
         'measured on this page; hover over one to get AstroCamp local time.',
-      ahoraTechos: 'Now · roofs open', noResponde: 'not responding',
+      ahoraTechos: 'Now · roofs open', noResponde: 'not responding', lecturaRetrasada: 'reading delayed', retrasado: 'NOT UPDATED',
       deN: 'of', techosPl: 'roofs',
       probCorta: 'chance of opening',
       probCortaDespejado: 'chance of clear sky',
@@ -259,7 +259,7 @@
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
       viento: 'Wind', presion: 'Pressure', cieloIR: 'Sky (IR)',
       indice: 'Cloud index', techos: 'Roofs open', seguridad: 'Status',
-      medidoHace: 'Measured', minutos: 'min ago', viejo: 'stale reading',
+      medidoHace: 'Measured', minutos: 'min ago', horas: 'h ago', viejo: 'stale reading',
       delArchivo: 'Filled in from our archive:',
       campos: { temperatura: 'temperature', humedad: 'humidity', viento_ms: 'wind',
                 presion: 'pressure', punto_rocio: 'dew point',
@@ -476,15 +476,18 @@
      capitulos persiguiendo.
      El aviso va ARRIBA, antes que el nombre y el numero, para que no se pueda
      leer el valor sin haber leido antes que no es de ahora. */
-  function sensor(clave, valor, unidad, estado, cuando, rescatado) {
+  function sensor(clave, valor, unidad, estado, cuando, rescatado, retrasado) {
     if (valor === null || valor === undefined) { return ''; }
-    var caido = !!rescatado;
+    // `retrasado`: la lectura entera ha caducado (ver `lecturaCaducada`). Se
+    // marca igual que un campo rescatado, pero el rotulo no culpa al sitio.
+    var caido = !!rescatado || !!retrasado;
     var marca = rescatado || cuando;
+    var rotulo = rescatado ? 'NO RESPONDE' : retrasado;
     // La hora va SIEMPRE que se sepa, y entera en el title: quien quiera saber
     // de cuando es la medida la ve, y quien no, no se come una fecha completa.
     return '<div class="aw-sensor ' + (estado || '') + (caido ? ' caido' : '') + '"' +
       (marca ? ' title="' + esc(String(marca).replace('T', ' ').slice(0, 16)) + ' UTC"' : '') +
-      '>' + (caido ? '<span class="no-responde">NO RESPONDE</span>' : '') +
+      '>' + (caido ? '<span class="no-responde">' + esc(rotulo) + '</span>' : '') +
       '<span class="k">' + esc(clave) + '</span>' +
       '<span class="v">' + esc(valor) +
         (unidad ? ' <span class="u">' + esc(unidad) + '</span>' : '') + '</span>' +
@@ -511,6 +514,36 @@
     if (h < 1.5) { return ''; }                    // "hace 1 h" no aporta nada
     if (h < 36) { return ' · ' + Math.round(h) + ' h'; }
     return ' · ' + Math.round(h / 24) + ' d';
+  }
+
+  /* NUESTRA LECTURA TAMBIEN CADUCA, Y ESO NO LO PUEDE DECIR EL MOTOR. Lo que
+     el colector escribe en `ahora.json` (`fresco`, `antiguedad_min`, los
+     techos) es verdad EN EL MOMENTO EN QUE LEYO; si despues deja de leer, el
+     fichero sigue diciendo "18 techos, medido hace 1 min" para siempre. El
+     26-10-2026 la pagina pinto "Cerrado, 14:14 UTC" a las 20:17 con los 18
+     techos abiertos: el reloj de cron-job.org llevaba desde el 01-10 sin
+     lanzar (su horario era solo abril-septiembre) y nadie miraba la hora del
+     fichero contra la de ahora.
+     75 min: el reloj lanza cada 30 min pero deja huecos de una hora en las
+     horas impares de dia, y una pasada tarda hasta ~7 min. Pasado eso, el
+     ultimo estado no se ensenia como el actual. */
+  var LECTURA_CADUCA_MIN = 75;
+
+  // Minutos desde nuestra ultima lectura si ya ha caducado; 0 si sigue valiendo.
+  function lecturaCaducada(s) {
+    var t0 = Date.parse((s && (s.leido_utc || s.medido_utc)) || '');
+    if (isNaN(t0)) { return 0; }
+    var min = (Date.now() - t0) / 60000;
+    return min > LECTURA_CADUCA_MIN ? min : 0;
+  }
+
+  // Como `antiguedad`, pero sin callarse por debajo de hora y media: aqui el
+  // retraso ES el mensaje.
+  function edadSiempre(iso) {
+    var t0 = Date.parse(iso);
+    if (isNaN(t0)) { return ''; }
+    var min = (Date.now() - t0) / 60000;
+    return min < 90 ? ' · ' + Math.round(min) + ' min' : antiguedad(iso);
   }
 
   // -------------------------------------------------------- LA CÚPULA ------
@@ -884,8 +917,9 @@
   function columnaTechos(datos, t) {
     var sen = datos.sensores || {};
     var arch = (sen.del_archivo || {}).techos;
+    var caduca = lecturaCaducada(sen);
     var pie;
-    if (sen.techos_total) {
+    if (sen.techos_total && !caduca) {
       var abiertos = sen.techos_abiertos || 0;
       pie = '<b class="n">' + abiertos + '</b> ' + esc(t.deN) + ' ' + sen.techos_total +
         ' ' + esc(t.techosPl) +
@@ -901,9 +935,14 @@
         pie: pie
       });
     }
-    pie = '<b class="n">' + esc(t.noResponde) + '</b><span class="cuando">' +
-      (arch
-        ? esc(t.sinDatoDesde) + ' ' + esc(String(arch).slice(11, 16)) + ' UTC' + esc(antiguedad(arch))
+    // Dos cegueras distintas con el mismo dibujo: el sitio no dice los techos
+    // (`noResponde`) o somos NOSOTROS los que llevamos rato sin leer.
+    var desde = caduca ? (sen.medido_utc || sen.leido_utc) : arch;
+    pie = '<b class="n">' + esc(caduca ? t.lecturaRetrasada : t.noResponde) +
+      '</b><span class="cuando">' +
+      (desde
+        ? esc(t.sinDatoDesde) + ' ' + esc(String(desde).slice(11, 16)) + ' UTC' +
+          esc(caduca ? edadSiempre(desde) : antiguedad(desde))
         : esc(t.sinDatoTechos)) + '</span>';
     return columnaSemaforo({
       rotulo: t.ahoraTechos,
@@ -1138,40 +1177,48 @@
     // El margen de rocio se DERIVA de temperatura y punto de rocio, asi que
     // esta caido si cualquiera de los dos lo esta.
     var rocioViejo = arch.punto_rocio || arch.temperatura;
+    // Con la lectura entera caducada, TODAS las casillas llevan la marca.
+    var ret = lecturaCaducada(s) ? t.retrasado : null;
     // El fotometro primero: es la unica medida DIRECTA del fondo de cielo que
     // hay en esta pagina, y todo lo demas del cielo es estimacion.
     html += sensor(t.fotometro, num(s.cielo_mag_medido, 2), t.magArc, 'good',
-      s.cielo_mag_medido_utc);
+      s.cielo_mag_medido_utc, null, ret);
     html += sensor(t.temp, num(s.temperatura), '°C', '', s.medido_utc,
-                   arch.temperatura);
+                   arch.temperatura, ret);
     html += sensor(t.humedad, num(s.humedad, 0), '%', s.humedad > 85 ? 'alert' : '',
-                   s.medido_utc, arch.humedad);
+                   s.medido_utc, arch.humedad, ret);
     html += sensor(t.rocio, num(s.margen_rocio), '°C',
       s.riesgo_rocio === 'crítico' ? 'alert' : (s.riesgo_rocio === 'bajo' ? 'good' : ''),
-      s.medido_utc, rocioViejo);
+      s.medido_utc, rocioViejo, ret);
     html += sensor(t.viento, num(kmh(s.viento_ms), 0), 'km/h',
-                   s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc, arch.viento_ms);
+                   s.viento_ms >= 5.5 ? 'alert' : '', s.medido_utc, arch.viento_ms, ret);
     html += sensor(t.presion, num(s.presion, 0), 'hPa', '', s.medido_utc,
-                   arch.presion);
+                   arch.presion, ret);
     // El IR crudo del CloudWatcher se retira: es la ENTRADA de la que el
     // fabricante deriva el índice de nubes que va al lado, y el índice es
     // además el que consume el motor. Dos números para lo mismo, y el crudo
     // necesita una escala que la página no da.
     html += sensor(t.indice, num(s.cielo_indice), '',
-      s.cielo_despejado === true ? 'good' : '', s.medido_utc, arch.cielo_indice);
+      s.cielo_despejado === true ? 'good' : '', s.medido_utc, arch.cielo_indice, ret);
     // Los techos ya NO van aquí: suben a la cabecera, del tamaño de la
     // previsión y a su lado, porque no son un sensor más -- son la respuesta
     // medida a la misma pregunta que la previsión contesta estimando.
     if (s.estado_seguridad) {
       html += sensor(t.seguridad, s.estado_seguridad, '',
-        s.estado_seguridad === 'Safe' ? 'good' : 'alert', s.medido_utc);
+        s.estado_seguridad === 'Safe' ? 'good' : 'alert', s.medido_utc, null, ret);
     }
     html += '</div>';
 
-    if (s.antiguedad_min !== null && s.antiguedad_min !== undefined) {
+    // La edad se cuenta contra el reloj de QUIEN MIRA, no se copia de
+    // `antiguedad_min`: esa es la que tenia cuando el colector leyo, y con el
+    // colector parado seguia diciendo "hace 1 min" seis horas despues.
+    var t0 = Date.parse(s.medido_utc || '');
+    if (!isNaN(t0)) {
+      var min = Math.max(0, (Date.now() - t0) / 60000);
       html += '<div class="aw-stale">' + esc(t.medidoHace) + ' ' +
-        num(s.antiguedad_min, 0) + ' ' + esc(t.minutos) +
-        (s.fresco === false ? ' · ' + esc(t.viejo) : '') + '.</div>';
+        (min < 90 ? num(min, 0) + ' ' + esc(t.minutos)
+                  : num(min / 60, 0) + ' ' + esc(t.horas)) +
+        (ret || s.fresco === false ? ' · ' + esc(t.viejo) : '') + '.</div>';
     }
     // La lista de "completado desde el archivo" se retira: decia en una linea
     // al pie lo que ahora dice CADA casilla en su sitio, y obligaba a cruzar
