@@ -96,7 +96,7 @@
       temp: 'Temperatura', humedad: 'Humedad', rocio: 'Margen de rocío',
       viento: 'Viento', presion: 'Presión', cieloIR: 'Cielo (IR)',
       indice: 'Índice de nubes', techos: 'Techos abiertos', seguridad: 'Estado',
-      medidoHace: 'Medido hace', minutos: 'min', horas: 'h', viejo: 'lectura antigua',
+      medidoHace: 'Medido hace', minutos: 'min', horasHace: 'h', viejo: 'lectura antigua',
       delArchivo: 'Completado desde nuestro archivo:',
       campos: { temperatura: 'temperatura', humedad: 'humedad', viento_ms: 'viento',
                 presion: 'presión', punto_rocio: 'punto de rocío',
@@ -259,7 +259,7 @@
       temp: 'Temperature', humedad: 'Humidity', rocio: 'Dew margin',
       viento: 'Wind', presion: 'Pressure', cieloIR: 'Sky (IR)',
       indice: 'Cloud index', techos: 'Roofs open', seguridad: 'Status',
-      medidoHace: 'Measured', minutos: 'min ago', horas: 'h ago', viejo: 'stale reading',
+      medidoHace: 'Measured', minutos: 'min ago', horasHace: 'h ago', viejo: 'stale reading',
       delArchivo: 'Filled in from our archive:',
       campos: { temperatura: 'temperature', humedad: 'humidity', viento_ms: 'wind',
                 presion: 'pressure', punto_rocio: 'dew point',
@@ -1217,7 +1217,7 @@
       var min = Math.max(0, (Date.now() - t0) / 60000);
       html += '<div class="aw-stale">' + esc(t.medidoHace) + ' ' +
         (min < 90 ? num(min, 0) + ' ' + esc(t.minutos)
-                  : num(min / 60, 0) + ' ' + esc(t.horas)) +
+                  : num(min / 60, 0) + ' ' + esc(t.horasHace)) +
         (ret || s.fresco === false ? ' · ' + esc(t.viejo) : '') + '.</div>';
     }
     // La lista de "completado desde el archivo" se retira: decia en una linea
