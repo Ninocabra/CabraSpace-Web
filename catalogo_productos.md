@@ -289,6 +289,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
   - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
 - **Modelo: SV580**
+  - [Configuración del Telescopio Insignia SVBONY SV580 y Captura Lunar](https://www.youtube.com/watch?v=KCrfZ-etiXw) (2026-10-26)
   - [Presentamos el SVBONY SV580: Una Nueva Era en Astrofotografía Full-Frame](https://www.youtube.com/watch?v=QbBxcfESfrI) (2026-10-13)
 
 ## Takahashi
@@ -373,7 +374,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: ASIAIR**
   - [Novedades en ASIAIR V3.0 de ZWO](https://www.youtube.com/shorts/jHi-yW2CYWg) (2026-08-13)
-  - [ASIAIR V3.0: Nuevas Funciones y Guía de Usuario](https://www.zwoastro.com/2026/07/15/asiair-new-features-and-user-guide/) (2026-07-15)
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
 - **Modelo: N.I.N.A.**
