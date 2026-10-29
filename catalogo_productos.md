@@ -145,8 +145,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [El Rig de Astrofotografía de Cielo Profundo de Ed Ting: Estado del Arte](https://www.youtube.com/watch?v=bmzvuG8SsW8) (2026-10-18)
 - **Modelo: Nebula Photos**
   - [Cómo añadir autoenfoque a tu telescopio](https://www.youtube.com/watch?v=5aFmfiffPVM) (2026-07-31)
-- **Modelo: Oberwerk**
-  - [NEAF 2026: Nuevos Oberwerk Sport APO Binoculares & Telescopios Binoculares](https://www.youtube.com/watch?v=hzXRRj13Hfk) (2026-07-17)
 - **Modelo: ToupTek Astro**
   - [Gateway todo en uno para astrofotografía de cielo profundo](https://www.youtube.com/shorts/3Tc0QbWQSho) (2026-08-29)
 - **Modelo: View into Space**
@@ -318,6 +316,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevo Kit de Imagen Mono Versátil ToupTek Astro: AE676M y AFW-mini](https://www.youtube.com/watch?v=mehD122BGW4) (2026-09-10)
   - [Presentación de la cámara ToupTek SkyEye Plus para astrofotografía](https://www.youtube.com/shorts/XoD4TUcPrpI) (2026-08-29)
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
+
+### MOUNTS
+- **Modelo: ToupTek Astro**
+  - [Anuncio de la Nueva Montura ToupTek Astro SH20](https://www.youtube.com/watch?v=U1XG3ENHXyc) (2026-10-29)
 
 ### TELESCOPES
 - **Modelo: ToupTek Astro**
