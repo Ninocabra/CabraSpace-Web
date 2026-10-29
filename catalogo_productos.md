@@ -220,8 +220,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## QHYCCD
 
 ### CAMERAS
-- **Modelo: Cámara Mosaico**
-  - [Solución de Cámara Mosaico CMOS de QHYCCD](https://www.qhyccd.com/cmos-mosaic-camera-solution/) (2026-07-17)
 - **Modelo: miniCAM8M**
   - [Cámara QHYCCD miniCAM8M Juega un Rol Clave en el Descubrimiento de la Nebulosa Planetaria HMK 1](https://www.qhyccd.com/qhyccd-minicam8m-helps-reveal-hmk-1-a-newly-documented-planetary-nebula/) (2026-10-12)
 
@@ -346,6 +344,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Stellafane 2026 — What an Experience! 🔭✨ #zwo #starparty #astronomy  #Stellafane (ZWO (YouTube))](https://www.youtube.com/shorts/xtxH2WVT_pU) (2026-08-21)
 - **Modelo: S50 Pro**
   - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
+- **Modelo: Seestar S50 Pro**
+  - [ZWO apoya a jóvenes astrónomos en la IOAA-jr 2026 en Tailandia](https://www.zwoastro.com/2026/10/29/zwo-seestar-s50-pro-ioaa-jr-2026-thailand/) (2026-10-29)
 - **Modelo: espacio**
   - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
 - **Modelo: space**
