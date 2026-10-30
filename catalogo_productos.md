@@ -163,6 +163,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Pleiades Astrophoto**
   - [Análisis de PixInsight 1.9.5 y nuevos desarrollos en astrofotografía](https://www.youtube.com/watch?v=L1pT3V5fR8s) (2026-09-19)
 - **Modelo: Procesamiento de Imágenes**
+  - [Novedades de PixInsight 1.9.6: Análisis Completo de Cada Nueva Función](https://www.youtube.com/watch?v=7hStXoH-ANM) (2026-10-30)
   - [Optimiza PixInsight para un Uso Agradable en 5 Minutos](https://www.youtube.com/watch?v=sIu3Wh6yLPo) (2026-10-06)
 - **Modelo: SHO**
   - [No se necesita mono para SHO. Tutoría de PixInsight completa + datos gratuitos](https://www.youtube.com/watch?v=0Brsjiu1w2k) (2026-08-05)
@@ -268,8 +269,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
-- **Modelo: SV535**
-  - [Svbony SV535: Más que un telescopio, un teleobjetivo de alto rendimiento para Sony Mirrorless](https://www.youtube.com/watch?v=_7-MsOixHPs) (2026-07-17)
 - **Modelo: SV550**
   - [SVBONY SV550 80mm Triplet APO: Desempaquetado y Ensamblaje](https://www.youtube.com/watch?v=la9dpejHKxA) (2026-08-01)
 - **Modelo: SV555**
