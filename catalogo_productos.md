@@ -65,12 +65,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: RASA 6**
   - [Nuevo Astrográfo Celestron RASA 6](https://stargazerslounge.com/topic/431636-new-celestron-rasa-6-astrograph/) (2026-09-14)
 
-## DayStar
-
-### ACCESSORIES
-- **Modelo: Electronic Focusers**
-  - [Día de NEAF 2026: Filtros Daystar, enfocador electrónico, capas planas y Quark Smart](https://www.youtube.com/watch?v=v0H1_hFQvGg) (2026-07-17)
-
 ## DwarfLab
 
 ### CAMERAS
@@ -328,6 +322,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
 
 ## Vaonis
+
+### ACCESSORIES
+- **Modelo: ATLAS**
+  - [Noticias de Astrofotografía: VAONIS ATLAS, SV580, SW Orbis 60EDX y más](https://www.youtube.com/watch?v=nAnmjjyauQw) (2026-10-29)
 
 ### TELESCOPES
 - **Modelo: Atlas**
