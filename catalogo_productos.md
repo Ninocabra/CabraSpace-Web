@@ -57,7 +57,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Celestron C90: Una Joya Oculta y Económica para Astrofotografía](https://www.youtube.com/watch?v=MnQy75tpkVE) (2026-10-04)
 - **Modelo: CPC Deluxe HD**
   - [CPC Deluxe HD con tecnología PrimaLuceLab: 8", 9.25" y 11" — Más que solo tamaño](https://www.youtube.com/watch?v=70CrB3cUXkg) (2026-08-27)
-  - [Análisis del Celestron CPC Deluxe HD con PrimaLuceLab](https://www.youtube.com/watch?v=CyNBp2G3YMo) (2026-07-17)
 - **Modelo: Celestron Origin**
   - [Tutorial Paso a Paso de Mosaicos Celestron Origin con el Dr. Sasse](https://www.youtube.com/watch?v=H3D8Vg9UqDo) (2026-10-21)
 - **Modelo: Ed Ting**
@@ -319,6 +318,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ToupTek Astro presenta su nuevo telescopio SkyEye Plus](https://www.youtube.com/shorts/UKuUg_jNAz0) (2026-09-28)
 - **Modelo: comet**
   - [ToupTekAstro explica el regreso del cometa 220P](https://www.youtube.com/shorts/ojtYm3KxTuI) (2026-08-22)
+
+## Unistellar
+
+### TELESCOPES
+- **Modelo: Seestar S50 Pro**
+  - [Comparativa: Seestar S50 Pro vs Dwarf Draco vs Vaonis Atlas](https://www.youtube.com/shorts/pqtQIxmlkUs) (2026-10-31)
 
 ## Vaonis
 
