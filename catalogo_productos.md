@@ -288,6 +288,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### ACCESSORIES
 - **Modelo: ToupTek Astro**
+  - [Cámara ToupTek Astro se une a un telescopio gigante](https://www.youtube.com/shorts/2YT6CVHylak) (2026-10-31)
   - [ToupTek Astro: Equipo Listo para la Acción Estelar](https://www.youtube.com/shorts/uS5x-LQyha0) (2026-10-01)
 
 ### CAMERAS
@@ -352,8 +353,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO apoya a jóvenes astrónomos en la IOAA-jr 2026 en Tailandia](https://www.zwoastro.com/2026/10/29/zwo-seestar-s50-pro-ioaa-jr-2026-thailand/) (2026-10-29)
 - **Modelo: espacio**
   - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
-- **Modelo: space**
-  - [Novedades de ZWO en Equipamiento Astrophotography](https://www.youtube.com/shorts/T_WA6jYybyo) (2026-07-18)
 
 ### ASTROPHOTOGRAPHY
 - **Modelo: ASI2600MC Duo**
