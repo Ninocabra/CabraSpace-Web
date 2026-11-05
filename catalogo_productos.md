@@ -43,6 +43,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Celestron
 
 ### ACCESSORIES
+- **Modelo: Filtro Nebula**
+  - [Tutorial del Filtro Nebula de Celestron con el Dr. Sasse](https://www.youtube.com/watch?v=mtLJDLNTaAw) (2026-11-05)
 - **Modelo: StarSense**
   - [Configuración de StarSense AutoAlign V2 en Monturas Ecuatoriales Alemanas](https://www.youtube.com/watch?v=3QoplhzUNW4) (2026-10-21)
 - **Modelo: StarSense AutoAlign**
@@ -170,8 +172,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SyQon Studio ya está disponible: cómo usarlo con SASpro y PixInsight](https://www.youtube.com/watch?v=ov2L5AErUMQ) (2026-09-25)
 - **Modelo: TAIC**
   - [Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)](https://www.youtube.com/watch?v=Tp08gy1xJZ8) (2026-09-19)
-- **Modelo: Veil**
-  - [Lanzamiento de Veil Double Dual Narrowband SHO](https://www.youtube.com/watch?v=bT_dSfx0MFw) (2026-07-20)
 - **Modelo: View into Space**
   - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
 
