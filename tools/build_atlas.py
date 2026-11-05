@@ -269,7 +269,7 @@ def build_home(lang, obs):
         ("herramientas.html", "web", T('Herramientas <em class="gi">web</em>', 'Web <em class="gi">tools</em>'), "Nº II", T("Sin instalar", "No installation"),
          T("CabraSpace Web, Astro Forecast, AutoGHS, contaminación lumínica y PixelMath-teca.", "CabraSpace Web, Astro Forecast, AutoGHS, light pollution and PixelMath-teca.")),
         ("programas.html", "down", T("Programas", "Software"), "Nº III", "",
-         T("Para instalar en PixInsight: PI Workflow.", "For PixInsight: PI Workflow.")),
+         T("Scripts para PixInsight, en preparación.", "PixInsight scripts, in preparation.")),
     ]
     index = "".join(
         f'<a class="card{" gold" if tag else ""}" href="{fname(h, lang)}" style="padding: 30px; min-height: 250px">'
@@ -315,7 +315,7 @@ def build_home(lang, obs):
       <div class="c7" style="grid-column: span 7; display: flex; flex-direction: column; gap: 24px">
         <div class="jb" style="display: flex; align-items: center; justify-content: space-between"><div style="display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">III.</span><span class="caps" style="color: var(--t2)">{T("Programas para instalar", "Software to install")(lang)}</span></div>
         <a class="lnk" href="{fname("programas.html", lang)}">{T("Ver programas", "View software")(lang)}{ARROW}</a></div>
-        <a class="card frow" href="{fname("programas.html", lang)}" style="flex-direction: row; align-items: center; gap: 18px; padding: 24px"><span class="med">{ICON["down"]}</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="bd" style="font-size: 24px; font-weight: 500">PI Workflow</span><span style="font-size: 14.5px; color: var(--t3)">{T("Script para PixInsight · Windows y macOS", "PixInsight script · Windows and macOS")(lang)}</span></span></a>
+        <a class="card frow" href="{fname("programas.html", lang)}" style="flex-direction: row; align-items: center; gap: 18px; padding: 24px"><span class="med">{ICON["down"]}</span><span style="display: flex; flex-direction: column; gap: 4px"><span class="bd" style="font-size: 24px; font-weight: 500">{T("En preparación", "In preparation")(lang)}</span><span style="font-size: 14.5px; color: var(--t3)">{T("Scripts para PixInsight · próximamente", "PixInsight scripts · coming soon")(lang)}</span></span></a>
       </div>
       <div class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column">
         <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--line)"><span class="caps" style="color: var(--t3)">{T("Bitácora", "Logbook")(lang)}</span><a class="lnk" href="{fname("bitacora.html", lang)}" style="font-size: 14px">{T("Todo", "All")(lang)}</a></div>
@@ -473,24 +473,14 @@ def build_programas(lang):
                  f'<span style="font-size: 15px; line-height: 1.6; color: var(--t3)">{d(lang)}</span></div>' for n, d in WORKSHOP)
     body = page_title(lang, "Nº III", T("Para instalar en tu equipo", "To install on your computer")(lang),
                       T('<em class="gi">Programas</em>', '<em class="gi">Software</em>')(lang),
-                      T("Scripts que se descargan, cada uno con su instalación paso a paso y su historial de cambios.",
-                        "Downloadable scripts, each with step-by-step installation and a changelog.")(lang))
+                      T("Programas para PixInsight. Ahora mismo no hay ninguno publicado; están en preparación.",
+                        "Software for PixInsight. None is published right now; they are in preparation.")(lang))
     body += f"""
     <section style="padding: 0 var(--gx)">
-      <div class="card g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 16px; border-radius: 36px">
-        <div class="c6 zbox" style="grid-column: span 6; height: 440px; position: relative; border-radius: 24px; overflow: hidden"><img class="zoom" src="atlas/img/piw-ui.jpg" alt="{T("PI Workflow en PixInsight, pestaña de preprocesado", "PI Workflow in PixInsight, pre-processing tab")(lang)}" loading="lazy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%"></div>
-        <div class="c6" style="grid-column: span 6; padding: 36px 36px 36px 8px; display: flex; flex-direction: column; gap: 16px">
-          <span style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><span class="tg g">{T("Script de PixInsight", "PixInsight script")(lang)}</span><span class="tg">Windows · macOS</span><span class="no" style="margin-left: auto">Nº I</span></span>
-          <span class="bd" style="font-size: clamp(38px, 3.5vw, 50px); font-weight: 400; line-height: 1.02; letter-spacing: -0.02em">PI <em class="gi">Workflow</em></span>
-          <span style="font-size: 16.5px; line-height: 1.7; color: var(--t2)">{T("Flujo de procesado unificado dentro de PixInsight: preprocesado, estirado, postprocesado y combinación de canales en una sola ventana.", "A unified processing workflow inside PixInsight: pre-processing, stretching, post-processing and channel combination in a single window.")(lang)}</span>
-          <div>
-            <div class="kv"><span>{T("Requiere", "Requires")(lang)}</span><span>PixInsight 1.9.4+</span></div>
-            <div class="kv"><span>{T("Instalación", "Install")(lang)}</span><span>{T("Repositorio de actualizaciones", "Update repository")(lang)}</span></div>
-            <div class="kv"><span>{T("Código", "Source")(lang)}</span><span><a href="https://github.com/Ninocabra/PI-Workflow" target="_blank" rel="noopener noreferrer">GitHub · PI-Workflow</a></span></div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 4px" id="changelog" data-lang="{lang}"></div>
-          <span style="display: flex; gap: 14px; align-items: center; margin-top: auto; padding-top: 10px; flex-wrap: wrap"><a class="btn" href="{fname("cabrascripts.html", lang)}#pi-workflow">{T("Cómo instalarlo", "How to install")(lang)}{ARROW}</a><a class="lnk" href="https://github.com/Ninocabra/PI-Workflow/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">{T("Historial de cambios", "Changelog")(lang)}</a></span>
-        </div>
+      <div class="card dash" style="padding: clamp(32px, 5vw, 56px); display: flex; flex-direction: column; gap: 16px; border-radius: 36px">
+        <span style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><span class="tg">{T("Temporalmente retirado", "Temporarily withdrawn")(lang)}</span></span>
+        <span class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em">{T("Sin programas publicados ahora mismo", "No published software right now")(lang)}</span>
+        <span style="font-size: 16.5px; line-height: 1.7; color: var(--t2); max-width: 680px">{T("El script que estaba aquí se ha retirado temporalmente mientras se revisa su compatibilidad. Volverá cuando esté listo.", "The script that used to be here has been temporarily withdrawn while its compatibility is reviewed. It will return when it is ready.")(lang)}</span>
       </div>
     </section>
     <section style="display: flex; flex-direction: column; gap: 28px; padding: clamp(64px, 8vw, 104px) var(--gx) 120px">
@@ -498,27 +488,10 @@ def build_programas(lang):
                 f'<span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3); margin-bottom: 8px">{T("Programas en los que trabajo; saldrán cuando estén listos.", "Programs I am working on; they will be released when ready.")(lang)}</span>')}
       <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">{ws}</div>
     </section>"""
-    js = """  <script>
-  (function () {
-    var box = document.getElementById('changelog'); if (!box) return;
-    var en = box.getAttribute('data-lang') === 'en';
-    var url = 'https://raw.githubusercontent.com/Ninocabra/PI-Workflow/main/' + (en ? 'CHANGELOG.md' : 'CHANGELOG.es.md');
-    fetch(url).then(function (r) { if (!r.ok) throw 0; return r.text(); }).then(function (t) {
-      var heads = t.split('\\n').filter(function (l) { return /^##\\s+/.test(l); }).slice(0, 3);
-      if (!heads.length) return;
-      var e = document.createElement('span'); e.className = 'caps'; e.style.cssText = 'color: var(--t3); padding: 8px 2px'; e.textContent = en ? 'Latest versions' : 'Últimas versiones'; box.appendChild(e);
-      heads.forEach(function (h) {
-        var s = document.createElement('span'); s.className = 'kv'; var a = document.createElement('span'); var b = document.createElement('span');
-        var txt = h.replace(/^##\\s+/, '').replace(/[\\[\\]]/g, ''); var m = txt.match(/^(\\S+)\\s*[-–—]?\\s*(.*)$/);
-        a.textContent = m ? m[1] : txt; b.textContent = m ? m[2] : ''; s.appendChild(a); s.appendChild(b); box.appendChild(s);
-      });
-    }).catch(function () {});
-  })();
-  </script>"""
     return page(lang, "programas.html", T("Programas · CabraSpace", "Software · CabraSpace")(lang),
-                T("PI Workflow, flujo de procesado unificado para PixInsight, y los programas en preparación de CabraSpace.",
-                  "PI Workflow, a unified processing workflow for PixInsight, and the CabraSpace programs in the works.")(lang),
-                body, extra_js=js)
+                T("Programas de CabraSpace para PixInsight, en preparación.",
+                  "CabraSpace software for PixInsight, in preparation.")(lang),
+                body)
 
 
 def build_bitacora(lang):

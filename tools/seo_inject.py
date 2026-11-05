@@ -84,7 +84,8 @@ def pages():
     out = []
     for path in sorted(glob.glob(os.path.join(ROOT, "*.html"))):
         f = os.path.basename(path)
-        if f.startswith("borrador-") or f in ("pi-workflow.html", "pi-workflow-en.html"):
+        if f.startswith("borrador-") or f in ("pi-workflow.html", "pi-workflow-en.html",
+                                               "cabrascripts.html", "cabrascripts-en.html"):
             continue
         out.append(path)
     return out
