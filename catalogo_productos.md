@@ -312,6 +312,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### MOUNTS
 - **Modelo: ToupTek Astro**
+  - [Presentación de la Montura ToupTek Astro ATLAS SH20 con Transmisión por Onda de Deformación](https://www.youtube.com/watch?v=7UphDpW3Dqw) (2026-11-05)
   - [Anuncio de la Nueva Montura ToupTek Astro SH20](https://www.youtube.com/watch?v=U1XG3ENHXyc) (2026-10-29)
 
 ### TELESCOPES
@@ -351,8 +352,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Noticias Astro Septiembre 2026: Seestar S50 Pro, RB Focus eXcalibur 4.0, Askar N210](https://www.youtube.com/watch?v=qmu5k4BSjGo) (2026-08-28)
 - **Modelo: Seestar S50 Pro**
   - [ZWO apoya a jóvenes astrónomos en la IOAA-jr 2026 en Tailandia](https://www.zwoastro.com/2026/10/29/zwo-seestar-s50-pro-ioaa-jr-2026-thailand/) (2026-10-29)
-- **Modelo: espacio**
-  - [Novedades de ZWO: Mantente Conectado con el Universo](https://www.youtube.com/shorts/otOFM83nTJg) (2026-07-19)
 
 ### ASTROPHOTOGRAPHY
 - **Modelo: ASI2600MC Duo**
