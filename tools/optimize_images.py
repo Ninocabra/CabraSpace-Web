@@ -20,7 +20,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TO_CONVERT = [
     "img/lightpollution-preview.png",
     "img/nightvis-preview.png",
-    "pi-workflow-interface.png",
     "nebula_original.png", "nebula_stars.png", "nebula_starless.png",
     "nebula_ha.png", "nebula_oiii.png", "nebula_sii.png",
     "logo.png",
@@ -30,7 +29,6 @@ TO_CONVERT = [
 REF_REPLACEMENTS = [
     ("img/lightpollution-preview.png", "img/lightpollution-preview.webp"),
     ("img/nightvis-preview.png", "img/nightvis-preview.webp"),
-    ("'pi-workflow-interface.png'", "'pi-workflow-interface.webp'"),
     ("'nebula_original.png'", "'nebula_original.webp'"),
     ("'nebula_stars.png'", "'nebula_stars.webp'"),
     ("'nebula_starless.png'", "'nebula_starless.webp'"),
