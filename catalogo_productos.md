@@ -31,8 +31,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: SLOAN**
   - [Filtros Baader SLOAN/SDSS Nueva Generación - 1.25" "I"](https://stargazerslounge.com/topic/448156-baader-new-gen-sloansdss-filters-125-i/) (2026-09-11)
-- **Modelo: Solar Filter**
-  - [Haz tu propio filtro solar para casi cualquier telescopio (Guía DIY de película solar Baader)](https://www.youtube.com/watch?v=bDvwnYecK7o) (2026-07-19)
 
 ## Baader Planetarium
 
@@ -311,6 +309,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevas Cámaras ToupTek Astro SkyEye Plus APS-C y Full-Frame para Deep-Sky](https://www.youtube.com/watch?v=8zLtcJnFviM) (2026-08-24)
 
 ### MOUNTS
+- **Modelo: ATLAS**
+  - [Análisis del Montaje ToupTek ATLAS SH20](https://www.youtube.com/shorts/gJ7vboOw7bY) (2026-11-06)
 - **Modelo: ToupTek Astro**
   - [Presentación de la Montura ToupTek Astro ATLAS SH20 con Transmisión por Onda de Deformación](https://www.youtube.com/watch?v=7UphDpW3Dqw) (2026-11-05)
   - [Anuncio de la Nueva Montura ToupTek Astro SH20](https://www.youtube.com/watch?v=U1XG3ENHXyc) (2026-10-29)
