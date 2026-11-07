@@ -127,6 +127,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ## MLAstro
 
+### MOUNTS
+- **Modelo: MLAstro One**
+  - [Montura MLAstro One: ¡Gran Capacidad de Carga, Gran Valor!](https://www.youtube.com/watch?v=GyBRGnklvkE) (2026-11-07)
+
 ### TELESCOPES
 - **Modelo: Dwarf DRACO**
   - [Noticias de Astro: Nuevo Telescopio Dwarf DRACO, MLAstro TRINITY y AAPA Pro](https://www.youtube.com/watch?v=_i8YYt5_WNM) (2026-09-23)
@@ -290,8 +294,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ToupTek Astro: Equipo Listo para la Acción Estelar](https://www.youtube.com/shorts/uS5x-LQyha0) (2026-10-01)
 
 ### CAMERAS
-- **Modelo: AE676C**
-  - [La nueva cámara ToupTek AE676C con sensor cuadrado enfriado 7x7mm](https://stargazerslounge.com/topic/446931-the-new-touptek-ae676c-camera-with-cooled-7x7mm-square-sensor/) (2026-07-22)
 - **Modelo: AE676M**
   - [ToupTek AE676M: Capturando la Luna con un Zoom Impresionante](https://www.youtube.com/shorts/s6878VBcidk) (2026-10-20)
 - **Modelo: Cámara CMOS**
