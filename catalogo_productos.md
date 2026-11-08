@@ -221,6 +221,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: seguridad**
   - [Advertencia de seguridad de QHYCCD sobre código malicioso en su sitio web](https://www.qhyccd.com/security-advisory-malicious-code-on-www-qhyccd-com-10-12-august-2026/) (2026-08-12)
 
+## Siril
+
+### SOFTWARE
+- **Modelo: Procesamiento de imágenes**
+  - [Siril Versión 1.4.5: Correcciones y Mejoras](https://gitlab.com/free-astro/siril/-/releases/1.4.5) (2026-10-27)
+
 ## Sky-Watcher
 
 ### MOUNTS
@@ -275,7 +281,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: SV555**
   - [Observación del eclipse solar en España con la SVBONY SV555](https://www.youtube.com/watch?v=b4DjxdUNjuM) (2026-09-16)
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
-  - [Actualizaciones del Telescopio Refractor Svbony SV555](https://www.youtube.com/watch?v=wDz5QTbJ9q4) (2026-07-24)
 - **Modelo: SV580**
   - [Configuración del Telescopio Insignia SVBONY SV580 y Captura Lunar](https://www.youtube.com/watch?v=KCrfZ-etiXw) (2026-10-26)
   - [Presentamos el SVBONY SV580: Una Nueva Era en Astrofotografía Full-Frame](https://www.youtube.com/watch?v=QbBxcfESfrI) (2026-10-13)

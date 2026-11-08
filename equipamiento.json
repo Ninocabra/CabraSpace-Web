@@ -1,5 +1,26 @@
 [
   {
+    "id": "https://gitlab.com/free-astro/siril/-/releases/1.4.5",
+    "title_es": "Siril Versión 1.4.5: Correcciones y Mejoras",
+    "title_en": "Siril Version 1.4.5: Fixes and Improvements",
+    "summary_es": "La versión 1.4.5 de Siril introduce una serie de correcciones de errores importantes, incluyendo la mejora de nombres de constelaciones en anotaciones, la resolución de problemas de contención de hilos en Python y la corrección de la apertura de archivos JPEG XL. También se han abordado fallos en la compilación con OpenCV 5 y en la inicialización del entorno virtual de Python, así como problemas con la escritura de valores EQUINOX en cabeceras FITS y la truncación de extensiones de archivo FITS.",
+    "summary_en": "Siril version 1.4.5 brings a series of crucial bug fixes, including improved constellation names in annotations, resolution of Python threading contention issues, and fixing the opening of JPEG XL files. Compilation issues with OpenCV 5 and Python virtual environment initialization have also been addressed, along with problems concerning the writing of EQUINOX values in FITS headers and FITS file extension truncation.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-10-27",
+    "url": "https://gitlab.com/free-astro/siril/-/releases/1.4.5",
+    "tags": [
+      "Siril",
+      "Software",
+      "Astrofotografía",
+      "Procesamiento de imágenes",
+      "Corrección de errores",
+      "Versión 1.4.5"
+    ],
+    "source_type": "official",
+    "source": "GitLab Releases (Siril)"
+  },
+  {
     "id": "https://www.youtube.com/watch?v=GyBRGnklvkE",
     "title_es": "Montura MLAstro One: ¡Gran Capacidad de Carga, Gran Valor!",
     "title_en": "MLAstro One Mount: Huge Payload, Great Value!",
@@ -3081,26 +3102,5 @@
     ],
     "source_type": "official",
     "source": "Explore Scientific (YouTube)"
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=wDz5QTbJ9q4",
-    "title_es": "Actualizaciones del Telescopio Refractor Svbony SV555",
-    "title_en": "Svbony SV555 Refractor Telescope Updates",
-    "summary_es": "Este vídeo analiza las últimas actualizaciones y mejoras introducidas por Svbony en su telescopio refractor SV555. Se detallan los cambios en óptica, construcción y accesorios, así como su impacto en el rendimiento para astrofotografía y observación visual.",
-    "summary_en": "This video discusses the latest updates and improvements made by Svbony to their SV555 refractor telescope. Changes in optics, construction, and accessories are detailed, along with their impact on performance for astrophotography and visual observation.",
-    "category_es": "TELESCOPIOS",
-    "category_en": "TELESCOPES",
-    "date": "2026-07-24",
-    "url": "https://www.youtube.com/watch?v=wDz5QTbJ9q4",
-    "tags": [
-      "Svbony",
-      "SV555",
-      "Refractor",
-      "Telescope",
-      "Astrophotography",
-      "Review"
-    ],
-    "source_type": "official",
-    "source": "Svbony (YouTube)"
   }
 ]
