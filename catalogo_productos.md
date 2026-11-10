@@ -97,8 +97,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Nuevos oculares Explore Scientific a prueba de agua con vidrio ED listos para el lanzamiento](https://www.youtube.com/watch?v=kzm58mTjPEU) (2026-09-29)
 
 ### MOUNTS
-- **Modelo: Astronomical League**
-  - [Julian Shapiro en el 60to Acto Vivo de la Liga Astronómica](https://www.youtube.com/watch?v=M3axbtFAUO4) (2026-07-25)
 - **Modelo: Sidara Nano**
   - [Explore Scientific Sidara Nano: Nueva Montura Alt-Az Portátil](https://www.youtube.com/watch?v=qTcJkLXp70M) (2026-09-29)
 - **Modelo: Sidara Pro**
@@ -156,8 +154,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Apple Silicon**
   - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
-- **Modelo: Autopalette**
-  - [Actualización de Autopalette y Novedades en PixInsight](https://www.youtube.com/watch?v=F8kAp3xG3Fo) (2026-07-27)
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: MLDenoise**
@@ -178,12 +174,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
 
 ### TELESCOPES
-- **Modelo: Ed Ting**
-  - [Los 3 Tipos de Telescopios que la Gente Compra por Error](https://www.youtube.com/watch?v=PZNdM0Q8FBw) (2026-07-26)
 - **Modelo: Lukomatico**
   - [Telescopio económico f/3 vs Sensor grande: ¿Cuál es la mejor opción?](https://www.youtube.com/watch?v=aHmgWODEuA4) (2026-10-03)
   - [Comparativa de Telescopio Presupuestario f/3 con Sensor Grande](https://www.youtube.com/watch?v=ZeIBNH5jCVU) (2026-10-03)
   - [Análisis del Telescopio Económico Lukomatico f/3](https://www.youtube.com/watch?v=XOE_5euPrOM) (2026-08-31)
+- **Modelo: S30 Plus**
+  - [S30 Plus: ¿El Mejor Telescopio Inteligente de Nivel de Entrada en 2026?](https://www.youtube.com/watch?v=WIzIg_mYSNA) (2026-11-10)
 - **Modelo: StellaLyra**
   - [Anuncio de Oferta Especial: Telescopio Newtoniano StellaLyra 12" f/4](https://stargazerslounge.com/topic/448696-stellalyra-12-f4-m-lrn-newtonian-3-focuser/) (2026-09-27)
 - **Modelo: Telescopio Principiante**
@@ -400,12 +396,16 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
 - **Modelo: Pilares de la Creación**
   - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
+- **Modelo: S30 Plus**
+  - [Análisis del Nuevo Seestar para Principiantes: S30 Plus](https://www.youtube.com/watch?v=jBmDATTnlmo) (2026-11-10)
 - **Modelo: S50 Pro**
   - [Análisis Profundo del Seestar S50 Pro: ¿Qué Puede Capturar Realmente?](https://www.youtube.com/watch?v=FFfbkIVI0LM) (2026-10-23)
   - [Reseña del Seestar S50 Pro: ¿El Mejor Telescopio Inteligente Hasta la Fecha?](https://www.youtube.com/watch?v=ksk36W2vCoM) (2026-08-28)
   - [Análisis del Seestar S50 Pro: ¿El Telescopio Inteligente Que Estabas Esperando?](https://www.youtube.com/watch?v=ANiJj9bgDAs) (2026-08-25)
 - **Modelo: S50PRO**
   - [Review a 60 días del Telescopio SEESTAR S50PRO](https://www.youtube.com/watch?v=HyE0VaF8ZWs) (2026-10-10)
+- **Modelo: Seestar S30 Plus**
+  - [ZWO presenta el Seestar S30 Plus, un telescopio inteligente todo en uno](https://www.youtube.com/watch?v=91k7O-5l40k) (2026-11-10)
 - **Modelo: Seestar S50 Pro**
   - [Seestar S50 Pro, Draco y Atlas: la batalla de los telescopios inteligentes](https://www.youtube.com/watch?v=uHKKxh2gV-A) (2026-10-25)
   - [Problemas Reales y Soluciones del Seestar S50 Pro](https://www.youtube.com/watch?v=hpHKMMM3cH0) (2026-10-22)
