@@ -25,6 +25,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Video de demostración de los Askar N160 y N210: ¿Qué reflector Newton de gran apertura elegir?](https://www.youtube.com/watch?v=6ba0GKdDPeY) (2026-08-21)
 - **Modelo: N210**
   - [Presentación del Telescopio Askar N210](https://www.youtube.com/watch?v=gPf8nHhGvWE) (2026-08-19)
+- **Modelo: SQA70pro**
+  - [Askar presenta el telescopio refractor SQA70pro](https://www.youtube.com/watch?v=T5Qhe64C5r8) (2026-11-11)
 
 ## Baader
 
@@ -198,9 +200,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Primalucelab
 
 ### ACCESSORIES
-- **Modelo: ASTRO-RES**
-  - [Instalación de la Estación de Observatorio ASTRO-RES en Portugal](https://www.youtube.com/watch?v=-WjqifBBYT8) (2026-07-28)
-  - [Instalación de Estación Observatorio ASTRO-RES en Atlar Innovation Space Center, Portugal](https://www.primalucelab.com/blog/astro-res-observatory-station-installed-at-atlar-innovation-space-center-portugal/) (2026-07-28)
 - **Modelo: DUAL-COMPACT**
   - [Instalación de la Estación de Observatorio DUAL-COMPACT en el Planetario de Morelia](https://www.youtube.com/watch?v=HshLziS6bK8) (2026-09-30)
   - [PrimaLuceLab instala una estación observatorio DUAL-COMPACT en el Planetario de Morelia, México](https://www.primalucelab.com/blog/dual-compact-observatory-station-installed-in-morelia-planetarium-mexico/) (2026-09-29)
@@ -401,6 +400,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Pilares de la Creación**
   - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
 - **Modelo: S30 Plus**
+  - [Análisis del Seestar S30 Plus: ¿Es Realmente Diferente?](https://www.youtube.com/watch?v=eA_Z6ewfHyM) (2026-11-10)
   - [Análisis del Nuevo Seestar para Principiantes: S30 Plus](https://www.youtube.com/watch?v=jBmDATTnlmo) (2026-11-10)
 - **Modelo: S50 Pro**
   - [Análisis Profundo del Seestar S50 Pro: ¿Qué Puede Capturar Realmente?](https://www.youtube.com/watch?v=FFfbkIVI0LM) (2026-10-23)
