@@ -205,6 +205,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [PrimaLuceLab instala una estación observatorio DUAL-COMPACT en el Planetario de Morelia, México](https://www.primalucelab.com/blog/dual-compact-observatory-station-installed-in-morelia-planetarium-mexico/) (2026-09-29)
 - **Modelo: ESATTO**
   - [PrimaLuceLab abre una división en California](https://www.youtube.com/watch?v=chY6A3tvUaA) (2026-09-25)
+- **Modelo: Italia**
+  - [PrimaLuceLab: De Italia al Universo](https://www.youtube.com/watch?v=dpfUsY2QTbk) (2026-11-12)
 - **Modelo: NEAST Summit**
   - [Avance de NEAST Summit 2026](https://www.youtube.com/shorts/xH3d-PakLh8) (2026-10-01)
 - **Modelo: mounting**
@@ -249,8 +251,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Equipos de Astronomía**
   - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
-- **Modelo: Filtro Solar**
-  - [Filtro Solar Svbony SV229 para Observación Solar](https://www.youtube.com/shorts/itNAjB2wwFI) (2026-07-29)
 - **Modelo: Kit de Cielo Profundo**
   - [Oferta de Día de Astronomía de SVBONY #2: Construye tu Kit de Cielo Profundo con Francisco](https://www.youtube.com/watch?v=sYmor4_z7UE) (2026-09-15)
 - **Modelo: Ofertas**
