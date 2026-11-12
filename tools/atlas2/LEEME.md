@@ -4,7 +4,8 @@ Desde el 12-11-2026 la copia del repo es la FUENTE del sistema. El prototipo `Ca
 (y `project/p1,p3,p5`) queda como referencia congelada: no se sigue editando allí.
 **F2 (12-11-2026):** el MARCO ya está en las 54 páginas: `atlas/atlas2-marco.css` + `atlas/atlas2.js`, con el marcado
 que escribe `tools/sync_nav.py`. **F3 (12-11-2026):** el interior nuevo (`atlas/atlas2.css`) lo cargan ya las 10 páginas
-de portada e índices (ver «F3» abajo); el resto aún no. El muestrario se ve en
+de portada e índices (ver «F3» abajo); **F4 (12-11-2026):** también las 20 láminas de observación (ver «F4»); quedan las
+20 páginas a mano (F5). El muestrario se ve en
 `atlas/atlas2-muestra.html` (`noindex`, en `atlas/` a propósito: `sync_nav.py` y `seo_inject.py` solo recorren los
 `*.html` de la raíz). La convivencia con `index.css` / `atlas.css` está explicada en `atlas/LEEME.md`.
 
@@ -70,7 +71,31 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   `.prog-cab`, `.prog`, `.reg-mas`, `.cartela-l`/`.cartela--larga` (rótulo que se oculta en móvil si la cartela pasa
   de 32 caracteres) y el ▶ destacado de `.cap-play.paused` (D1).
 
-## Pendiente para F4–F5
+## F4 (12-11-2026): las 20 láminas con el interior nuevo y su relato
+
+- `build_obs_page()` reescrita con el diseño de `v2/transito-qatar1b.html` y sus variantes (cielo profundo, eclipse);
+  detalle de qué hace cada parte en `atlas/LEEME.md` («F4»). `page()` ya solo escribe Atlas II (se quitó la rama
+  `interior="a1"` y las funciones de Atlas I que solo usaban las láminas: `obs_card`, `plate_img`, `plate_ph`,
+  `breadcrumb`, `kv_rows`, `neighbours`).
+- Piezas nuevas en `atlas2.css` (en su índice): `.det`, `.relato`, `.cita`, `.refs` (`.ref-n`, `.ref-tx`, `.ref-est`,
+  `--preprint`, `.refs-inf`), `.lam-natural--foto`, `.fases`/`.fases-l`, `.video--campo`/`.video--16x9`, la lámina
+  «siguiente» espejada en `.pasa-fin`, y `.cartela--l40`/`--l52` (cartelas largas: rótulo oculto por debajo de 760 / 960
+  px). Cambian dos piezas existentes, solo usadas por las láminas: `.lam-natural img` y `.video` ya no fijan proporción
+  en CSS (la dan `width`/`height`, o la clase de caja del vídeo).
+- `VERSION` de `sync_nav.py` **no** se ha subido (cambiaría las 54 páginas, también las 20 a mano): se sube una vez en F6.
+- Herramientas nuevas: `tools/miniaturas.py` (miniaturas WebP de las curvas) y `tools/check_relatos.py` (fidelidad de los
+  relatos frente a RELATOS.md; visto fallar con cuatro alteraciones a propósito).
+
+## Pendiente para F5–F6 (notas de F4)
+
+- `publish_from_inbox.py` no llama a `miniaturas.py` (no se tocó): un tránsito nuevo sale en las rejillas con su PNG
+  original hasta que alguien ejecute `python tools/miniaturas.py`. Se puede añadir a su lista `BUILD` si Pillow está
+  en la máquina que publica.
+- Las cartelas de la cabecera «a la par» de Herramientas y Bitácora (F3) se salen de su columna entre 880 y 1020 px
+  (medido en F4 con un barrido de anchos; no es de F4 y no se ha tocado).
+- Superíndices de las llamadas: objetivo táctil pequeño (por debajo de 44 px), como en cualquier texto con notas.
+
+## Pendiente para F4–F5 (escrito en F3; F4 ya hecho)
 
 - **Numeración D2**: hecha en las 10 páginas de F3 (cartelas Tabula I–IV). Falta la de las cabeceras a mano de las
   herramientas (F5): CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,

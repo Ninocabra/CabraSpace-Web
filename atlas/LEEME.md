@@ -6,8 +6,8 @@
 |---|---|
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
-| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Desde F3 lo cargan las 10 páginas de portada e índices** (después del marco); las demás lo cargarán al migrar (F4 láminas, F5 herramientas y catálogos). |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 44 páginas sin migrar: su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 10 de F3 ya no la cargan. Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; las 20 a mano lo cargarán en F5. |
+| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin migrar (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
 | `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
 | `atlas/atlas.js` | Script de cabecera de Atlas I. **Ya no lo carga ninguna página** (F2); se borra en F6. No cargarlo junto a `atlas2.js`: los dos alternarían el modo noche y un clic se anularía. |
 | `atlas/astroforecast.css` | Titular y paneles Atlas de Astro Forecast. |
@@ -31,9 +31,13 @@ Las páginas generadas llevan la marca `ATLAS-PAGE`: no se editan a mano, se edi
 1. Copia sus ficheros web a `obs/<slug>/` (JPG de ≈2400 px para la imagen completa, recorte 1600×1200
    y miniatura 800×600; curvas PNG de ≈1600 px; vídeos MP4 de menos de 30 MB).
 2. Añade su entrada a `obs/observaciones.json` copiando una del mismo tipo (`deep-sky`, `transit` o
-   `eclipse`) y cambiando slug, fechas, `title`, `media` y `facts_display`.
-3. Ejecuta los tres comandos. La portada, Observaciones y los «Más en…» se actualizan solos. (Desde F2 el
-   menú ya no lleva «Lo último»: una observación nueva no reescribe la cabecera de todas las páginas.)
+   `eclipse`) y cambiando slug, fechas, `title`, `media` y `facts_display`. El relato (`story`) es opcional:
+   sin él la lámina sale igual, sin hueco (ver «F4» abajo).
+3. Si es un tránsito: `python tools/miniaturas.py` (escribe `curva-m.webp`, la miniatura ligera de las rejillas;
+   sin ella las rejillas cargan el PNG de 700 KB, que funciona pero pesa diez veces más).
+4. Ejecuta los tres comandos. La portada, Observaciones y el «lámina anterior / siguiente» de las láminas vecinas
+   se actualizan solos. (Desde F2 el menú ya no lleva «Lo último»: una observación nueva no reescribe la cabecera
+   de todas las páginas.)
 
 ### O por el buzón (lo que usan los programas)
 
@@ -119,6 +123,37 @@ fuentes web (Bodoni Moda, Figtree, IBM Plex Mono; las ponía antes el `@import` 
 - Sección 7 de compatibilidad de `atlas2-marco.css`: nada era de estas páginas (catálogos y PixelMath-teca).
 - «Desde dónde se observa» (Observaciones) usa el grabado del techo corredizo (D3, `atlas/img/techo-corredizo.svg`,
   generador en `tools/atlas2/d3/`). `atlas/img/cupula.svg` queda en el repo sin usar (F6).
+
+## F4 (12-11-2026): las 20 láminas de observación con el interior nuevo y su relato
+
+Las 10 observaciones × ES/EN (`transito-*`, `cielo-m82`, `cielo-pk164`, `eclipse-2026`) las escribe `build_obs_page()`
+con `interior="a2"` (como las 10 de F3: `atlas2-marco.css` + `atlas2.css`, sin `index.css` ni `atlas.css`, sin `style=""`).
+Ya no queda ninguna página generada con Atlas I; `page()` solo escribe Atlas II.
+
+- **Diseño** (el de `propuestas-estetica/v2/transito-qatar1b.html`): miga de dos pasos con el ancla que entienden los
+  filtros (`observaciones.html#exoplanetas`…), cartela «Lám. N · subtítulo», título, entradilla (la `description`); la
+  figura principal a su proporción natural (abre el original); debajo, a la izquierda el relato, las notas, «Hecho con»
+  y el vídeo; a la derecha la ficha técnica (fija al bajar); las referencias bajo el texto; al final, lámina anterior y
+  siguiente por número de lámina (calculado de los datos). Sin grabado. Desaparece el bloque «Más en…» (el prototipo
+  no lo tiene; la miga ya lleva a la lista filtrada).
+- **Tránsitos**: el campo (`campo.jpg`) y el póster del vídeo son el mismo fichero (comprobado byte a byte): van en una
+  sola figura, «El campo… Al reproducirlo, la noche entera en vídeo», como el prototipo. Si algún día no coinciden,
+  salen como dos figuras.
+- **Cielo profundo**: la fotografía protagonista (`.lam-natural--foto`, hasta 1100 px) y, como antes, pulsar abre la
+  versión completa (`full`).
+- **Eclipse**: la corona (abre la de 4K), la serie de fases (`.panel.fases`, cada disco abre su imagen), el vídeo
+  (`preload="none"`, caja 16:9), notas, ficha y relato. `downloads` se pinta en la ficha si una entrada lo trae.
+- **Relato** (`story` en `observaciones.json`, campo nuevo, opcional): `{source, es: [párrafos], en: [párrafos],
+  links?, refs: [{n, authors, year, title, venue, url, status} | {n, text: {es, en}, url, status} | {n, own: true}]}`.
+  El español sale TAL CUAL de `propuestas-estetica/d4-investigacion/RELATOS.md` (con sus llamadas `[n]` e `[inf.]`); lo
+  pasa `propuestas-estetica/d4-investigacion/relatos_a_json.py`, que también escribe `RELATOS-EN.md` (el inglés, para
+  revisar). Las llamadas salen como superíndices enlazados a su referencia; `[inf.]` como «inf.» con una nota al pie
+  de la lista (inferencia o cuenta propia, no publicada). **Fidelidad: `python tools/check_relatos.py`** (texto ES
+  idéntico a RELATOS.md sin llamadas, mismas llamadas, mismas referencias y enlaces; EN con la misma estructura).
+  Si cambia RELATOS.md: `relatos_a_json.py`, la cadena de tres comandos y `check_relatos.py`.
+- **Miniaturas**: `tools/miniaturas.py` (Pillow) escribe `obs/<slug>/curva-m.webp` (800 px, WebP q85, 48–70 KB frente
+  a 600–850 KB del PNG). `build_atlas.py` las usa en las rejillas (portada, Observaciones, anterior/siguiente) si
+  existen; la lámina sigue con el PNG. Peso de Observaciones (todo lo que carga, medido): 5484 KiB → 1056 KiB.
 
 ## Versión de las hojas de estilo
 

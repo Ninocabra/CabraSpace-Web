@@ -8,10 +8,12 @@
   <meta name="description" content="Light curve of the WASP-59 b exoplanet transit, measured from the AstroCamp observatory.">
   <meta name="cabra:og-image" content="https://cabraspace.com/obs/wasp59b-2026-09-03/curva.png">
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/transito-wasp59b-2026-09-03-en.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/transito-wasp59b-2026-09-03.html">
@@ -54,33 +56,87 @@
     </div>
     <div class="filete" aria-hidden="true"></div>
   </header>
-  <main class="a3 page">
-    <div class="grain" aria-hidden="true"></div>
-<nav aria-label="Breadcrumb" style="padding: 36px var(--gx) 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap"><a class="lnk" href="observaciones-en.html" style="font-size: 14px">Observations</a><span class="bd" style="font-style: italic; color: var(--t3)">›</span><a class="lnk" href="observaciones-en.html#exoplanetas" style="font-size: 14px">Exoplanets</a></nav>
-    <section style="position: relative; padding: 40px var(--gx) 48px; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Pl. IV</span><span class="caps" style="color: var(--t2)">Light curve · one night</span></div>
-      <h1 class="bd" style="font-size: clamp(42px, 5.8vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em">Transit of <em class="gi">WASP-59 b</em></h1>
-    </section>
-    <div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
-    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 56px var(--gx) 96px">
-      <div class="c8" style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/wasp59b-2026-09-03/curva.png" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 520px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp59b-2026-09-03/curva.png" alt="Light curve of the WASP-59 b transit: the star dims while the planet passes in front" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 1</span><span class="bd">Relative flux against time, with the fitted model.</span></figcaption></figure>
-        <div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px"><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><div class="plate" style="height: 320px"><div class="plate-in"><video controls preload="none" playsinline poster="obs/wasp59b-2026-09-03/poster.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000"><source src="obs/wasp59b-2026-09-03/video.mp4" type="video/mp4"></video></div></div><figcaption class="cap"><span class="caps">Fig. 2</span><span class="bd">The whole night on video.</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/wasp59b-2026-09-03/campo.jpg" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 320px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp59b-2026-09-03/campo.jpg" alt="Star field with the target and comparison stars marked" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 3</span><span class="bd">The field: target and comparison stars.</span></figcaption></figure></div>
-        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 720px"><span class="caps" style="color: var(--t3)">Notes</span><div style="font-size: 18px; line-height: 1.75; color: var(--t2); display: flex; flex-direction: column; gap: 14px"><p><em class="gi">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because there was a meridian flip in the middle of the transit.</p></div></div>
+  <main>
+
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      <nav class="ruta" aria-label="Breadcrumb"><a class="miga" href="observaciones-en.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Observations</a><span aria-hidden="true">›</span><a class="miga" href="observaciones-en.html#exoplanetas">Exoplanets</a></nav>
+      <p class="cartela">Pl. IV<span class="cartela-l"> <i>·</i> Light curve · one night</span></p>
+      <h1 class="tit-1">Transit of <em class="gi nb">WASP-59 b</em></h1>
+      <p class="entradilla">Light curve of the WASP-59 b exoplanet transit, measured from the AstroCamp observatory.</p>
+    </div>
+  </div>
+</div>
+<div class="filete" aria-hidden="true"></div>
+<section class="sec">
+  <div class="wrap">
+    <figure class="lam-natural">
+      <a class="lam-marco" href="obs/wasp59b-2026-09-03/curva.png" target="_blank" rel="noopener"><img class="encaja" src="obs/wasp59b-2026-09-03/curva.png" alt="Light curve of the WASP-59 b transit: the star dims while the planet passes in front" width="1600" height="1161"></a>
+      <figcaption class="fig-pie"><b>Fig. 1.</b> Relative flux against time, with the fitted model.</figcaption>
+    </figure>
+    <div class="duo det">
+      <div class="col">
+        <div class="prosa relato">
+          <p>WASP-59 b, published in 2013, orbits a K5 dwarf every 7.9 days<sup class="cita"><a href="#ref-1" aria-label="Reference 1">1</a></sup>. It is a warm Jupiter<sup class="cita"><a href="#ref-2" aria-label="Reference 2">2</a></sup> of 0.86 Jupiter masses and 0.78 Jupiter radii, probably with a large, dense core<sup class="cita"><a href="#ref-1" aria-label="Reference 1">1</a></sup>. Its literature fits in a few lines<sup class="cita"><a href="#ref-3" aria-label="Reference 3">3</a></sup>: two measurements of the angle between its orbit and the star&#x27;s spin give 16° and −1°, with errors of almost 20°; the second is considered compatible with an aligned orbit<sup class="cita"><a href="#ref-2" aria-label="Reference 2">2</a>, <a href="#ref-4" aria-label="Reference 4">4</a></sup>. Gaia also found a companion star at about 9500 astronomical units<sup class="cita"><a href="#ref-5" aria-label="Reference 5">5</a></sup>. My transit, centred on 4 September at 01:09 UTC, arrived 1.2 min late<sup class="cita"><a href="#ref-6" aria-label="Reference 6">6</a>, <a href="#ref-7" aria-label="Reference 7">7</a></sup>.</p>
+        </div>
+        <div class="prosa notas">
+          <span class="caps rotulo">Notes</span>
+          <p><em class="gi">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because there was a meridian flip in the middle of the transit.</p>
+        </div>
+        <p class="nota"><span class="fell">Made with</span><span><b>Cabra<em class="gi">Transit</em></b> · Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet.</span></p>
+        <figure class="fig">
+          <video class="video video--campo" controls preload="none" playsinline poster="obs/wasp59b-2026-09-03/poster.jpg" width="1300" height="988" aria-label="Star field with the target and comparison stars marked"><source src="obs/wasp59b-2026-09-03/video.mp4" type="video/mp4"></video>
+          <figcaption class="fig-pie"><b>Fig. 2.</b> The field: target and comparison stars. Play it for the whole night on video.</figcaption>
+        </figure>
       </div>
-      <aside class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 28px">
-        <div class="card" style="padding: 32px"><span class="caps" style="color: var(--gold); margin-bottom: 8px">Technical details</span><div class="kv"><span>Planet</span><span>WASP-59 b</span></div><div class="kv"><span>Night</span><span>3 Sep · 2026</span></div><div class="kv"><span>Filter</span><span>R</span></div><div class="kv"><span>Frames</span><span>809 × 30 s</span></div><div class="kv"><span>Rp/R★ measured (indicative)</span><span>0.1373 ± 0.0054 (stat.) ± 0.0114 (sys.)</span></div><div class="kv"><span>Rp/R★ published</span><span>0.1300 ± 0.0060 (Hébrard et al. 2013, via Knudstrup et al. 2024)</span></div><div class="kv"><span>(Rp/R★)² (indicative)</span><span>1.88 % (measured) vs 1.69 % (literature)</span></div><div class="kv"><span>Predicted duration</span><span>162 min</span></div><div class="kv"><span>Mid-transit</span><span>4 Sep, 01:09:16 UTC ± 1.7 min</span></div><div class="kv"><span>O−C</span><span>+1.2 min (ExoClock)</span></div><div class="kv"><span>Telescope</span><span>Celestron C9.25</span></div><div class="kv"><span>Site</span><span>AstroCamp · 1600 m</span></div></div>
-        <div class="card gold" style="padding: 30px; gap: 12px"><span class="caps" style="color: var(--t3)">Made with</span><span class="bd" style="font-size: 30px; font-weight: 500">Cabra<em class="gi">Transit</em></span><span style="font-size: 15px; line-height: 1.6; color: var(--t2)">Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet.</span></div>
-        
-      </aside>
-    </section>
-    <section style="display: flex; flex-direction: column; gap: 40px; margin: 0 var(--gb) 96px; padding: 72px var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
-      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 0 8px">
-        <h2 class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em">More in <em class="gi">exoplanets</em></h2>
-        <a class="lnk" href="observaciones-en.html#exoplanetas">All<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      <div class="panel">
+        <span class="caps">Technical details</span>
+        <dl class="ficha">
+          <div><dt>Planet</dt><dd>WASP-59 b</dd></div>
+          <div><dt>Night</dt><dd>3 Sep · 2026</dd></div>
+          <div><dt>Filter</dt><dd>R</dd></div>
+          <div><dt>Frames</dt><dd>809 × 30 s</dd></div>
+          <div><dt>Rp/R★ measured (indicative)</dt><dd>0.1373 ± 0.0054 (stat.) ± 0.0114 (sys.)</dd></div>
+          <div><dt>Rp/R★ published</dt><dd>0.1300 ± 0.0060 (Hébrard et al. 2013, via Knudstrup et al. 2024)</dd></div>
+          <div><dt>(Rp/R★)² (indicative)</dt><dd>1.88 % (measured) vs 1.69 % (literature)</dd></div>
+          <div><dt>Predicted duration</dt><dd>162 min</dd></div>
+          <div><dt>Mid-transit</dt><dd>4 Sep, 01:09:16 UTC ± 1.7 min</dd></div>
+          <div><dt>O−C</dt><dd>+1.2 min (ExoClock)</dd></div>
+          <div><dt>Telescope</dt><dd>Celestron C9.25</dd></div>
+          <div><dt>Site</dt><dd>AstroCamp · 1600 m</dd></div>
+        </dl>
       </div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px"><a href="transito-qatar1b-2026-09-22-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. X</span><span class="bd">Exoplanets · 22 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of Qatar-1 b</span></a><a href="transito-wasp52b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp52b-2026/curva.png" alt="Transit of WASP-52 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. IX</span><span class="bd">Exoplanets · 21 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of WASP-52 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a><a href="transito-tres3b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres3b-2026/curva.png" alt="Transit of TrES-3 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. VIII</span><span class="bd">Exoplanets · 15 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of TrES-3 b</span></a></div>
-    </section>
+      <section class="refs" aria-labelledby="t-refs">
+        <h2 class="caps rotulo" id="t-refs">References</h2>
+        <ol>
+          <li id="ref-1"><span class="ref-n">1</span><span class="ref-tx">Hébrard, G. et al. (2013). “WASP-52b, WASP-58b, WASP-59b, and WASP-60b: four new transiting close-in giant planets”. <i>A&amp;A 549, A134</i>. <a href="https://arxiv.org/abs/1211.0810" target="_blank" rel="noopener noreferrer">arXiv:1211.0810</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-2"><span class="ref-n">2</span><span class="ref-tx">Knudstrup, E. et al. (2024). “Obliquities of exoplanet host stars: 19 new and updated measurements, and trends in the sample of 205 measurements”. <i>A&amp;A 690, A379</i>. <a href="https://arxiv.org/abs/2408.09793" target="_blank" rel="noopener noreferrer">arXiv:2408.09793</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-3"><span class="ref-n">3</span><span class="ref-tx">Search of the arXiv API, 12-11-2026: abs:&quot;WASP-59b&quot; returns 2 results (the discovery and [4]); abs:&quot;WASP-59&quot;, none. <a href="https://export.arxiv.org/api/query?search_query=abs:%22WASP-59b%22" target="_blank" rel="noopener noreferrer">export.arxiv.org</a> <span class="ref-est">Database</span></span></li>
+          <li id="ref-4"><span class="ref-n">4</span><span class="ref-tx">Zak, J. et al. (2025). “Stellar obliquities of eight close-in gas giant exoplanets”. <i>A&amp;A 694, A91</i>. <a href="https://arxiv.org/abs/2501.05615" target="_blank" rel="noopener noreferrer">arXiv:2501.05615</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-5"><span class="ref-n">5</span><span class="ref-tx">Fontanive, C. &amp; Bardalez Gagliuffi, D. (2021). “The Census of Exoplanets in Visual Binaries: population trends from a volume-limited Gaia DR2 and literature search”. <i>Frontiers in Astronomy and Space Sciences 8, 625250</i>. <a href="https://arxiv.org/abs/2101.12667" target="_blank" rel="noopener noreferrer">arXiv:2101.12667</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-6"><span class="ref-n">6</span><span class="ref-tx">Own data: this plate.</span></li>
+          <li id="ref-7"><span class="ref-n">7</span><span class="ref-tx">ExoClock planet database: WASP-59 b, T0 = 2459695.71571 BJD_TDB and P = 7.9195883 d; 93 observations (90 from its network) and 1 time from the literature. <a href="https://www.exoclock.space/database/planets_json" target="_blank" rel="noopener noreferrer">exoclock.space</a> <span class="ref-est">Database</span></span></li>
+        </ol>
+      </section>
+    </div>
+  </div>
+</section>
+<section class="sec sec--pegada">
+  <div class="wrap">
+    <nav class="pasa" aria-label="Neighbouring plates">
+      <div>
+        <span class="caps rotulo">Previous plate</span>
+        <a class="lam lam--fila" href="eclipse-2026-en.html"><span class="lam-marco"><img src="obs/eclipse-2026/corona-thumb.jpg" alt="Solar eclipse of 12 August" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. III</span><span class="fell">Eclipses · 12 Aug</span></span><span class="lam-t">Solar eclipse of 12 August</span></a>
+      </div>
+      <div class="pasa-fin">
+        <span class="caps rotulo">Next plate</span>
+        <a class="lam lam--fila" href="transito-tres2b-2026-09-06-en.html"><span class="lam-marco"><img class="encaja" src="obs/tres2b-2026-09-06/curva-m.webp" alt="Light curve of the TrES-2 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. V</span><span class="fell">Exoplanets · 6 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">TrES-2 b</span></span></a>
+      </div>
+    </nav>
+  </div>
+</section>
+
   </main>
   <footer class="pie">
     <div class="filete" aria-hidden="true"></div>

@@ -20,13 +20,18 @@
    piezas del sistema (antes eran <style> de las paginas del prototipo): .grab-techo, .desde, .prog-cab, .prog,
    .reg-mas, y el ▶ destacado de .cap-play.paused (D1).
 
+   F4 (12-11-2026): la cargan tambien las 20 laminas de observacion (build_obs_page). Piezas nuevas: .det (composicion
+   del detalle, antes <style> de v2/transito-qatar1b.html), .relato + .cita (texto con llamadas, D4), .refs (lista de
+   referencias con su estado), .lam-natural--foto (fotografia protagonista), .fases (serie de fases del eclipse) y la
+   lamina «siguiente» espejada en .pasa. .lam-natural y .video ya no fijan proporcion: la dan width/height del elemento.
+
    PIEZAS (en este orden en el fichero)
      1. Tokens ............ -> atlas2-marco.css (aqui solo --gx y --wrap, del interior)
      2. Base .............. reset, .wrap, .bd .fell .caps .gi .nb .sr
      3. Hoja y orla ....... -> atlas2-marco.css
      4. Cabecera .......... -> atlas2-marco.css (aqui solo .ic, boton de icono)
      5. Botones ........... .btn .btn-linea .lnk .etq ; :disabled de .btn y .btn-linea
-     6. Cartela y titulos . .cartela (.cartela-l, .cartela--larga) .sec .sec-cab(.sec-cab--izq) .tit-1 .tit-2
+     6. Cartela y titulos . .cartela (.cartela-l, .cartela--larga, --l40, --l52) .sec .sec-cab(.sec-cab--izq) .tit-1 .tit-2
                             .tit-3 .sub .orn
      7. Heroe (portada) ... .heroe .heroe-carta .carta .carta-oro/-ecl/-est
                             .heroe-velo .heroe-in .heroe-tx .aviso .heroe-pie
@@ -41,11 +46,11 @@
                             .herr--ancha (tarjeta horizontal) .herr-usos .herr-lista
     10. Laminas ........... .laminas(--3|--4) .lam .lam-marco .lam-meta .lam-t
                             .lam--g .lam--m .lam--fila .lam-video
-                            .serie (serie destacada) .lam-natural (a tamano natural)
-                            .video (video enmarcado)
+                            .serie (serie destacada) .lam-natural (a tamano natural) .lam-natural--foto
+                            .video (video enmarcado) .fases .fases-l (serie de fases)
     11. Bitacora .......... .bit .bit-f .bit-d .bit-t .bit-g .bit-a .bit--compacta
                             .bit--reg (registro denso) .bit-s (fuente) .is-mismo (fecha repetida)
-    12. Composicion ....... .duo .col .rejilla(-2|-3|-4) .taller .nota .cierre
+    12. Composicion ....... .duo .col .det (detalle de una lamina) .rejilla(-2|-3|-4) .taller .nota .cierre
                             .reg .reg-lado .reg-cab .reg-fin .reg-mas (registro con lateral fijo)
                             .desde (figura con letras + texto: «Desde donde se observa»)
                             .cats (lista de enlaces sobrios) .grupo .grupo-t (grupo con rotulo)
@@ -53,7 +58,7 @@
                             .pie-lam
     14. Pagina secundaria . .pag-cab(.pag-cab--par) .pag-tx .pag-grab .miga .ruta
                             .prog-cab .prog (cabecera con grabado mayor; fichas «en el taller»)
-                            .entradilla .rotulo .prosa .ficha .chips .chip .chips-g
+                            .entradilla .rotulo .prosa .relato .cita .refs .ficha .chips .chip .chips-g
                             .panel .pasa (anterior / siguiente)
                             formularios: .campo (+ output) .campos .soltar .lienzo
                             .consola .desplegable .casilla
@@ -352,11 +357,33 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .serie:hover .tit-2 { color: var(--gold2); }
 .serie + .laminas { margin-top: clamp(40px, 4.4vw, 64px); }
 /* lamina a tamano natural (la curva de una pagina de detalle), abre el original:
-   <figure class="lam-natural"><a class="lam-marco" href><img class="encaja" width height></a><figcaption class="fig-pie"> */
+   <figure class="lam-natural"><a class="lam-marco" href><img class="encaja" width height></a><figcaption class="fig-pie">
+   La proporcion la dan los atributos width/height del <img> (F4: antes se fijaba aqui 1600/1161, la de las curvas). */
 .lam-natural .lam-marco { padding: 12px; }
-.lam-natural .lam-marco img { height: auto; aspect-ratio: 1600 / 1161; object-fit: contain; }
-/* video enmarcado: <video class="video" ...> dentro de una .fig */
-.video { display: block; width: 100%; height: auto; aspect-ratio: 1300 / 988; background: #000; outline: 1px solid var(--line); }
+.lam-natural .lam-marco img { height: auto; object-fit: contain; }
+/* fotografia protagonista (cielo profundo, la corona del eclipse): centrada, sin pasar de ~1100 px de ancho para que
+   quepa casi entera en una pantalla. <figure class="lam-natural lam-natural--foto"> */
+.lam-natural--foto { max-width: 1100px; margin: 0 auto; }
+.lam-natural--foto .lam-marco img { background: #0d0a07; }
+/* video enmarcado: <video class="video" width height ...> dentro de una .fig. Proporcion: sus atributos width/height
+   (las curvas usan la de su poster, 1300 x 988, como el prototipo; el eclipse, la del video, 1920 x 1080). */
+.video { display: block; width: 100%; height: auto; background: #000; outline: 1px solid var(--line); }
+/* width/height solo fijan la caja hasta que carga el poster, y luego el video (proporcion «auto»): medido, la caja de
+   un transito pasaba de 448 a 332 px de alto al darle a reproducir. Por eso build_atlas.py fija la caja con una clase:
+   --campo, la del campo que hace de poster en los transitos (1300 x 988, como el prototipo); --16x9, la del video
+   cuando el poster tiene otra forma (eclipse: poster cuadrado). El video se ve dentro, sin recortar. */
+.video--campo { aspect-ratio: 1300 / 988; }
+.video--16x9 { aspect-ratio: 16 / 9; }
+/* serie de fases (el eclipse): discos en fila con su hora; cada uno abre su imagen. Va dentro de un .panel.
+   <div class="panel fases"><span class="caps rotulo">Las fases · hora UTC</span><ol class="fases-l"><li><a href target="_blank">
+   <img width height><span class="fell">17:38</span></a></li>...</ol></div> */
+.fases { margin-top: clamp(36px, 4vw, 52px); }
+.fases .rotulo { color: var(--t2); }
+.fases-l { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 22px 14px; }
+.fases-l a { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--t3); transition: color .2s; }
+.fases-l a:hover { color: var(--gold2); }
+.fases-l img { width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 50%; object-fit: cover; outline: 1px solid var(--line); }
+.fases-l .fell { font-size: 15px; line-height: 1.25; text-align: center; }
 
 /* ---------------------------------------------------------------- 11. filas de bitacora
    <ol class="bit"><li><a class="bit-f" href><span class="bit-d">5 · XI</span>
@@ -389,6 +416,24 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(36px, 4.4vw, 60px); }
 .col { display: flex; flex-direction: column; min-width: 0; }
 .col > .lnk { align-self: flex-start; margin-top: 18px; }
+/* detalle de una lamina (F4): el texto a la izquierda, la ficha a la derecha (fija al bajar) y las referencias bajo
+   el texto. En una columna (<= 1080 px) quedan en el orden del marcado: texto, ficha, referencias.
+   <div class="duo det"><div class="col">relato · notas · «Hecho con» · figura</div><div class="panel">ficha</div>
+   <section class="refs">...</section></div>   (antes era el <style> propio de v2/transito-qatar1b.html) */
+.det { align-items: start; align-content: start; margin-top: clamp(40px, 4.4vw, 60px); }
+.det > .col { grid-column: 1; grid-row: 1; }
+.det > .panel { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 28px; }
+.det > .refs { grid-column: 1; grid-row: 2; }
+/* sin texto (una observacion sin relato ni notas): la ficha ocupa la primera columna, sin hueco delante */
+.det > .panel:first-child { grid-column: 1; position: relative; top: auto; }
+.det .col > :first-child { margin-top: 0; }
+.det .prosa { max-width: 32em; }                  /* ~65 caracteres por linea (medido: 72-75 a todo el ancho de la columna) */
+.det .notas { margin-top: 30px; }
+.det .nota { margin-top: 26px; }
+.det .nota .fell { white-space: nowrap; }
+.det .fig { margin-top: clamp(36px, 4vw, 52px); }
+.det .panel > .caps { display: block; margin-bottom: 8px; color: var(--gold); }
+.det .panel > .caps ~ .caps { margin-top: 30px; }
 .rejilla { display: grid; gap: 20px; }
 .rejilla-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .rejilla-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -491,6 +536,32 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .prosa ul { list-style: none; }
 .prosa ul li { position: relative; padding-left: 20px; }
 .prosa ul li::before { content: ""; position: absolute; left: 2px; top: .78em; width: 8px; height: 1px; background: var(--gold); }
+/* relato de una lamina (D4): texto corrido, sin titulo propio (R1), con llamadas a su lista de referencias.
+   <div class="prosa relato"><p>... texto<sup class="cita"><a href="#ref-1">1</a>, <a href="#ref-2">2</a></sup>.</p></div>
+   La llamada no cambia el interlineado (line-height 0 y desplazada con top, no con vertical-align: super).
+   [inf.] de RELATOS.md (inferencia o cuenta nuestra, no publicada) es <a class="cita-inf" href="#nota-inf">inf.</a>. */
+.relato { max-width: 38em; font-size: 17px; }
+.cita { position: relative; top: -.5em; margin-left: .1em; font-family: var(--f-sans); font-size: .68em; line-height: 0; vertical-align: baseline; white-space: nowrap; color: var(--t3); }
+.prosa .cita a:not(.btn):not(.btn-linea):not(.lnk) { padding: 0 .06em; color: var(--gold2); text-decoration: none; }
+.prosa .cita a:not(.btn):not(.btn-linea):not(.lnk):hover { color: var(--tx); text-decoration: underline; }
+.prosa .cita a.cita-inf { font-style: italic; color: var(--t3); }
+/* referencias de una lamina: lista numerada sobria, cada una con su enlace y su estado dicho en claro.
+   <section class="refs" aria-labelledby="t-refs"><h2 class="caps rotulo" id="t-refs">Referencias</h2><ol>
+   <li id="ref-1"><span class="ref-n">1</span><span class="ref-tx">Autores (2011). «Titulo». <i>Revista 1, 2</i>.
+   <a href target="_blank" rel="noopener noreferrer">arXiv:…</a> <span class="ref-est">Publicado</span></span></li></ol>
+   <p class="refs-inf" id="nota-inf">...</p></section>   (.ref-est--preprint: el preprint, con filete de trazos) */
+.refs { max-width: 720px; padding-top: 24px; border-top: 1px dotted var(--pt); }
+.refs ol { display: flex; flex-direction: column; gap: 8px; }
+.refs li { display: grid; grid-template-columns: 2em minmax(0, 1fr); gap: 0 8px; padding: 5px 8px 5px 4px; scroll-margin-top: 24px; font-size: 14.5px; line-height: 1.6; color: var(--t2); overflow-wrap: anywhere; transition: background-color .3s; }
+.refs li:target { background: var(--s1); outline: 1px solid var(--c2); }
+.ref-n { padding-top: .2em; font-family: var(--f-mono); font-size: 12px; text-align: right; color: var(--gold); }
+.ref-tx i { color: var(--tx); }
+.ref-tx a { color: var(--gold2); text-decoration: underline; text-decoration-color: var(--c2); text-underline-offset: 3px; overflow-wrap: anywhere; }
+.ref-tx a:hover { text-decoration-color: var(--gold2); }
+.ref-est { display: inline-block; margin-left: 4px; padding: 0 6px; border: 1px solid var(--line); font-family: var(--f-mono); font-size: 10px; line-height: 1.7; letter-spacing: .14em; text-transform: uppercase; color: var(--t3); white-space: nowrap; }
+.ref-est--preprint { border-style: dashed; border-color: var(--t3); color: var(--t2); }
+.refs-inf { margin-top: 14px; padding-left: 4px; scroll-margin-top: 24px; font-size: 14px; line-height: 1.6; color: var(--t3); }
+.refs-inf i { color: var(--t2); }
 /* ficha tecnica: <dl class="ficha"><div><dt>Telescopio</dt><dd>SCT 9.25"</dd></div>...</dl> */
 .ficha > div { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; padding: 11px 2px; border-bottom: 1px dotted var(--pt); }
 .ficha dt { font-size: 15px; color: var(--t3); }
@@ -507,6 +578,10 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .pasa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px clamp(36px, 4.4vw, 60px); align-items: center; padding-top: 30px; border-top: 1px dotted var(--pt); }
 .pasa-fin { justify-self: end; text-align: right; }
 .pasa-fin .fell { font-size: 17px; color: var(--t3); }
+/* la lamina «siguiente», espejada: miniatura a la derecha y rotulos alineados a ella (en movil vuelve a la izquierda) */
+.pasa-fin .lam--fila { grid-template-columns: minmax(0, 1fr) minmax(0, 196px); }
+.pasa-fin .lam--fila .lam-marco { grid-column: 2; }
+.pasa-fin .lam--fila .lam-meta { justify-content: flex-end; }
 /* caja con esquinas marcadas (panel de una herramienta, bloque destacado) */
 .panel { position: relative; padding: clamp(20px, 2.6vw, 32px); background: var(--s1); border: 1px solid var(--line); }
 .panel::before, .panel::after { content: ""; position: absolute; width: 9px; height: 9px; border: 1px solid var(--gold); opacity: .7; }
@@ -579,6 +654,8 @@ body.night-vision .cap-dot { box-shadow: none; }
   .heroe-velo { display: none; }
   .heroe-pie { order: 3; position: static; transform: none; align-self: center; padding: 6px var(--gx) 22px; }
   .duo { grid-template-columns: minmax(0, 1fr); gap: 64px; }
+  .det > .col, .det > .panel, .det > .refs { grid-column: 1; grid-row: auto; }
+  .det > .panel { position: relative; top: auto; }
   .bit--compacta { display: block; }
   .bit--compacta .bit-f { min-height: 78px; }
   .herr--ancha { grid-template-columns: minmax(0, 1fr); }
@@ -670,6 +747,13 @@ body.night-vision .cap-dot { box-shadow: none; }
   .chips-g { flex: 1 0 100%; margin: 4px 0 -4px; padding-left: 0; border-left: 0; min-height: 28px; }
   .pasa { grid-template-columns: minmax(0, 1fr); }
   .pasa-fin { justify-self: start; text-align: left; }
+  .pasa-fin .lam--fila { grid-template-columns: minmax(0, 118px) minmax(0, 1fr); }
+  .pasa-fin .lam--fila .lam-marco { grid-column: 1; }
+  .pasa-fin .lam--fila .lam-meta { justify-content: flex-start; }
+  .fases-l { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 10px; }
+  .fases-l .fell { font-size: 14px; }
+  .relato { font-size: 16.5px; }
+  .refs li { font-size: 14px; padding-left: 0; }
   /* registro */
   .reg-cab { padding: 0 4px 12px; }
   .bit--reg .bit-f { padding: 14px 4px; gap: 4px 14px; }
@@ -682,6 +766,10 @@ body.night-vision .cap-dot { box-shadow: none; }
 @media (max-width: 520px) {
   .cartela--larga .cartela-l { display: none; }
 }
+/* F4: cartelas de lamina mas largas (el subtitulo): > 40 caracteres, sin rotulo por debajo de 760 px; > 52, por
+   debajo de 960 px (medido: la del eclipse se salia de su columna entre 540 y 860 px) */
+@media (max-width: 760px) { .cartela--l40 .cartela-l { display: none; } }
+@media (max-width: 960px) { .cartela--l52 .cartela-l { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }

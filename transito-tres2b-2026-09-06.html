@@ -8,10 +8,12 @@
   <meta name="description" content="Curva de luz del tránsito del exoplaneta TrES-2 b, medida desde el observatorio AstroCamp.">
   <meta name="cabra:og-image" content="https://cabraspace.com/obs/tres2b-2026-09-06/curva.png">
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/transito-tres2b-2026-09-06.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/transito-tres2b-2026-09-06.html">
@@ -54,33 +56,92 @@
     </div>
     <div class="filete" aria-hidden="true"></div>
   </header>
-  <main class="a3 page">
-    <div class="grain" aria-hidden="true"></div>
-<nav aria-label="Ruta" style="padding: 36px var(--gx) 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap"><a class="lnk" href="observaciones.html" style="font-size: 14px">Observaciones</a><span class="bd" style="font-style: italic; color: var(--t3)">›</span><a class="lnk" href="observaciones.html#exoplanetas" style="font-size: 14px">Exoplanetas</a></nav>
-    <section style="position: relative; padding: 40px var(--gx) 48px; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Lám. V</span><span class="caps" style="color: var(--t2)">Curva de luz · una noche</span></div>
-      <h1 class="bd" style="font-size: clamp(42px, 5.8vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em">Tránsito de <em class="gi">TrES-2 b</em></h1>
-    </section>
-    <div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
-    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 56px var(--gx) 96px">
-      <div class="c8" style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/tres2b-2026-09-06/curva.png" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 520px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres2b-2026-09-06/curva.png" alt="Curva de luz del tránsito de TrES-2 b: el brillo de la estrella baja mientras el planeta pasa por delante" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 1</span><span class="bd">Flujo relativo frente al tiempo, con el modelo ajustado.</span></figcaption></figure>
-        <div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px"><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><div class="plate" style="height: 320px"><div class="plate-in"><video controls preload="none" playsinline poster="obs/tres2b-2026-09-06/poster.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000"><source src="obs/tres2b-2026-09-06/video.mp4" type="video/mp4"></video></div></div><figcaption class="cap"><span class="caps">Fig. 2</span><span class="bd">La noche entera en vídeo.</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/tres2b-2026-09-06/campo.jpg" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 320px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres2b-2026-09-06/campo.jpg" alt="Campo de estrellas con el objetivo y las estrellas de comparación marcadas" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 3</span><span class="bd">El campo: objetivo y estrellas de comparación.</span></figcaption></figure></div>
-        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 720px"><span class="caps" style="color: var(--t3)">Notas</span><div style="font-size: 18px; line-height: 1.75; color: var(--t2); display: flex; flex-direction: column; gap: 14px"><p><em class="gi">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p></div></div>
+  <main>
+
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      <nav class="ruta" aria-label="Ruta"><a class="miga" href="observaciones.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Observaciones</a><span aria-hidden="true">›</span><a class="miga" href="observaciones.html#exoplanetas">Exoplanetas</a></nav>
+      <p class="cartela cartela--larga">Lám. V<span class="cartela-l"> <i>·</i> Curva de luz · una noche</span></p>
+      <h1 class="tit-1">Tránsito de <em class="gi nb">TrES-2 b</em></h1>
+      <p class="entradilla">Curva de luz del tránsito del exoplaneta TrES-2 b, medida desde el observatorio AstroCamp.</p>
+    </div>
+  </div>
+</div>
+<div class="filete" aria-hidden="true"></div>
+<section class="sec">
+  <div class="wrap">
+    <figure class="lam-natural">
+      <a class="lam-marco" href="obs/tres2b-2026-09-06/curva.png" target="_blank" rel="noopener"><img class="encaja" src="obs/tres2b-2026-09-06/curva.png" alt="Curva de luz del tránsito de TrES-2 b: el brillo de la estrella baja mientras el planeta pasa por delante" width="1600" height="1161"></a>
+      <figcaption class="fig-pie"><b>Fig. 1.</b> Flujo relativo frente al tiempo, con el modelo ajustado.</figcaption>
+    </figure>
+    <div class="duo det">
+      <div class="col">
+        <div class="prosa relato">
+          <p>TrES-2 b fue el primer planeta en tránsito hallado en el campo de la futura misión Kepler: un júpiter caliente que da una vuelta en 2,47 días, con tránsitos de un 1,4 % de profundidad<sup class="cita"><a href="#ref-1" aria-label="Referencia 1">1</a></sup>. Cruza la estrella muy cerca de su borde; en 2007 era, entre los planetas cercanos, el de mayor parámetro de impacto<sup class="cita"><a href="#ref-2" aria-label="Referencia 2">2</a></sup>. En 2011 se le llamó «el exoplaneta más oscuro conocido»<sup class="cita"><a href="#ref-3" aria-label="Referencia 3">3</a></sup>. Según el análisis de los datos de Kepler, su albedo geométrico va de 0,014<sup class="cita"><a href="#ref-4" aria-label="Referencia 4">4</a></sup> a 0,025, y quedaría por debajo del 1 % si se descuenta su emisión térmica<sup class="cita"><a href="#ref-3" aria-label="Referencia 3">3</a></sup>. Su espectro con el Hubble no muestra rasgos<sup class="cita"><a href="#ref-5" aria-label="Referencia 5">5</a></sup>. Si su órbita decae sigue abierto: con tránsitos de aficionados (base ETD) se estimó un acortamiento del periodo de 12,6 ± 2,4 ms por año<sup class="cita"><a href="#ref-6" aria-label="Referencia 6">6</a></sup> y con TESS, de 5,58 ± 1,81 ms por año<sup class="cita"><a href="#ref-7" aria-label="Referencia 7">7</a></sup>, sin que ninguno se dé por concluyente; ExoClock IV (un preprint de 2025, aún sin revisión por pares) no lo incluye entre los planetas que se apartan de un periodo constante<sup class="cita"><a href="#ref-8" aria-label="Referencia 8">8</a></sup>.</p>
+          <p>Mi noche del 6 de septiembre empezó a mitad del tránsito: tengo la salida, no la entrada<sup class="cita"><a href="#ref-9" aria-label="Referencia 9">9</a>, <a class="cita-inf" href="#nota-inf" title="Inferencia, cuenta o comparación propia, no publicada">inf.</a></sup>. La hora central vale, +1,8 ± 6,2 min frente a la efeméride de ExoClock; la profundidad, no<sup class="cita"><a href="#ref-9" aria-label="Referencia 9">9</a>, <a href="#ref-10" aria-label="Referencia 10">10</a></sup>.</p>
+        </div>
+        <div class="prosa notas">
+          <span class="caps rotulo">Notas</span>
+          <p><em class="gi">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p>
+        </div>
+        <p class="nota"><span class="fell">Hecho con</span><span><b>Cabra<em class="gi">Transit</em></b> · Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.</span></p>
+        <figure class="fig">
+          <video class="video video--campo" controls preload="none" playsinline poster="obs/tres2b-2026-09-06/poster.jpg" width="1300" height="988" aria-label="Campo de estrellas con el objetivo y las estrellas de comparación marcadas"><source src="obs/tres2b-2026-09-06/video.mp4" type="video/mp4"></video>
+          <figcaption class="fig-pie"><b>Fig. 2.</b> El campo: objetivo y estrellas de comparación. Al reproducirlo, la noche entera en vídeo.</figcaption>
+        </figure>
       </div>
-      <aside class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 28px">
-        <div class="card" style="padding: 32px"><span class="caps" style="color: var(--gold); margin-bottom: 8px">Ficha técnica</span><div class="kv"><span>Planeta</span><span>TrES-2 b</span></div><div class="kv"><span>Noche</span><span>6 · IX · 2026</span></div><div class="kv"><span>Filtro</span><span>R</span></div><div class="kv"><span>Tomas</span><span>665 × 30 s</span></div><div class="kv"><span>Rp/R★ medido (orientativo)</span><span>0.1251 ± 0.0064 (estad.) ± 0.0125 (sist.)</span></div><div class="kv"><span>Rp/R★ publicado</span><span>0.1254 ± 0.0005 (Esteves et al. 2015)</span></div><div class="kv"><span>(Rp/R★)² (orientativo)</span><span>1.56 % (medida) vs 1.57 % (literatura)</span></div><div class="kv"><span>Duración prevista</span><span>109 min</span></div><div class="kv"><span>Centro del tránsito</span><span>21:57:31 UTC ± 6.2 min</span></div><div class="kv"><span>O−C</span><span>+1.8 min (ExoClock)</span></div><div class="kv"><span>Telescopio</span><span>Celestron C9.25</span></div><div class="kv"><span>Lugar</span><span>AstroCamp · 1600 m</span></div></div>
-        <div class="card gold" style="padding: 30px; gap: 12px"><span class="caps" style="color: var(--t3)">Hecho con</span><span class="bd" style="font-size: 30px; font-weight: 500">Cabra<em class="gi">Transit</em></span><span style="font-size: 15px; line-height: 1.6; color: var(--t2)">Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.</span></div>
-        
-      </aside>
-    </section>
-    <section style="display: flex; flex-direction: column; gap: 40px; margin: 0 var(--gb) 96px; padding: 72px var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
-      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 0 8px">
-        <h2 class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em">Más en <em class="gi">exoplanetas</em></h2>
-        <a class="lnk" href="observaciones.html#exoplanetas">Todas<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      <div class="panel">
+        <span class="caps">Ficha técnica</span>
+        <dl class="ficha">
+          <div><dt>Planeta</dt><dd>TrES-2 b</dd></div>
+          <div><dt>Noche</dt><dd>6 · IX · 2026</dd></div>
+          <div><dt>Filtro</dt><dd>R</dd></div>
+          <div><dt>Tomas</dt><dd>665 × 30 s</dd></div>
+          <div><dt>Rp/R★ medido (orientativo)</dt><dd>0.1251 ± 0.0064 (estad.) ± 0.0125 (sist.)</dd></div>
+          <div><dt>Rp/R★ publicado</dt><dd>0.1254 ± 0.0005 (Esteves et al. 2015)</dd></div>
+          <div><dt>(Rp/R★)² (orientativo)</dt><dd>1.56 % (medida) vs 1.57 % (literatura)</dd></div>
+          <div><dt>Duración prevista</dt><dd>109 min</dd></div>
+          <div><dt>Centro del tránsito</dt><dd>21:57:31 UTC ± 6.2 min</dd></div>
+          <div><dt>O−C</dt><dd>+1.8 min (ExoClock)</dd></div>
+          <div><dt>Telescopio</dt><dd>Celestron C9.25</dd></div>
+          <div><dt>Lugar</dt><dd>AstroCamp · 1600 m</dd></div>
+        </dl>
       </div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px"><a href="transito-qatar1b-2026-09-22.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Tránsito de Qatar-1 b" loading="lazy"></div></div><div class="cap"><span class="caps">Lám. X</span><span class="bd">Exoplanetas · 22 · IX</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Tránsito de Qatar-1 b</span></a><a href="transito-wasp52b-2026.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp52b-2026/curva.png" alt="Tránsito de WASP-52 b" loading="lazy"></div></div><div class="cap"><span class="caps">Lám. IX</span><span class="bd">Exoplanetas · 21 · IX</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Tránsito de WASP-52 b <span class="tg" style="vertical-align: middle; margin-left: 6px">parcial</span></span></a><a href="transito-tres3b-2026.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres3b-2026/curva.png" alt="Tránsito de TrES-3 b" loading="lazy"></div></div><div class="cap"><span class="caps">Lám. VIII</span><span class="bd">Exoplanetas · 15 · IX</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Tránsito de TrES-3 b</span></a></div>
-    </section>
+      <section class="refs" aria-labelledby="t-refs">
+        <h2 class="caps rotulo" id="t-refs">Referencias</h2>
+        <ol>
+          <li id="ref-1"><span class="ref-n">1</span><span class="ref-tx">O&#x27;Donovan, F. T. et al. (2006). «TrES-2: The First Transiting Planet in the Kepler Field». <i>ApJ 651, L61</i>. <a href="https://arxiv.org/abs/astro-ph/0609335" target="_blank" rel="noopener noreferrer">arXiv:astro-ph/0609335</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-2"><span class="ref-n">2</span><span class="ref-tx">Holman, M. J. et al. (2007). «The Transit Light Curve Project. VI. Three Transits of the Exoplanet TrES-2». <i>ApJ 664, 1185</i>. <a href="https://arxiv.org/abs/0704.2907" target="_blank" rel="noopener noreferrer">arXiv:0704.2907</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-3"><span class="ref-n">3</span><span class="ref-tx">Kipping, D. M. &amp; Spiegel, D. S. (2011). «Detection of visible light from the darkest world». <i>MNRAS 417, L88</i>. <a href="https://arxiv.org/abs/1108.2297" target="_blank" rel="noopener noreferrer">arXiv:1108.2297</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-4"><span class="ref-n">4</span><span class="ref-tx">Barclay, T. et al. (2012). «Photometrically derived masses and radii of the planet and star in the TrES-2 system». <i>ApJ 761, 53</i>. <a href="https://arxiv.org/abs/1210.4592" target="_blank" rel="noopener noreferrer">arXiv:1210.4592</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-5"><span class="ref-n">5</span><span class="ref-tx">Ranjan, S. et al. (2014). «Atmospheric Characterization of 5 Hot Jupiters with Wide Field Camera 3 on the Hubble Space Telescope». <i>ApJ 785, 148</i>. <a href="https://arxiv.org/abs/1403.1266" target="_blank" rel="noopener noreferrer">arXiv:1403.1266</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-6"><span class="ref-n">6</span><span class="ref-tx">Hagey, S. R., Edwards, B. &amp; Boley, A. C. (2022). «Evidence of Long-Term Period Variations in the Exoplanet Transit Database (ETD)». <i>AJ 164</i>. <a href="https://arxiv.org/abs/2209.10752" target="_blank" rel="noopener noreferrer">arXiv:2209.10752</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-7"><span class="ref-n">7</span><span class="ref-tx">Biswas, S. et al. (2024). «Probing the Possible Causes of the Transit Timing Variation for TrES-2b in the TESS Era». <i>AJ 168, 176</i>. <a href="https://arxiv.org/abs/2409.12069" target="_blank" rel="noopener noreferrer">arXiv:2409.12069</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-8"><span class="ref-n">8</span><span class="ref-tx">Kokori, A. et al. (2025). «ExoClock Project IV: A homogeneous catalogue of 620 updated exoplanet ephemerides». <a href="https://arxiv.org/abs/2511.14407" target="_blank" rel="noopener noreferrer">arXiv:2511.14407</a> <span class="ref-est ref-est--preprint">Preprint, sin revisión por pares</span></span></li>
+          <li id="ref-9"><span class="ref-n">9</span><span class="ref-tx">Datos propios: esta lámina.</span></li>
+          <li id="ref-10"><span class="ref-n">10</span><span class="ref-tx">ExoClock, base de datos de planetas: TrES-2 b, T0 = 2455714,2416097 BJD_TDB y P = 2,470613387 d. <a href="https://www.exoclock.space/database/planets_json" target="_blank" rel="noopener noreferrer">exoclock.space</a> <span class="ref-est">Base de datos</span></span></li>
+        </ol>
+        <p class="refs-inf" id="nota-inf"><i>inf.</i> marca una inferencia, una cuenta o una comparación propias, no publicadas.</p>
+      </section>
+    </div>
+  </div>
+</section>
+<section class="sec sec--pegada">
+  <div class="wrap">
+    <nav class="pasa" aria-label="Láminas vecinas">
+      <div>
+        <span class="caps rotulo">Lámina anterior</span>
+        <a class="lam lam--fila" href="transito-wasp59b-2026-09-03.html"><span class="lam-marco"><img class="encaja" src="obs/wasp59b-2026-09-03/curva-m.webp" alt="Curva de luz del tránsito de WASP-59 b: el brillo de la estrella baja mientras el planeta pasa por delante" loading="lazy"></span><span class="lam-meta"><span class="caps">Lám. IV</span><span class="fell">Exoplanetas · 3 · IX</span><span class="etq etq--pt">parcial</span></span><span class="lam-t">Tránsito de <span class="nb">WASP-59 b</span></span></a>
+      </div>
+      <div class="pasa-fin">
+        <span class="caps rotulo">Lámina siguiente</span>
+        <a class="lam lam--fila" href="transito-wasp52b-2026-09-07.html"><span class="lam-marco"><img class="encaja" src="obs/wasp52b-2026-09-07/curva-m.webp" alt="Curva de luz del tránsito de WASP-52 b: el brillo de la estrella baja mientras el planeta pasa por delante" loading="lazy"></span><span class="lam-meta"><span class="caps">Lám. VI</span><span class="fell">Exoplanetas · 7 · IX</span><span class="etq etq--pt">parcial</span></span><span class="lam-t">Tránsito de <span class="nb">WASP-52 b</span></span></a>
+      </div>
+    </nav>
+  </div>
+</section>
+
   </main>
   <footer class="pie">
     <div class="filete" aria-hidden="true"></div>

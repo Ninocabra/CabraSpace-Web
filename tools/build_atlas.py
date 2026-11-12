@@ -15,19 +15,25 @@ Después ejecuta SIEMPRE, en este orden y desde la raíz del repo:
 Para añadir una observación: añade su entrada en obs/observaciones.json (y sus ficheros en
 obs/<slug>/) y vuelve a ejecutar los tres comandos.
 
-Dos interiores conviven (migración Atlas II, ver propuestas-estetica/PLAN-MIGRACION.md):
-  - Atlas II (F3, 12-11-2026): portada, Observaciones, Herramientas, Programas y Bitácora. Marcado del
-    prototipo aprobado (propuestas-estetica/v2/) con clases de atlas/atlas2.css, sin style="" salvo las letras
-    de llamada de la lámina. page(..., interior="a2"): cargan atlas2.css y NO index.css ni atlas.css.
-  - Atlas I: las fichas de cada observación (build_obs_page, F4 las migrará). page(..., interior="a1"),
-    salida idéntica a la de antes de F3.
+Interior Atlas II en TODAS las páginas que genera (migración, ver propuestas-estetica/PLAN-MIGRACION.md): marcado del
+prototipo aprobado (propuestas-estetica/v2/) con clases de atlas/atlas2.css, sin style="" salvo las letras de llamada
+de la lámina del techo. page(): cargan atlas2.css y NO index.css ni atlas.css.
+  - F3 (12-11-2026): portada, Observaciones, Herramientas, Programas y Bitácora.
+  - F4 (12-11-2026): las láminas de cada observación (build_obs_page), con el diseño de v2/transito-qatar1b.html,
+    las variantes de cielo profundo y eclipse, y su relato con referencias (campo `story` de observaciones.json,
+    que sale de propuestas-estetica/d4-investigacion/RELATOS.md; fidelidad: tools/check_relatos.py). Una
+    observación sin `story` se pinta igual, sin hueco.
+Las rejillas usan la miniatura ligera <curva>-m.webp si existe (la escribe tools/miniaturas.py); si no, el original.
 La carta animada de la portada sale de tools/atlas2/carta_capricornio.py (figure_for_page) y la mueve
 atlas/capricornus2.js; la lámina del techo corredizo, de tools/atlas2/d3/ (letras en llamadas.json).
 """
 import html
 import json
 import os
+import re
+import struct
 import sys
+import urllib.parse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -100,7 +106,11 @@ def cartela(num, label=""):
     «Tabula II · Photography and measurements»), so it gets .cartela--larga and atlas2.css hides the label there."""
     if not label:
         return f'<p class="cartela">{num}</p>'
-    long_ = " cartela--larga" if len(f"{num} · {label}") > 32 else ""
+    # F4: plate cartelas are longer (the subtitle): measured, «Lám. III · Eclipse total · 12 · VIII · 2026 · Mirador del
+    # Cabrero» overflowed its column from 540 to 860 px. Two more steps: > 40 characters, label hidden below 760 px;
+    # > 52, below 960 px (atlas2.css §17). The F3 cartelas (<= 40) do not change.
+    n = len(f"{num} · {label}")
+    long_ = (" cartela--larga" if n > 32 else "") + (" cartela--l40" if n > 40 else "") + (" cartela--l52" if n > 52 else "")
     return f'<p class="cartela{long_}">{num}<span class="cartela-l"> <i>·</i> {label}</span></p>'
 
 
@@ -174,17 +184,15 @@ def roman(n):
 
 
 # ---------------------------------------------------------------- page shell
-def page(lang, base, title, desc, body, og_image=None, extra_head="", extra_js="", interior="a1"):
-    """Page shell. interior="a1": Atlas I (index.css + atlas.css, <main class="a3 page">), as before F3.
-    interior="a2": Atlas II (web fonts + atlas/atlas2.css; sync_nav.py puts atlas2-marco.css before it and adds
-    no atlas.css), plain <main>. The marco (sheet, header, footer) is sync_nav.py's in both."""
+def page(lang, base, title, desc, body, og_image=None, extra_head="", extra_js="", interior="a2"):
+    """Page shell, Atlas II interior: web fonts + atlas/atlas2.css (sync_nav.py puts atlas2-marco.css before it and
+    adds no atlas.css), plain <main>. The marco (sheet, header, footer) is sync_nav.py's. Since F4 every generated page
+    is "a2"; the Atlas I branch (index.css + atlas.css, <main class="a3 page">) was removed with its last user."""
+    if interior != "a2":
+        raise ValueError("build_atlas.py only writes Atlas II pages since F4")
     og = f'\n  <meta name="cabra:og-image" content="{SITE}/{og_image}">' if og_image else ""
-    if interior == "a2":
-        sheets = A2_FONTS + '\n  <link rel="stylesheet" href="atlas/atlas2.css">'
-        main_open = "  <main>"
-    else:
-        sheets = '\n  <link rel="stylesheet" href="index.css?v=1.4">\n  <link rel="stylesheet" href="atlas/atlas.css">'
-        main_open = '  <main class="a3 page">\n    <div class="grain" aria-hidden="true"></div>'
+    sheets = A2_FONTS + '\n  <link rel="stylesheet" href="atlas/atlas2.css">'
+    main_open = "  <main>"
     return f"""<!DOCTYPE html>
 <html lang="{lang}">
 <head>
@@ -210,15 +218,69 @@ def page(lang, base, title, desc, body, og_image=None, extra_head="", extra_js="
 """
 
 
-def plate_img(src, alt, height, fit=False, extra=""):
-    cls = "zoom fitc" if fit else "zoom"
-    bg = ' style="background: #1b140e"' if fit else ""
-    return (f'<div class="plate" style="height: {height}px"><div class="plate-in"{bg}>'
-            f'<img class="{cls}" src="{src}" alt="{esc(alt)}" loading="lazy">{extra}</div></div>')
+# ---------------------------------------------------------------- media sizes (stdlib: width/height attributes)
+def img_size(rel):
+    """(width, height) of a local PNG or JPEG read from its header, or None. Stdlib only (no Pillow here)."""
+    try:
+        with open(os.path.join(ROOT, rel), "rb") as f:
+            head = f.read(24)
+            if head[:8] == b"\x89PNG\r\n\x1a\n":
+                return struct.unpack(">II", head[16:24])
+            if head[:2] != b"\xff\xd8":
+                return None
+            f.seek(2)
+            while True:
+                b = f.read(1)
+                while b and b != b"\xff":
+                    b = f.read(1)
+                while b == b"\xff":
+                    b = f.read(1)
+                if not b:
+                    return None
+                marker = b[0]
+                if marker == 0x01 or 0xD0 <= marker <= 0xD8:
+                    continue
+                seg = struct.unpack(">H", f.read(2))[0]
+                if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):   # SOFn: precision, height, width
+                    f.read(1)
+                    h, w = struct.unpack(">HH", f.read(4))
+                    return w, h
+                f.seek(seg - 2, 1)
+    except (OSError, struct.error):
+        return None
 
 
-def plate_ph(text, height):
-    return f'<div class="plate" style="height: {height}px"><div class="plate-in"><div class="ph">{text}</div></div></div>'
+def mp4_size(rel):
+    """(width, height) of a local MP4's first video track (its tkhd box), or None."""
+    try:
+        data = open(os.path.join(ROOT, rel), "rb").read()
+    except OSError:
+        return None
+    i = data.find(b"tkhd")
+    while i > 3:
+        size = struct.unpack(">I", data[i - 4:i])[0]
+        w, h = struct.unpack(">II", data[i - 4 + size - 8:i - 4 + size])
+        if w and h:
+            return w >> 16, h >> 16
+        i = data.find(b"tkhd", i + 4)
+    return None
+
+
+def wh(size):
+    return f' width="{size[0]}" height="{size[1]}"' if size else ""
+
+
+def same_file(a, b):
+    """True if two local files have the same bytes (a video poster that IS the field image)."""
+    pa, pb = os.path.join(ROOT, a), os.path.join(ROOT, b)
+    try:
+        if a == b:
+            return True
+        if os.path.getsize(pa) != os.path.getsize(pb):
+            return False
+        return open(pa, "rb").read() == open(pb, "rb").read()
+    except OSError:
+        return False
 
 
 # ---------------------------------------------------------------- observations
@@ -226,9 +288,11 @@ def load_obs():
     p = os.path.join(ROOT, "obs", "observaciones.json")
     data = json.load(open(p, encoding="utf-8"))
     data.sort(key=lambda o: o.get("date_iso") or "", reverse=True)
-    # plate numbers (Lám. I, II…) in chronological order, stable over time
+    # plate numbers (Lám. I, II…) in chronological order, stable over time; _n is the same number, for the
+    # previous / next links of each plate
     for i, o in enumerate(sorted(data, key=lambda o: o.get("date_iso") or "")):
         o["_lam"] = roman(i + 1)
+        o["_n"] = i + 1
     return data
 
 
@@ -246,18 +310,16 @@ def obs_thumb(o):
     return o.get("thumb")
 
 
-def obs_card(o, lang, height=300):
-    lam = T(f"Lám. {o['_lam']}", f"Pl. {o['_lam']}")(lang)
-    kind = tr(KIND[o["kind"]], lang)
-    thumb = obs_thumb(o)
-    fit = o["kind"] == "transit"
-    media = plate_img(thumb, obs_title(o, lang), height, fit=fit) if thumb else plate_ph(esc(obs_title(o, lang)), height)
-    return (f'<a href="{fname(obs_page(o), lang)}" class="zbox obs-card" data-fam="{FAMILY[o["kind"]]}" data-kind="{o["kind"]}" '
-            f'style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)">{media}'
-            f'<div class="cap"><span class="caps">{lam}</span><span class="bd">{kind} · {short_date(o.get("date_iso"), lang)}</span></div>'
-            f'<span class="bd" style="font-size: 27px; line-height: 1.15">{obs_title(o, lang)}'
-            + (f' <span class="tg" style="vertical-align: middle; margin-left: 6px">{T("parcial", "partial")(lang)}</span>' if o.get("status") == "parcial" else "")
-            + '</span></a>')
+def thumb_src(o):
+    """What the grids show: the light copy <thumb>-m.webp next to the thumbnail if tools/miniaturas.py wrote one (the
+    transit curves: 800 px WebP of ~70 KB instead of the 1600 px PNG of ~700 KB), else the thumbnail itself. The plate
+    keeps the original."""
+    t = obs_thumb(o)
+    if t:
+        small = os.path.splitext(t)[0] + "-m.webp"
+        if os.path.isfile(os.path.join(ROOT, small)):
+            return small
+    return t
 
 
 # ---------------------------------------------------------------- Atlas II index pages (F3, 12-11-2026)
@@ -295,7 +357,7 @@ def lam_meta(o, lang, year=False):
 
 def lam_card(o, lang, cls="lam", kind_attr=True):
     """<a class="lam"> plate card (atlas2.css §10). data-kind lets the Observations filters hide it."""
-    thumb = obs_thumb(o)
+    thumb = thumb_src(o)
     enc = ' class="encaja"' if o["kind"] == "transit" else ""
     img = f'<img{enc} src="{thumb}" alt="{esc(thumb_alt(o, lang))}" loading="lazy">' if thumb else ""
     da = f' data-kind="{o["kind"]}"' if kind_attr else ""
@@ -816,103 +878,276 @@ def build_bitacora(lang):
                 body, extra_js=js, interior="a2")
 
 
-# ---------------------------------------------------------------- per-observation pages
-def breadcrumb(lang, items):
-    parts = []
-    for i, (href, label) in enumerate(items):
-        if i:
-            parts.append('<span class="bd" style="font-style: italic; color: var(--t3)">›</span>')
-        parts.append(f'<a class="lnk" href="{href}" style="font-size: 14px">{label}</a>' if href else f'<span style="font-size: 14px; color: var(--t3)">{label}</span>')
-    return f'<nav aria-label="{T("Ruta", "Breadcrumb")(lang)}" style="padding: 36px var(--gx) 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap">{"".join(parts)}</nav>'
+# ---------------------------------------------------------------- per-observation pages (F4, 12-11-2026)
+# Diseño de la lámina de Qatar-1 b del prototipo aprobado (propuestas-estetica/v2/transito-qatar1b.html): miga de dos
+# pasos, cartela «Lám. N · subtítulo», título, entradilla; la figura principal grande a su proporción natural (abre el
+# original); debajo, el texto (relato, notas, «Hecho con», figuras secundarias) a la izquierda y la ficha técnica a la
+# derecha, las referencias bajo el texto; al final, el paso a la lámina anterior y siguiente (por número de lámina).
+# Variantes: cielo profundo (la fotografía protagonista, .lam-natural--foto, abre la versión completa) y eclipse
+# (además, la serie de fases). La imagen científica manda: sin grabado.
+STATUS = {"publicado": T("Publicado", "Published"),
+          "preprint": T("Preprint, sin revisión por pares", "Preprint, not peer reviewed"),
+          "base de datos": T("Base de datos", "Database"),
+          "nota de prensa": T("Nota de prensa", "Press release"),
+          "datos propios": T("Datos propios", "Own data")}
+CALL_RE = re.compile(r"\s*\[((?:\d+|inf\.)(?:,\s*(?:\d+|inf\.))*)\]")     # [1] · [8, 9] · [9, inf.] · [inf.] of RELATOS.md
+INF_TITLE = T("Inferencia, cuenta o comparación propia, no publicada", "Our own inference, calculation or comparison, not published")
+INF_NOTE = T("marca una inferencia, una cuenta o una comparación propias, no publicadas.",
+             "marks our own inference, calculation or comparison, not published.")
 
 
-def kv_rows(rows):
-    return "".join(f'<div class="kv"><span>{esc(k)}</span><span>{v}</span></div>' for k, v in rows if v)
+def story_calls(paragraphs):
+    return [[x.strip() for x in m.group(1).split(",")] for p in paragraphs for m in CALL_RE.finditer(p)]
 
 
-def neighbours(o, obs, lang):
-    same = [x for x in obs if x["kind"] == o["kind"] and x is not o]
-    return "".join(obs_card(x, lang, 200) for x in same[:3])
+def story_para(text, lang, links):
+    """One paragraph of the plate's story: escaped text, its calls [n] as linked superscripts and, if the story says so,
+    a phrase turned into a link to another plate (Lám. VI -> «Lám. IX»)."""
+    def call(m):
+        parts = []
+        for x in (x.strip() for x in m.group(1).split(",")):
+            if x == "inf.":
+                parts.append(f'<a class="cita-inf" href="#nota-inf" title="{INF_TITLE(lang)}">inf.</a>')
+            else:
+                parts.append(f'<a href="#ref-{x}" aria-label="{T("Referencia", "Reference")(lang)} {x}">{x}</a>')
+        return '<sup class="cita">' + ", ".join(parts) + "</sup>"
+    s = CALL_RE.sub(call, esc(text))
+    for phrase, href in links:
+        s = s.replace(esc(phrase), f'<a href="{href}">{esc(phrase)}</a>', 1)
+    return f"<p>{s}</p>"
+
+
+def story_links(o, obs, lang):
+    """story.links {lang: {phrase: slug}} -> [(phrase, page)]; warns if the phrase names another plate number."""
+    out = []
+    for phrase, slug in ((o.get("story") or {}).get("links") or {}).get(lang, {}).items():
+        target = next((x for x in obs if x["slug"] == slug), None)
+        if not target:
+            print(f"  AVISO {o['slug']}: el relato enlaza a '{slug}', que no existe", file=sys.stderr)
+            continue
+        if not phrase.endswith(" " + target["_lam"]):
+            print(f"  AVISO {o['slug']}: «{phrase}» enlaza a la lámina {target['_lam']}", file=sys.stderr)
+        out.append((phrase, fname(obs_page(target), lang)))
+    return out
+
+
+def link_label(url, several=False):
+    """Visible text of a reference link: arXiv:id, doi:…, else the site (or the file name when one entry has several)."""
+    m = re.match(r"https?://arxiv\.org/abs/(.+)$", url)
+    if m:
+        return "arXiv:" + m.group(1)
+    m = re.match(r"https?://(?:dx\.)?doi\.org/(.+)$", url)
+    if m:
+        return "doi:" + m.group(1)
+    u = urllib.parse.urlsplit(url)
+    if several:
+        return u.path.rstrip("/").rsplit("/", 1)[-1]
+    return re.sub(r"^www\.", "", u.netloc)
+
+
+def ref_item(r, lang):
+    v = lambda x: x.get(lang) or x.get("es") if isinstance(x, dict) else x
+    if r.get("own"):
+        body = T("Datos propios: esta lámina.", "Own data: this plate.")(lang)
+    else:
+        urls = r.get("url") or []
+        urls = [urls] if isinstance(urls, str) else urls
+        if "text" in r:
+            body = esc(v(r["text"]))
+        else:
+            q = ("«", "»") if lang == "es" else ("“", "”")
+            body = f'{esc(r.get("authors", ""))} ({esc(r.get("year", ""))}). {q[0]}{esc(r.get("title", ""))}{q[1]}.'
+            venue = v(r.get("venue") or "")
+            if venue and not (urls and venue == link_label(urls[0])):     # a preprint's venue IS its arXiv link
+                body += f' <i>{esc(venue)}</i>.'
+            if r.get("note"):
+                body += " " + esc(v(r["note"]))
+        body += "".join(f' <a href="{esc(u)}" target="_blank" rel="noopener noreferrer">{esc(link_label(u, len(urls) > 1))}</a>'
+                        for u in urls)
+        st = STATUS.get(r.get("status"))
+        if st:
+            label = st(lang) + (f' ({esc(v(r["status_note"]))})' if r.get("status_note") else "")
+            mod = " ref-est--preprint" if r["status"] == "preprint" else ""
+            body += f' <span class="ref-est{mod}">{label}</span>'
+    return f'<li id="ref-{r["n"]}"><span class="ref-n">{r["n"]}</span><span class="ref-tx">{body}</span></li>'
+
+
+def refs_block(story, lang):
+    refs = story.get("refs") or []
+    if not refs:
+        return ""
+    items = "\n          ".join(ref_item(r, lang) for r in refs)
+    has_inf = any("inf." in c for c in story_calls(story.get(lang) or story.get("es") or []))
+    inf = f'\n        <p class="refs-inf" id="nota-inf"><i>inf.</i> {INF_NOTE(lang)}</p>' if has_inf else ""
+    return (f'<section class="refs" aria-labelledby="t-refs">\n        <h2 class="caps rotulo" id="t-refs">{T("Referencias", "References")(lang)}</h2>\n'
+            f'        <ol>\n          {items}\n        </ol>{inf}\n      </section>')
+
+
+VIDEO_BOX = [(1300 / 988, " video--campo"), (16 / 9, " video--16x9")]     # box ratios atlas2.css knows (§10, .video)
+
+
+def fig_pie(n, cap):
+    return f'<figcaption class="fig-pie"><b>Fig. {n}.</b> {cap}</figcaption>' if cap else ""
+
+
+def lower_first(s):
+    return s[:1].lower() + s[1:] if s else s
+
+
+def plate_figures(o, lang):
+    """(main figure, secondary figures) of a plate. A video whose poster is the same file as an image of the plate (the
+    transit field) absorbs that image: one figure, as in the prototype («Al reproducirlo, …»)."""
+    title = obs_title(o, lang)
+    media = list(o.get("media", []))
+    merged = {}                                    # video index -> image it absorbs
+    for i, m in enumerate(media):
+        if m["type"] == "video" and m.get("poster"):
+            j = next((j for j, x in enumerate(media) if x["type"] != "video" and j not in merged.values() and j != 0
+                      and same_file(x["src"], m["poster"])), None)
+            if j is not None:
+                merged[i] = j
+    shown = [i for i in range(len(media)) if i not in merged.values()]
+    main, rest = "", []
+    for n, i in enumerate(shown, 1):
+        m = media[i]
+        cap = (m.get("caption") or {}).get(lang) or ""
+        alt = esc((m.get("alt") or {}).get(lang) or title)
+        if m["type"] == "video":
+            img = media[merged[i]] if i in merged else None
+            if img:
+                icap = (img.get("caption") or {}).get(lang) or ""
+                cap = (icap + " " + T("Al reproducirlo, ", "Play it for ")(lang) + lower_first(cap)).strip() if cap else icap
+            size = img_size(m["poster"]) if img else (mp4_size(m["src"]) or img_size(m.get("poster", "")))
+            label = f' aria-label="{esc((img.get("alt") or {}).get(lang) or title)}"' if img else ""
+            # width/height only hold until the poster and then the video load (ratio «auto»): pin the box with a class
+            ratio = size[0] / size[1] if size else 0
+            mod = next((c for r, c in VIDEO_BOX if abs(ratio - r) < 0.01), "")
+            fig = (f'<figure class="fig">\n          <video class="video{mod}" controls preload="none" playsinline poster="{m.get("poster", "")}"{wh(size)}{label}>'
+                   f'<source src="{m["src"]}" type="video/mp4"></video>\n          {fig_pie(n, cap)}\n        </figure>')
+        else:
+            plot = m["type"] == "plot" or m.get("fit")
+            enc = ' class="encaja"' if plot else ""
+            lazy = "" if n == 1 else ' loading="lazy"'
+            cls = "lam-natural" if (plot or n > 1) else "lam-natural lam-natural--foto"
+            if n > 1:
+                cls = "fig " + cls
+            fig = (f'<figure class="{cls}">\n      <a class="lam-marco" href="{m.get("full", m["src"])}" target="_blank" rel="noopener">'
+                   f'<img{enc} src="{m["src"]}" alt="{alt}"{wh(img_size(m["src"]))}{lazy}></a>\n      {fig_pie(n, cap)}\n    </figure>')
+        if n == 1:
+            main = fig
+        else:
+            rest.append(fig)
+    return main, rest
+
+
+def phases_block(o, lang):
+    ph = o.get("phases") or []
+    if not ph:
+        return ""
+    items = "\n        ".join(
+        f'<li><a href="{p["src"]}" target="_blank" rel="noopener"><img src="{p["src"]}" alt="{T("El Sol a las", "The Sun at")(lang)} {p["time"]} UTC"'
+        f'{wh(img_size(p["src"]))} loading="lazy"><span class="fell">{esc((p.get("label") or {}).get(lang, p["time"]))}</span></a></li>' for p in ph)
+    return (f'<div class="panel fases">\n      <span class="caps rotulo">{T("Las fases · hora UTC", "The phases · UTC time")(lang)}</span>\n'
+            f'      <ol class="fases-l">\n        {items}\n      </ol>\n    </div>')
+
+
+def pasa_block(o, obs, lang):
+    """Previous / next plate by plate number (computed from the data, so a new observation slots in by itself)."""
+    order = sorted(obs, key=lambda x: x["_n"])
+    i = order.index(o)
+    prev = order[i - 1] if i > 0 else None
+    nxt = order[i + 1] if i + 1 < len(order) else None
+    lam = o["_lam"]
+    card = lambda x: lam_card(x, lang, "lam lam--fila", kind_attr=False)
+    left = (f'<div>\n        <span class="caps rotulo">{T("Lámina anterior", "Previous plate")(lang)}</span>\n        '
+            + (card(prev) if prev else f'<span class="fell">{T(f"La lámina {lam} es la primera del cuaderno.", f"Plate {lam} is the first in the notebook.")(lang)}</span>')
+            + '\n      </div>')
+    right = (f'<div class="pasa-fin">\n        <span class="caps rotulo">{T("Lámina siguiente", "Next plate")(lang)}</span>\n        '
+             + (card(nxt) if nxt else f'<span class="fell">{T(f"La lámina {lam} es la más reciente del cuaderno.", f"Plate {lam} is the most recent in the notebook.")(lang)}</span>')
+             + '\n      </div>')
+    return f'<nav class="pasa" aria-label="{T("Láminas vecinas", "Neighbouring plates")(lang)}">\n      {left}\n      {right}\n    </nav>'
+
+
+def title_h1(o, lang):
+    """title_html, with the planet's designation kept on one line (prototype: <em class="gi nb">Qatar-1 b</em>)."""
+    th = (o.get("title_html") or {}).get(lang) or esc(obs_title(o, lang))
+    obj = esc(o.get("object") or "")
+    if obj:
+        th = th.replace(f'<em class="gi">{obj}</em>', f'<em class="gi nb">{obj}</em>', 1)
+    return th
 
 
 def build_obs_page(o, obs, lang):
     title = obs_title(o, lang)
     lam = T(f"Lám. {o['_lam']}", f"Pl. {o['_lam']}")(lang)
-    notes = (o.get("notes") or {}).get(lang) or (o.get("notes") or {}).get("es") or ""
-    facts = o.get("facts_display", {}).get(lang) or o.get("facts_display", {}).get("es") or []
-    media = o.get("media", [])  # list of {type: image|video|plot, src, alt{es,en}, caption{es,en}, poster}
-    blocks = []
-    for i, m in enumerate(media):
-        alt = (m.get("alt") or {}).get(lang) or title
-        cap = (m.get("caption") or {}).get(lang) or ""
-        h = m.get("height", 470 if i == 0 else 300)
-        if m["type"] == "video":
-            inner = (f'<video controls preload="none" playsinline poster="{m.get("poster", "")}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000">'
-                     f'<source src="{m["src"]}" type="video/mp4"></video>')
-            fig = f'<div class="plate" style="height: {h}px"><div class="plate-in">{inner}</div></div>'
-        else:
-            fit = m["type"] == "plot" or m.get("fit")
-            fig = (f'<a href="{m.get("full", m["src"])}" target="_blank" rel="noopener" class="zbox" style="display: block">'
-                   + plate_img(m["src"], alt, h, fit=fit) + "</a>")
-        blocks.append(f'<figure style="margin: 0; display: flex; flex-direction: column; gap: 14px">{fig}'
-                      + (f'<figcaption class="cap"><span class="caps">Fig. {i + 1}</span><span class="bd">{cap}</span></figcaption>' if cap else "") + '</figure>')
-    main_col = blocks[0] if blocks else ""
-    if o.get("phases"):
-        discs = "".join(
-            f'<a href="{ph["src"]}" target="_blank" rel="noopener" style="display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--t3)">'
-            f'<img src="{ph["src"]}" alt="{T("El Sol a las", "The Sun at")(lang)} {ph["time"]} UTC" loading="lazy" '
-            f'style="width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 50%; object-fit: cover; border: 1px solid var(--line)">'
-            f'<span class="bd" style="font-style: italic; font-size: 14px; text-align: center">{(ph.get("label") or {}).get(lang, ph["time"])}</span></a>' for ph in o["phases"])
-        main_col += (f'<div style="display: flex; flex-direction: column; gap: 18px; padding: 28px; border-radius: 22px; background: var(--s1); border: 1px solid var(--line)">'
-                     f'<span class="caps" style="color: var(--t2)">{T("Las fases · hora UTC", "The phases · UTC time")(lang)}</span>'
-                     f'<div class="phases" style="display: grid; grid-template-columns: repeat({min(7, len(o["phases"]))}, minmax(0, 1fr)); gap: 18px 12px">{discs}</div></div>')
-    more_media = ""
-    if len(blocks) > 1:
-        more_media = f'<div class="g2" style="display: grid; grid-template-columns: repeat({min(2, len(blocks) - 1)}, minmax(0, 1fr)); gap: 28px">{"".join(blocks[1:])}</div>'  # a lone second figure takes the full width
-    tool = o.get("made_with")
-    tool_card = ""
-    if tool:
-        tool_card = (f'<div class="card gold" style="padding: 30px; gap: 12px"><span class="caps" style="color: var(--t3)">{T("Hecho con", "Made with")(lang)}</span>'
-                     f'<span class="bd" style="font-size: 30px; font-weight: 500">{tool["name"]}</span>'
-                     f'<span style="font-size: 15px; line-height: 1.6; color: var(--t2)">{(tool.get("desc") or {}).get(lang, "")}</span></div>')
-    downloads = "".join(
-        f'<a class="row" href="{d["src"]}" download style="grid-template-columns: minmax(0, 1fr) auto"><span class="rt" style="font-size: 15.5px">{d["label"][lang]}</span><span class="bd rd" style="font-style: italic">{d["fmt"]} ↓</span></a>'
-        for d in o.get("downloads", []))
     kind_label = tr(KIND[o["kind"]], lang)
-    crumbs = [(fname("observaciones.html", lang), T("Observaciones", "Observations")(lang)),
-              (fname("observaciones.html", lang) + "#" + ANCHOR[o["kind"]], kind_label)]
-    related = neighbours(o, obs, lang)
-    body = breadcrumb(lang, crumbs)
-    body += f"""
-    <section style="position: relative; padding: 40px var(--gx) 48px; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">{lam}</span><span class="caps" style="color: var(--t2)">{esc(o.get("subtitle", {}).get(lang, kind_label))}</span></div>
-      <h1 class="bd" style="font-size: clamp(42px, 5.8vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em">{o.get("title_html", {}).get(lang, esc(title))}</h1>
-    </section>
-    <div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
-    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 56px var(--gx) 96px">
-      <div class="c8" style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px">
-        {main_col}
-        {more_media}
-        {f'<div style="display: flex; flex-direction: column; gap: 14px; max-width: 720px"><span class="caps" style="color: var(--t3)">{T("Notas", "Notes")(lang)}</span><div style="font-size: 18px; line-height: 1.75; color: var(--t2); display: flex; flex-direction: column; gap: 14px">{notes}</div></div>' if notes else ""}
-      </div>
-      <aside class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 28px">
-        <div class="card" style="padding: 32px"><span class="caps" style="color: var(--gold); margin-bottom: 8px">{T("Ficha técnica", "Technical details")(lang)}</span>{kv_rows(facts)}</div>
-        {tool_card}
-        {f'<div style="display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--t3); padding-bottom: 8px">{T("Descargas", "Downloads")(lang)}</span>{downloads}</div>' if downloads else ""}
-      </aside>
-    </section>"""
-    if related:
-        body += f"""
-    <section style="display: flex; flex-direction: column; gap: 40px; margin: 0 var(--gb) 96px; padding: 72px var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
-      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 0 8px">
-        <h2 class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em">{T("Más en", "More in")(lang)} <em class="gi">{kind_label.lower()}</em></h2>
-        <a class="lnk" href="{fname("observaciones.html", lang)}#{ANCHOR[o["kind"]]}">{T("Todas", "All")(lang)}{ARROW}</a>
-      </div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">{related}</div>
-    </section>"""
+    sub = (o.get("subtitle") or {}).get(lang) or kind_label
     desc = (o.get("description") or {}).get(lang) or title
+    ruta = (f'<nav class="ruta" aria-label="{T("Ruta", "Breadcrumb")(lang)}"><a class="miga" href="{fname("observaciones.html", lang)}">{BACK}'
+            f'{T("Observaciones", "Observations")(lang)}</a><span aria-hidden="true">›</span>'
+            f'<a class="miga" href="{fname("observaciones.html", lang)}#{ANCHOR[o["kind"]]}">{kind_label}</a></nav>')
+    main_fig, more_figs = plate_figures(o, lang)
+    # left column: story (D4), notes, «made with», secondary figures — each only if there is something to say
+    story = o.get("story") or {}
+    paras = story.get(lang) or []
+    col = []
+    if paras:
+        links = story_links(o, obs, lang)
+        col.append('<div class="prosa relato">\n          ' + "\n          ".join(story_para(p, lang, links) for p in paras) + "\n        </div>")
+    notes = (o.get("notes") or {}).get(lang) or ""
+    if notes:
+        col.append(f'<div class="prosa notas">\n          <span class="caps rotulo">{T("Notas", "Notes")(lang)}</span>\n          {notes}\n        </div>')
+    tool = o.get("made_with")
+    if tool:
+        col.append(f'<p class="nota"><span class="fell">{T("Hecho con", "Made with")(lang)}</span><span><b>{tool["name"]}</b> · '
+                   f'{(tool.get("desc") or {}).get(lang, "")}</span></p>')
+    col += more_figs
+    col_html = ('<div class="col">\n        ' + "\n        ".join(col) + "\n      </div>\n      ") if col else ""
+    facts = (o.get("facts_display") or {}).get(lang) or (o.get("facts_display") or {}).get("es") or []
+    ficha = "\n          ".join(f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in facts if v)
+    downloads = "\n          ".join(
+        f'<li><a href="{d["src"]}" download>{esc(d["label"][lang])}<span>{esc(d["fmt"])} ↓</span></a></li>' for d in o.get("downloads", []))
+    downloads = (f'\n        <span class="caps">{T("Descargas", "Downloads")(lang)}</span>\n        <ul class="cats">\n          {downloads}\n        </ul>'
+                 if downloads else "")
+    refs = refs_block(story, lang) if paras else ""
+    body = f"""
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      {ruta}
+      {cartela(lam, esc(sub))}
+      <h1 class="tit-1">{title_h1(o, lang)}</h1>
+      <p class="entradilla">{esc(desc)}</p>
+    </div>
+  </div>
+</div>
+{FILETE}
+
+<section class="sec">
+  <div class="wrap">
+    {main_fig}
+    {phases_block(o, lang)}
+    <div class="duo det">
+      {col_html}<div class="panel">
+        <span class="caps">{T("Ficha técnica", "Technical details")(lang)}</span>
+        <dl class="ficha">
+          {ficha}
+        </dl>{downloads}
+      </div>
+      {refs}
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--pegada">
+  <div class="wrap">
+    {pasa_block(o, obs, lang)}
+  </div>
+</section>
+"""
+    body = re.sub(r"\n[ \t]*(?=\n)", "", body)        # blocks a plate does not have leave no blank lines
     og = o.get("og") or obs_thumb(o)
-    return page(lang, obs_page(o), f"{title} · CabraSpace", desc, body, og_image=og)
+    return page(lang, obs_page(o), f"{title} · CabraSpace", desc, body, og_image=og, interior="a2")
 
 
 # ---------------------------------------------------------------- main
