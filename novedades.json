@@ -1,5 +1,24 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=XjxIXt4aAwM",
+    "title_es": "Corrección de gradientes con referencia al cielo real: un enfoque detallado",
+    "title_en": "Gradient Correction Using Real Sky Reference: A Detailed Approach",
+    "summary_es": "Este recurso explica una técnica avanzada para la corrección de gradientes en astrofotografía, utilizando una referencia del cielo real para un modelado preciso. Detalla cómo identificar y eliminar eficazmente la contaminación lumínica y los gradientes atmosféricos. Se guía al usuario a través de los pasos y herramientas específicas dentro de PixInsight para lograr un fondo de imagen más uniforme y natural.",
+    "summary_en": "This resource explains an advanced technique for gradient correction in astrophotography, leveraging a real sky reference for precise modeling. It details how to identify and effectively remove light pollution and atmospheric gradients. Users are guided through the specific steps and tools within PixInsight to achieve a flatter, more natural image background.",
+    "category_es": "TALLERES",
+    "category_en": "WORKSHOPS",
+    "date": "2026-11-12",
+    "url": "https://www.youtube.com/watch?v=XjxIXt4aAwM",
+    "tags": [
+      "Gradient Correction",
+      "DBE",
+      "ABE",
+      "PixInsight",
+      "Light Pollution",
+      "Workflow"
+    ]
+  },
+  {
     "id": "https://www.reddit.com/r/pixinsight/comments/1xp6b3n/cant_get_pixinsight_trial_version/",
     "title_es": "Problemas para Obtener la Versión de Prueba de PixInsight",
     "title_en": "Trouble Acquiring PixInsight Trial Version",
@@ -1859,21 +1878,6 @@
       "Separación de canales",
       "Script",
       "Astrofotografía"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=8Tu5Un91mvI",
-    "title_es": "Mapeo de color SHO y HOO de la Nebulosa Creciente (Utah Desert Remote Observatories)",
-    "title_en": "Crescent SHO and HOO Color Mapping (Utah Desert Remote Observatories)",
-    "summary_es": "Tutorial de Utah Desert Remote Observatories sobre el mapeo de color en paletas SHO y HOO para procesar la Nebulosa del Creciente.",
-    "summary_en": "Update or tutorial from Utah Desert Remote Observatories covering astrophotography: 'Crescent SHO and HOO Color Mapping'. Configure GEMINI_API_KEY in GitHub to enable automated AI summaries.",
-    "category_es": "SOFTWARE",
-    "category_en": "SOFTWARE",
-    "date": "2026-06-03",
-    "url": "https://www.youtube.com/watch?v=8Tu5Un91mvI",
-    "tags": [
-      "PixInsight",
-      "Utah Desert Remote Observatories"
     ]
   }
 ]
