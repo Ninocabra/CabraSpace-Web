@@ -8,10 +8,12 @@
   <meta name="description" content="Deep-sky images, exoplanet transits and the 2026 eclipse from the AstroCamp observatory.">
   <meta name="cabra:og-image" content="https://cabraspace.com/obs/pk164/thumb.jpg">
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/observaciones-en.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/observaciones.html">
@@ -54,31 +56,85 @@
     </div>
     <div class="filete" aria-hidden="true"></div>
   </header>
-  <main class="a3 page">
-    <div class="grain" aria-hidden="true"></div>
-<section style="position: relative; padding: clamp(40px, 6vw, 88px) var(--gx) clamp(32px, 5vw, 64px); display: flex; flex-direction: column; gap: 22px"><div class="glow" aria-hidden="true"></div><div class="ret" aria-hidden="true"></div><div style="position: relative; display: flex; align-items: center; gap: 14px"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Nº I</span><span class="caps" style="color: var(--t2)">Photography and measurements</span></div><h1 class="bd" style="position: relative; font-size: clamp(46px, 6.7vw, 96px); font-weight: 400; line-height: 0.98; letter-spacing: -0.02em">The observing <em class="gi">notebook</em></h1><p style="position: relative; max-width: 620px; font-size: 19px; line-height: 1.7; color: var(--t2)">What I do from the AstroCamp observatory: deep-sky images, exoplanet transit light curves and the 2026 eclipse.</p><div style="position: relative; display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap"><button type="button" class="chip on" data-f="all">All</button><span style="width: 1px; height: 28px; background: var(--line); margin: 0 6px"></span><span class="bd" style="font-size: 17px; font-style: italic; color: var(--t3)">Photography</span><button type="button" class="chip" data-f="deep-sky" data-anchor="cielo-profundo">Deep sky</button><button type="button" class="chip" data-f="eclipse" data-anchor="eclipses">Eclipses</button><span style="width: 1px; height: 28px; background: var(--line); margin: 0 6px"></span><span class="bd" style="font-size: 17px; font-style: italic; color: var(--t3)">Measurements</span><button type="button" class="chip" data-f="transit" data-anchor="exoplanetas">Exoplanets</button></div></section>
-    <section id="serie" style="padding: 0 var(--gx) clamp(48px, 7vw, 96px)">
-      <a href="eclipse-2026-en.html" class="card gold g12 zbox" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 16px; border-radius: 36px">
-        <div class="c7" style="grid-column: span 7; height: 440px; position: relative; border-radius: 24px; overflow: hidden"><img class="zoom" src="obs/eclipse-2026/corona.jpg" alt="Solar eclipse of 12 August" loading="lazy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #0d0a07"><span class="play"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#f3d27e"></path></svg></span></div>
-        <div class="c5" style="grid-column: span 5; padding: 40px 32px 40px 8px; display: flex; flex-direction: column; justify-content: center; gap: 20px">
-          <span style="display: flex; gap: 12px; align-items: center"><span class="tg g">Series</span><span class="no">Video</span></span>
-          <span class="bd" style="font-size: clamp(34px, 3.6vw, 52px); font-weight: 400; line-height: 1.04; letter-spacing: -0.02em">Solar eclipse, <em class="gi">twelfth of August</em></span>
-          <span style="font-size: 17px; line-height: 1.7; color: var(--t2)">The eclipse of 12 August 2026 on video, with the Vaonis Vespera Pro.</span>
-          <span class="go" style="font-size: 15.5px; color: var(--gold2)">Watch the series<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+  <main>
+
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      <p class="cartela cartela--larga">Tabula II<span class="cartela-l"> <i>·</i> Photography and measurements</span></p>
+      <h1 class="tit-1">The observing <em class="gi">notebook</em></h1>
+      <p class="entradilla">What I do from the AstroCamp observatory: deep-sky images, exoplanet transit light curves and the 2026 eclipse.</p>
+      <div class="chips" role="group" aria-label="Filter the observations">
+        <button class="chip is-on" type="button" aria-pressed="true" data-f="all">All</button>
+        <span class="chips-g fell">Photography</span>
+        <button class="chip" type="button" aria-pressed="false" data-f="deep-sky" data-anchor="cielo-profundo">Deep sky</button>
+        <button class="chip" type="button" aria-pressed="false" data-f="eclipse" data-anchor="eclipses">Eclipses</button>
+        <span class="chips-g fell">Measurements</span>
+        <button class="chip" type="button" aria-pressed="false" data-f="transit" data-anchor="exoplanetas">Exoplanets</button>
+      </div>
+    </div>
+    <div class="pag-grab"><span class="grab grab-refractor" aria-hidden="true"></span></div>
+  </div>
+</div>
+<div class="filete" aria-hidden="true"></div>
+
+<section class="sec">
+  <div class="wrap">
+   <div class="grupo" data-grupo="foto">
+    <h2 class="grupo-t">Photography</h2>
+    <a class="serie" href="eclipse-2026-en.html" id="serie" data-kind="eclipse"><span class="lam-marco"><img src="obs/eclipse-2026/corona.jpg" alt="Solar eclipse of 12 August" loading="lazy"><span class="lam-video"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><path d="M10 8.2v7.6l6-3.8z" fill="currentColor"></path></svg>On video</span></span><span class="serie-tx"><span class="etq">Series</span><span class="lam-meta"><span class="caps">Pl. III</span><span class="fell">Eclipses · 12 Aug 2026</span></span><span class="tit-2">Solar eclipse, <em class="gi">twelfth of August</em></span><p>The eclipse of 12 August 2026 on video, with the Vaonis Vespera Pro.</p><span class="lnk">Watch the series<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></span></a>
+    <div class="laminas">
+      <a class="lam lam--m" href="cielo-pk164-en.html" data-kind="deep-sky"><span class="lam-marco"><img src="obs/pk164/thumb.jpg" alt="PK 164+31.1, planetary nebula" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. II</span><span class="fell">Deep sky · 24 Apr</span></span><span class="lam-t"><span class="nb">PK 164+31.1</span>, planetary nebula</span></a>
+      <a class="lam lam--m" href="cielo-m82-en.html" data-kind="deep-sky"><span class="lam-marco"><img src="obs/m82/thumb.jpg" alt="M82, the Cigar Galaxy" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. I</span><span class="fell">Deep sky · 29 Jan</span></span><span class="lam-t">M82, the Cigar Galaxy</span></a>
+    </div>
+   </div>
+   <div class="grupo" data-grupo="med">
+    <h2 class="grupo-t">Measurements</h2>
+    <div class="laminas laminas--4">
+      <a class="lam" href="transito-qatar1b-2026-09-22-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/qatar1b-2026-09-22/curva.png" alt="Light curve of the Qatar-1 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. X</span><span class="fell">Exoplanets · 22 Sep</span></span><span class="lam-t">Transit of <span class="nb">Qatar-1 b</span></span></a>
+      <a class="lam" href="transito-wasp52b-2026-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/wasp52b-2026/curva.png" alt="Light curve of the WASP-52 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. IX</span><span class="fell">Exoplanets · 21 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">WASP-52 b</span></span></a>
+      <a class="lam" href="transito-tres3b-2026-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/tres3b-2026/curva.png" alt="Light curve of the TrES-3 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. VIII</span><span class="fell">Exoplanets · 15 Sep</span></span><span class="lam-t">Transit of <span class="nb">TrES-3 b</span></span></a>
+      <a class="lam" href="transito-qatar3b-2026-09-13-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/qatar3b-2026-09-13/curva.png" alt="Light curve of the Qatar-3 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. VII</span><span class="fell">Exoplanets · 13 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">Qatar-3 b</span></span></a>
+      <a class="lam" href="transito-wasp52b-2026-09-07-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/wasp52b-2026-09-07/curva.png" alt="Light curve of the WASP-52 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. VI</span><span class="fell">Exoplanets · 7 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">WASP-52 b</span></span></a>
+      <a class="lam" href="transito-tres2b-2026-09-06-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/tres2b-2026-09-06/curva.png" alt="Light curve of the TrES-2 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. V</span><span class="fell">Exoplanets · 6 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">TrES-2 b</span></span></a>
+      <a class="lam" href="transito-wasp59b-2026-09-03-en.html" data-kind="transit"><span class="lam-marco"><img class="encaja" src="obs/wasp59b-2026-09-03/curva.png" alt="Light curve of the WASP-59 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. IV</span><span class="fell">Exoplanets · 3 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">WASP-59 b</span></span></a>
+    </div>
+   </div>
+  </div>
+</section>
+
+<div class="filete" aria-hidden="true"></div>
+<section class="sec" aria-labelledby="t-desde">
+  <div class="wrap">
+    <div class="duo desde">
+      <figure class="fig">
+        <div class="fig-in">
+          <span class="grab grab-techo" role="img" aria-label="Roll-off roof observatory in section: the roof moved off along its rails, a telescope on an equatorial mount and a pier with its own footing; beyond, a second pier and the door"></span>
+          <span class="ll" style="left:93.33%;top:30.13%" aria-hidden="true">a</span>
+          <span class="ll" style="left:56.25%;top:60.7%" aria-hidden="true">b</span>
+          <span class="ll" style="left:32.71%;top:55.9%" aria-hidden="true">c</span>
+          <span class="ll" style="left:17.5%;top:57.86%" aria-hidden="true">d</span>
+          <span class="ll" style="left:30.62%;top:75.33%" aria-hidden="true">e</span>
+          <span class="ll" style="left:42.92%;top:96.94%" aria-hidden="true">f</span>
         </div>
-      </a>
-    </section>
-    <section class="g3" style="padding: 0 var(--gx) clamp(72px, 9vw, 128px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 64px 32px">
-<a href="transito-qatar1b-2026-09-22-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. X</span><span class="bd">Exoplanets · 22 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of Qatar-1 b</span></a>
-<a href="transito-wasp52b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp52b-2026/curva.png" alt="Transit of WASP-52 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. IX</span><span class="bd">Exoplanets · 21 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of WASP-52 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a>
-<a href="transito-tres3b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres3b-2026/curva.png" alt="Transit of TrES-3 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. VIII</span><span class="bd">Exoplanets · 15 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of TrES-3 b</span></a>
-<a href="transito-qatar3b-2026-09-13-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar3b-2026-09-13/curva.png" alt="Transit of Qatar-3 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. VII</span><span class="bd">Exoplanets · 13 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of Qatar-3 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a>
-<a href="transito-wasp52b-2026-09-07-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp52b-2026-09-07/curva.png" alt="Transit of WASP-52 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. VI</span><span class="bd">Exoplanets · 7 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of WASP-52 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a>
-<a href="transito-tres2b-2026-09-06-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres2b-2026-09-06/curva.png" alt="Transit of TrES-2 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. V</span><span class="bd">Exoplanets · 6 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of TrES-2 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a>
-<a href="transito-wasp59b-2026-09-03-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp59b-2026-09-03/curva.png" alt="Transit of WASP-59 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. IV</span><span class="bd">Exoplanets · 3 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of WASP-59 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a>
-<a href="cielo-pk164-en.html" class="zbox obs-card" data-fam="foto" data-kind="deep-sky" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in"><img class="zoom" src="obs/pk164/thumb.jpg" alt="PK 164+31.1, planetary nebula" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. II</span><span class="bd">Deep sky · 24 Apr</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">PK 164+31.1, planetary nebula</span></a>
-<a href="cielo-m82-en.html" class="zbox obs-card" data-fam="foto" data-kind="deep-sky" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 310px"><div class="plate-in"><img class="zoom" src="obs/m82/thumb.jpg" alt="M82, the Cigar Galaxy" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. I</span><span class="bd">Deep sky · 29 Jan</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">M82, the Cigar Galaxy</span></a>
-    </section>
+        <figcaption class="fig-pie"><b>Fig. I.</b> Roll-off roof observatory, in section. <i>a</i>, roll-off roof; <i>b</i>, rails and rail beams; <i>c</i>, telescope; <i>d</i>, equatorial mount; <i>e</i>, pier, isolated from the floor; <i>f</i>, footing.</figcaption>
+      </figure>
+      <div class="col">
+        <header class="sec-cab sec-cab--izq">
+          <h2 class="tit-2" id="t-desde">Where I <em class="gi">observe</em> from</h2>
+        </header>
+        <div class="prosa">
+          <p>The deep-sky photographs and the transit light curves come from the AstroCamp observatory. The eclipse of 12 August was photographed from the Cabrero viewpoint, in Teruel.</p>
+        </div>
+        <dl class="ficha">
+          <div><dt>Site</dt><dd>AstroCamp · 1600 m</dd></div>
+          <div><dt>Telescope</dt><dd>Celestron C9.25</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
   </main>
   <footer class="pie">
     <div class="filete" aria-hidden="true"></div>
@@ -92,23 +148,20 @@
   </footer>
   </div></div><!-- /hoja -->
   <script>
+  /* filtros: ocultan las láminas (y la serie) de otro tipo; una rejilla o un grupo que se quedan sin nada se ocultan
+     también, para no dejar hueco. El ancla (#exoplanetas, #cielo-profundo, #eclipses) se recuerda en la URL. */
   (function () {
-    var chips = document.querySelectorAll('[data-f]');
+    var chips = document.querySelectorAll('.chip[data-f]');
     function apply(f) {
-      chips.forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-f') === f); });
-      document.querySelectorAll('.obs-card').forEach(function (i) {
-        i.style.display = (f === 'all' || i.getAttribute('data-kind') === f) ? '' : 'none';
-      });
-      var s = document.getElementById('serie'); if (s) s.style.display = (f === 'all' || f === 'eclipse') ? '' : 'none';
+      chips.forEach(function (c) { var on = c.getAttribute('data-f') === f; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
+      document.querySelectorAll('.grupo [data-kind]').forEach(function (l) { l.hidden = !(f === 'all' || l.getAttribute('data-kind') === f); });
+      document.querySelectorAll('.grupo .laminas, .grupo').forEach(function (box) { box.hidden = !box.querySelector('[data-kind]:not([hidden])'); });
     }
     chips.forEach(function (c) { c.addEventListener('click', function () {
       var f = c.getAttribute('data-f'); apply(f);
       history.replaceState(null, '', f === 'all' ? location.pathname : '#' + c.getAttribute('data-anchor'));
     }); });
-    function fromHash() {
-      var h = location.hash.slice(1); if (!h) return;
-      var c = document.querySelector('[data-anchor="' + h + '"]'); if (c) apply(c.getAttribute('data-f'));
-    }
+    function fromHash() { var c = document.querySelector('.chip[data-anchor="' + location.hash.slice(1) + '"]'); apply(c ? c.getAttribute('data-f') : 'all'); }
     window.addEventListener('hashchange', fromHash); fromHash();
   })();
   </script>

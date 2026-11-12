@@ -6,8 +6,9 @@
 |---|---|
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
-| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). Aún no lo carga ninguna página: lo cargarán las migradas en F3–F5, después del marco. |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada: el interior de las páginas (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Desde F3 lo cargan las 10 páginas de portada e índices** (después del marco); las demás lo cargarán al migrar (F4 láminas, F5 herramientas y catálogos). |
+| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 44 páginas sin migrar: su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 10 de F3 ya no la cargan. Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
 | `atlas/atlas.js` | Script de cabecera de Atlas I. **Ya no lo carga ninguna página** (F2); se borra en F6. No cargarlo junto a `atlas2.js`: los dos alternarían el modo noche y un clic se anularía. |
 | `atlas/astroforecast.css` | Titular y paneles Atlas de Astro Forecast. |
 | `atlas/img/` | Logo dorado, grano, retícula, anillo y capturas usadas en varias páginas. |
@@ -91,16 +92,38 @@ Orden en el `<head>` de cada página (lo escribe `tools/sync_nav.py`):
 - `.hoja-in` usa `overflow: clip` (no `hidden`), para no apagar los `position: sticky` del interior.
 - Modo noche: tokens en penumbra (D5) y fotos con el filtro SVG `#cb-noche` (va en la cabecera). Los `<canvas>`
   de las herramientas no se filtran (como antes de F2). Medidas en el comentario de `atlas2-marco.css`.
-- `atlas2.css` (interior nuevo) NO se carga aún: su base pisa `body`, `h1`, `a`, `img`, `.wrap`, `.btn`…
+- `atlas2.css` (interior nuevo) no se carga en las páginas sin migrar: su base pisa `body`, `h1`, `a`, `img`, `.wrap`, `.btn`…
+  (desde F3 la cargan solo las 10 de portada e índices; ver la sección siguiente).
 
 Qué falta para F3–F5: cargar `atlas2.css` página a página al migrar su `<main>` (F3 portada e índices, F4 láminas,
 F5 herramientas y catálogos), quitar al migrar cada una su parte de la sección 7, y en F6 retirar `atlas.css`,
 `atlas.js` y lo muerto de `index.css`. Numeración D2 (I Herramientas · II Observaciones · III Bitácora · IV
 Programas): el marco ya la usa; el interior aún no (ver `tools/atlas2/LEEME.md`).
 
+## Convivencia desde F3 (12-11-2026): las 10 páginas con interior Atlas II
+
+Portada (`index.html`/`en.html`), Observaciones, Herramientas, Programas y Bitácora, en ES y EN. Las genera
+`build_atlas.py` con `page(..., interior="a2")`. Orden en su `<head>`:
+fuentes web (Bodoni Moda, Figtree, IBM Plex Mono; las ponía antes el `@import` de `index.css`) · IM Fell English ·
+**`atlas/atlas2-marco.css`** · **`atlas/atlas2.css`** (el interior, después del marco).
+
+- **NO cargan `index.css` ni `atlas.css`.** Comprobado antes de quitarlas: el marco no depende de ellas
+  (`atlas2-marco.css` trae sus tokens, su reset acotado a `.cab`/`.pie` y anula lo de `index.css` que ya no hace
+  falta anular), `atlas2.js` no usa nada suyo, y los scripts en línea de la portada y de Bitácora solo pintan clases
+  de `atlas2.css`. Ganancia: sin el filtro sepia que `index.css` aplica en noche a todo `<svg>`, y sin el `--gx` de
+  80 px de `atlas.css`: estas páginas usan el `--gx: clamp(16px, 3vw, 44px)` de `atlas2.css`. Las láminas y las
+  páginas a mano no cargan `atlas2.css`, así que su `--gx` (80/40/18) no cambia.
+- `sync_nav.py` reconoce el enlace a `atlas/atlas2.css` y en esas páginas no añade `atlas.css`, pone fuente y marco
+  delante de `atlas2.css` y le añade `?v=VERSION`. En las demás hace exactamente lo de F2 (re-ejecutado: 0 cambios).
+- Modo noche: el interior hereda los tokens de penumbra del marco; `atlas2.css` no redefine rojos.
+- Sección 7 de compatibilidad de `atlas2-marco.css`: nada era de estas páginas (catálogos y PixelMath-teca).
+- «Desde dónde se observa» (Observaciones) usa el grabado del techo corredizo (D3, `atlas/img/techo-corredizo.svg`,
+  generador en `tools/atlas2/d3/`). `atlas/img/cupula.svg` queda en el repo sin usar (F6).
+
 ## Versión de las hojas de estilo
 
-`tools/sync_nav.py` pone `?v=VERSION` a `atlas.css`, `atlas2-marco.css`, `atlas2.js` y a las capas de `EXTRA_CSS`. Si
+`tools/sync_nav.py` pone `?v=VERSION` a `atlas.css`, `atlas2-marco.css`, `atlas2.css`, `atlas2.js` y a las capas de `EXTRA_CSS`
+(`armilar.js` y `capricornus2.js` llevan el `A2_ASSET_V` de `build_atlas.py`). Si
 cambias un CSS, **sube `VERSION` en sync_nav.py y re-ejecútalo**: si subes el `?v=` a mano en las
 páginas, la siguiente ejecución lo devuelve al valor viejo y los navegadores siguen con la copia antigua.
 

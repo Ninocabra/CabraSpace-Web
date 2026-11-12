@@ -12,6 +12,10 @@ Escribe:
     atlas/capricornus2.js     solo el bloque de datos entre  /* DATA-BEGIN */ y /* DATA-END */
     atlas/atlas2-muestra.html           solo el SVG entre <!-- CAP-SVG-BEGIN --> y <!-- CAP-SVG-END -->
 
+La portada (index.html / en.html) NO se toca aqui: la escribe tools/build_atlas.py llamando a
+figure_for_page(lang) (misma funcion, sin matplotlib). Tras cambiar la carta, ejecuta tambien la cadena
+build_atlas.py -> sync_nav.py -> seo_inject.py.
+
 De donde sale cada cosa (no hay numeros nuevos):
   - La carta es la de project/p2/atlas_celeste.py (propuesta 2): proyeccion estereografica, este a la
     izquierda, 15.5 px por grado, Bright Star Catalogue 5.a ed. (V < 5.6) y los Messier del sitio.
@@ -33,10 +37,9 @@ import re
 import sys
 from pathlib import Path
 
-import matplotlib
-from fontTools.pens.svgPathPen import SVGPathPen
-from fontTools.pens.transformPen import TransformPen
-from fontTools.ttLib import TTFont
+# matplotlib and fontTools are needed only to draw the chart's lettering (chart()). They are imported
+# lazily, so that tools/build_atlas.py can import figure_for_page() (the animated figure of the home page)
+# with the standard library alone (F3, 12-11-2026).
 
 HERE = Path(__file__).resolve().parent
 SITE = HERE.parents[1]                  # raiz del repo de la web
@@ -73,6 +76,8 @@ def roman(n):
 # ---------------------------------------------------------------- lettering as outlines
 class Face:
     def __init__(self, filename):
+        import matplotlib
+        from fontTools.ttLib import TTFont
         self.font = TTFont(Path(matplotlib.get_data_path()) / "fonts" / "ttf" / filename)
         self.gs = self.font.getGlyphSet()
         self.cmap = self.font.getBestCmap()
@@ -89,6 +94,8 @@ class Face:
         return sum(self.adv(c)[1] for c in s) * size / self.upm + spacing * (len(s) - 1)
 
     def path(self, s, x, y, size, anchor="start", spacing=0.0, angle=0.0):
+        from fontTools.pens.svgPathPen import SVGPathPen
+        from fontTools.pens.transformPen import TransformPen
         sc = size / self.upm
         ca, sa = cos(rad(angle)), sin(rad(angle))
         w = self.width(s, size, spacing)
@@ -104,8 +111,7 @@ class Face:
         return "".join(out)
 
 
-ROMAN = Face("STIXGeneral.ttf")
-ITALIC = Face("STIXGeneralItalic.ttf")
+ROMAN = ITALIC = None                  # set by chart(): Face() needs matplotlib
 
 
 def svg_text(w, h, inner):
@@ -341,6 +347,8 @@ def check(mov):
 
 # ================================================================ the chart
 def chart(stars, mov):
+    global ROMAN, ITALIC
+    ROMAN, ITALIC = Face("STIXGeneral.ttf"), Face("STIXGeneralItalic.ttf")
     moving = [s["_bsc"] for s in mov]
     mxy = [ch_xy(s["ra"], s["de"]) for s in moving]
     seen, dropped = [], 0
@@ -471,12 +479,15 @@ def segments():
     return [[a, b] for line in LINES for a, b in zip(line, line[1:])]
 
 
-def figure_svg(mov):
+FIG_LABEL = {"es": "Carta de la constelación de Capricornio", "en": "Chart of the constellation Capricornus"}
+
+
+def figure_svg(mov, lang="es"):
     """Inline SVG for the page: today's sky. js/capricornus.js moves these same elements."""
     pos = {s["n"]: project_vec(s["r"]) for s in mov}
     sym = {s["n"]: s for s in mov}
     o = [f'<svg class="cap-fig" id="cap-chart" viewBox="0 0 {CH_W} {CH_H}" width="{CH_W}" height="{CH_H}" '
-         'role="img" aria-label="Carta de la constelación de Capricornio">']
+         f'role="img" aria-label="{FIG_LABEL[lang]}">']
     for i, (a, b) in enumerate(segments()):
         (x1, y1), (x2, y2) = pos[a], pos[b]
         d = math.hypot(x2 - x1, y2 - y1)
@@ -493,6 +504,13 @@ def figure_svg(mov):
         o.append(f'<text class="cap-letra" id="cap-t-{n}" x="{x + dx:.1f}" y="{y + dy:.1f}">{g}</text>')
     o.append("</svg>")
     return "\n".join(o)
+
+
+def figure_for_page(lang="es"):
+    """The animated figure as tools/build_atlas.py inlines it in the home page (index.html / en.html).
+    Standard library only. Same function as the sample page, so both stay identical to the data block of
+    atlas/capricornus2.js; re-run build_atlas.py after changing CATALOGUE, GREEK or the frame."""
+    return figure_svg(moving_stars(load_stars()), lang)
 
 
 def data_json(mov):

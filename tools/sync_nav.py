@@ -6,6 +6,9 @@ Qué hace en cada *.html de la raíz (idempotente: re-ejecutar no cambia nada):
   - <head>: asegura, en este orden, atlas/atlas.css?v=  ·  [capa EXTRA_CSS]?v=  ·  fuente IM Fell English
     ·  atlas/atlas2-marco.css?v=  (la última: el marco gana a index.css/atlas.css solo en lo suyo; ver la
     cabecera de atlas/atlas2-marco.css, «CONVIVENCIA»).
+    Páginas con INTERIOR Atlas II (desde F3: las que enlazan atlas/atlas2.css, hoy las 10 que genera
+    build_atlas.py con el interior nuevo): NO se les añade atlas.css; el orden es fuente IM Fell English ·
+    atlas2-marco.css?v= · atlas2.css?v= (el interior, después del marco). Las demás quedan igual que en F2.
   - Sustituye el <header id="navbar">…</header> por la cabecera Atlas II (ES o EN). El cajón móvil
     (#atlas-drawer) va DENTRO de la cabecera; el cajón viejo <div class="ad" id="atlas-drawer"> se quita.
   - Quita el antiguo <div class="mobile-menu-overlay">.
@@ -235,6 +238,8 @@ drawer_re = re.compile(r'\s*<div class="ad" id="atlas-drawer" hidden>.*?\n  </di
 overlay_re = re.compile(r'\s*<div class="mobile-menu-overlay"[^>]*>\s*</div>', re.S)
 footer_re = re.compile(r'<footer\b[^>]*>.*?</footer>', re.S)
 css_re = re.compile(r'<link rel="stylesheet" href="atlas/atlas\.css[^"]*">')
+A2_LINK = f'<link rel="stylesheet" href="atlas/atlas2.css?v={VERSION}">'
+a2_re = re.compile(r'<link rel="stylesheet" href="atlas/atlas2\.css[^"]*">')       # interior Atlas II (F3)
 marco_re = re.compile(r'[ \t]*<link rel="stylesheet" href="(?:atlas/atlas2-marco\.css[^"]*|' + re.escape(FONT_HREF) + r')">[ \t]*\r?\n?')
 js_re = re.compile(r'<script src="(?:mobile-menu\.js|atlas/atlas2?\.js)[^"]*"></script>')
 hoja_open_re = re.compile(re.escape(HOJA_OPEN) + r'\s*')
@@ -247,21 +252,27 @@ def process(fname, txt):
     # previous frame wrapper (re-run)
     txt = hoja_open_re.sub("", txt)
     txt = hoja_close_re.sub("", txt)
-    # stylesheets: atlas.css, [extra layer], font, marco (last)
-    if css_re.search(txt):
-        txt = css_re.sub(CSS_LINK, txt)
-    elif "</head>" in txt:
-        txt = txt.replace("</head>", f"  {CSS_LINK}\n</head>", 1)
-    txt = marco_re.sub("", txt)
-    base = fname[:-len("-en.html")] if fname.endswith("-en.html") else fname[:-len(".html")]
-    extra = EXTRA_CSS.get(base)
-    after = CSS_LINK
-    if extra:
-        link = f'<link rel="stylesheet" href="{extra}?v={VERSION}">'
-        txt = re.sub(r'\s*<link rel="stylesheet" href="' + re.escape(extra) + r'[^"]*">', "", txt)
-        txt = txt.replace(CSS_LINK, CSS_LINK + "\n  " + link, 1)
-        after = link
-    txt = txt.replace(after, after + "\n  " + FONT_LINK + "\n  " + MARCO_LINK, 1)
+    if a2_re.search(txt):
+        # page with the Atlas II interior (F3): font, marco, atlas2.css (the interior, after the marco); no atlas.css
+        txt = a2_re.sub(A2_LINK, txt)
+        txt = marco_re.sub("", txt)
+        txt = txt.replace(A2_LINK, FONT_LINK + "\n  " + MARCO_LINK + "\n  " + A2_LINK, 1)
+    else:
+        # stylesheets: atlas.css, [extra layer], font, marco (last)
+        if css_re.search(txt):
+            txt = css_re.sub(CSS_LINK, txt)
+        elif "</head>" in txt:
+            txt = txt.replace("</head>", f"  {CSS_LINK}\n</head>", 1)
+        txt = marco_re.sub("", txt)
+        base = fname[:-len("-en.html")] if fname.endswith("-en.html") else fname[:-len(".html")]
+        extra = EXTRA_CSS.get(base)
+        after = CSS_LINK
+        if extra:
+            link = f'<link rel="stylesheet" href="{extra}?v={VERSION}">'
+            txt = re.sub(r'\s*<link rel="stylesheet" href="' + re.escape(extra) + r'[^"]*">', "", txt)
+            txt = txt.replace(CSS_LINK, CSS_LINK + "\n  " + link, 1)
+            after = link
+        txt = txt.replace(after, after + "\n  " + FONT_LINK + "\n  " + MARCO_LINK, 1)
     # header (with its drawer inside)
     txt = drawer_re.sub("", txt)
     txt = overlay_re.sub("", txt)

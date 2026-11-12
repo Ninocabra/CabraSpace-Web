@@ -15,20 +15,25 @@
              atlas/atlas2.js al final (orla, modo noche, cajon movil).
      La plantilla del prototipo (propuestas-estetica/v2/plantilla.html) sigue valiendo para el <main>.
 
+   F3 (12-11-2026): la cargan ya las 10 paginas que genera tools/build_atlas.py con interior nuevo (portada,
+   Observaciones, Herramientas, Programas, Bitacora; ES y EN), SIN index.css ni atlas.css. Anadidas aqui como
+   piezas del sistema (antes eran <style> de las paginas del prototipo): .grab-techo, .desde, .prog-cab, .prog,
+   .reg-mas, y el ▶ destacado de .cap-play.paused (D1).
+
    PIEZAS (en este orden en el fichero)
      1. Tokens ............ -> atlas2-marco.css (aqui solo --gx y --wrap, del interior)
      2. Base .............. reset, .wrap, .bd .fell .caps .gi .nb .sr
      3. Hoja y orla ....... -> atlas2-marco.css
      4. Cabecera .......... -> atlas2-marco.css (aqui solo .ic, boton de icono)
      5. Botones ........... .btn .btn-linea .lnk .etq ; :disabled de .btn y .btn-linea
-     6. Cartela y titulos . .cartela .sec .sec-cab(.sec-cab--izq) .tit-1 .tit-2
+     6. Cartela y titulos . .cartela (.cartela-l, .cartela--larga) .sec .sec-cab(.sec-cab--izq) .tit-1 .tit-2
                             .tit-3 .sub .orn
      7. Heroe (portada) ... .heroe .heroe-carta .carta .carta-oro/-ecl/-est
                             .heroe-velo .heroe-in .heroe-tx .aviso .heroe-pie
-                            .cap-fig .cap-time ...
+                            .cap-fig .cap-time ... ; .cap-play.paused (el ▶ destacado, D1)
      8. Grabados .......... .grab + .grab-armilar -astrolabio -octante
                             -refractor -cupula -rosa -observatorio -factorias
-                            -pizarra -histograma -placa ; .armilar[data-armilar]
+                            -pizarra -histograma -placa -techo ; .armilar[data-armilar]
                             .fig .ll .fig-pie (figura con letras de llamada)
      9. Herramientas ...... .herr-zona .bento .herr .herr--mayor .herr--pronto
                             .herr-n .herr-t .herr-d .herr-lam .herr-ir
@@ -41,11 +46,13 @@
     11. Bitacora .......... .bit .bit-f .bit-d .bit-t .bit-g .bit-a .bit--compacta
                             .bit--reg (registro denso) .bit-s (fuente) .is-mismo (fecha repetida)
     12. Composicion ....... .duo .col .rejilla(-2|-3|-4) .taller .nota .cierre
-                            .reg .reg-lado .reg-cab .reg-fin (registro con lateral fijo)
+                            .reg .reg-lado .reg-cab .reg-fin .reg-mas (registro con lateral fijo)
+                            .desde (figura con letras + texto: «Desde donde se observa»)
                             .cats (lista de enlaces sobrios) .grupo .grupo-t (grupo con rotulo)
     13. Frisos ............ .friso-fig .friso .friso-horizonte -taller -archivo
                             .pie-lam
     14. Pagina secundaria . .pag-cab(.pag-cab--par) .pag-tx .pag-grab .miga .ruta
+                            .prog-cab .prog (cabecera con grabado mayor; fichas «en el taller»)
                             .entradilla .rotulo .prosa .ficha .chips .chip .chips-g
                             .panel .pasa (anterior / siguiente)
                             formularios: .campo (+ output) .campos .soltar .lienzo
@@ -122,6 +129,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .cartela::before, .cartela::after { content: ""; position: absolute; top: -1px; width: 22px; height: 40px; background: var(--gold); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 40' fill='none' stroke='%23000'%3E%3Cpath d='M21.5 .5V13L1.5 4.5v31L21.5 27v12.5'/%3E%3Ccircle cx='9' cy='20' r='1.3' fill='%23000' stroke='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 40' fill='none' stroke='%23000'%3E%3Cpath d='M21.5 .5V13L1.5 4.5v31L21.5 27v12.5'/%3E%3Ccircle cx='9' cy='20' r='1.3' fill='%23000' stroke='none'/%3E%3C/svg%3E") no-repeat center / 100% 100%; }
 .cartela::before { right: 100%; }
 .cartela::after { left: 100%; transform: scaleX(-1); }
+/* rotulo de la cartela en su propio span (.cartela-l). Una cartela de mas de 32 caracteres no cabe en un movil
+   (no se parte nunca): build_atlas.py le pone .cartela--larga y por debajo de 520 px queda solo el numero (§17). */
+.cartela-l { display: contents; }
 
 .sec { position: relative; padding: clamp(40px, 4.6vw, 66px) 0; }
 .sec--1 { padding-top: clamp(32px, 2.8vw, 40px); }                 /* la que sigue al heroe: asoma en la primera pantalla */
@@ -175,6 +185,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .cap-play .i-play { display: none; }
 .cap-play.paused .i-play { display: inline; }
 .cap-play.paused .i-pause { display: none; }
+/* D1 (Nino, 12-11-2026): con «reducir movimiento» la figura arranca quieta; el ▶ tiene que verse bien: en pausa,
+   el boton se rellena de oro (el mismo trato que la accion principal) y el icono crece. */
+.cap-play.paused, .cap-play.paused:hover { background: var(--gold); color: var(--ink); border-right-color: var(--gold); }
+.cap-play.paused:hover { background: var(--gold2); }
+.cap-play.paused svg { width: 17px; height: 17px; }
 .cap-track { position: relative; flex: 0 0 120px; height: 14px; }
 .cap-bar { position: absolute; left: 0; right: 0; top: 7px; height: 1px; background: var(--t3); opacity: .6; }
 .cap-tick { position: absolute; top: 3px; width: 1px; height: 9px; background: var(--t3); transform: translateX(-.5px); }
@@ -200,6 +215,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .grab-pizarra { --m: url(img/pizarra.svg); aspect-ratio: 480 / 420; }
 .grab-histograma { --m: url(img/histograma.svg); aspect-ratio: 480 / 420; }
 .grab-placa { --m: url(img/placa.svg); aspect-ratio: 480 / 420; }
+/* observatorio de techo corredizo, en corte (D3, version 2; tools/atlas2/d3/techo.py). La mascara se declara
+   ENTERA y no por --m: una url() relativa dentro de una variable CSS puede acabar resuelta contra otra hoja
+   (le paso al dibujarla en d3-techo/prueba.html); asi no depende de donde se use. Letras a-f: tools/atlas2/d3/llamadas.json. */
+.grab-techo { aspect-ratio: 480 / 458; -webkit-mask: url(img/techo-corredizo.svg) no-repeat center / contain; mask: url(img/techo-corredizo.svg) no-repeat center / contain; }
 
 /* la esfera armilar animada: <div class="armilar" data-armilar aria-hidden="true"></div>
    js/armilar.js dibuja dentro con currentColor y anade .is-live; hasta entonces (o sin JS) se ve
@@ -213,6 +232,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    <figure class="fig"><div class="fig-in"><span class="grab grab-cupula" role="img" aria-label="..."></span>
    <span class="ll" style="left:12.08%;top:35.81%" aria-hidden="true">a</span>...</div>
    <figcaption class="fig-pie"><b>Fig. 1.</b> ... <i>a</i>, cupula; ...</figcaption></figure>
+   Las letras del techo corredizo (la que usa Observaciones) las lee build_atlas.py de tools/atlas2/d3/llamadas.json.
    Posiciones de las letras de cupula.svg (de la propuesta 3): a 12.08/35.81 · b 23.33/18.34 ·
    c 70.42/41.92 · d 41.04/51.53 · e 62.5/79.91 · f 67.92/96.51  (left % / top %). */
 .fig-in { position: relative; }
@@ -394,6 +414,14 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .reg-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 20px; flex-wrap: wrap; padding: 0 12px 14px; }
 .reg-cab h2 { font-family: var(--f-fell); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.2; color: var(--t2); }
 .reg-fin { padding: 22px 12px 0; font-size: 14.5px; color: var(--t3); }
+/* «Cargar mas» bajo el registro: <div class="reg-mas"><button class="btn-linea"></button></div> */
+.reg-mas { display: flex; justify-content: center; padding-top: 26px; }
+.reg-mas[hidden] { display: none; }
+/* «Desde donde se observa»: la figura con letras a un lado y el texto con su ficha al otro.
+   <div class="duo desde"><figure class="fig">...</figure><div class="col">...<dl class="ficha"></dl></div></div> */
+.desde { align-items: center; }
+.desde .fig { max-width: 470px; justify-self: center; width: 100%; }
+.desde .ficha { margin-top: 26px; max-width: 460px; }
 /* lista de enlaces sobrios (catalogos): <ul class="cats"><li><a href>Texto<svg flecha></a></li></ul> */
 .cats a { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 48px; border-bottom: 1px dotted var(--pt); font-size: 15px; line-height: 1.35; color: var(--t2); transition: color .2s; }
 .cats li:first-child a { border-top: 1px solid var(--line); }
@@ -435,6 +463,16 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
    ...h1</div><p class="entradilla">...</p></div> */
 .pag-cab--par { grid-template-columns: minmax(0, 1fr) minmax(0, 440px); padding-bottom: clamp(26px, 3vw, 40px); }
 .pag-cab--par .entradilla { margin-bottom: 6px; font-size: 17px; color: var(--t3); }
+/* cabecera con UN grabado mayor que el hueco normal (Programas: el astrolabio es el unico de la pagina):
+   <div class="pag-cab prog-cab"> ... <div class="pag-grab"><span class="grab grab-astrolabio"></span></div></div> */
+.prog-cab { align-items: center; padding-bottom: clamp(28px, 3.4vw, 48px); }
+.prog-cab .pag-grab { width: clamp(220px, 27vw, 360px); margin-right: clamp(0px, 2vw, 32px); }
+.prog-cab .pag-grab .grab { --grab: .5; }
+.prog-cab .entradilla { max-width: 600px; }
+/* fichas «en el taller»: .herr--pronto sin enlace, con su materia en Fell. <ul class="rejilla rejilla-3 prog"><li class="herr herr--pronto"> */
+.prog .herr { min-height: 0; padding: 26px 26px 28px; }
+.prog .herr-t { margin-top: 10px; font-size: 26px; font-weight: 400; letter-spacing: -.01em; }
+.prog .herr-d { margin-top: 10px; font-size: 15.5px; line-height: 1.6; }
 /* miga de dos pasos: <nav class="ruta"><a class="miga">Uno</a><span aria-hidden="true">›</span><a class="miga">Dos</a></nav> */
 .ruta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; margin-bottom: -10px; color: var(--t3); }
 .ruta .miga { margin-bottom: 0; }
@@ -566,6 +604,7 @@ body.night-vision .cap-dot { box-shadow: none; }
   .reg-lado { display: contents; }
   .reg-lado nav { order: 2; }
   .reg-lado .grab { display: none; }
+  .prog-cab .pag-grab { width: 190px; margin: 0; }
 }
 @media (max-width: 700px) {
   .heroe { --cap-s: .72; --cap-y: 118px; }
@@ -638,6 +677,10 @@ body.night-vision .cap-dot { box-shadow: none; }
   .bit--reg .bit-t { font-size: 17.5px; }
   .bit-f.is-mismo .bit-d { display: none; }
   .reg-fin { padding: 18px 4px 0; }
+  .prog .herr-t, .prog .herr-d { max-width: none; }
+}
+@media (max-width: 520px) {
+  .cartela--larga .cartela-l { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
