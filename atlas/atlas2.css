@@ -3,22 +3,23 @@
    Estetica de la propuesta 2 (hoja de atlas con orla graduada, cartelas
    «Tabula», IM Fell English en rotulos) con el orden de contenido de la 4.
 
-   COMO SE USA
+   DESDE F2 (12-11-2026) ESTA HOJA ES SOLO EL INTERIOR. El marco (tokens, variables heredadas, hoja y
+   orla, cabecera con cajon, pie, modo noche) esta en atlas/atlas2-marco.css, que llevan las 54 paginas
+   (lo pone tools/sync_nav.py). Las paginas migradas en F3-F5 cargaran atlas2-marco.css Y DESPUES esta.
+   NO cargar esta hoja sobre paginas sin migrar: su base (2) pisa body, h1, a, img, .wrap, .btn, .caps.
+
+   COMO SE USA (pagina migrada)
      <head>  viewport + Google Fonts (Bodoni Moda, Figtree, IBM Plex Mono,
-             IM Fell English) + este CSS.
-     <body>  script minimo de modo noche (ver plantilla.html)
-             .hoja > .hoja-in > header.cab + main + footer.pie
-             js/atlas2.js al final: dibuja la orla, modo noche, menu movil,
-             marca la pagina actual en el menu.
-     La pagina de referencia para copiar es plantilla.html.
+             IM Fell English) + atlas2-marco.css + este CSS.
+     <body>  script minimo de modo noche; cabecera, cajon, pie y hoja los escribe sync_nav.py;
+             atlas/atlas2.js al final (orla, modo noche, cajon movil).
+     La plantilla del prototipo (propuestas-estetica/v2/plantilla.html) sigue valiendo para el <main>.
 
    PIEZAS (en este orden en el fichero)
-     1. Tokens ............ :root, body.night-vision
+     1. Tokens ............ -> atlas2-marco.css (aqui solo --gx y --wrap, del interior)
      2. Base .............. reset, .wrap, .bd .fell .caps .gi .nb .sr
-     3. Hoja y orla ....... .hoja .hoja-in .orla(-t|-b|-l|-r) .esq .filete
-     4. Cabecera .......... .cab .cab-bar .cab-logo .cab-nav .cab-l .cab-r
-                            .cab-hw .cab-noche .cab-lang .cab-burger .ic
-                            (seccion actual: aria-current; en una subpagina, <body data-sec="...">)
+     3. Hoja y orla ....... -> atlas2-marco.css
+     4. Cabecera .......... -> atlas2-marco.css (aqui solo .ic, boton de icono)
      5. Botones ........... .btn .btn-linea .lnk .etq ; :disabled de .btn y .btn-linea
      6. Cartela y titulos . .cartela .sec .sec-cab(.sec-cab--izq) .tit-1 .tit-2
                             .tit-3 .sub .orn
@@ -49,9 +50,8 @@
                             .panel .pasa (anterior / siguiente)
                             formularios: .campo (+ output) .campos .soltar .lienzo
                             .consola .desplegable .casilla
-    15. Pie ............... .pie .pie-g .pie-cita .pie-tr .pie-src .pie-enl
-                            .pie-base .pie-nav
-    16. Modo noche ........ body.night-vision (todo a rojo, tambien grabados)
+    15. Pie ............... -> atlas2-marco.css
+    16. Modo noche ........ tokens y fotos -> atlas2-marco.css; aqui, fondos de piezas del interior
     17. Responsive ........ 1399 / 1080 / 980 / 860 / 700 px ; prefers-reduced-motion
 
    REGLAS
@@ -61,98 +61,20 @@
      - Objetivos tactiles >= 44 px. Nada de estilos inline masivos en las paginas.
    ========================================================================== */
 
-/* ---------------------------------------------------------------- 1. tokens */
+/* ---------------------------------------------------------------- 1. tokens · 1b. variables heredadas
+   MOVIDOS a atlas/atlas2-marco.css en F2 (12-11-2026), con la hoja y orla (3), la cabecera (4), el pie (15) y el
+   modo noche (16): ese es el MARCO que llevan las 54 paginas. Esta hoja necesita atlas2-marco.css cargada ANTES.
+   Aqui quedan solo los dos tokens del interior, que el marco no define a proposito: */
 :root {
-  --bg: #110d09; --s1: #1b140e; --s2: #281d14; --line: #3d2e1f;
-  --tx: #fbf2e0; --t2: #d0c1a5; --t3: #a3957b;
-  --gold: #e5b53f; --gold2: #f3d27e; --ver: #e0603f; --ink: #1a1204;
-  --bg-rgb: 17, 13, 9;                    /* el fondo, para velos con transparencia */
-  --c: rgba(229, 181, 63, .62);           /* filete de la orla y de las cartelas */
-  --cb: rgba(229, 181, 63, .46);          /* tramos llenos de la orla */
-  --c2: rgba(229, 181, 63, .3);           /* segundo filete, mas tenue */
-  --pt: rgba(208, 193, 165, .3);          /* linea de puntos */
-  --grab: .3;                             /* opacidad de un grabado de fondo */
-
-  --f-disp: "Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
-  --f-fell: "IM Fell English", Georgia, serif;
-  --f-sans: Figtree, "Segoe UI", system-ui, sans-serif;
-  --f-mono: "IBM Plex Mono", Consolas, monospace;
-
-  --b: 36px;                              /* ancho de la orla */
-  --gx: clamp(16px, 3vw, 44px);           /* margen lateral del contenido */
+  --gx: clamp(16px, 3vw, 44px);           /* margen lateral del contenido (Atlas I usa 80px: ver atlas2-marco.css, CONVIVENCIA) */
   --wrap: 1326px;
-  --ease: cubic-bezier(.16, 1, .3, 1);
-}
-body.night-vision {
-  --bg: #050000; --s1: #0e0202; --s2: #170404; --line: #2e0808;
-  /* texto sobre --bg, medido (WCAG): tx 6.3:1 > t2 5.9:1 > t3 4.9:1 (4.65:1 sobre --s2). Antes t3 era
-     2.3:1 y t2 3.7:1: los rotulos pequenos no se leian. La jerarquia se mantiene por luminancia. */
-  --tx: #ff4a3d; --t2: #ff3a2c; --t3: #ea2e22;
-  --gold: #ff2a1a; --gold2: #ff5a4a; --ver: #b3140a; --ink: #0a0000;
-  --bg-rgb: 5, 0, 0;
-  --c: rgba(255, 42, 26, .5); --cb: rgba(255, 42, 26, .36); --c2: rgba(255, 42, 26, .24);
-  --pt: rgba(200, 36, 26, .34);
-}
-
-/* ---------------------------------------------------------------- 1b. variables heredadas
-   SOLO EN LA COPIA DEL REPO (no esta en el prototipo propuestas-estetica/v2/).
-   Las herramientas (astroweather.css, autoghs, pixelmath, cabraspace-imaging-workflow, tools.css) y los
-   style="" de las paginas generadas por tools/build_atlas.py usan los nombres de index.css / Atlas I.
-   Esto los define con el valor equivalente del sistema nuevo, como hace hoy atlas/atlas.css:12-38, para
-   que, cuando esta hoja se cargue, ninguna herramienta se quede sin color. Sin esto, var(--gold-primary)
-   etc. caerian al valor de index.css (otro dorado y otro gris).
-
-   DE DONDE SALE CADA VALOR
-   - Los alias (var(--...)) apuntan al token nuevo de la seccion 1: un solo sitio donde cambiar el color.
-   - En body.night-vision se REPITEN las mismas lineas: una variable declarada en :root con var() se
-     resuelve en :root y se hereda ya resuelta, asi que no seguiria al token de noche si no se redeclara
-     en body. Es lo que hace hoy index.css:1306-1325 (valores propios de noche) y lo que se mantiene.
-   - Sin equivalente en el sistema nuevo (valor literal, copiado):
-       --gold-secondary  dia #c9982a  <- atlas/atlas.css:22      noche #cc0000 <- index.css:1312
-       --gold-dark       dia #2a1f0c  <- atlas/atlas.css:22      noche #330000 <- index.css:1314
-       --border-hover    dia #54402b  <- atlas/atlas.css:25      noche #3a0808 <- index.css:1324
-   - --gold-glow / --gold-border / --gold-border-muted: el dorado nuevo (229,181,63) con las opacidades de
-     atlas.css:23 (.12 / .24 / .09); de noche el rojo nuevo (255,42,26) con las de index.css:1315-1317
-     (.15 / .25 / .10).
-   - --glow: atlas.css:16 (dia rgba(196,110,42,.26)) y atlas.css:36 (noche rgba(255,0,0,.08)).
-   - --ah (81px: altura de la cabecera de hoy; las herramientas tienen alturas fijas ligadas a ella:
-     tools.css:96,121-124, pixelmath.html:15,62-63, cabraspace-imaging-workflow.html:126,177) <- atlas.css:17.
-     F2 lo cambiara a la altura de la cabecera nueva. --gb --gb2 <- atlas.css:18.
-   - YA DEFINIDAS ARRIBA y con el mismo valor que Atlas I (no se duplican): --bg --s1 --s2 --line --tx
-     --t2 --t3 --gold --gold2 --ink --ver --ease. En noche Atlas II da MAS contraste a --t2 y --t3 (atlas.css:36
-     tenia #c8241a y #8e170f): se usa el nuevo.
-   - YA DEFINIDA CON OTRO VALOR: --gx. Atlas I = 80px (atlas.css:18); aqui es clamp(16px, 3vw, 44px) y NO se
-     pisa. Efecto: las paginas generadas de hoy, que usan var(--gx) en 135 style="", tendrian margen lateral
-     menor si cargasen esta hoja antes de migrar su marcado (F3-F4).
-   - Tipografias: --font-sans/-display/-mono y --a-sans/-disp/-mono son alias de --f-sans/--f-disp/--f-mono
-     (Figtree, Bodoni Moda, IBM Plex Mono: los mismos de atlas.css:26-32).
-   Cuando ninguna pagina ni herramienta use ya un nombre viejo, se borra su linea (F6). */
-:root {
-  --glow: rgba(196, 110, 42, .26);
-  --ah: 81px; --gb: 40px; --gb2: 72px;
-
-  --bg-color: var(--bg); --bg-card: var(--s1); --bg-card-hover: var(--s2);
-  --gold-primary: var(--gold); --gold-secondary: #c9982a; --gold-light: var(--gold2); --gold-dark: #2a1f0c;
-  --gold-glow: rgba(229, 181, 63, .12); --gold-border: rgba(229, 181, 63, .24); --gold-border-muted: rgba(229, 181, 63, .09);
-  --text-primary: var(--tx); --text-secondary: var(--t2); --text-muted: var(--t3);
-  --border-color: var(--line); --border-hover: #54402b;
-  --font-sans: var(--f-sans); --font-display: var(--f-disp); --font-mono: var(--f-mono);
-  --a-sans: var(--f-sans); --a-disp: var(--f-disp); --a-mono: var(--f-mono);
-}
-body.night-vision {
-  --glow: rgba(255, 0, 0, .08);
-  --bg-color: var(--bg); --bg-card: var(--s1); --bg-card-hover: var(--s2);
-  --gold-primary: var(--gold); --gold-secondary: #cc0000; --gold-light: var(--gold2); --gold-dark: #330000;
-  --gold-glow: rgba(255, 42, 26, .15); --gold-border: rgba(255, 42, 26, .25); --gold-border-muted: rgba(255, 42, 26, .10);
-  --text-primary: var(--tx); --text-secondary: var(--t2); --text-muted: var(--t3);
-  --border-color: var(--line); --border-hover: #3a0808;
 }
 
 /* ---------------------------------------------------------------- 2. base */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  margin: 0; padding: clamp(8px, 1.2vw, 18px);
+  margin: 0; padding: 0;                  /* el margen de la hoja lo da .hoja en atlas2-marco.css (--hm); antes era este padding */
   background: var(--bg); color: var(--tx);
   font-family: var(--f-sans); font-size: 16px; line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -172,64 +94,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .nb { white-space: nowrap; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ---------------------------------------------------------------- 3. hoja y orla
-   La orla la dibuja js/atlas2.js dentro de .hoja (24 horas arriba y abajo, de +80 a -80 grados a
-   los lados). Sin JS queda el doble filete, que ya es marco. */
-.hoja { position: relative; max-width: 1880px; margin: 0 auto; border: 1px solid var(--c); }
-.hoja-in { position: relative; margin: var(--b); border: 1px solid var(--c); overflow: hidden; }
-.orla { position: absolute; display: flex; overflow: hidden; pointer-events: none; }
-.orla i { flex: 1 1 0; position: relative; display: block; min-width: 0; min-height: 0; }
-.orla b { position: absolute; font: italic 400 11px/1 var(--f-fell); color: var(--t3); white-space: nowrap; }
-.orla-t, .orla-b { left: var(--b); right: var(--b); height: var(--b); }
-.orla-t { top: 0; }
-.orla-b { bottom: 0; }
-.orla-l, .orla-r { top: var(--b); bottom: var(--b); width: var(--b); flex-direction: column; }
-.orla-l { left: 0; }
-.orla-r { right: 0; }
-.orla-t i { background: linear-gradient(var(--c), var(--c)) 0 5px / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 6px / 1px 11px no-repeat, repeating-linear-gradient(90deg, var(--c) 0 1px, transparent 1px calc(100% / 6)) 0 6px / 100% 5px no-repeat; }
-.orla-b i { background: linear-gradient(var(--c), var(--c)) 0 calc(100% - 5px) / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 1px 11px no-repeat, repeating-linear-gradient(90deg, var(--c) 0 1px, transparent 1px calc(100% / 6)) 0 calc(100% - 6px) / 100% 5px no-repeat; }
-.orla-l i { background: linear-gradient(var(--c), var(--c)) 5px 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) 6px 0 / 11px 1px no-repeat, repeating-linear-gradient(180deg, var(--c) 0 1px, transparent 1px 20%) 6px 0 / 5px 100% no-repeat; }
-.orla-r i { background: linear-gradient(var(--c), var(--c)) calc(100% - 5px) 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 11px 1px no-repeat, repeating-linear-gradient(180deg, var(--c) 0 1px, transparent 1px 20%) calc(100% - 6px) 0 / 5px 100% no-repeat; }
-.orla i:nth-child(odd)::before { content: ""; position: absolute; background: var(--cb); }
-.orla-t i:nth-child(odd)::before { left: 0; right: 0; top: 0; height: 5px; }
-.orla-b i:nth-child(odd)::before { left: 0; right: 0; bottom: 0; height: 5px; }
-.orla-l i:nth-child(odd)::before { top: 0; bottom: 0; left: 0; width: 5px; }
-.orla-r i:nth-child(odd)::before { top: 0; bottom: 0; right: 0; width: 5px; }
-.orla-t b { left: 0; top: 20px; transform: translateX(-50%); }
-.orla-b b { left: 0; bottom: 20px; transform: translateX(-50%); }
-.orla-l b { top: 0; left: 19px; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
-.orla-r b { top: 0; right: 19px; writing-mode: vertical-rl; transform: translateY(-50%); }
-.esq { position: absolute; width: var(--b); height: var(--b); display: flex; align-items: center; justify-content: center; color: var(--gold); pointer-events: none; }
-.esq svg { width: 14px; height: 14px; }
-.esq-tl { top: 0; left: 0; border-right: 1px solid var(--c); border-bottom: 1px solid var(--c); }
-.esq-tr { top: 0; right: 0; border-left: 1px solid var(--c); border-bottom: 1px solid var(--c); }
-.esq-bl { bottom: 0; left: 0; border-right: 1px solid var(--c); border-top: 1px solid var(--c); }
-.esq-br { bottom: 0; right: 0; border-left: 1px solid var(--c); border-top: 1px solid var(--c); }
-/* doble filete: separa cabecera, heroe, pie */
-.filete { height: 4px; border-top: 1px solid var(--c); border-bottom: 1px solid var(--c2); }
-
-/* ---------------------------------------------------------------- 4. cabecera
-   Identica en todas las paginas. atlas2.js pone aria-current="page" al enlace de la pagina actual. */
-.cab { position: relative; z-index: 5; }
-.cab-bar { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0 24px; padding: 10px clamp(16px, 3vw, 40px); }
-.cab-logo { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; }
-.cab-logo img { width: 30px; height: 36px; object-fit: contain; }
-.cab-logo span { font-family: var(--f-disp); font-size: 23px; font-weight: 500; letter-spacing: .01em; }
-.cab-nav { display: flex; align-items: center; gap: clamp(18px, 2.6vw, 38px); }
-.cab-l { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: var(--t2); transition: color .2s; }
-.cab-l:hover { color: var(--gold2); }
-.cab-l[aria-current] { color: var(--tx); box-shadow: inset 0 -1px 0 var(--gold); }
-.cab-r { display: flex; align-items: center; gap: 14px; }
-.cab-hw { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px; border: 1px solid var(--gold); color: var(--gold2); font-size: 14.5px; font-weight: 500; white-space: nowrap; transition: background-color .2s, color .2s; }
-.cab-hw:hover, .cab-hw[aria-current] { background: var(--gold); color: var(--ink); }
+/* ---------------------------------------------------------------- 3. hoja y orla · 4. cabecera -> atlas2-marco.css
+   Boton de icono (lo usan tambien piezas del interior, p. ej. .cap-play): */
 .ic { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--t2); cursor: pointer; transition: color .2s; }
 .ic:hover { color: var(--gold2); }
 .ic svg { width: 20px; height: 20px; }
-.cab-noche[aria-pressed="true"] { color: var(--gold2); }
-.cab-lang { display: inline-flex; align-items: center; font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; color: var(--t3); }
-.cab-lang a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
-.cab-lang a:hover, .cab-lang a[aria-current] { color: var(--gold2); }
-.cab-burger { display: none; }
 
 /* ---------------------------------------------------------------- 5. botones y enlaces */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border: 0; background: var(--gold); color: var(--ink); font-size: 15.5px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color .2s; }
@@ -649,23 +518,9 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
 .casilla { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 10px; padding-top: 6px; border-top: 1px dotted var(--pt); font-size: 14.5px; color: var(--t2); cursor: pointer; }
 .casilla input { width: 17px; height: 17px; margin: 0; accent-color: var(--gold); }
 
-/* ---------------------------------------------------------------- 15. pie (identico en todas las paginas) */
-.pie { position: relative; padding: clamp(48px, 5.4vw, 76px) 0 30px; }
-.pie-g { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: end; }
-.pie-cita { max-width: 780px; font-family: var(--f-fell); font-style: italic; font-size: clamp(24px, 2.7vw, 36px); line-height: 1.22; color: var(--tx); }
-.pie-tr { margin-top: 16px; max-width: 620px; font-size: 16px; color: var(--t2); }
-.pie-src { display: block; margin-top: 12px; }
-.pie-enl { display: flex; flex-wrap: wrap; gap: 14px; }
-.pie-base { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); }
-.pie-marca { display: inline-flex; align-items: center; gap: 12px; }
-.pie-marca img { width: 22px; height: 26px; object-fit: contain; }
-.pie-nav { display: flex; flex-wrap: wrap; gap: 0 26px; }
-.pie-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14.5px; color: var(--t2); transition: color .2s; }
-.pie-nav a:hover { color: var(--gold2); }
-
-/* ---------------------------------------------------------------- 16. modo noche
-   Los tokens ya lo vuelven todo rojo (texto, filetes, grabados de mascara). Aqui, lo que no es token. */
-body.night-vision img, body.night-vision video, body.night-vision iframe, body.night-vision canvas:not(.armilar canvas) { filter: url(#cb-noche); opacity: .85; }   /* filtro SVG que inyecta atlas2.js: luminancia -> solo canal rojo. La cadena sepia+hue-rotate+saturate dejaba verde-amarillo lo mas brillante de las fotos */
+/* ---------------------------------------------------------------- 15. pie -> atlas2-marco.css
+   ---------------------------------------------------------------- 16. modo noche: tokens, fotos (#cb-noche) e iconos
+   en atlas2-marco.css; aqui, lo que es de piezas del interior. */
 body.night-vision .herr-captura, body.night-vision .lam-marco img.encaja, body.night-vision .serie .lam-marco img { background: var(--bg); }
 body.night-vision .cap-dot { box-shadow: none; }
 
@@ -678,10 +533,6 @@ body.night-vision .cap-dot { box-shadow: none; }
   .herr-lado .armilar { width: clamp(176px, 16vw, 214px); margin: -26px 2vw 0 0; flex: none; }
 }
 @media (max-width: 1080px) {
-  .orla-t i:nth-child(even) b, .orla-b i:nth-child(even) b { display: none; }
-  .cab-bar { gap: 0 16px; padding-left: 16px; padding-right: 16px; }
-  .cab-nav { gap: 18px; }
-  .cab-r { gap: 6px; }
   /* heroe apilado: texto, y debajo la carta como lamina propia */
   .heroe { --cap-x: 50%; --cap-y: 160px; flex-direction: column; align-items: stretch; min-height: 0; }
   .heroe-in { order: 1; padding: 40px var(--gx) 34px; }
@@ -698,19 +549,9 @@ body.night-vision .cap-dot { box-shadow: none; }
   .laminas--3 .lam-marco img { height: 200px; }
   .laminas--4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 980px) {
-  /* menu: los enlaces pasan a un panel que abre el boton */
-  .cab-bar { flex-wrap: wrap; }
-  .cab-burger { display: inline-flex; }
-  .cab-nav { display: none; order: 3; flex: 1 0 100%; flex-direction: column; align-items: stretch; gap: 0; margin-top: 8px; border-top: 1px solid var(--line); }
-  .cab.is-open .cab-nav { display: flex; }
-  .cab-nav .cab-l { min-height: 50px; padding: 0 4px; border-bottom: 1px dotted var(--pt); font-size: 16.5px; }
-  .cab-nav .cab-l[aria-current] { box-shadow: none; color: var(--gold2); }
-}
 @media (max-width: 860px) {
   .pag-cab { grid-template-columns: minmax(0, 1fr); align-items: start; }
   .pag-grab { width: 170px; grid-row: 1; }
-  .pie-g { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 28px; }
   .rejilla-3, .rejilla-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(230px, auto); }
   .herr--mayor { grid-column: 1 / -1; grid-row: auto; }
@@ -727,21 +568,6 @@ body.night-vision .cap-dot { box-shadow: none; }
   .reg-lado .grab { display: none; }
 }
 @media (max-width: 700px) {
-  :root { --b: 13px; }
-  /* la orla se simplifica: sin numeros, sin graduacion menor, sin estrellas de esquina */
-  .orla b, .esq svg, .orla i::before { display: none; }
-  .orla-t i { background: linear-gradient(var(--c), var(--c)) 0 5px / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 6px / 1px 5px no-repeat; }
-  .orla-b i { background: linear-gradient(var(--c), var(--c)) 0 calc(100% - 5px) / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 1px 5px no-repeat; }
-  .orla-l i { background: linear-gradient(var(--c), var(--c)) 5px 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) 6px 0 / 5px 1px no-repeat; }
-  .orla-r i { background: linear-gradient(var(--c), var(--c)) calc(100% - 5px) 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 5px 1px no-repeat; }
-  .cab-bar { padding: 6px 8px; gap: 0 6px; }
-  .cab-r { gap: 2px; }
-  .cab-logo span { font-size: 20px; }
-  .cab-hw { width: 44px; padding: 0; justify-content: center; }
-  .cab-hw span { display: none; }
-  .cab-lang { display: none; }
-  .cab.is-open .cab-nav { padding-bottom: 52px; }
-  .cab.is-open .cab-lang { display: inline-flex; position: absolute; left: 8px; bottom: 6px; }
   .heroe { --cap-s: .72; --cap-y: 118px; }
   .heroe-in { padding: 30px var(--gx) 28px; }
   .heroe-tx p { font-size: 16.5px; }
@@ -781,7 +607,6 @@ body.night-vision .cap-dot { box-shadow: none; }
   .taller .grab { width: 86px; }
   .taller .lnk { grid-column: 1; }
   .taller h2 { font-size: 26px; }
-  .pie-base { flex-direction: column; align-items: flex-start; }
   .ficha > div { flex-direction: column; gap: 2px; }
   .ficha dd { text-align: left; }
   /* herramientas: la horizontal y la lista */

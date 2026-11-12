@@ -2,15 +2,18 @@
 
 Desde el 12-11-2026 la copia del repo es la FUENTE del sistema. El prototipo `CabraSpace/propuestas-estetica/v2/`
 (y `project/p1,p3,p5`) queda como referencia congelada: no se sigue editando allí.
-Nada de esto lo carga todavía ninguna página real. Se ve en `atlas/atlas2-muestra.html` (`noindex`, en `atlas/`
-a propósito: `sync_nav.py` y `seo_inject.py` solo recorren los `*.html` de la raíz).
+**F2 (12-11-2026):** el MARCO ya está en las 54 páginas: `atlas/atlas2-marco.css` + `atlas/atlas2.js`, con el marcado
+que escribe `tools/sync_nav.py`. El interior nuevo (`atlas/atlas2.css`) aún no lo carga ninguna página real; se ve en
+`atlas/atlas2-muestra.html` (`noindex`, en `atlas/` a propósito: `sync_nav.py` y `seo_inject.py` solo recorren los
+`*.html` de la raíz). La convivencia con `index.css` / `atlas.css` está explicada en `atlas/LEEME.md`.
 
 ## Qué es cada cosa
 
 | Fichero | Qué es |
 |---|---|
-| `atlas/atlas2.css` | Hoja del sistema (tokens, hoja con orla, cabecera, láminas, grabados, noche…). La sección 1b es propia del repo: define las variables viejas (`--gold-primary`, `--bg-card`…) y las cortas de Atlas I con el valor del sistema nuevo. Cada valor lleva su origen en el comentario. |
-| `atlas/atlas2.js` | Orla graduada, modo noche (`localStorage 'night-vision'`), menú móvil, sección activa. |
+| `atlas/atlas2-marco.css` | (F2) El marco, extraído de `atlas2.css`: tokens (con la noche en penumbra, D5), variables heredadas (`--gold-primary`, `--bg-card`…, antes sección 1b), hoja con orla, cabecera con cajón móvil, pie, modo noche y una sección de compatibilidad temporal. Lo cargan las 54 páginas, la última hoja. |
+| `atlas/atlas2.css` | Interior del sistema (base, botones, cartelas, héroe, grabados, herramientas, láminas, bitácora, composición, frisos, página secundaria). Necesita `atlas2-marco.css` antes. El margen de la hoja ya no es un `padding` del `body` (lo da `.hoja`). |
+| `atlas/atlas2.js` | (F2) Único script de cabecera de las 54 páginas: orla graduada, filtro `#cb-noche` de respaldo, modo noche (`localStorage 'night-vision'`), cajón móvil `#atlas-drawer`. La sección actual ya no la marca el JS: la escribe `sync_nav.py`. |
 | `atlas/armilar.js` | Esfera armilar animada. **Generado** por `tools/atlas2/armilar/build_armilar.py`: no se edita. |
 | `atlas/capricornus2.js` | Capricornio animada (el `capricornus.js` del prototipo; el «2» evita confundirlo con `tools/capricornus.py`). Su bloque `DATA-BEGIN/END` lo reescribe `carta_capricornio.py`. |
 | `atlas/img/*.svg` | Grabados-máscara nuevos (armilar, astrolabio, octante, refractor, cúpula, horizonte, taller, archivo, las tres capas de la carta y `rosa.svg`). Los que ya existían idénticos (observatorio, factorias, pizarra, histograma, placa) no se duplican. |
@@ -42,3 +45,18 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   `armilar.src.js` rompería la igualdad byte a byte con el prototipo. Se corrige en la primera edición real del motor.
 - La latitud de `p1/instrumentos.py` (38,15°, AstroCamp) está marcada allí «NOT VERIFIED».
 - Comprobador de la web: `node tools/check_site.mjs` (ver cabecera del fichero); línea base en `tools/check_site_baseline.json`.
+- `atlas2-muestra.html` carga ya `atlas2-marco.css` + `atlas2.css`, pero conserva la cabecera del prototipo (sin cajón):
+  por debajo de 980 px su menú no se despliega. No es una página del sitio.
+
+## Pendiente para F3–F5 (anotado en F2)
+
+- **Numeración D2** (I Herramientas · II Observaciones · III Bitácora · IV Programas): el marco (cajón y orden del pie)
+  ya la sigue. El interior todavía usa la vieja: `tools/build_atlas.py:267-271` (portada: Observaciones Nº I,
+  Herramientas Nº II, Programas Nº III), `:378` (Observaciones Nº I), `:426` (Herramientas Nº II), `:435` (CabraSpace Web
+  «Nº I · la principal»), `:474` (Programas Nº III), `:507` (Bitácora Nº IV, coincide); y las cabeceras a mano de las
+  herramientas: CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,
+  PixelMath-teca «Nº V» (numeran herramientas, no secciones).
+- Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css`.
+- Los `<canvas>` de las herramientas (resultado de PixelMath-teca, visor de CabraSpace Web) no se filtran en modo noche
+  (como antes de F2): siguen saliendo en color. Decidir en F5 si se filtran.
+- `index.css:1395` (`.dashboard-section`, padding-top 150px) no lo usa ninguna página: F6.

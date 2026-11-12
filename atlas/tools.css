@@ -117,11 +117,14 @@ section.simulator-card { position: relative; }   /* la de AutoGHS no es sticky: 
 .tl-top h1 .nw { white-space: nowrap; }
 
 /* ---------- CabraSpace Web: franja compacta. El cockpit ocupa la pantalla sin scroll, así que la
-   franja mide 88 px bajo la barra y la rejilla se encoge exactamente eso (+1 px del margen) ---------- */
+   franja mide 88 px bajo la barra y la rejilla se encoge exactamente eso (+1 px del margen).
+   F2 (Atlas II): la cabecera ya no es fija (--ah = 0) y encima del contenido hay hoja + orla + cabecera:
+   --marco-top (atlas2-marco.css). Antes 207 = 81 (cabecera) + 126 (franja 88 + 35 hasta la rejilla + 3 abajo).
+   El respaldo 81px deja el cálculo de antes si la hoja del marco no carga. ---------- */
 .tl-top.tl-compact { height: calc(var(--ah) + 88px); box-sizing: border-box; padding: calc(var(--ah) + 10px) var(--gx) 10px; gap: 6px; justify-content: center; }
 .tl-compact h1 { font-size: clamp(30px, 3vw, 44px); }
-.tl-top + main.piw-container { padding-top: 6px; min-height: calc(100vh - 217px); }
-@media (min-width: 768px) { .tl-top + main .piw-grid { height: calc(100vh - 207px); } }
+.tl-top + main.piw-container { padding-top: 6px; min-height: calc(100vh - 136px - var(--marco-top, 81px)); }
+@media (min-width: 768px) { .tl-top + main .piw-grid { height: calc(100vh - 126px - var(--marco-top, 81px)); } }
 @media (max-width: 1100px) { .tl-art.art-placa { width: 92px; } }
 @media (max-width: 700px) { .tl-art.art-placa { width: 120px; opacity: .12; } }
 @media (max-width: 767px) { .tl-top.tl-compact { height: auto; } }   /* en móvil el cockpit ya hace scroll */
