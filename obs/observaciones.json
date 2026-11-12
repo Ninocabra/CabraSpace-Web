@@ -342,7 +342,7 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1655 ± 0.0020"
+     "0.1655 ± 0.0020 (Sozzetti et al. 2009)"
     ],
     [
      "Centro · 29 · VIII",
@@ -350,7 +350,7 @@
     ],
     [
      "O−C · 29 · VIII",
-     "-3.2 min"
+     "-3.2 min (ExoClock)"
     ],
     [
      "Centro · 15 · IX",
@@ -358,7 +358,7 @@
     ],
     [
      "O−C · 15 · IX",
-     "-1.0 min"
+     "-1.0 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -392,7 +392,7 @@
     ],
     [
      "Rp/R★ published",
-     "0.1655 ± 0.0020"
+     "0.1655 ± 0.0020 (Sozzetti et al. 2009)"
     ],
     [
      "Mid-transit · 29 Aug",
@@ -400,7 +400,7 @@
     ],
     [
      "O−C · 29 Aug",
-     "-3.2 min"
+     "-3.2 min (ExoClock)"
     ],
     [
      "Mid-transit · 15 Sep",
@@ -408,7 +408,7 @@
     ],
     [
      "O−C · 15 Sep",
-     "-1.0 min"
+     "-1.0 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -594,7 +594,7 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
      "Centro · 7 · IX",
@@ -602,7 +602,7 @@
     ],
     [
      "O−C · 7 · IX",
-     "-0.7 min"
+     "-0.7 min (ExoClock)"
     ],
     [
      "Centro · 21 · IX",
@@ -610,7 +610,7 @@
     ],
     [
      "O−C · 21 · IX",
-     "-2.0 min"
+     "-2.0 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -644,7 +644,7 @@
     ],
     [
      "Rp/R★ published",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
      "Mid-transit · 7 Sep",
@@ -652,7 +652,7 @@
     ],
     [
      "O−C · 7 Sep",
-     "-0.7 min"
+     "-0.7 min (ExoClock)"
     ],
     [
      "Mid-transit · 21 Sep",
@@ -660,7 +660,7 @@
     ],
     [
      "O−C · 21 Sep",
-     "-2.0 min"
+     "-2.0 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -834,10 +834,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1463 ± 0.0006"
+     "0.1463 ± 0.0006 (Collins et al. 2017)"
     ],
     [
-     "Profundidad",
+     "(Rp/R★)²",
      "2.18 % (medida) vs 2.14 % (literatura)"
     ],
     [
@@ -850,7 +850,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -884,10 +884,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1463 ± 0.0006"
+     "0.1463 ± 0.0006 (Collins et al. 2017)"
     ],
     [
-     "Depth",
+     "(Rp/R★)²",
      "2.18 % (measured) vs 2.14 % (literature)"
     ],
     [
@@ -900,7 +900,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1074,10 +1074,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1254 ± 0.0005"
+     "0.1254 ± 0.0005 (Esteves et al. 2015)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "1.56 % (medida) vs 1.57 % (literatura)"
     ],
     [
@@ -1090,7 +1090,7 @@
     ],
     [
      "O−C",
-     "+1.8 min"
+     "+1.8 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1124,10 +1124,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1254 ± 0.0005"
+     "0.1254 ± 0.0005 (Esteves et al. 2015)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "1.56 % (measured) vs 1.57 % (literature)"
     ],
     [
@@ -1140,7 +1140,7 @@
     ],
     [
      "O−C",
-     "+1.8 min"
+     "+1.8 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1207,8 +1207,8 @@
    }
   ],
   "notes": {
-   "es": "<p><em class=\"gi\">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso o el egreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p>",
-   "en": "<p><em class=\"gi\">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress or the egress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p>"
+   "es": "<p><em class=\"gi\">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p>",
+   "en": "<p><em class=\"gi\">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p>"
   },
   "made_with": {
    "name": "Cabra<em class=\"gi\">Transit</em>",
@@ -1314,10 +1314,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.0888 ± 0.0018"
+     "0.0888 ± 0.0018 (Alsubai et al. 2017)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "0.66 % (medida) vs 0.79 % (literatura)"
     ],
     [
@@ -1326,11 +1326,11 @@
     ],
     [
      "Centro del tránsito",
-     "00:42:44 UTC ± 4.4 min"
+     "14 · IX, 00:42:44 UTC ± 4.4 min"
     ],
     [
      "O−C",
-     "-7.5 min"
+     "-7.5 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1364,10 +1364,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.0888 ± 0.0018"
+     "0.0888 ± 0.0018 (Alsubai et al. 2017)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "0.66 % (measured) vs 0.79 % (literature)"
     ],
     [
@@ -1376,11 +1376,11 @@
     ],
     [
      "Mid-transit",
-     "00:42:44 UTC ± 4.4 min"
+     "14 Sep, 00:42:44 UTC ± 4.4 min"
     ],
     [
      "O−C",
-     "-7.5 min"
+     "-7.5 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1554,10 +1554,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1300 ± 0.0060"
+     "0.1300 ± 0.0060 (Hébrard et al. 2013, vía Knudstrup et al. 2024)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "1.88 % (medida) vs 1.69 % (literatura)"
     ],
     [
@@ -1566,11 +1566,11 @@
     ],
     [
      "Centro del tránsito",
-     "01:09:16 UTC ± 1.7 min"
+     "4 · IX, 01:09:16 UTC ± 1.7 min"
     ],
     [
      "O−C",
-     "+1.2 min"
+     "+1.2 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1604,10 +1604,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1300 ± 0.0060"
+     "0.1300 ± 0.0060 (Hébrard et al. 2013, via Knudstrup et al. 2024)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "1.88 % (measured) vs 1.69 % (literature)"
     ],
     [
@@ -1616,11 +1616,11 @@
     ],
     [
      "Mid-transit",
-     "01:09:16 UTC ± 1.7 min"
+     "4 Sep, 01:09:16 UTC ± 1.7 min"
     ],
     [
      "O−C",
-     "+1.2 min"
+     "+1.2 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1898,7 +1898,7 @@
     ],
     [
      "Totalidad",
-     "18:30:30 – 18:32:30 UTC"
+     "18:30:31 – 18:32:11 UTC · 1 min 40 s (IGN)"
     ],
     [
      "Timelapse",
@@ -1936,7 +1936,7 @@
     ],
     [
      "Totality",
-     "18:30:30 – 18:32:30 UTC"
+     "18:30:31 – 18:32:11 UTC · 1 min 40 s (IGN)"
     ],
     [
      "Timelapse",
@@ -2061,10 +2061,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "2.80 % (medida) vs 2.65 % (literatura)"
     ],
     [
@@ -2077,7 +2077,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -2111,10 +2111,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "2.80 % (measured) vs 2.65 % (literature)"
     ],
     [
@@ -2127,7 +2127,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescope",
