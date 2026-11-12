@@ -1,0 +1,145 @@
+{
+ "generated": "2026-11-12T14:20:20.025Z",
+ "base": "http://localhost:8190/",
+ "results": [
+  {
+   "page": "control-oculto.html",
+   "redirect": false,
+   "failures": [
+    {
+     "page": "control-oculto.html",
+     "kind": "desborde",
+     "key": "desborde@1440",
+     "detail": "scrollWidth 3008 > 1440 (div.ancho right=3008)",
+     "known": false
+    },
+    {
+     "page": "control-oculto.html",
+     "kind": "desborde",
+     "key": "desborde@390",
+     "detail": "scrollWidth 3008 > 390 (div.ancho right=3008)",
+     "known": false
+    }
+   ],
+   "ignoredExternal": 1,
+   "overflow": {
+    "390": {
+     "iw": 390,
+     "sw": 3008,
+     "culprit": "div.ancho right=3008"
+    },
+    "1440": {
+     "iw": 1440,
+     "sw": 3008,
+     "culprit": "div.ancho right=3008"
+    }
+   },
+   "captureHeights": {},
+   "slowLoad": false
+  },
+  {
+   "page": "control.html",
+   "redirect": false,
+   "failures": [
+    {
+     "page": "control.html",
+     "kind": "js",
+     "key": "Error: 6 excepcion JS de control",
+     "detail": "Error: 6 excepcion JS de control",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "consola",
+     "key": "[network] Failed to load resource: the server responded with a status of 404 (File not found) /no-existe.png",
+     "detail": "[network] Failed to load resource: the server responded with a status of 404 (File not found) /no-existe.png",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "consola",
+     "key": "5 error de consola de control",
+     "detail": "5 error de consola de control",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "consola",
+     "key": "[network] Failed to load resource: the server responded with a status of 404 (File not found) /nada-de-nada.png",
+     "detail": "[network] Failed to load resource: the server responded with a status of 404 (File not found) /nada-de-nada.png",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "recurso",
+     "key": "/no-existe.png",
+     "detail": "/no-existe.png -> HTTP 404",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "recurso",
+     "key": "/nada-de-nada.png",
+     "detail": "/nada-de-nada.png -> HTTP 404",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "enlace",
+     "key": "/no-existe.html",
+     "detail": "/no-existe.html -> enlace interno roto: 404",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "desborde",
+     "key": "desborde@1440",
+     "detail": "scrollWidth 3008 > 1440 (div.ancho right=3008)",
+     "known": false
+    },
+    {
+     "page": "control.html",
+     "kind": "desborde",
+     "key": "desborde@390",
+     "detail": "scrollWidth 3008 > 390 (div.ancho right=3008)",
+     "known": false
+    }
+   ],
+   "ignoredExternal": 1,
+   "overflow": {
+    "390": {
+     "iw": 390,
+     "sw": 3008,
+     "culprit": "div.ancho right=3008"
+    },
+    "1440": {
+     "iw": 1440,
+     "sw": 3008,
+     "culprit": "div.ancho right=3008"
+    }
+   },
+   "captureHeights": {},
+   "slowLoad": false
+  },
+  {
+   "page": "limpia.html",
+   "redirect": false,
+   "failures": [],
+   "ignoredExternal": 1,
+   "overflow": {
+    "390": {
+     "iw": 390,
+     "sw": 390,
+     "culprit": null
+    },
+    "1440": {
+     "iw": 1440,
+     "sw": 1440,
+     "culprit": null
+    }
+   },
+   "captureHeights": {},
+   "slowLoad": false
+  }
+ ]
+}

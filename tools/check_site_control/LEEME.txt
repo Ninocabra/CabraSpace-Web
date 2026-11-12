@@ -1,0 +1,2 @@
+Control positivo de tools/check_site.mjs. control.html falla a proposito (imagen rota, enlace roto, url() roto, excepcion JS, error de consola, 3000 px de ancho); limpia.html no debe fallar.
+Relanzar: en esta carpeta `python -m http.server 8190`, y desde la raiz del repo `node tools/check_site.mjs --dir tools/check_site_control --base http://localhost:8190/` (debe salir con codigo 1 y marcar los fallos de control.html). Salida de referencia: salida.txt.
