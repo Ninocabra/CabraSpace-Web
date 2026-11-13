@@ -101,8 +101,8 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   herramientas (F5a, 13-11-2026): CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,
   PixelMath-teca «Nº V» (hechas). Numeran herramientas, no secciones, igual que el bento de la portada y la lista de
   Herramientas (Nº I–V): si se mantienen, ya coinciden.
-- Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css` (F5a: la de PixelMath-teca
-  ya está fuera; quedan las de los catálogos). Detalle de F5a en `atlas/LEEME.md`.
+- Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css` (hecho: F5a sacó la de
+  PixelMath-teca y F5b la de los catálogos; la sección 7 está vacía). Detalle de F5a y F5b en `atlas/LEEME.md`.
 - F4: `build_obs_page` puede reutilizar `lam_card`, `lam_meta`, `nb_title` y `thumb_alt` (ya en `build_atlas.py`) para
   sus «Más en…», y pasar a `interior="a2"`. Los «Más en exoplanetas» enlazan a `observaciones.html#exoplanetas`: el
   ancla funciona con los filtros nuevos.

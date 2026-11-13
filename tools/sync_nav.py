@@ -39,12 +39,15 @@ VERSION = "20261112a"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
-# Capas de estilo propias de las 5 herramientas, en este orden. Desde F5 (cabecera Atlas II) van DESPUÉS de atlas2.css:
-# tools-base.css (convivencia: devuelve al interior lo que la base de atlas2.css le cambia) y su capa propia.
+# Capas de estilo propias de las 5 herramientas y de los 5 catálogos, en este orden. Desde F5 (cabecera Atlas II) van
+# DESPUÉS de atlas2.css: tools-base.css (convivencia: devuelve al interior lo que la base de atlas2.css le cambia) y, en las
+# herramientas, su capa propia. Los catálogos (F5b) solo llevan tools-base.css.
 EXTRA_CSS = {
     "cabraspace-imaging-workflow": ["atlas/tools-base.css", "atlas/tools.css"], "autoghs": ["atlas/tools-base.css", "atlas/tools.css"],
     "pixelmath": ["atlas/tools-base.css", "atlas/tools.css"], "contaminacion-mapa": ["atlas/tools-base.css", "atlas/tools.css"],
     "astroforecast": ["atlas/tools-base.css", "atlas/astroforecast.css"],
+    "equipamiento": ["atlas/tools-base.css"], "novedades": ["atlas/tools-base.css"], "cursos-youtube": ["atlas/tools-base.css"],
+    "divulgacion-coffeebreak": ["atlas/tools-base.css"], "contaminacion": ["atlas/tools-base.css"],
 }
 # no tenían pie; lo reciben (el marco de F2 lo lleva en todas las páginas)
 WITH_FOOTER = {"astroforecast.html", "astroforecast-en.html", "contaminacion-mapa.html", "contaminacion-mapa-en.html"}

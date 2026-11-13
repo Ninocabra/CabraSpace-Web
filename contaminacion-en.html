@@ -11,33 +11,6 @@
   <link rel="stylesheet" href="support.css">
   <style>
     /* Custom styles for Light Pollution section */
-    .section-header {
-      padding-top: 150px;
-      padding-bottom: 36px;
-      text-align: center;
-    }
-    
-    .sec-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 18px;
-    }
-
-    .sec-subtitle {
-      color: var(--text-secondary);
-      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
-      max-width: 650px;
-      margin: 0 auto;
-      font-weight: 300;
-      line-height: 1.6;
-    }
-
     /* Map Highlight Card */
     .map-highlight-card {
       background: #070708;
@@ -186,6 +159,8 @@
   <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/tools-base.css?v=20261112a">
 </head>
 <body>
   <!-- FOUC Preventer for Night Mode -->
@@ -221,14 +196,21 @@
     <div class="filete" aria-hidden="true"></div>
   </header>
 
+  <div class="wrap pag-wrap">
+    <div class="pag-cab">
+      <div class="pag-tx">
+        <a class="miga" href="bitacora-en.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Logbook</a>
+        <p class="cartela">Tabula III<span class="cartela-l"> <i>·</i> Pollution</span></p>
+        <h1 class="tit-1">Light <em class="gi">Pollution</em></h1>
+        <p class="entradilla">Plan your observation and imaging sessions using interactive maps and learn the best techniques and filter recommendations to beat the city glow.</p>
+      </div>
+      <div class="pag-grab"><span class="grab grab-factorias" aria-hidden="true"></span></div>
+    </div>
+  </div>
+  <div class="filete" aria-hidden="true"></div>
+
   <!-- Main Section -->
-  <main class="container">
-    <section class="section-header">
-      <h1 class="sec-title">Light Pollution</h1>
-      <p class="sec-subtitle">
-        Plan your observation and imaging sessions using interactive maps and learn the best techniques and filter recommendations to beat the city glow.
-      </p>
-    </section>
+  <main class="container cat-main">
 
     <!-- Map Highlight Card -->
     <section class="map-highlight-card" id="mapCard">

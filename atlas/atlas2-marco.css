@@ -21,8 +21,7 @@
        astroforecast.css .aw-top) dejan de reservar los 81 px que tapaba la cabecera vieja.
      - --marco-top = alto de lo que hay encima del contenido (margen de la hoja + filetes + orla +
        cabecera). Lo usan las herramientas de pantalla completa (tools.css: rejilla de CabraSpace Web).
-     - Seccion 7 «compatibilidad»: los pocos ajustes del interior que dependian de la cabecera fija
-       (padding-top:150px de 4 catalogos, sticky top:100px del lateral de Coffee Break). Se borran en F5 al migrar esas paginas.
+     - Seccion 7: vacia desde F5b (era la compatibilidad con la cabecera fija; ver el comentario de la seccion).
 
    PIEZAS
      1. Tokens ............ :root, body.night-vision (penumbra, D5)
@@ -33,7 +32,7 @@
                             seccion actual: aria-current (lo escribe sync_nav.py, no el JS)
      5. Pie ............... footer.pie .pie-in .pie-g .pie-cita .pie-tr .pie-src .pie-enl .pie-base .pie-nav
      6. Modo noche ........ fotos con el filtro SVG #cb-noche (va en la cabecera), iconos del marco
-     7. Compatibilidad .... ajustes del interior por la cabecera ya no fija (se quitan en F5)
+     7. (vacia desde F5b) .. antes, ajustes del interior por la cabecera ya no fija
      8. Responsive ........ 1080 / 980 / 700 px ; prefers-reduced-motion (solo el marco)
    ========================================================================== */
 
@@ -231,15 +230,10 @@ footer.pie { position: relative; z-index: 1; display: block; margin: 0; padding:
 body.night-vision img, body.night-vision video, body.night-vision iframe, body.night-vision .video-thumbnail-bg { filter: url(#cb-noche) !important; opacity: .75; }
 body.night-vision :is(.cab, .pie, .esq) svg { filter: none !important; opacity: 1; }
 
-/* ---------------------------------------------------------------- 7. compatibilidad (se quita en F5)
-   Paginas a mano que reservaban sitio a la cabecera fija de 81 px. Valor = el suyo menos 81, para que el
-   titulo quede a la misma distancia de la cabecera que antes (medido antes de F2: h1 a 150 px, 69 bajo la
-   cabecera, a 1440 y a 390). */
-:is(.section-header, .courses-header, .divulgacion-header, .database-header) { padding-top: calc(150px - 81px) !important; }
-/* sticky: top:100px dejaba sitio a la cabecera fija; ahora no hay nada encima al bajar */
-aside.podcast-sidebar { top: 24px; }
-/* (F5, 13-11-2026) Lo de PixelMath-teca de esta seccion (sticky del simulador y su padding en movil) paso a atlas/tools.css
-   al migrar la pagina. Quedan los catalogos: Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guias de Contaminacion. */
+/* ---------------------------------------------------------------- 7. (vacia desde F5b, 13-11-2026)
+   Aqui estaba la compatibilidad de las paginas a mano con la cabecera fija de 81 px (padding-top:150px de los
+   catalogos, sticky de PixelMath-teca y de Coffee Break). Todas migraron a la cabecera nueva: lo de PixelMath-teca
+   esta en atlas/tools.css y el sticky de Coffee Break en atlas/tools-base.css. */
 
 /* ---------------------------------------------------------------- 8. responsive */
 @media (max-width: 1080px) {

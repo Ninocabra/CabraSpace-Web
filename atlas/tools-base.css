@@ -6,8 +6,10 @@
    sistema, enlaces sin su subrayado, el font-size de <html>, etc. Medido el 13-11-2026 con los estilos calculados de
    TODOS los elementos del interior, antes y después (ver informe de F5). Esta hoja se carga justo DESPUÉS de atlas2.css
    (lo ordena tools/sync_nav.py) y solo devuelve al interior lo que tenía. No toca la cabecera ni el marco.
-   Raíces del interior: main.container (CabraSpace Web, AutoGHS, PixelMath-teca), .aw-section (Astro Forecast),
-   .cm-maps (Contaminación, mapa).
+   Raíces del interior: main.container (CabraSpace Web, AutoGHS, PixelMath-teca y los 5 catálogos de F5b), .aw-section
+   (Astro Forecast), .cm-maps (Contaminación, mapa).
+   F5b (13-11-2026): la cargan también los 5 catálogos (Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guías de
+   Contaminación; ES y EN), cuya cabecera es la misma .pag-cab. Sus reglas propias están al final («Catálogos»).
    Se borra, con atlas.css e index.css, cuando se rediseñe el interior de cada herramienta (D6).
    ========================================================================== */
 
@@ -33,3 +35,15 @@ body { font-size: inherit; }
 .aw-sem-col .rotulo { margin-bottom: 0; }
 .aw-info.refs { max-width: none; padding-top: 0; border-top: 1px solid rgba(255, 255, 255, 0.22); }
 .aw-info.refs:hover, .aw-info.refs:focus { border-top-color: rgba(207, 171, 74, 0.6); }
+
+/* ---------- Catálogos (F5b): Equipamiento, Novedades, Cursos YouTube, Coffee Break, Contaminación (guías) ----------
+   Las páginas llevan <main class="container cat-main">. Los robots solo tocan sus JSON; el interior no se reescribe. */
+/* aire entre el filete de la cabecera y el primer bloque (antes lo daba el padding-bottom de 36 px de la cabecera vieja) */
+main.cat-main { padding-top: 36px; }
+/* sticky del lateral de Coffee Break: top:100px dejaba sitio a la cabecera fija; ahora no hay nada fijo encima.
+   (estaba en la sección 7 de atlas2-marco.css) */
+aside.podcast-sidebar { top: 24px; }
+/* el botón «Abrir Mapa Interactivo» de Contaminación es .btn.btn-primary de index.css; el .btn de atlas2.css (sin borde,
+   texto en tinta, gap, alto mínimo y transición) lo pisaba. Se devuelve lo de index.css, también al pasar el ratón. */
+main.cat-main .btn.btn-primary { border: 1px solid var(--gold-primary); color: var(--bg-color); gap: normal; min-height: 0; transition: var(--transition-smooth); }
+main.cat-main .btn.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); box-shadow: 0 0 25px var(--gold-glow); }

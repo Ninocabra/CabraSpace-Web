@@ -11,33 +11,6 @@
   <link rel="stylesheet" href="support.css">
   <style>
     /* Estilos específicos para la sección de Divulgación - Coffee Break */
-    .divulgacion-header {
-      padding-top: 150px;
-      padding-bottom: 36px;
-      text-align: center;
-    }
-    
-    .divulgacion-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      background: linear-gradient(180deg, var(--text-primary) 30%, var(--gold-primary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 18px;
-    }
-
-    .divulgacion-subtitle {
-      color: var(--text-secondary);
-      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
-      max-width: 650px;
-      margin: 0 auto;
-      font-weight: 300;
-      line-height: 1.6;
-    }
-
     .divulgacion-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -684,6 +657,8 @@
   <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/tools-base.css?v=20261112a">
 </head>
 <body>
   <!-- FOUC Preventer for Night Mode -->
@@ -719,16 +694,22 @@
     <div class="filete" aria-hidden="true"></div>
   </header>
 
-  <!-- Page Header -->
-  <section class="divulgacion-header container">
-    <h1 class="divulgacion-title">Coffee Break: Señal y Ruido</h1>
-    <p class="divulgacion-subtitle">
-      La tertulia semanal que repasa las últimas noticias de la actualidad científica. El mejor podcast en español para aprender astrofísica, cosmología y ciencias del espacio.
-    </p>
-  </section>
+
+  <div class="wrap pag-wrap">
+    <div class="pag-cab">
+      <div class="pag-tx">
+        <a class="miga" href="bitacora.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Bitácora</a>
+        <p class="cartela">Tabula III<span class="cartela-l"> <i>·</i> Coffee Break</span></p>
+        <h1 class="tit-1">Coffee Break: Señal y <em class="gi">Ruido</em></h1>
+        <p class="entradilla">La tertulia semanal que repasa las últimas noticias de la actualidad científica. El mejor podcast en español para aprender astrofísica, cosmología y ciencias del espacio.</p>
+      </div>
+      <div class="pag-grab"><span class="grab grab-armilar" aria-hidden="true"></span></div>
+    </div>
+  </div>
+  <div class="filete" aria-hidden="true"></div>
 
   <!-- Main Grid Content -->
-  <main class="container divulgacion-grid">
+  <main class="container cat-main divulgacion-grid">
     <!-- Left Column (Player) -->
     <section>
       <!-- Embedded Podcast Player -->

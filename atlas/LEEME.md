@@ -6,12 +6,12 @@
 |---|---|
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
-| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; **desde F5a también las 10 páginas de las 5 herramientas** (ES y EN); los 5 catálogos a mano lo cargarán en F5b. |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin migrar (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; **desde F5a también las 10 páginas de las 5 herramientas** (ES y EN); **desde F5b también los 5 catálogos** (ES y EN). |
+| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin interior nuevo (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; desde F5a/F5b las 20 a mano llevan la cabecera nueva pero conservan esta hoja; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
 | `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
 | `atlas/atlas.js` | Script de cabecera de Atlas I. **Ya no lo carga ninguna página** (F2); se borra en F6. No cargarlo junto a `atlas2.js`: los dos alternarían el modo noche y un clic se anularía. |
 | `atlas/astroforecast.css` | Paneles Atlas de Astro Forecast (desde F5a la cabecera es la de `atlas2.css`; se carga después de `atlas2.css`). |
-| `atlas/tools-base.css` | (F5a) Convivencia de las 5 herramientas con `atlas2.css`: devuelve al interior lo que la base de `atlas2.css` le cambiaba. Ver «F5a». |
+| `atlas/tools-base.css` | (F5a, F5b) Convivencia de las 5 herramientas **y de los 5 catálogos** con `atlas2.css`: devuelve al interior lo que la base de `atlas2.css` le cambiaba; al final, las reglas propias de los catálogos. Ver «F5a» y «F5b». |
 | `atlas/img/` | Logo dorado, grano, retícula, anillo y capturas usadas en varias páginas. |
 | `obs/observaciones.json` | Tu trabajo: una entrada por observación. `facts` guarda cada dato con su fuente (fichero y línea del informe); `facts_display` es lo que se ve en la ficha. |
 | `obs/<slug>/` | Imágenes, curvas y vídeos de cada observación. |
@@ -190,7 +190,34 @@ como `v2/autoghs.html`), y el filete debajo. La interfaz y el JavaScript de cada
   fila (cartela · título · entradilla · grabado). La rejilla mide `100vh - 38px - --cockpit-cab - 4px - --marco-top`: es la misma
   cuenta de antes con la franja de 88 px cambiada por la cabecera nueva. Por debajo de 1100 px se ocultan entradilla y grabado.
 - Las reglas de PixelMath-teca de la sección 7 de `atlas2-marco.css` (sticky del simulador y su padding en móvil) pasaron a `tools.css`.
-  Quedan en la sección 7 las de los catálogos (`.section-header`… y el lateral de Coffee Break).
+  (F5b: la sección 7 ha quedado vacía, ver «F5b».)
 - La versión inglesa de CabraSpace Web se genera: la cabecera está en `tools/i18n_workflow_en.json` (entrada nueva) y se quitaron
   las 20 traducciones obsoletas (18 del menú antiguo + consola y pie viejos; la consola ganó su entrada nueva).
   `python tools/build_workflow_en.py --check` sigue marcando DESFASE, pero solo en cabecera y pie, que reescribe `sync_nav.py`.
+
+## F5b (13-11-2026): cabecera Atlas II en los 5 catálogos (ES y EN)
+
+Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guías de Contaminación (`contaminacion.html`; el mapa es la herramienta Nº IV).
+Todos cuelgan de **III Bitácora** en el menú (`SECTIONS` de `sync_nav.py`) y la Bitácora los lista, así que llevan la cartela
+«Tabula III · <nombre>» y la miga «Bitácora» (ES) / «Logbook» (EN). El resto de la cabecera es la de F5a: `.pag-cab` con título
+(una palabra en cursiva dorada), la entradilla que ya tenía la página y un grabado (`.pag-grab`), seguida del filete.
+
+- La cabecera sale de `<main>` (antes era un `<section class="database-header|courses-header|divulgacion-header|section-header">`
+  dentro o justo antes) y va entre el menú y `<main>`. Sus reglas `.database-header`/`.db-title`/`.db-subtitle` (y las equivalentes) del
+  `<style>` de cada página se borraron: ya nada las usaba. El `<main>` lleva `class="… cat-main"`.
+- **Orden del `<head>`**: `index.css` · `support.css` · `atlas.css` · fuente · `atlas2-marco.css` · `atlas2.css` · `tools-base.css`
+  (`EXTRA_CSS` de `sync_nav.py` lleva ahora los 5 catálogos; solo esa capa). Ojo al editar a mano: el enlace a `atlas2.css` debe ir justo
+  después del de `atlas.css`, porque `sync_nav.py` coloca ahí fuente, marco, `atlas2.css` y capas; si se pone antes, `atlas.css` queda
+  detrás del marco y pisa sus tokens.
+- **Medido** (estilos calculados de todos los elementos del interior, antes con una copia servida de `HEAD` y después con el árbol de
+  trabajo, 1440 y 390): con `atlas2.css` sin más, 1959 propiedades distintas en Equipamiento (fuente de los botones, alto de los chips,
+  `max-width` de las imágenes, `transition`); con `tools-base.css`, ninguna salvo `text-size-adjust: auto → 100%` (inocuo con meta viewport)
+  y el padding de `main.cat-main`. Una cosa más hacía falta: el botón «Abrir Mapa Interactivo» de Contaminación (`.btn.btn-primary` de
+  `index.css`) lo pisaba el `.btn` de `atlas2.css` (sin borde, texto en tinta, otra transición); se devuelve en `tools-base.css`.
+  Igual que en F5a, la regla `@media (prefers-reduced-motion: reduce) { * { transition:none; animation:none } }` de `atlas2.css`
+  (§17) apaga transiciones y el giro del «cargando» para quien pida reducir movimiento; no se puede neutralizar desde fuera.
+- La sección 7 de `atlas2-marco.css` queda vacía (solo un comentario): `padding-top:150px` de las cabeceras viejas ya no tiene a quién
+  aplicarse (grep: ninguna página, hoja ni script usa ya `.section-header`, `.courses-header`, `.divulgacion-header` ni `.database-header`)
+  y el `top:24px` del lateral de Coffee Break pasó a `tools-base.css` junto a las otras reglas de catálogo.
+- Grabados elegidos (los de `atlas2.css`, ninguno nuevo): Equipamiento `refractor`, Novedades `octante`, Cursos `pizarra`, Coffee Break
+  `armilar`, Contaminación `factorias`. El prototipo no define el grabado de cada catálogo: es una elección de ilustración por tema.
