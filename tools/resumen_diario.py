@@ -113,10 +113,25 @@ def send(subject, body_html, user, to, password):
     msg = MIMEMultipart("alternative")
     msg["Subject"], msg["From"], msg["To"] = subject, f"CabraSpace Bitácora <{user}>", to
     msg.attach(MIMEText(body_html, "html", "utf-8"))
-    with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as s:
-        s.starttls()
-        s.login(user, password)
-        s.sendmail(user, [to], msg.as_string())
+    # Gmail muestra la contraseña de aplicación en grupos de 4 con espacios; al pegarla en el
+    # secreto pueden colarse espacios o saltos de línea, y entonces Gmail CORTA la conexión en el
+    # login (SMTPServerDisconnected, 13-11-2026). Se quita todo espacio en blanco, como AstroPrecios.
+    password = "".join(password.split())
+    last = None
+    for attempt in (1, 2):
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as s:
+                s.starttls()
+                s.login(user, password)
+                s.sendmail(user, [to], msg.as_string())
+            return
+        except Exception as e:
+            last = e
+            print(f"Error enviando (intento {attempt}): {type(e).__name__}: {e} · longitud contraseña={len(password)}")
+            if attempt == 1:
+                import time
+                time.sleep(8)
+    raise last
 
 
 def main():
