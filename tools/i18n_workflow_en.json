@@ -104,78 +104,6 @@
     "en": "  <meta name=\"twitter:description\" content=\"Web-based astronomical image processing and analysis system based on the PixInsight cockpit. Real-time stretching, calibration, and blending.\">"
   },
   {
-    "es": "      <a href=\"index.html\" class=\"logo-link\">",
-    "en": "      <a href=\"en.html\" class=\"logo-link\">"
-  },
-  {
-    "es": "      <button class=\"hamburger-btn\" id=\"hamburger-btn\" aria-label=\"Abrir menú\" aria-expanded=\"false\">",
-    "en": "      <button class=\"hamburger-btn\" id=\"hamburger-btn\" aria-label=\"Open menu\" aria-expanded=\"false\">"
-  },
-  {
-    "es": "        <li><a href=\"index.html\" class=\"nav-link\">Inicio</a></li>",
-    "en": "        <li><a href=\"en.html\" class=\"nav-link\">Home</a></li>"
-  },
-  {
-    "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Novedades <span class=\"arrow\">▾</span></a>",
-    "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Latest News <span class=\"arrow\">▾</span></a>"
-  },
-  {
-    "es": "            <li><a href=\"equipamiento.html\" class=\"dropdown-item\">Equipamiento</a></li>\n            <li><a href=\"novedades.html\" class=\"dropdown-item\">PixInsight</a></li>",
-    "en": "            <li><a href=\"equipamiento-en.html\" class=\"dropdown-item\">Equipment</a></li>\n            <li><a href=\"novedades-en.html\" class=\"dropdown-item\">PixInsight</a></li>"
-  },
-  {
-    "es": "        <li><a href=\"cabraspace-imaging-workflow.html\" class=\"nav-link\">CabraSpace Imaging Workflow (BETA)</a></li>",
-    "en": "        <li><a href=\"cabraspace-imaging-workflow-en.html\" class=\"nav-link\">CabraSpace Imaging Workflow (BETA)</a></li>"
-  },
-  {
-    "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Astrofotografía <span class=\"arrow\">▾</span></a>",
-    "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Astrophotography <span class=\"arrow\">▾</span></a>"
-  },
-  {
-    "es": "            <li><a href=\"astroforecast.html\" class=\"dropdown-item\">Astro Forecast</a></li>",
-    "en": "            <li><a href=\"astroforecast-en.html\" class=\"dropdown-item\">Astro Forecast</a></li>"
-  },
-  {
-    "es": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Recursos PixInsight <span class=\"arrow\">▸</span></a>",
-    "en": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">PixInsight Resources <span class=\"arrow\">▸</span></a>"
-  },
-  {
-    "es": "                <li><a href=\"cabrascripts.html\" class=\"dropdown-item\">CabraScripts</a></li>\n                <li><a href=\"pixelmath.html\" class=\"dropdown-item\">PixelMath-teca</a></li>\n                <li><a href=\"cursos-youtube.html\" class=\"dropdown-item\">Cursos Youtube</a></li>",
-    "en": "                <li><a href=\"cabrascripts-en.html\" class=\"dropdown-item\">CabraScripts</a></li>\n                <li><a href=\"pixelmath-en.html\" class=\"dropdown-item\">PixelMath-teca</a></li>\n                <li><a href=\"cursos-youtube-en.html\" class=\"dropdown-item\">YouTube Courses</a></li>"
-  },
-  {
-    "es": "                <li><a href=\"autoghs.html\" class=\"dropdown-item\">AutoGHS</a></li>",
-    "en": "                <li><a href=\"autoghs-en.html\" class=\"dropdown-item\">AutoGHS</a></li>"
-  },
-  {
-    "es": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Contaminación Lumínica <span class=\"arrow\">▸</span></a>",
-    "en": "              <a href=\"#\" class=\"dropdown-item dropdown-toggle\">Light Pollution <span class=\"arrow\">▸</span></a>"
-  },
-  {
-    "es": "                <li><a href=\"contaminacion-mapa.html\" class=\"dropdown-item\">Mapa de Contaminación</a></li>\n                <li><a href=\"contaminacion.html\" class=\"dropdown-item\">Vídeos y Guías</a></li>",
-    "en": "                <li><a href=\"contaminacion-mapa-en.html\" class=\"dropdown-item\">Light Pollution Map</a></li>\n                <li><a href=\"contaminacion-en.html\" class=\"dropdown-item\">Videos & Guides</a></li>"
-  },
-  {
-    "es": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Divulgación <span class=\"arrow\">▾</span></a>",
-    "en": "          <a href=\"#\" class=\"nav-link dropdown-toggle\">Outreach <span class=\"arrow\">▾</span></a>"
-  },
-  {
-    "es": "            <li><a href=\"divulgacion-coffeebreak.html\" class=\"dropdown-item\">Coffee Break: señal y ruido</a></li>",
-    "en": "            <li><a href=\"divulgacion-coffeebreak-en.html\" class=\"dropdown-item\">Coffee Break: señal y ruido</a></li>"
-  },
-  {
-    "es": "        <button id=\"nightmode-toggle\" class=\"nightmode-btn\" aria-label=\"Modo Noche\" title=\"Modo Noche Astronómico\">",
-    "en": "        <button id=\"nightmode-toggle\" class=\"nightmode-btn\" aria-label=\"Night Mode\" title=\"Astronomical Night Mode\">"
-  },
-  {
-    "es": "          <a href=\"cabraspace-imaging-workflow.html\" class=\"lang-link active\">ES</a>",
-    "en": "          <a href=\"cabraspace-imaging-workflow.html\" class=\"lang-link\">ES</a>"
-  },
-  {
-    "es": "          <a href=\"cabraspace-imaging-workflow-en.html\" class=\"lang-link\">EN</a>",
-    "en": "          <a href=\"cabraspace-imaging-workflow-en.html\" class=\"lang-link active\">EN</a>"
-  },
-  {
     "es": "      Modelos de IA por sus creadores:",
     "en": "      AI models by their creators:"
   },
@@ -852,8 +780,12 @@
     "en": "        </div>        <!-- Logs Console -->"
   },
   {
-    "es": "              <span>Consola de Procesado CabraSpace Imaging Workflow <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Limpiar</span>",
-    "en": "              <span>CabraSpace Imaging Workflow Processing Console <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Clear</span>"
+    "es": "  <div class=\"wrap pag-wrap pag-wrap--cockpit\">\n    <div class=\"pag-cab pag-cab--cockpit\">\n      <div class=\"pag-tx\">\n        <a class=\"miga\" href=\"herramientas.html\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 12H5M11 6l-6 6 6 6\"></path></svg>Herramientas web</a>\n        <p class=\"cartela cartela--l26\">Tabula I <i>·</i> Nº I<span class=\"cartela-l\"> <i>·</i> Procesado</span></p>\n        <h1 class=\"tit-1\">CabraSpace <em class=\"gi\">Web</em></h1>\n        <p class=\"entradilla\">Procesa tus imágenes en el navegador: estirado, máscaras, anotación y separación de estrellas.</p>\n      </div>\n      <div class=\"pag-grab\"><span class=\"grab grab-placa\" aria-hidden=\"true\"></span></div>\n    </div>\n  </div>\n  <div class=\"filete\" aria-hidden=\"true\"></div>",
+    "en": "  <div class=\"wrap pag-wrap pag-wrap--cockpit\">\n    <div class=\"pag-cab pag-cab--cockpit\">\n      <div class=\"pag-tx\">\n        <a class=\"miga\" href=\"herramientas-en.html\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 12H5M11 6l-6 6 6 6\"></path></svg>Web tools</a>\n        <p class=\"cartela cartela--l26\">Tabula I <i>·</i> Nº I<span class=\"cartela-l\"> <i>·</i> Processing</span></p>\n        <h1 class=\"tit-1\">CabraSpace <em class=\"gi\">Web</em></h1>\n        <p class=\"entradilla\">Process your images in the browser: stretching, masks, annotation and star separation.</p>\n      </div>\n      <div class=\"pag-grab\"><span class=\"grab grab-placa\" aria-hidden=\"true\"></span></div>\n    </div>\n  </div>\n  <div class=\"filete\" aria-hidden=\"true\"></div>"
+  },
+  {
+    "es": "              <span>Consola de procesado de CabraSpace Web <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Limpiar</span>",
+    "en": "              <span>CabraSpace Web processing console <strong style=\"color:var(--gold-primary); font-size:0.75rem; margin-left:6px; background:rgba(207,171,74,0.12); padding:1px 5px; border-radius:3px; border:1px solid var(--gold-border);\">BETA</strong></span>\n              <span id=\"btnConsoleClear\" style=\"cursor:pointer; color:var(--gold-primary);\">Clear</span>"
   },
   {
     "es": "              <div class=\"piw-console-line\"><span class=\"time\">[09:21:35]</span><span class=\"info\">Listo para el procesado. Esperando entrada...</span></div>",
@@ -870,10 +802,6 @@
   {
     "es": "            Exportar",
     "en": "            Export"
-  },
-  {
-    "es": "      <p>&copy; 2026 CabraSpace. Diseñado para la comunidad de astrofotografía.</p>",
-    "en": "      <p>&copy; 2026 CabraSpace. Designed for the astrophotography community.</p>"
   },
   {
     "es": "  <!-- Librerías de soporte -->",

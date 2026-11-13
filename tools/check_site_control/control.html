@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Control positivo del comprobador</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="estilo-control.css">
+</head><body>
+<h1>Pagina de control: DEBE fallar por seis motivos</h1>
+<img src="no-existe.png" alt="1 imagen rota">
+<a href="no-existe.html">2 enlace interno roto</a>
+<div class="ancho">3 elemento de 3000 px de ancho</div>
+<p class="fondo">4 url() roto dentro de la hoja de estilos</p>
+<script>console.error('5 error de consola de control');</script>
+<script>throw new Error('6 excepcion JS de control');</script>
+</body></html>

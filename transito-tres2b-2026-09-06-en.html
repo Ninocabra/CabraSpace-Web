@@ -8,8 +8,12 @@
   <meta name="description" content="Light curve of the TrES-2 b exoplanet transit, measured from the AstroCamp observatory.">
   <meta name="cabra:og-image" content="https://cabraspace.com/obs/tres2b-2026-09-06/curva.png">
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="atlas/atlas.css?v=20260925f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261113a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261113a">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/transito-tres2b-2026-09-06-en.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/transito-tres2b-2026-09-06.html">
@@ -32,65 +36,125 @@
   <script>
     if (localStorage.getItem('night-vision') === 'enabled') { document.body.classList.add('night-vision'); }
   </script>
-  <header id="navbar" class="ah">
+  <div class="hoja" data-marco><div class="hoja-in">
+  <header id="navbar" class="cab">
     <!-- NAV-AUTO: cabecera, cajón y pie generados por tools/sync_nav.py; editar ahí y re-ejecutar -->
-    <div class="ah-bar">
-      <a href="en.html" class="ah-logo" aria-label="CabraSpace, home"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a>
-      <nav class="ah-nav" aria-label="Main">
-        <div class="mt"><a href="observaciones-en.html" class="nl" data-sec="obs">Observations<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a><div class="mega mega-obs"><div class="card" style="padding: 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px"><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Photography</span><a href="observaciones-en.html#cielo-profundo" class="mi"><b>Deep sky</b><span>Galaxies and nebulae</span></a><a href="eclipse-2026-en.html" class="mi"><b>Eclipses</b><span>12 Aug 2026, on video</span></a></div><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Measurements</span><a href="observaciones-en.html#exoplanetas" class="mi"><b>Exoplanets</b><span>Transit light curves</span></a></div><div style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 14px; padding-left: 32px; border-left: 1px solid var(--line)"><span class="caps" style="color: var(--t3)">Latest</span><a href="transito-qatar1b-2026-09-22-en.html" class="zbox" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: center; color: var(--tx)"><span class="plate" style="display: block; height: 190px; background: var(--bg)"><span class="plate-in" style="display: block; background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></span></span><span style="display: flex; flex-direction: column; gap: 10px"><span class="cap" style="padding: 0"><span class="caps">Pl. X</span><span class="bd">22 Sep</span></span><span class="bd" style="font-size: 28px; line-height: 1.1">Transit of <em class="gi">Qatar-1 b</em></span></span></a><a class="lnk" href="observaciones-en.html" style="margin-top: 6px">All observations<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div></div></div></div>
-        <a href="programas-en.html" class="nl" data-sec="prog">Software</a>
-        <a href="bitacora-en.html" class="nl" data-sec="bit">Logbook</a>
-      </nav>
-      <div class="ah-right">
-        <div class="mt"><a href="herramientas-en.html" class="hw" data-sec="herr"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span class="hwl">Web tools</span></a><div class="mega mega-herr"><div class="card gold" style="padding: 28px 24px 22px"><span class="caps" style="color: var(--gold); padding: 0 16px 12px">Open in your browser · nothing to install</span><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px"><a href="cabraspace-imaging-workflow-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span><b>CabraSpace Web</b><small>Processing in the browser · beta</small></span><span class="go">Open</span></a><a href="astroforecast-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg></span><span><b>Astro Forecast</b><small>Tonight at AstroCamp</small></span><span class="go">Open</span></a><a href="autoghs-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg></span><span><b>AutoGHS</b><small>Automatic GHS stretch</small></span><span class="go">Open</span></a><a href="contaminacion-mapa-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span><b>Light pollution</b><small>Sky brightness map</small></span><span class="go">Open</span></a><a href="pixelmath-en.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg></span><span><b>PixelMath-teca</b><small>Formulas ready to copy</small></span><span class="go">Open</span></a><span class="ti" style="opacity: .55"><span class="med" style="border-style: dashed"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"></circle><path d="M2 20 22 4"></path></svg></span><span><b>CabraPlanes</b><small>Coming soon</small></span></span></div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 16px 16px 0; border-top: 1px dotted rgba(199,191,169,.32)"><span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3)">Looking for something to install in PixInsight?</span><a class="lnk" href="programas-en.html">Software</a></div></div></div></div>
-        <button class="ic ah-night" type="button" aria-label="Night mode" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
-        <span class="caps ah-lang"><a href="transito-tres2b-2026-09-06.html" lang="es">ES</a> · <a href="transito-tres2b-2026-09-06-en.html" lang="en" class="on">EN</a></span>
-        <button class="ic ah-burger" type="button" aria-label="Open menu" aria-controls="atlas-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    <svg class="cab-filtros" width="0" height="0" aria-hidden="true" focusable="false"><filter id="cb-noche" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.17 0.57 0.06 0 0  0.008 0.028 0.003 0 0  0 0 0 0 0  0 0 0 1 0"></feColorMatrix></filter></svg>
+    <div class="cab-bar">
+      <a href="en.html" class="cab-logo" aria-label="CabraSpace, home"><img src="atlas/img/logo-gold.png" alt="" width="30" height="36"><span>CabraSpace</span></a>
+      <nav class="cab-nav" aria-label="Main"><a href="observaciones-en.html" class="cab-l" aria-current="true">Observations</a><a href="programas-en.html" class="cab-l">Software</a><a href="bitacora-en.html" class="cab-l">Logbook</a></nav>
+      <div class="cab-r">
+        <a href="herramientas-en.html" class="cab-hw" aria-label="Web tools"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span>Web tools</span></a>
+        <button class="ic cab-noche" type="button" aria-label="Night mode" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+        <span class="cab-lang" role="group" aria-label="Language"><a href="transito-tres2b-2026-09-06.html" lang="es" hreflang="es">ES</a><span aria-hidden="true">·</span><a href="transito-tres2b-2026-09-06-en.html" lang="en" hreflang="en" aria-current="true">EN</a></span>
+        <button class="ic cab-burger" type="button" aria-label="Open menu" data-open="Open menu" data-close="Close menu" aria-controls="atlas-drawer" aria-expanded="false"><svg class="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><svg class="i-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
       </div>
     </div>
-    <div class="dbl" aria-hidden="true"></div>
+    <div class="cab-cajon" id="atlas-drawer" hidden>
+      <nav aria-label="Sections"><a href="herramientas-en.html" class="cab-cl"><i>I.</i><b>Web tools</b><small>Use them now · nothing to install</small></a><a href="observaciones-en.html" class="cab-cl" aria-current="true"><i>II.</i><b>Observations</b><small>Photography · Measurements</small></a><a href="bitacora-en.html" class="cab-cl"><i>III.</i><b>Logbook</b><small>News</small></a><a href="programas-en.html" class="cab-cl"><i>IV.</i><b>Software</b><small>Desktop software</small></a></nav>
+      <div class="cab-cajon-pie"><span class="cab-lang" role="group" aria-label="Language"><a href="transito-tres2b-2026-09-06.html" lang="es" hreflang="es">ES</a><span aria-hidden="true">·</span><a href="transito-tres2b-2026-09-06-en.html" lang="en" hreflang="en" aria-current="true">EN</a></span></div>
+    </div>
+    <div class="filete" aria-hidden="true"></div>
   </header>
-  <div class="ad" id="atlas-drawer" hidden><div class="ad-in">
-    <div class="ad-top"><a href="en.html"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a><button class="ic ad-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
-    <div class="ad-sec"><span class="caps" style="font-size: 11.5px; color: var(--gold)">Use them now · nothing to install</span><div class="ad-tiles"><a href="cabraspace-imaging-workflow-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>CabraSpace Web</a><a href="astroforecast-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg>Astro Forecast</a><a href="autoghs-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg>AutoGHS</a><a href="contaminacion-mapa-en.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>Light pollution</a></div><a class="lnk" href="herramientas-en.html" style="font-size: 14px">All web tools</a></div>
-    <nav class="ad-sec" aria-label="Main" style="padding-top: 8px; gap: 0"><a href="observaciones-en.html" class="acc"><i>I.</i><b>Observations</b><small>Photography · Measurements</small></a><a href="programas-en.html" class="acc"><i>II.</i><b>Software</b><small>Desktop software</small></a><a href="bitacora-en.html" class="acc sub"><i>III.</i><b>Logbook</b><small>News</small></a></nav>
-    <div class="ad-foot"><button class="ic ah-night" type="button" aria-label="Night mode" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button><span class="caps ah-lang"><a href="transito-tres2b-2026-09-06.html" lang="es">ES</a> · <a href="transito-tres2b-2026-09-06-en.html" lang="en" class="on">EN</a></span></div>
-  </div></div>
-  <main class="a3 page">
-    <div class="grain" aria-hidden="true"></div>
-<nav aria-label="Breadcrumb" style="padding: 36px var(--gx) 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap"><a class="lnk" href="observaciones-en.html" style="font-size: 14px">Observations</a><span class="bd" style="font-style: italic; color: var(--t3)">›</span><a class="lnk" href="observaciones-en.html#exoplanetas" style="font-size: 14px">Exoplanets</a></nav>
-    <section style="position: relative; padding: 40px var(--gx) 48px; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Pl. V</span><span class="caps" style="color: var(--t2)">Light curve · one night</span></div>
-      <h1 class="bd" style="font-size: clamp(42px, 5.8vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em">Transit of <em class="gi">TrES-2 b</em></h1>
-    </section>
-    <div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
-    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 56px var(--gx) 96px">
-      <div class="c8" style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/tres2b-2026-09-06/curva.png" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 520px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres2b-2026-09-06/curva.png" alt="Light curve of the TrES-2 b transit: the star dims while the planet passes in front" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 1</span><span class="bd">Relative flux against time, with the fitted model.</span></figcaption></figure>
-        <div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px"><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><div class="plate" style="height: 320px"><div class="plate-in"><video controls preload="none" playsinline poster="obs/tres2b-2026-09-06/poster.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000"><source src="obs/tres2b-2026-09-06/video.mp4" type="video/mp4"></video></div></div><figcaption class="cap"><span class="caps">Fig. 2</span><span class="bd">The whole night on video.</span></figcaption></figure><figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/tres2b-2026-09-06/campo.jpg" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 320px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres2b-2026-09-06/campo.jpg" alt="Star field with the target and comparison stars marked" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 3</span><span class="bd">The field: target and comparison stars.</span></figcaption></figure></div>
-        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 720px"><span class="caps" style="color: var(--t3)">Notes</span><div style="font-size: 18px; line-height: 1.75; color: var(--t2); display: flex; flex-direction: column; gap: 14px"><p><em class="gi">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress or the egress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p></div></div>
-      </div>
-      <aside class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 28px">
-        <div class="card" style="padding: 32px"><span class="caps" style="color: var(--gold); margin-bottom: 8px">Technical details</span><div class="kv"><span>Planet</span><span>TrES-2 b</span></div><div class="kv"><span>Night</span><span>6 Sep · 2026</span></div><div class="kv"><span>Filter</span><span>R</span></div><div class="kv"><span>Frames</span><span>665 × 30 s</span></div><div class="kv"><span>Rp/R★ measured (indicative)</span><span>0.1251 ± 0.0064 (stat.) ± 0.0125 (sys.)</span></div><div class="kv"><span>Rp/R★ published</span><span>0.1254 ± 0.0005</span></div><div class="kv"><span>Depth (indicative)</span><span>1.56 % (measured) vs 1.57 % (literature)</span></div><div class="kv"><span>Predicted duration</span><span>109 min</span></div><div class="kv"><span>Mid-transit</span><span>21:57:31 UTC ± 6.2 min</span></div><div class="kv"><span>O−C</span><span>+1.8 min</span></div><div class="kv"><span>Telescope</span><span>Celestron C9.25</span></div><div class="kv"><span>Site</span><span>AstroCamp · 1600 m</span></div></div>
-        <div class="card gold" style="padding: 30px; gap: 12px"><span class="caps" style="color: var(--t3)">Made with</span><span class="bd" style="font-size: 30px; font-weight: 500">Cabra<em class="gi">Transit</em></span><span style="font-size: 15px; line-height: 1.6; color: var(--t2)">Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet.</span></div>
-        
-      </aside>
-    </section>
-    <section style="display: flex; flex-direction: column; gap: 40px; margin: 0 var(--gb) 96px; padding: 72px var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
-      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 0 8px">
-        <h2 class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em">More in <em class="gi">exoplanets</em></h2>
-        <a class="lnk" href="observaciones-en.html#exoplanetas">All<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
-      </div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px"><a href="transito-qatar1b-2026-09-22-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Transit of Qatar-1 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. X</span><span class="bd">Exoplanets · 22 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of Qatar-1 b</span></a><a href="transito-wasp52b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/wasp52b-2026/curva.png" alt="Transit of WASP-52 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. IX</span><span class="bd">Exoplanets · 21 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of WASP-52 b <span class="tg" style="vertical-align: middle; margin-left: 6px">partial</span></span></a><a href="transito-tres3b-2026-en.html" class="zbox obs-card" data-fam="med" data-kind="transit" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in" style="background: #1b140e"><img class="zoom fitc" src="obs/tres3b-2026/curva.png" alt="Transit of TrES-3 b" loading="lazy"></div></div><div class="cap"><span class="caps">Pl. VIII</span><span class="bd">Exoplanets · 15 Sep</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">Transit of TrES-3 b</span></a></div>
-    </section>
-  </main>
-  <footer class="af">
-    <figure class="af-epi"><blockquote class="af-sign" lang="la">Caelum videre.</blockquote><figcaption><span class="af-tr">To behold the skies.</span><span class="caps af-src">Ovid · Metamorphoses I, 85 · tr. Brookes More, 1922</span></figcaption></figure>
-    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a><a class="ghost" href="mailto:info@cabraspace.com">Contact</a></div>
-    <div class="dbl" aria-hidden="true"></div>
-    <div class="af-bottom"><span><img src="atlas/img/logo-gold.png" alt=""><span class="caps" style="font-size: 11.5px">CabraSpace · MMXXVI</span></span><nav aria-label="Footer"><a class="nl" href="observaciones-en.html">Observations</a><a class="nl" href="herramientas-en.html">Web tools</a><a class="nl" href="programas-en.html">Software</a><a class="nl" href="bitacora-en.html">Logbook</a></nav></div>
-  </footer>
+  <main>
 
-  <script src="atlas/atlas.js?v=20260925f"></script>
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      <nav class="ruta" aria-label="Breadcrumb"><a class="miga" href="observaciones-en.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Observations</a><span aria-hidden="true">›</span><a class="miga" href="observaciones-en.html#exoplanetas">Exoplanets</a></nav>
+      <p class="cartela cartela--l26 cartela--larga cartela--l40">Tabula II <i>·</i> Pl. V<span class="cartela-l"> <i>·</i> Light curve · one night</span></p>
+      <h1 class="tit-1">Transit of <em class="gi nb">TrES-2 b</em></h1>
+      <p class="entradilla">Light curve of the TrES-2 b exoplanet transit, measured from the AstroCamp observatory.</p>
+    </div>
+  </div>
+</div>
+<div class="filete" aria-hidden="true"></div>
+<section class="sec">
+  <div class="wrap">
+    <figure class="lam-natural">
+      <a class="lam-marco" href="obs/tres2b-2026-09-06/curva.png" target="_blank" rel="noopener"><img class="encaja" src="obs/tres2b-2026-09-06/curva.png" alt="Light curve of the TrES-2 b transit: the star dims while the planet passes in front" width="1600" height="1161"></a>
+      <figcaption class="fig-pie"><b>Fig. 1.</b> Relative flux against time, with the fitted model.</figcaption>
+    </figure>
+    <div class="duo det">
+      <div class="col">
+        <div class="prosa relato">
+          <p>TrES-2 b was the first transiting planet found in the field of the future Kepler mission: a hot Jupiter that completes an orbit in 2.47 days, with transits 1.4% deep<sup class="cita"><a href="#ref-1" aria-label="Reference 1">1</a></sup>. It crosses the star very close to its edge; in 2007 it had, among the nearby planets, the largest impact parameter<sup class="cita"><a href="#ref-2" aria-label="Reference 2">2</a></sup>. In 2011 it was called “the darkest exoplanet known”<sup class="cita"><a href="#ref-3" aria-label="Reference 3">3</a></sup>. According to the analysis of the Kepler data, its geometric albedo ranges from 0.014<sup class="cita"><a href="#ref-4" aria-label="Reference 4">4</a></sup> to 0.025, and it would fall below 1% if its thermal emission is discounted<sup class="cita"><a href="#ref-3" aria-label="Reference 3">3</a></sup>. Its Hubble spectrum shows no features<sup class="cita"><a href="#ref-5" aria-label="Reference 5">5</a></sup>. Whether its orbit decays remains open: with amateur transits (ETD database) a shortening of the period of 12.6 ± 2.4 ms per year was estimated<sup class="cita"><a href="#ref-6" aria-label="Reference 6">6</a></sup> and with TESS, of 5.58 ± 1.81 ms per year<sup class="cita"><a href="#ref-7" aria-label="Reference 7">7</a></sup>, with neither regarded as conclusive; ExoClock IV (a 2025 preprint, not yet peer reviewed) does not include it among the planets that depart from a constant period<sup class="cita"><a href="#ref-8" aria-label="Reference 8">8</a></sup>.</p>
+          <p>My night of 6 September began halfway through the transit: I have the egress, not the ingress<sup class="cita"><a href="#ref-9" aria-label="Reference 9">9</a>, <a class="cita-inf" href="#nota-inf" title="Our own inference, calculation or comparison, not published">inf.</a></sup>. The mid-transit time is valid, +1.8 ± 6.2 min against the ExoClock ephemeris; the depth is not<sup class="cita"><a href="#ref-9" aria-label="Reference 9">9</a>, <a href="#ref-10" aria-label="Reference 10">10</a></sup>.</p>
+        </div>
+        <div class="prosa notas">
+          <span class="caps rotulo">Notes</span>
+          <p><em class="gi">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p>
+        </div>
+        <p class="nota"><span class="fell">Made with</span><span><b>Cabra<em class="gi">Transit</em></b> · Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet.</span></p>
+        <figure class="fig">
+          <video class="video video--campo" controls preload="none" playsinline poster="obs/tres2b-2026-09-06/poster.jpg" width="1300" height="988" aria-label="Star field with the target and comparison stars marked"><source src="obs/tres2b-2026-09-06/video.mp4" type="video/mp4"></video>
+          <figcaption class="fig-pie"><b>Fig. 2.</b> The field: target and comparison stars. Play it for the whole night on video.</figcaption>
+        </figure>
+      </div>
+      <div class="panel">
+        <span class="caps">Technical details</span>
+        <dl class="ficha">
+          <div><dt>Planet</dt><dd>TrES-2 b</dd></div>
+          <div><dt>Night</dt><dd>6 Sep · 2026</dd></div>
+          <div><dt>Filter</dt><dd>R</dd></div>
+          <div><dt>Frames</dt><dd>665 × 30 s</dd></div>
+          <div><dt>Rp/R★ measured (indicative)</dt><dd>0.1251 ± 0.0064 (stat.) ± 0.0125 (sys.)</dd></div>
+          <div><dt>Rp/R★ published</dt><dd>0.1254 ± 0.0005 (Esteves et al. 2015)</dd></div>
+          <div><dt>(Rp/R★)² (indicative)</dt><dd>1.56 % (measured) vs 1.57 % (literature)</dd></div>
+          <div><dt>Predicted duration</dt><dd>109 min</dd></div>
+          <div><dt>Mid-transit</dt><dd>21:57:31 UTC ± 6.2 min</dd></div>
+          <div><dt>O−C</dt><dd>+1.8 min (ExoClock)</dd></div>
+          <div><dt>Telescope</dt><dd>Celestron C9.25</dd></div>
+          <div><dt>Site</dt><dd>AstroCamp · 1600 m</dd></div>
+        </dl>
+      </div>
+      <section class="refs" aria-labelledby="t-refs">
+        <h2 class="caps rotulo" id="t-refs">References</h2>
+        <ol>
+          <li id="ref-1"><span class="ref-n">1</span><span class="ref-tx">O&#x27;Donovan, F. T. et al. (2006). “TrES-2: The First Transiting Planet in the Kepler Field”. <i>ApJ 651, L61</i>. <a href="https://arxiv.org/abs/astro-ph/0609335" target="_blank" rel="noopener noreferrer">arXiv:astro-ph/0609335</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-2"><span class="ref-n">2</span><span class="ref-tx">Holman, M. J. et al. (2007). “The Transit Light Curve Project. VI. Three Transits of the Exoplanet TrES-2”. <i>ApJ 664, 1185</i>. <a href="https://arxiv.org/abs/0704.2907" target="_blank" rel="noopener noreferrer">arXiv:0704.2907</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-3"><span class="ref-n">3</span><span class="ref-tx">Kipping, D. M. &amp; Spiegel, D. S. (2011). “Detection of visible light from the darkest world”. <i>MNRAS 417, L88</i>. <a href="https://arxiv.org/abs/1108.2297" target="_blank" rel="noopener noreferrer">arXiv:1108.2297</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-4"><span class="ref-n">4</span><span class="ref-tx">Barclay, T. et al. (2012). “Photometrically derived masses and radii of the planet and star in the TrES-2 system”. <i>ApJ 761, 53</i>. <a href="https://arxiv.org/abs/1210.4592" target="_blank" rel="noopener noreferrer">arXiv:1210.4592</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-5"><span class="ref-n">5</span><span class="ref-tx">Ranjan, S. et al. (2014). “Atmospheric Characterization of 5 Hot Jupiters with Wide Field Camera 3 on the Hubble Space Telescope”. <i>ApJ 785, 148</i>. <a href="https://arxiv.org/abs/1403.1266" target="_blank" rel="noopener noreferrer">arXiv:1403.1266</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-6"><span class="ref-n">6</span><span class="ref-tx">Hagey, S. R., Edwards, B. &amp; Boley, A. C. (2022). “Evidence of Long-Term Period Variations in the Exoplanet Transit Database (ETD)”. <i>AJ 164</i>. <a href="https://arxiv.org/abs/2209.10752" target="_blank" rel="noopener noreferrer">arXiv:2209.10752</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-7"><span class="ref-n">7</span><span class="ref-tx">Biswas, S. et al. (2024). “Probing the Possible Causes of the Transit Timing Variation for TrES-2b in the TESS Era”. <i>AJ 168, 176</i>. <a href="https://arxiv.org/abs/2409.12069" target="_blank" rel="noopener noreferrer">arXiv:2409.12069</a> <span class="ref-est">Published</span></span></li>
+          <li id="ref-8"><span class="ref-n">8</span><span class="ref-tx">Kokori, A. et al. (2025). “ExoClock Project IV: A homogeneous catalogue of 620 updated exoplanet ephemerides”. <a href="https://arxiv.org/abs/2511.14407" target="_blank" rel="noopener noreferrer">arXiv:2511.14407</a> <span class="ref-est ref-est--preprint">Preprint, not peer reviewed</span></span></li>
+          <li id="ref-9"><span class="ref-n">9</span><span class="ref-tx">Own data: this plate.</span></li>
+          <li id="ref-10"><span class="ref-n">10</span><span class="ref-tx">ExoClock planet database: TrES-2 b, T0 = 2455714.2416097 BJD_TDB and P = 2.470613387 d. <a href="https://www.exoclock.space/database/planets_json" target="_blank" rel="noopener noreferrer">exoclock.space</a> <span class="ref-est">Database</span></span></li>
+        </ol>
+        <p class="refs-inf" id="nota-inf"><i>inf.</i> marks our own inference, calculation or comparison, not published.</p>
+      </section>
+    </div>
+  </div>
+</section>
+<section class="sec sec--pegada">
+  <div class="wrap">
+    <nav class="pasa" aria-label="Neighbouring plates">
+      <div>
+        <span class="caps rotulo">Previous plate</span>
+        <a class="lam lam--fila" href="transito-wasp59b-2026-09-03-en.html"><span class="lam-marco"><img class="encaja" src="obs/wasp59b-2026-09-03/curva-m.webp" alt="Light curve of the WASP-59 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. IV</span><span class="fell">Exoplanets · 3 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">WASP-59 b</span></span></a>
+      </div>
+      <div class="pasa-fin">
+        <span class="caps rotulo">Next plate</span>
+        <a class="lam lam--fila" href="transito-wasp52b-2026-09-07-en.html"><span class="lam-marco"><img class="encaja" src="obs/wasp52b-2026-09-07/curva-m.webp" alt="Light curve of the WASP-52 b transit: the star dims while the planet passes in front" loading="lazy"></span><span class="lam-meta"><span class="caps">Pl. VI</span><span class="fell">Exoplanets · 7 Sep</span><span class="etq etq--pt">partial</span></span><span class="lam-t">Transit of <span class="nb">WASP-52 b</span></span></a>
+      </div>
+    </nav>
+  </div>
+</section>
+
+  </main>
+  <footer class="pie">
+    <div class="filete" aria-hidden="true"></div>
+    <div class="pie-in">
+      <div class="pie-g">
+        <figure><blockquote class="pie-cita" lang="la">Caelum videre.</blockquote><figcaption><p class="pie-tr">To behold the skies.</p><span class="caps pie-src">Ovid · Metamorphoses I, 85 · tr. Brookes More, 1922</span></figcaption></figure>
+        <div class="pie-enl"><a class="btn-linea" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube · @CabraSpace</a><a class="btn-linea" href="mailto:info@cabraspace.com">Contact</a></div>
+      </div>
+      <div class="pie-base"><span class="pie-marca"><img src="atlas/img/logo-gold.png" alt="" width="22" height="26"><span class="caps">CabraSpace · MMXXVI</span></span><nav class="pie-nav" aria-label="Footer"><a href="herramientas-en.html">Web tools</a><a href="observaciones-en.html" aria-current="true">Observations</a><a href="bitacora-en.html">Logbook</a><a href="programas-en.html">Software</a></nav></div>
+    </div>
+  </footer>
+  </div></div><!-- /hoja -->
+
+  <script src="atlas/atlas2.js?v=20261113a"></script>
 </body>
 </html>

@@ -1,0 +1,276 @@
+/* ==========================================================================
+   CabraSpace · Atlas II — MARCO comun de las 54 paginas (F2 de la migracion)
+   Extraido de atlas/atlas2.css el 12-11-2026: tokens, variables heredadas, hoja con orla, cabecera
+   con su cajon movil, pie y modo noche. atlas2.css se queda con los componentes del interior
+   (laminas, herramientas, bitacora, formularios...) y NECESITA esta hoja cargada antes.
+
+   CONVIVENCIA (por que esta hoja se puede cargar sobre paginas que aun no se han migrado)
+     Orden en <head> (lo pone tools/sync_nav.py):  index.css · [support.css ...] · atlas/atlas.css ·
+       [capa EXTRA_CSS: tools.css / astroforecast.css] · IM Fell English · ESTA HOJA (la ultima).
+     - Todos los selectores son del marco y solo del marco: .hoja .hoja-in .orla .esq, .cab ...
+       (cabecera, con id="navbar"), .cab-cajon (#atlas-drawer) y footer.pie. Ninguna regla de
+       elemento suelto (body, a, img, h1, .wrap, .btn, .caps...) que pudiera cambiar el interior.
+       Lo que la cabecera/el pie necesitan de reset va acotado a .cab / .pie.
+     - index.css pone header{position:fixed...} y footer{...} a cualquier header/footer: se anulan
+       aqui con #navbar.cab y footer.pie.
+     - Tokens: los colores de dia son los mismos que atlas.css:12-33 (no cambia nada); NO se redefine
+       --gx (el interior sigue con sus 80/40/18 px de atlas.css: sus 135 style="" no pierden margen).
+       El marco usa su propio margen lateral --mx.
+     - --ah pasa de 81px a 0px: la cabecera ya no es fija, ocupa su sitio en el flujo. Asi los
+       padding-top:calc(var(--ah)+X) del interior (atlas.css .a3.page, tools.css .tl-top,
+       astroforecast.css .aw-top) dejan de reservar los 81 px que tapaba la cabecera vieja.
+     - --marco-top = alto de lo que hay encima del contenido (margen de la hoja + filetes + orla +
+       cabecera). Lo usan las herramientas de pantalla completa (tools.css: rejilla de CabraSpace Web).
+     - Seccion 7: vacia desde F5b (era la compatibilidad con la cabecera fija; ver el comentario de la seccion).
+
+   PIEZAS
+     1. Tokens ............ :root, body.night-vision (penumbra, D5)
+     2. Variables heredadas  --gold-primary, --bg-card... (las herramientas) — antes 1b de atlas2.css
+     3. Hoja y orla ....... .hoja .hoja-in .orla(-t|-b|-l|-r) .esq .filete
+     4. Cabecera .......... #navbar.cab .cab-bar .cab-logo .cab-nav .cab-l .cab-r .cab-hw .cab-noche
+                            .cab-lang .cab-burger .ic ; cajon movil .cab-cajon(#atlas-drawer) .cab-cl
+                            seccion actual: aria-current (lo escribe sync_nav.py, no el JS)
+     5. Pie ............... footer.pie .pie-in .pie-g .pie-cita .pie-tr .pie-src .pie-enl .pie-base .pie-nav
+     6. Modo noche ........ fotos con el filtro SVG #cb-noche (va en la cabecera), iconos del marco
+     7. (vacia desde F5b) .. antes, ajustes del interior por la cabecera ya no fija
+     8. Responsive ........ 1080 / 980 / 700 px ; prefers-reduced-motion (solo el marco)
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 1. tokens */
+:root {
+  --bg: #110d09; --s1: #1b140e; --s2: #281d14; --line: #3d2e1f;
+  --tx: #fbf2e0; --t2: #d0c1a5; --t3: #a3957b;
+  --gold: #e5b53f; --gold2: #f3d27e; --ver: #e0603f; --ink: #1a1204;
+  --bg-rgb: 17, 13, 9;                    /* el fondo, para velos con transparencia */
+  --c: rgba(229, 181, 63, .62);           /* filete de la orla y de las cartelas */
+  --cb: rgba(229, 181, 63, .46);          /* tramos llenos de la orla */
+  --c2: rgba(229, 181, 63, .3);           /* segundo filete, mas tenue */
+  --pt: rgba(208, 193, 165, .3);          /* linea de puntos */
+  --grab: .3;                             /* opacidad de un grabado de fondo */
+  --orla-op: .25;                        /* intensidad de la orla graduada (numeros, grados, tramos, estrellas): 1 = como el prototipo */
+
+  --f-disp: "Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
+  --f-fell: "IM Fell English", Georgia, serif;
+  --f-sans: Figtree, "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, monospace;
+
+  --b: 36px;                              /* ancho de la orla */
+  --hm: clamp(8px, 1.2vw, 18px);          /* margen de la hoja al borde de la ventana (era el padding del body en v2/) */
+  --mx: clamp(16px, 3vw, 44px);           /* margen lateral del marco (cabecera, pie). El interior usa --gx */
+  --cab-h: 68px;                          /* alto de la cabecera: barra 64 + filete 4 */
+  --marco-top: calc(var(--hm) + 2px + var(--b) + var(--cab-h));   /* lo que hay encima del contenido */
+  --ah: 0px;                              /* cabecera fija de Atlas I (81px): ya no hay; ver CONVIVENCIA */
+  --ease: cubic-bezier(.16, 1, .3, 1);
+}
+/* Modo noche en PENUMBRA (D5, Nino 12-11-2026: para usar junto al telescopio). Antes (F1) el texto se habia
+   subido a 4,5:1+ (tx 6,3 · t2 5,9 · t3 4,9). Ahora se baja el brillo y se fija un minimo legible.
+   Contraste WCAG medido sobre --bg #050000 (y sobre --s2 #170404, la caja mas clara):
+     --tx  #e24136  5,0:1 (4,8)   texto principal
+     --t2  #bd2b21  3,5:1 (3,4)   secundario
+     --t3  #b4241b  3,2:1 (3,0)   terciario: >= 3:1 tambien sobre las cajas
+     --gold #c42116 3,6:1 · --gold2 #c34538 4,2:1 (enlaces y rotulos)
+   Calculado con scratchpad f2/cr.py (formula WCAG 2.x) y comprobado en el navegador con los colores computados. */
+body.night-vision {
+  --bg: #050000; --s1: #0e0202; --s2: #170404; --line: #2a0707;
+  --tx: #e24136; --t2: #bd2b21; --t3: #b4241b;
+  --gold: #c42116; --gold2: #c34538; --ver: #8f1008; --ink: #0a0000;
+  --bg-rgb: 5, 0, 0;
+  --c: rgba(196, 33, 22, .55); --cb: rgba(196, 33, 22, .4); --c2: rgba(196, 33, 22, .28);
+  --pt: rgba(180, 36, 27, .34);
+}
+
+/* ---------------------------------------------------------------- 2. variables heredadas
+   Las herramientas (astroweather.css, autoghs, pixelmath, cabraspace-imaging-workflow, tools.css) y los
+   style="" de las paginas generadas por tools/build_atlas.py usan los nombres de index.css / Atlas I.
+   Aqui se definen con el valor equivalente del sistema nuevo, como hace atlas/atlas.css:12-38.
+   - Los alias (var(--...)) apuntan al token de la seccion 1: un solo sitio donde cambiar el color.
+   - En body.night-vision se REPITEN: una variable declarada en :root con var() se resuelve en :root y se
+     hereda ya resuelta, asi que no seguiria al token de noche si no se redeclara en body.
+   - Sin equivalente nuevo (literal): --gold-secondary dia #c9982a <- atlas.css:22, noche #cc0000 <- index.css:1312;
+     --gold-dark dia #2a1f0c <- atlas.css:22, noche #330000 <- index.css:1314; --border-hover dia #54402b
+     <- atlas.css:25, noche #3a0808 <- index.css:1324. --gold-glow/-border/-border-muted: el dorado (229,181,63)
+     con las opacidades de atlas.css:23; de noche el rojo nuevo de --gold (196,33,22) con las de index.css:1315-1317.
+   - --glow: atlas.css:16 (dia) y atlas.css:36 (noche). --gb --gb2 <- atlas.css:18.
+   - NO se define --gx (ver CONVIVENCIA). --ah esta en la seccion 1.
+   - EFECTO DE NOCHE EN LAS HERRAMIENTAS: index.css:1306-1325 tenia --text-muted #660000 (1,6:1, ilegible) y
+     --text-secondary #b30000 (2,9:1); ahora siguen a --t3/--t2 de la penumbra (3,2 y 3,5:1). De dia, nada cambia.
+   Cuando ninguna pagina ni herramienta use ya un nombre viejo, se borra su linea (F6). */
+:root {
+  --glow: rgba(196, 110, 42, .26);
+  --gb: 40px; --gb2: 72px;
+  --bg-color: var(--bg); --bg-card: var(--s1); --bg-card-hover: var(--s2);
+  --gold-primary: var(--gold); --gold-secondary: #c9982a; --gold-light: var(--gold2); --gold-dark: #2a1f0c;
+  --gold-glow: rgba(229, 181, 63, .12); --gold-border: rgba(229, 181, 63, .24); --gold-border-muted: rgba(229, 181, 63, .09);
+  --text-primary: var(--tx); --text-secondary: var(--t2); --text-muted: var(--t3);
+  --border-color: var(--line); --border-hover: #54402b;
+  --font-sans: var(--f-sans); --font-display: var(--f-disp); --font-mono: var(--f-mono);
+  --a-sans: var(--f-sans); --a-disp: var(--f-disp); --a-mono: var(--f-mono);
+}
+body.night-vision {
+  --glow: rgba(255, 0, 0, .06);
+  --bg-color: var(--bg); --bg-card: var(--s1); --bg-card-hover: var(--s2);
+  --gold-primary: var(--gold); --gold-secondary: #cc0000; --gold-light: var(--gold2); --gold-dark: #330000;
+  --gold-glow: rgba(196, 33, 22, .15); --gold-border: rgba(196, 33, 22, .25); --gold-border-muted: rgba(196, 33, 22, .10);
+  --text-primary: var(--tx); --text-secondary: var(--t2); --text-muted: var(--t3);
+  --border-color: var(--line); --border-hover: #3a0808;
+}
+
+/* ---------------------------------------------------------------- 3. hoja y orla
+   <div class="hoja"><div class="hoja-in"> cabecera · contenido · pie </div></div>  (lo pone sync_nav.py)
+   La orla la dibuja atlas/atlas2.js dentro de .hoja (24 horas arriba y abajo, de +90 a -90 grados a los
+   lados). Sin JS queda el doble filete, que ya es marco. */
+.hoja { position: relative; box-sizing: border-box; width: calc(100% - 2 * var(--hm)); max-width: 1880px; margin: var(--hm) auto; border: 1px solid var(--c); }
+/* overflow: clip y NO hidden: hidden crea un contenedor de scroll y apaga position: sticky dentro
+   (PixelMath-teca, Coffee Break). clip recorta igual (frisos, carta) sin ese efecto. */
+.hoja-in { position: relative; margin: var(--b); border: 1px solid var(--c); overflow: clip; }
+.orla { position: absolute; display: flex; overflow: hidden; pointer-events: none; opacity: var(--orla-op); }
+.orla i { flex: 1 1 0; position: relative; display: block; min-width: 0; min-height: 0; }
+.orla b { position: absolute; font: italic 400 11px/1 var(--f-fell); color: var(--t3); white-space: nowrap; }
+.orla-t, .orla-b { left: var(--b); right: var(--b); height: var(--b); }
+.orla-t { top: 0; }
+.orla-b { bottom: 0; }
+.orla-l, .orla-r { top: var(--b); bottom: var(--b); width: var(--b); flex-direction: column; }
+.orla-l { left: 0; }
+.orla-r { right: 0; }
+.orla-t i { background: linear-gradient(var(--c), var(--c)) 0 5px / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 6px / 1px 11px no-repeat, repeating-linear-gradient(90deg, var(--c) 0 1px, transparent 1px calc(100% / 6)) 0 6px / 100% 5px no-repeat; }
+.orla-b i { background: linear-gradient(var(--c), var(--c)) 0 calc(100% - 5px) / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 1px 11px no-repeat, repeating-linear-gradient(90deg, var(--c) 0 1px, transparent 1px calc(100% / 6)) 0 calc(100% - 6px) / 100% 5px no-repeat; }
+.orla-l i { background: linear-gradient(var(--c), var(--c)) 5px 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) 6px 0 / 11px 1px no-repeat, repeating-linear-gradient(180deg, var(--c) 0 1px, transparent 1px 20%) 6px 0 / 5px 100% no-repeat; }
+.orla-r i { background: linear-gradient(var(--c), var(--c)) calc(100% - 5px) 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 11px 1px no-repeat, repeating-linear-gradient(180deg, var(--c) 0 1px, transparent 1px 20%) calc(100% - 6px) 0 / 5px 100% no-repeat; }
+.orla i:nth-child(odd)::before { content: ""; position: absolute; background: var(--cb); }
+.orla-t i:nth-child(odd)::before { left: 0; right: 0; top: 0; height: 5px; }
+.orla-b i:nth-child(odd)::before { left: 0; right: 0; bottom: 0; height: 5px; }
+.orla-l i:nth-child(odd)::before { top: 0; bottom: 0; left: 0; width: 5px; }
+.orla-r i:nth-child(odd)::before { top: 0; bottom: 0; right: 0; width: 5px; }
+.orla-t b { left: 0; top: 20px; transform: translateX(-50%); }
+.orla-b b { left: 0; bottom: 20px; transform: translateX(-50%); }
+.orla-l b { top: 0; left: 19px; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
+.orla-r b { top: 0; right: 19px; writing-mode: vertical-rl; transform: translateY(-50%); }
+.esq { position: absolute; width: var(--b); height: var(--b); display: flex; align-items: center; justify-content: center; color: var(--gold); pointer-events: none; }
+.esq svg { width: 14px; height: 14px; opacity: var(--orla-op); }
+.esq-tl { top: 0; left: 0; border-right: 1px solid var(--c); border-bottom: 1px solid var(--c); }
+.esq-tr { top: 0; right: 0; border-left: 1px solid var(--c); border-bottom: 1px solid var(--c); }
+.esq-bl { bottom: 0; left: 0; border-right: 1px solid var(--c); border-top: 1px solid var(--c); }
+.esq-br { bottom: 0; right: 0; border-left: 1px solid var(--c); border-top: 1px solid var(--c); }
+/* doble filete: separa cabecera, heroe, pie */
+.filete { height: 4px; border-top: 1px solid var(--c); border-bottom: 1px solid var(--c2); }
+
+/* ---------------------------------------------------------------- 4. cabecera
+   Marcado: tools/sync_nav.py (header id="navbar" class="cab"). Identica en todas las paginas salvo el
+   conmutador ES/EN (apunta a la gemela) y aria-current (seccion actual, escrito por sync_nav.py).
+   #navbar.cab anula el header{position:fixed; background...} y header.scrolled de index.css:108-125. */
+#navbar.cab, #navbar.cab.scrolled { position: relative; top: auto; left: auto; right: auto; width: auto; height: auto; z-index: 5; display: block; margin: 0; padding: 0; border: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; transition: none; font-family: var(--f-sans); font-size: 16px; font-weight: 400; line-height: 1.6; color: var(--tx); text-align: left; }
+.cab *, .cab *::before, .cab *::after { box-sizing: border-box; }
+.cab a { color: inherit; text-decoration: none; }
+.cab img { display: block; max-width: 100%; }
+.cab button { font: inherit; color: inherit; margin: 0; }
+.cab a:focus-visible, .cab button:focus-visible { outline: 2px solid var(--gold2); outline-offset: 3px; }
+.cab-filtros { position: absolute; width: 0; height: 0; overflow: hidden; }
+.cab-bar { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0 24px; height: 64px; padding: 10px clamp(16px, 3vw, 40px); }
+.cab-logo { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; }
+.cab-logo img { width: 30px; height: 36px; object-fit: contain; }
+.cab-logo span { font-family: var(--f-disp); font-size: 23px; font-weight: 500; letter-spacing: .01em; color: var(--tx); }
+.cab-nav { display: flex; align-items: center; gap: clamp(18px, 2.6vw, 38px); }
+.cab-l { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; color: var(--t2); transition: color .2s; }
+.cab-l:hover { color: var(--gold2); }
+.cab-l[aria-current] { color: var(--tx); box-shadow: inset 0 -1px 0 var(--gold); }
+.cab-r { display: flex; align-items: center; gap: 14px; }
+.cab-hw { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px; border: 1px solid var(--gold); color: var(--gold2); font-size: 14.5px; font-weight: 500; line-height: 1; white-space: nowrap; transition: background-color .2s, color .2s; }
+.cab-hw svg { flex: none; }
+.cab-hw:hover, .cab-hw[aria-current] { background: var(--gold); color: var(--ink); }
+.cab .ic { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 0; background: none; color: var(--t2); cursor: pointer; transition: color .2s; }
+.cab .ic:hover { color: var(--gold2); }
+.cab .ic svg { width: 20px; height: 20px; }
+.cab-noche[aria-pressed="true"] { color: var(--gold2) !important; }
+.cab-lang { display: inline-flex; align-items: center; font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; color: var(--t3); }
+.cab-lang a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+.cab-lang a:hover, .cab-lang a[aria-current] { color: var(--gold2); }
+.cab-burger { display: none !important; }
+/* cajon movil (#atlas-drawer): en el flujo, bajo la barra (como el menu del prototipo); solo <= 980 px.
+   Indice numerado de las cuatro secciones (D2: I Herramientas · II Observaciones · III Bitacora · IV Programas). */
+.cab-cajon { display: none; }
+.cab-cl { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: baseline; gap: 2px 8px; min-height: 56px; padding: 12px 4px; border-bottom: 1px dotted var(--pt); }
+.cab-cl i { font-family: var(--f-fell); font-style: italic; font-size: 18px; color: var(--gold); }
+.cab-cl b { font-family: var(--f-disp); font-weight: 400; font-size: 23px; line-height: 1.15; color: var(--tx); }
+.cab-cl small { grid-column: 2; font-size: 13px; line-height: 1.3; color: var(--t3); }
+.cab-burger .i-cerrar, .cab.is-open .cab-burger .i-menu { display: none; }
+.cab.is-open .cab-burger .i-cerrar { display: block; }
+.cab-cl:hover b, .cab-cl[aria-current] b { color: var(--gold2); }
+.cab-cajon-pie { display: none; align-items: center; justify-content: flex-end; padding-top: 6px; }
+
+/* ---------------------------------------------------------------- 5. pie (identico en todas las paginas)
+   footer.pie anula el footer{border-top; padding:48px 0; background:#020202} de index.css:775. */
+footer.pie { position: relative; z-index: 1; display: block; margin: 0; padding: 0; border: 0; background: none; font-family: var(--f-sans); font-size: 16px; font-weight: 400; line-height: 1.6; color: var(--tx); text-align: left; }
+.pie *, .pie *::before, .pie *::after { box-sizing: border-box; }
+.pie a { color: inherit; text-decoration: none; }
+.pie img { display: block; max-width: 100%; }
+.pie figure, .pie blockquote, .pie p { margin: 0; padding: 0; border: 0; }
+.pie a:focus-visible { outline: 2px solid var(--gold2); outline-offset: 3px; }
+.pie .caps { font-family: var(--f-mono); font-size: 11.5px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--t3); }
+.pie-in { max-width: 1326px; margin: 0 auto; padding: clamp(48px, 5.4vw, 76px) var(--mx) 30px; }
+.pie-g { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: end; }
+.pie-cita { max-width: 780px; font-family: var(--f-fell); font-style: italic; font-size: clamp(24px, 2.7vw, 36px); line-height: 1.22; color: var(--tx); }
+.pie-tr { margin-top: 16px !important; max-width: 620px; font-size: 16px; color: var(--t2); }
+.pie-src { display: block; margin-top: 12px; }
+.pie-enl { display: flex; flex-wrap: wrap; gap: 14px; }
+.pie .btn-linea { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; padding: 0 20px; border: 1px solid var(--line); background: none; color: var(--t2); font-size: 15px; white-space: nowrap; cursor: pointer; transition: border-color .2s, color .2s; }
+.pie .btn-linea:hover { border-color: var(--gold); color: var(--gold2); }
+.pie-base { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); }
+.pie-marca { display: inline-flex; align-items: center; gap: 12px; }
+.pie-marca img { width: 22px; height: 26px; object-fit: contain; }
+.pie-nav { display: flex; flex-wrap: wrap; gap: 0 26px; }
+.pie-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14.5px; color: var(--t2); transition: color .2s; }
+.pie-nav a:hover, .pie-nav a[aria-current] { color: var(--gold2); }
+
+/* ---------------------------------------------------------------- 6. modo noche
+   Los tokens ya lo vuelven todo rojo (texto, filetes, grabados de mascara). Aqui, lo que no es token.
+   Fotos y videos: filtro SVG #cb-noche (luminancia -> solo canal rojo; va dentro de la cabecera, en
+   svg.cab-filtros). Sustituye la cadena sepia+hue-rotate+saturate de index.css:1328-1338, que dejaba
+   verde-amarillo lo mas brillante de las fotos; misma especificidad + !important + hoja posterior = gana.
+   Los lienzos (<canvas>) de las herramientas NO se filtran (como hoy): no tocar su interior.
+   Iconos del marco: index.css filtra en noche todo <svg> (sepia...); los del marco ya son rojos por color. */
+body.night-vision img, body.night-vision video, body.night-vision iframe, body.night-vision .video-thumbnail-bg { filter: url(#cb-noche) !important; opacity: .75; }
+body.night-vision :is(.cab, .pie, .esq) svg { filter: none !important; opacity: 1; }
+/* las estrellas de esquina son parte de la orla: misma intensidad que ella tambien de noche */
+body.night-vision .hoja .esq svg { opacity: var(--orla-op) !important; }
+
+/* ---------------------------------------------------------------- 7. (vacia desde F5b, 13-11-2026)
+   Aqui estaba la compatibilidad de las paginas a mano con la cabecera fija de 81 px (padding-top:150px de los
+   catalogos, sticky de PixelMath-teca y de Coffee Break). Todas migraron a la cabecera nueva: lo de PixelMath-teca
+   esta en atlas/tools.css y el sticky de Coffee Break en atlas/tools-base.css. */
+
+/* ---------------------------------------------------------------- 8. responsive */
+@media (max-width: 1080px) {
+  .orla-t i:nth-child(even) b, .orla-b i:nth-child(even) b { display: none; }
+  .cab-bar { gap: 0 16px; padding-left: 16px; padding-right: 16px; }
+  .cab-nav { gap: 18px; }
+  .cab-r { gap: 6px; }
+}
+@media (max-width: 980px) {
+  .cab-nav { display: none; }
+  .cab-burger { display: inline-flex !important; }
+  .cab-cajon:not([hidden]) { display: block; padding: 4px clamp(16px, 3vw, 40px) 14px; border-top: 1px solid var(--line); }
+}
+@media (max-width: 860px) {
+  .pie-g { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 28px; }
+}
+@media (max-width: 700px) {
+  :root { --b: 13px; --cab-h: 60px; }
+  /* la orla se simplifica: sin numeros, sin graduacion menor, sin estrellas de esquina */
+  .orla b, .esq svg, .orla i::before { display: none; }
+  .orla-t i { background: linear-gradient(var(--c), var(--c)) 0 5px / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 6px / 1px 5px no-repeat; }
+  .orla-b i { background: linear-gradient(var(--c), var(--c)) 0 calc(100% - 5px) / 100% 1px no-repeat, linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 1px 5px no-repeat; }
+  .orla-l i { background: linear-gradient(var(--c), var(--c)) 5px 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) 6px 0 / 5px 1px no-repeat; }
+  .orla-r i { background: linear-gradient(var(--c), var(--c)) calc(100% - 5px) 0 / 1px 100% no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 5px 1px no-repeat; }
+  .cab-bar { height: 56px; padding: 6px 8px; gap: 0 6px; }
+  .cab-r { gap: 2px; }
+  .cab-logo span { font-size: 20px; }
+  .cab-hw { width: 44px; padding: 0; justify-content: center; }
+  .cab-hw span { display: none; }
+  .cab-bar .cab-lang { display: none; }
+  .cab-cajon-pie { display: flex; }
+  .cab-cl b { font-size: 21px; }
+  .pie-base { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cab *, .pie * { transition: none !important; }
+}

@@ -8,8 +8,12 @@
   <meta name="description" content="La nebulosa planetaria PK 164+31.1 en paleta HOO, desde el observatorio AstroCamp.">
   <meta name="cabra:og-image" content="https://cabraspace.com/obs/pk164/crop.jpg">
   <!-- ATLAS-PAGE: generada por tools/build_atlas.py; editar ahí y re-ejecutar -->
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="atlas/atlas.css?v=20260925f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
+  <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261113a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261113a">
   <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="https://cabraspace.com/cielo-pk164.html">
   <link rel="alternate" hreflang="es" href="https://cabraspace.com/cielo-pk164.html">
@@ -32,65 +36,106 @@
   <script>
     if (localStorage.getItem('night-vision') === 'enabled') { document.body.classList.add('night-vision'); }
   </script>
-  <header id="navbar" class="ah">
+  <div class="hoja" data-marco><div class="hoja-in">
+  <header id="navbar" class="cab">
     <!-- NAV-AUTO: cabecera, cajón y pie generados por tools/sync_nav.py; editar ahí y re-ejecutar -->
-    <div class="ah-bar">
-      <a href="index.html" class="ah-logo" aria-label="CabraSpace, inicio"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a>
-      <nav class="ah-nav" aria-label="Principal">
-        <div class="mt"><a href="observaciones.html" class="nl" data-sec="obs">Observaciones<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a><div class="mega mega-obs"><div class="card" style="padding: 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px"><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Fotografía</span><a href="observaciones.html#cielo-profundo" class="mi"><b>Cielo profundo</b><span>Galaxias y nebulosas</span></a><a href="eclipse-2026.html" class="mi"><b>Eclipses</b><span>12 · VIII · 2026, en vídeo</span></a></div><div style="grid-column: span 3; display: flex; flex-direction: column; gap: 4px"><span class="caps" style="color: var(--gold); padding: 0 18px 10px">Medidas</span><a href="observaciones.html#exoplanetas" class="mi"><b>Exoplanetas</b><span>Curvas de luz de tránsitos</span></a></div><div style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 14px; padding-left: 32px; border-left: 1px solid var(--line)"><span class="caps" style="color: var(--t3)">Lo último</span><a href="transito-qatar1b-2026-09-22.html" class="zbox" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: center; color: var(--tx)"><span class="plate" style="display: block; height: 190px; background: var(--bg)"><span class="plate-in" style="display: block; background: #1b140e"><img class="zoom fitc" src="obs/qatar1b-2026-09-22/curva.png" alt="Tránsito de Qatar-1 b" loading="lazy"></span></span><span style="display: flex; flex-direction: column; gap: 10px"><span class="cap" style="padding: 0"><span class="caps">Lám. X</span><span class="bd">22 · IX</span></span><span class="bd" style="font-size: 28px; line-height: 1.1">Tránsito de <em class="gi">Qatar-1 b</em></span></span></a><a class="lnk" href="observaciones.html" style="margin-top: 6px">Todas las observaciones<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></div></div></div></div>
-        <a href="programas.html" class="nl" data-sec="prog">Programas</a>
-        <a href="bitacora.html" class="nl" data-sec="bit">Bitácora</a>
-      </nav>
-      <div class="ah-right">
-        <div class="mt"><a href="herramientas.html" class="hw" data-sec="herr"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span class="hwl">Herramientas web</span></a><div class="mega mega-herr"><div class="card gold" style="padding: 28px 24px 22px"><span class="caps" style="color: var(--gold); padding: 0 16px 12px">Se abren en el navegador · sin instalar</span><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px"><a href="cabraspace-imaging-workflow.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span><span><b>CabraSpace Web</b><small>Procesado en el navegador · beta</small></span><span class="go">Abrir</span></a><a href="astroforecast.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg></span><span><b>Astro Forecast</b><small>La noche en AstroCamp</small></span><span class="go">Abrir</span></a><a href="autoghs.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg></span><span><b>AutoGHS</b><small>Estirado GHS automático</small></span><span class="go">Abrir</span></a><a href="contaminacion-mapa.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg></span><span><b>Contaminación</b><small>Brillo del cielo por zonas</small></span><span class="go">Abrir</span></a><a href="pixelmath.html" class="ti"><span class="med"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 5H7l5 7-5 7h10"></path></svg></span><span><b>PixelMath-teca</b><small>Fórmulas para copiar</small></span><span class="go">Abrir</span></a><span class="ti" style="opacity: .55"><span class="med" style="border-style: dashed"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6"></circle><path d="M2 20 22 4"></path></svg></span><span><b>CabraPlanes</b><small>Próximamente</small></span></span></div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 16px 16px 0; border-top: 1px dotted rgba(199,191,169,.32)"><span class="bd" style="font-size: 16px; font-style: italic; color: var(--t3)">¿Algo para instalar en PixInsight?</span><a class="lnk" href="programas.html">Programas</a></div></div></div></div>
-        <button class="ic ah-night" type="button" aria-label="Modo noche" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
-        <span class="caps ah-lang"><a href="cielo-pk164.html" lang="es" class="on">ES</a> · <a href="cielo-pk164-en.html" lang="en">EN</a></span>
-        <button class="ic ah-burger" type="button" aria-label="Abrir menú" aria-controls="atlas-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    <svg class="cab-filtros" width="0" height="0" aria-hidden="true" focusable="false"><filter id="cb-noche" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.17 0.57 0.06 0 0  0.008 0.028 0.003 0 0  0 0 0 0 0  0 0 0 1 0"></feColorMatrix></filter></svg>
+    <div class="cab-bar">
+      <a href="index.html" class="cab-logo" aria-label="CabraSpace, inicio"><img src="atlas/img/logo-gold.png" alt="" width="30" height="36"><span>CabraSpace</span></a>
+      <nav class="cab-nav" aria-label="Principal"><a href="observaciones.html" class="cab-l" aria-current="true">Observaciones</a><a href="programas.html" class="cab-l">Programas</a><a href="bitacora.html" class="cab-l">Bitácora</a></nav>
+      <div class="cab-r">
+        <a href="herramientas.html" class="cab-hw" aria-label="Herramientas web"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="3.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="3.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"></rect></svg><span>Herramientas web</span></a>
+        <button class="ic cab-noche" type="button" aria-label="Modo noche" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+        <span class="cab-lang" role="group" aria-label="Idioma"><a href="cielo-pk164.html" lang="es" hreflang="es" aria-current="true">ES</a><span aria-hidden="true">·</span><a href="cielo-pk164-en.html" lang="en" hreflang="en">EN</a></span>
+        <button class="ic cab-burger" type="button" aria-label="Abrir menú" data-open="Abrir menú" data-close="Cerrar menú" aria-controls="atlas-drawer" aria-expanded="false"><svg class="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><svg class="i-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
       </div>
     </div>
-    <div class="dbl" aria-hidden="true"></div>
+    <div class="cab-cajon" id="atlas-drawer" hidden>
+      <nav aria-label="Secciones"><a href="herramientas.html" class="cab-cl"><i>I.</i><b>Herramientas web</b><small>Úsalas ahora · sin instalar</small></a><a href="observaciones.html" class="cab-cl" aria-current="true"><i>II.</i><b>Observaciones</b><small>Fotografía · Medidas</small></a><a href="bitacora.html" class="cab-cl"><i>III.</i><b>Bitácora</b><small>Novedades</small></a><a href="programas.html" class="cab-cl"><i>IV.</i><b>Programas</b><small>Para instalar</small></a></nav>
+      <div class="cab-cajon-pie"><span class="cab-lang" role="group" aria-label="Idioma"><a href="cielo-pk164.html" lang="es" hreflang="es" aria-current="true">ES</a><span aria-hidden="true">·</span><a href="cielo-pk164-en.html" lang="en" hreflang="en">EN</a></span></div>
+    </div>
+    <div class="filete" aria-hidden="true"></div>
   </header>
-  <div class="ad" id="atlas-drawer" hidden><div class="ad-in">
-    <div class="ad-top"><a href="index.html"><img src="atlas/img/logo-gold.png" alt=""><span>CabraSpace</span></a><button class="ic ad-close" type="button" aria-label="Cerrar menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
-    <div class="ad-sec"><span class="caps" style="font-size: 11.5px; color: var(--gold)">Úsalas ahora · sin instalar</span><div class="ad-tiles"><a href="cabraspace-imaging-workflow.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>CabraSpace Web</a><a href="astroforecast.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H8a5 5 0 1 1 1.3-9.8A6 6 0 0 1 20 12a3.5 3.5 0 0 1-2.5 7z"></path></svg>Astro Forecast</a><a href="autoghs.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"></path><path d="M7 17c5 0 5-10 12-10"></path></svg>AutoGHS</a><a href="contaminacion-mapa.html" class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>Contaminación</a></div><a class="lnk" href="herramientas.html" style="font-size: 14px">Todas las herramientas</a></div>
-    <nav class="ad-sec" aria-label="Principal" style="padding-top: 8px; gap: 0"><a href="observaciones.html" class="acc"><i>I.</i><b>Observaciones</b><small>Fotografía · Medidas</small></a><a href="programas.html" class="acc"><i>II.</i><b>Programas</b><small>Para instalar</small></a><a href="bitacora.html" class="acc sub"><i>III.</i><b>Bitácora</b><small>Novedades</small></a></nav>
-    <div class="ad-foot"><button class="ic ah-night" type="button" aria-label="Modo noche" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button><span class="caps ah-lang"><a href="cielo-pk164.html" lang="es" class="on">ES</a> · <a href="cielo-pk164-en.html" lang="en">EN</a></span></div>
-  </div></div>
-  <main class="a3 page">
-    <div class="grain" aria-hidden="true"></div>
-<nav aria-label="Ruta" style="padding: 36px var(--gx) 0; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap"><a class="lnk" href="observaciones.html" style="font-size: 14px">Observaciones</a><span class="bd" style="font-style: italic; color: var(--t3)">›</span><a class="lnk" href="observaciones.html#cielo-profundo" style="font-size: 14px">Cielo profundo</a></nav>
-    <section style="position: relative; padding: 40px var(--gx) 48px; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap"><span class="bd" style="font-size: 20px; font-style: italic; color: var(--gold)">Lám. II</span><span class="caps" style="color: var(--t2)">Cielo profundo · paleta HOO · abril de 2026</span></div>
-      <h1 class="bd" style="font-size: clamp(42px, 5.8vw, 84px); font-weight: 400; line-height: 1; letter-spacing: -0.02em">PK 164+31.1, nebulosa <em class="gi">planetaria</em></h1>
-    </section>
-    <div class="dbl" aria-hidden="true" style="margin: 0 var(--gx)"></div>
-    <section class="g12" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding: 56px var(--gx) 96px">
-      <div class="c8" style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px">
-        <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px"><a href="obs/pk164/full.jpg" target="_blank" rel="noopener" class="zbox" style="display: block"><div class="plate" style="height: 560px"><div class="plate-in"><img class="zoom" src="obs/pk164/crop.jpg" alt="Nebulosa planetaria PK 164+31.1 en paleta HOO" loading="lazy"></div></div></a><figcaption class="cap"><span class="caps">Fig. 1</span><span class="bd">Paleta HOO (H-alfa y OIII). Pulsa para ver el campo completo.</span></figcaption></figure>
-        
-        
-      </div>
-      <aside class="c4" style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 28px">
-        <div class="card" style="padding: 32px"><span class="caps" style="color: var(--gold); margin-bottom: 8px">Ficha técnica</span><div class="kv"><span>Objeto</span><span>PK 164+31.1 · Lince</span></div><div class="kv"><span>Tipo</span><span>Nebulosa planetaria</span></div><div class="kv"><span>Paleta</span><span>HOO</span></div><div class="kv"><span>Lugar</span><span>Observatorio AstroCamp</span></div><div class="kv"><span>Procesado</span><span>24 · IV · 2026</span></div><div class="kv"><span>Tamaño final</span><span>6131 × 4049 px</span></div></div>
-        
-        
-      </aside>
-    </section>
-    <section style="display: flex; flex-direction: column; gap: 40px; margin: 0 var(--gb) 96px; padding: 72px var(--gb) 64px; border-radius: 36px; background: var(--s1); border: 1px solid var(--line)">
-      <div class="jb" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 0 8px">
-        <h2 class="bd" style="font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em">Más en <em class="gi">cielo profundo</em></h2>
-        <a class="lnk" href="observaciones.html#cielo-profundo">Todas<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
-      </div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px"><a href="cielo-m82.html" class="zbox obs-card" data-fam="foto" data-kind="deep-sky" style="display: flex; flex-direction: column; gap: 16px; color: var(--tx)"><div class="plate" style="height: 200px"><div class="plate-in"><img class="zoom" src="obs/m82/thumb.jpg" alt="M82, la galaxia del Cigarro" loading="lazy"></div></div><div class="cap"><span class="caps">Lám. I</span><span class="bd">Cielo profundo · 29 · I</span></div><span class="bd" style="font-size: 27px; line-height: 1.15">M82, la galaxia del Cigarro</span></a></div>
-    </section>
-  </main>
-  <footer class="af">
-    <figure class="af-epi"><blockquote class="af-sign" lang="la">Caelum videre.</blockquote><figcaption><span class="af-tr">Contemplar el cielo.</span><span class="caps af-src">Ovidio · Metamorfosis I, 85 · trad. Francisco Crivell, 1805</span></figcaption></figure>
-    <div class="af-links"><a class="ghost" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube</a><a class="ghost" href="mailto:info@cabraspace.com">Contacto</a></div>
-    <div class="dbl" aria-hidden="true"></div>
-    <div class="af-bottom"><span><img src="atlas/img/logo-gold.png" alt=""><span class="caps" style="font-size: 11.5px">CabraSpace · MMXXVI</span></span><nav aria-label="Pie de página"><a class="nl" href="observaciones.html">Observaciones</a><a class="nl" href="herramientas.html">Herramientas web</a><a class="nl" href="programas.html">Programas</a><a class="nl" href="bitacora.html">Bitácora</a></nav></div>
-  </footer>
+  <main>
 
-  <script src="atlas/atlas.js?v=20260925f"></script>
+<div class="wrap">
+  <div class="pag-cab">
+    <div class="pag-tx">
+      <nav class="ruta" aria-label="Ruta"><a class="miga" href="observaciones.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Observaciones</a><span aria-hidden="true">›</span><a class="miga" href="observaciones.html#cielo-profundo">Cielo profundo</a></nav>
+      <p class="cartela cartela--l26 cartela--larga cartela--l40 cartela--l52 cartela--l64">Tabula II <i>·</i> Lám. II<span class="cartela-l"> <i>·</i> Cielo profundo · paleta HOO · abril de 2026</span></p>
+      <h1 class="tit-1">PK 164+31.1, nebulosa <em class="gi">planetaria</em></h1>
+      <p class="entradilla">La nebulosa planetaria PK 164+31.1 en paleta HOO, desde el observatorio AstroCamp.</p>
+    </div>
+  </div>
+</div>
+<div class="filete" aria-hidden="true"></div>
+<section class="sec">
+  <div class="wrap">
+    <figure class="lam-natural lam-natural--foto">
+      <a class="lam-marco" href="obs/pk164/full.jpg" target="_blank" rel="noopener"><img src="obs/pk164/crop.jpg" alt="Nebulosa planetaria PK 164+31.1 en paleta HOO" width="1600" height="1200"></a>
+      <figcaption class="fig-pie"><b>Fig. 1.</b> Paleta HOO (H-alfa y OIII). Pulsa para ver el campo completo.</figcaption>
+    </figure>
+    <div class="duo det">
+      <div class="col">
+        <div class="prosa relato">
+          <p>PK 164+31.1, o Jones-Emberson 1, apenas tiene literatura propia: ningún resumen de arXiv la nombra<sup class="cita"><a href="#ref-1" aria-label="Referencia 1">1</a></sup>. Es un anillo elíptico ancho con dos condensaciones interiores simétricas; las más brillantes parecen expulsadas en sentidos opuestos, quizá en una fase temprana de colimación<sup class="cita"><a href="#ref-2" aria-label="Referencia 2">2</a></sup>. Su estrella central, una enana blanca de unos 150 000 K<sup class="cita"><a href="#ref-3" aria-label="Referencia 3">3</a></sup>, no muestra en TESS señales de una compañera cercana<sup class="cita"><a href="#ref-4" aria-label="Referencia 4">4</a></sup>. Por su paralaje en Gaia está a unos 985 pársecs, unos 3200 años luz<sup class="cita"><a href="#ref-5" aria-label="Referencia 5">5</a>, <a href="#ref-3" aria-label="Referencia 3">3</a></sup>: el doble de los 1600 que repite la divulgación<sup class="cita"><a href="#ref-6" aria-label="Referencia 6">6</a></sup>. En mi imagen HOO se reconocen el anillo y las dos condensaciones<sup class="cita"><a href="#ref-7" aria-label="Referencia 7">7</a>, <a class="cita-inf" href="#nota-inf" title="Inferencia, cuenta o comparación propia, no publicada">inf.</a></sup>.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <span class="caps">Ficha técnica</span>
+        <dl class="ficha">
+          <div><dt>Objeto</dt><dd>PK 164+31.1 · Lince</dd></div>
+          <div><dt>Tipo</dt><dd>Nebulosa planetaria</dd></div>
+          <div><dt>Paleta</dt><dd>HOO</dd></div>
+          <div><dt>Lugar</dt><dd>Observatorio AstroCamp</dd></div>
+          <div><dt>Procesado</dt><dd>24 · IV · 2026</dd></div>
+          <div><dt>Tamaño final</dt><dd>6131 × 4049 px</dd></div>
+        </dl>
+      </div>
+      <section class="refs" aria-labelledby="t-refs">
+        <h2 class="caps rotulo" id="t-refs">Referencias</h2>
+        <ol>
+          <li id="ref-1"><span class="ref-n">1</span><span class="ref-tx">Búsqueda en la API de arXiv, 12-11-2026: abs:&quot;JnEr 1&quot;, abs:&quot;Jones-Emberson&quot; y abs:&quot;PK 164+31.1&quot; devuelven 0 resultados. <a href="https://export.arxiv.org/api/query?search_query=abs:%22Jones-Emberson%22" target="_blank" rel="noopener noreferrer">export.arxiv.org</a> <span class="ref-est">Base de datos</span></span></li>
+          <li id="ref-2"><span class="ref-n">2</span><span class="ref-tx">Phillips, J. P. &amp; Ramos-Larios, G. (2010). «Spitzer mid-infrared observations of seven bipolar planetary nebulae». <i>MNRAS</i>. <a href="https://arxiv.org/abs/1004.0038" target="_blank" rel="noopener noreferrer">arXiv:1004.0038</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-3"><span class="ref-n">3</span><span class="ref-tx">Csukai, A., Zijlstra, A. A., McDonald, I. &amp; De Marco, O. (2025). «Central-star extinctions towards planetary nebulae». <i>MNRAS 543, 3035</i>. <a href="https://arxiv.org/abs/2509.10621" target="_blank" rel="noopener noreferrer">arXiv:2509.10621</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-4"><span class="ref-n">4</span><span class="ref-tx">Aller, A., Lillo-Box, J. &amp; Jones, D. (2024). «Planetary nebulae seen with TESS: New and revisited short-period binary central star candidates from Cycles 1 to 4». <i>A&amp;A 690, A190</i>. <a href="https://arxiv.org/abs/2409.06332" target="_blank" rel="noopener noreferrer">arXiv:2409.06332</a> <span class="ref-est">Publicado</span></span></li>
+          <li id="ref-5"><span class="ref-n">5</span><span class="ref-tx">Gaia DR3 (gaiadr3.gaia_source, fuente 936605992140011392) y distancias de Bailer-Jones et al. 2021 (external.gaiaedr3_distance), consulta TAP del 12-11-2026. <a href="https://gea.esac.esa.int/archive/" target="_blank" rel="noopener noreferrer">gea.esac.esa.int</a> <span class="ref-est">Base de datos</span></span></li>
+          <li id="ref-6"><span class="ref-n">6</span><span class="ref-tx">NASA, APOD del 24-02-2023, «Jones-Emberson 1». <a href="https://science.nasa.gov/image-article/apod-2023-february-24-jones-emberson-1" target="_blank" rel="noopener noreferrer">science.nasa.gov</a> <span class="ref-est">Nota de prensa (divulgación)</span></span></li>
+          <li id="ref-7"><span class="ref-n">7</span><span class="ref-tx">Datos propios: esta lámina.</span></li>
+        </ol>
+        <p class="refs-inf" id="nota-inf"><i>inf.</i> marca una inferencia, una cuenta o una comparación propias, no publicadas.</p>
+      </section>
+    </div>
+  </div>
+</section>
+<section class="sec sec--pegada">
+  <div class="wrap">
+    <nav class="pasa" aria-label="Láminas vecinas">
+      <div>
+        <span class="caps rotulo">Lámina anterior</span>
+        <a class="lam lam--fila" href="cielo-m82.html"><span class="lam-marco"><img src="obs/m82/thumb.jpg" alt="M82, la galaxia del Cigarro" loading="lazy"></span><span class="lam-meta"><span class="caps">Lám. I</span><span class="fell">Cielo profundo · 29 · I</span></span><span class="lam-t">M82, la galaxia del Cigarro</span></a>
+      </div>
+      <div class="pasa-fin">
+        <span class="caps rotulo">Lámina siguiente</span>
+        <a class="lam lam--fila" href="eclipse-2026.html"><span class="lam-marco"><img src="obs/eclipse-2026/corona-thumb.jpg" alt="Eclipse solar del 12 de agosto" loading="lazy"></span><span class="lam-meta"><span class="caps">Lám. III</span><span class="fell">Eclipses · 12 · VIII</span></span><span class="lam-t">Eclipse solar del 12 de agosto</span></a>
+      </div>
+    </nav>
+  </div>
+</section>
+
+  </main>
+  <footer class="pie">
+    <div class="filete" aria-hidden="true"></div>
+    <div class="pie-in">
+      <div class="pie-g">
+        <figure><blockquote class="pie-cita" lang="la">Caelum videre.</blockquote><figcaption><p class="pie-tr">Contemplar el cielo.</p><span class="caps pie-src">Ovidio · Metamorfosis I, 85 · trad. Francisco Crivell, 1805</span></figcaption></figure>
+        <div class="pie-enl"><a class="btn-linea" href="https://www.youtube.com/@CabraSpace" target="_blank" rel="noopener noreferrer">YouTube · @CabraSpace</a><a class="btn-linea" href="mailto:info@cabraspace.com">Contacto</a></div>
+      </div>
+      <div class="pie-base"><span class="pie-marca"><img src="atlas/img/logo-gold.png" alt="" width="22" height="26"><span class="caps">CabraSpace · MMXXVI</span></span><nav class="pie-nav" aria-label="Pie de página"><a href="herramientas.html">Herramientas web</a><a href="observaciones.html" aria-current="true">Observaciones</a><a href="bitacora.html">Bitácora</a><a href="programas.html">Programas</a></nav></div>
+    </div>
+  </footer>
+  </div></div><!-- /hoja -->
+
+  <script src="atlas/atlas2.js?v=20261113a"></script>
 </body>
 </html>

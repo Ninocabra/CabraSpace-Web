@@ -110,6 +110,91 @@
     ]
    ]
   },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "M82 está a unos 3,5 megapársecs, algo más de 11 millones de años luz [1, 2], y es la galaxia prototípica con brote estelar [1]. Su formación de estrellas se disparó en dos episodios, hace unos 10 y 5 millones de años, que se atribuyen a la interacción gravitatoria con su vecina M81 [3]. La energía de sus supernovas y vientos estelares alimenta un viento que saca de la galaxia al menos 30 masas solares de gas al año [1], en dos lóbulos opuestos cuyo gas se aleja a entre 525 y 655 km/s [4]. El JWST muestra que el hidrógeno alfa marca la superficie de nubes frías arrastradas por ese viento, que sobreviven lejos del brote [5]; parte de ese brillo es luz de la región central dispersada por polvo [6]. Qué empuja el viento sigue en discusión: XRISM midió en 2026 gas central a unos 23 millones de grados, concluye que su presión térmica basta y sugiere que no hacen falta rayos cósmicos [1]; un estudio posterior sostiene que la anchura de sus líneas exige movimientos supersónicos y que parte de la energía podría ir a campos magnéticos y rayos cósmicos [7].",
+    "Los filamentos rojos que salen del disco en mi imagen son ese hidrógeno del viento [8, inf.]."
+   ],
+   "en": [
+    "M82 lies at about 3.5 megaparsecs, a little over 11 million light years [1, 2], and is the prototypical starburst galaxy [1]. Its star formation surged in two episodes, about 10 and 5 million years ago, which are attributed to the gravitational interaction with its neighbour M81 [3]. The energy of its supernovae and stellar winds powers a wind that carries at least 30 solar masses of gas a year out of the galaxy [1], in two opposite lobes whose gas moves away at between 525 and 655 km/s [4]. JWST shows that hydrogen-alpha marks the surface of cold clouds dragged along by that wind, which survive far from the starburst [5]; part of that glow is light from the central region scattered by dust [6]. What drives the wind is still under discussion: in 2026 XRISM measured central gas at about 23 million degrees, concludes that its thermal pressure is enough and suggests that cosmic rays are not needed [1]; a later study argues that the width of its lines requires supersonic motions and that part of the energy could go into magnetic fields and cosmic rays [7].",
+    "The red filaments coming out of the disc in my image are that hydrogen of the wind [8, inf.]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "XRISM Collaboration",
+     "year": "2026",
+     "title": "A fast starburst wind consumes most of the energy from supernovae",
+     "venue": "Nature 651, 909",
+     "note": {
+      "es": "Título en arXiv: «A Fast, Hot Wind from a Nuclear Starburst».",
+      "en": "Title on arXiv: “A Fast, Hot Wind from a Nuclear Starburst”."
+     },
+     "url": "https://arxiv.org/abs/2603.24674",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Goobar, A. et al.",
+     "year": "2014",
+     "title": "The rise of SN 2014J in the nearby galaxy M82",
+     "venue": "ApJ 784, L12",
+     "url": "https://arxiv.org/abs/1402.0849",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "Förster Schreiber, N. M. et al.",
+     "year": "2003",
+     "title": "The Nature of Starburst Activity in M82",
+     "venue": "ApJ 599, 193",
+     "url": "https://arxiv.org/abs/astro-ph/0309357",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Shopbell, P. L. & Bland-Hawthorn, J.",
+     "year": "1998",
+     "title": "The Asymmetric Wind in M82",
+     "venue": "ApJ 493, 129",
+     "url": "https://arxiv.org/abs/astro-ph/9708038",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "authors": "Lopez, S. et al.",
+     "year": "2026",
+     "title": "JWST Observations of Starbursts: PAHs Closely Trace the Cool Phase of M82's Galactic Wind",
+     "venue": "ApJ Letters 999, L7",
+     "url": "https://arxiv.org/abs/2510.01314",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "authors": "Yoshida, M. et al.",
+     "year": "2019",
+     "title": "Spectropolarimetry of the superwind filaments of the starburst galaxy M82 II: kinematics of the dust surrounding the nuclear starburst",
+     "venue": "PASJ 71, 87",
+     "url": "https://arxiv.org/abs/1905.11897",
+     "status": "publicado"
+    },
+    {
+     "n": 7,
+     "authors": "Grayson, S. et al.",
+     "year": "2026",
+     "title": "Supersonic Motion in the Driving Region of M82",
+     "venue": "ApJ 1007, 65",
+     "url": "https://arxiv.org/abs/2607.07782",
+     "status": "publicado"
+    },
+    {
+     "n": 8,
+     "own": true,
+     "status": "datos propios"
+    }
+   ]
+  },
   "description": {
    "es": "M82, la galaxia del Cigarro, fotografiada desde el observatorio AstroCamp.",
    "en": "M82, the Cigar Galaxy, photographed from the AstroCamp observatory."
@@ -233,6 +318,80 @@
     ]
    ]
   },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "PK 164+31.1, o Jones-Emberson 1, apenas tiene literatura propia: ningún resumen de arXiv la nombra [1]. Es un anillo elíptico ancho con dos condensaciones interiores simétricas; las más brillantes parecen expulsadas en sentidos opuestos, quizá en una fase temprana de colimación [2]. Su estrella central, una enana blanca de unos 150 000 K [3], no muestra en TESS señales de una compañera cercana [4]. Por su paralaje en Gaia está a unos 985 pársecs, unos 3200 años luz [5, 3]: el doble de los 1600 que repite la divulgación [6]. En mi imagen HOO se reconocen el anillo y las dos condensaciones [7, inf.]."
+   ],
+   "en": [
+    "PK 164+31.1, or Jones-Emberson 1, has hardly any literature of its own: no arXiv abstract names it [1]. It is a broad elliptical ring with two symmetric inner condensations; the brightest ones seem to have been ejected in opposite directions, perhaps at an early stage of collimation [2]. Its central star, a white dwarf of about 150,000 K [3], shows no signs in TESS of a close companion [4]. From its Gaia parallax it lies at about 985 parsecs, some 3200 light years [5, 3]: twice the 1600 that popular-science sources repeat [6]. In my HOO image the ring and the two condensations can be recognised [7, inf.]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "text": {
+      "es": "Búsqueda en la API de arXiv, 12-11-2026: abs:\"JnEr 1\", abs:\"Jones-Emberson\" y abs:\"PK 164+31.1\" devuelven 0 resultados.",
+      "en": "Search of the arXiv API, 12-11-2026: abs:\"JnEr 1\", abs:\"Jones-Emberson\" and abs:\"PK 164+31.1\" return 0 results."
+     },
+     "url": "https://export.arxiv.org/api/query?search_query=abs:%22Jones-Emberson%22",
+     "status": "base de datos"
+    },
+    {
+     "n": 2,
+     "authors": "Phillips, J. P. & Ramos-Larios, G.",
+     "year": "2010",
+     "title": "Spitzer mid-infrared observations of seven bipolar planetary nebulae",
+     "venue": "MNRAS",
+     "url": "https://arxiv.org/abs/1004.0038",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "Csukai, A., Zijlstra, A. A., McDonald, I. & De Marco, O.",
+     "year": "2025",
+     "title": "Central-star extinctions towards planetary nebulae",
+     "venue": "MNRAS 543, 3035",
+     "url": "https://arxiv.org/abs/2509.10621",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Aller, A., Lillo-Box, J. & Jones, D.",
+     "year": "2024",
+     "title": "Planetary nebulae seen with TESS: New and revisited short-period binary central star candidates from Cycles 1 to 4",
+     "venue": "A&A 690, A190",
+     "url": "https://arxiv.org/abs/2409.06332",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "text": {
+      "es": "Gaia DR3 (gaiadr3.gaia_source, fuente 936605992140011392) y distancias de Bailer-Jones et al. 2021 (external.gaiaedr3_distance), consulta TAP del 12-11-2026.",
+      "en": "Gaia DR3 (gaiadr3.gaia_source, source 936605992140011392) and distances from Bailer-Jones et al. 2021 (external.gaiaedr3_distance), TAP query of 12-11-2026."
+     },
+     "url": "https://gea.esac.esa.int/archive/",
+     "status": "base de datos"
+    },
+    {
+     "n": 6,
+     "text": {
+      "es": "NASA, APOD del 24-02-2023, «Jones-Emberson 1».",
+      "en": "NASA, APOD of 24 Feb 2023, “Jones-Emberson 1”."
+     },
+     "url": "https://science.nasa.gov/image-article/apod-2023-february-24-jones-emberson-1",
+     "status": "nota de prensa",
+     "status_note": {
+      "es": "divulgación",
+      "en": "outreach"
+     }
+    },
+    {
+     "n": 7,
+     "own": true,
+     "status": "datos propios"
+    }
+   ]
+  },
   "description": {
    "es": "La nebulosa planetaria PK 164+31.1 en paleta HOO, desde el observatorio AstroCamp.",
    "en": "The planetary nebula PK 164+31.1 in the HOO palette, from the AstroCamp observatory."
@@ -342,7 +501,7 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1655 ± 0.0020"
+     "0.1655 ± 0.0020 (Sozzetti et al. 2009)"
     ],
     [
      "Centro · 29 · VIII",
@@ -350,7 +509,7 @@
     ],
     [
      "O−C · 29 · VIII",
-     "-3.2 min"
+     "-3.2 min (ExoClock)"
     ],
     [
      "Centro · 15 · IX",
@@ -358,7 +517,7 @@
     ],
     [
      "O−C · 15 · IX",
-     "-1.0 min"
+     "-1.0 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -392,7 +551,7 @@
     ],
     [
      "Rp/R★ published",
-     "0.1655 ± 0.0020"
+     "0.1655 ± 0.0020 (Sozzetti et al. 2009)"
     ],
     [
      "Mid-transit · 29 Aug",
@@ -400,7 +559,7 @@
     ],
     [
      "O−C · 29 Aug",
-     "-3.2 min"
+     "-3.2 min (ExoClock)"
     ],
     [
      "Mid-transit · 15 Sep",
@@ -408,7 +567,7 @@
     ],
     [
      "O−C · 15 Sep",
-     "-1.0 min"
+     "-1.0 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -484,6 +643,96 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "TrES-3 b se anunció en 2007: 1,92 masas de Júpiter y una vuelta a su estrella cada 1,31 días, unas 31 horas, uno de los periodos más cortos conocidos entonces, idóneo para estudiar si su órbita decae [1]. Pasa casi rozando el borde de la estrella, y esa geometría engaña: una búsqueda en 330 planetas con TESS le atribuyó una aparente variación de su profundidad [2]. Si la órbita se acorta está en discusión. Un análisis de 2024 ve los tiempos de tránsito ajustarse a un periodo constante, sin decaimiento [3]; el catálogo ExoClock IV (un preprint de 2025, aún sin revisión por pares) detecta en cambio una deriva a largo plazo, que se absorbe con un término cuadrático [4]. En su atmósfera, una subida hacia el azul demasiado grande para ser dispersión de Rayleigh [5] resultó no ser propia del sistema; los datos favorecen un espectro plano [6]. En 2010 fue descrito como el primer planeta muy irradiado sin inversión de temperatura [7].",
+    "Mis dos noches concuerdan y dan Rp/R★ = 0,1663 ± 0,0060, de acuerdo con el valor publicado, 0,1655 ± 0,0020; los centros llegaron 3,2 y 1,0 min antes de la efeméride de ExoClock [8, 9]. Dos noches no bastan para hablar de variaciones [inf.]."
+   ],
+   "en": [
+    "TrES-3 b was announced in 2007: 1.92 Jupiter masses and one orbit around its star every 1.31 days, about 31 hours, one of the shortest periods known at the time, ideal for studying whether its orbit decays [1]. It passes almost grazing the edge of the star, and that geometry is deceptive: a search of 330 planets with TESS attributed to it an apparent variation in its depth [2]. Whether the orbit is shrinking is under discussion. A 2024 analysis finds that the transit times fit a constant period, with no decay [3]; the ExoClock IV catalogue (a 2025 preprint, not yet peer reviewed) instead detects a long-term drift, which is absorbed by a quadratic term [4]. In its atmosphere, a rise towards the blue too large to be Rayleigh scattering [5] turned out not to belong to the system; the data favour a flat spectrum [6]. In 2010 it was described as the first highly irradiated planet without a temperature inversion [7].",
+    "My two nights agree with each other and give Rp/R★ = 0.1663 ± 0.0060, in agreement with the published value, 0.1655 ± 0.0020; the mid-transits arrived 3.2 and 1.0 min ahead of the ExoClock ephemeris [8, 9]. Two nights are not enough to speak of variations [inf.]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "O'Donovan, F. T. et al.",
+     "year": "2007",
+     "title": "TrES-3: A Nearby, Massive, Transiting Hot Jupiter in a 31-Hour Orbit",
+     "venue": "ApJ 663, L37",
+     "url": "https://arxiv.org/abs/0705.2004",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Wang, G. & Espinoza, N.",
+     "year": "2023",
+     "title": "A Blind Search for Transit Depth Variability with TESS",
+     "venue": "AJ 167, 1",
+     "url": "https://arxiv.org/abs/2311.02154",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "Maciejewski, G. et al.",
+     "year": "2024",
+     "title": "Planet-star interactions with precise transit timing. IV. Probing the regime of dynamical tides for GK host stars",
+     "venue": "A&A 692, A35",
+     "url": "https://arxiv.org/abs/2410.22162",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Kokori, A. et al.",
+     "year": "2025",
+     "title": "ExoClock Project IV: A homogeneous catalogue of 620 updated exoplanet ephemerides",
+     "venue": "arXiv:2511.14407",
+     "url": "https://arxiv.org/abs/2511.14407",
+     "status": "preprint"
+    },
+    {
+     "n": 5,
+     "authors": "Parviainen, H. et al.",
+     "year": "2016",
+     "title": "The GTC exoplanet transit spectroscopy survey II: An overly-large Rayleigh-like feature for exoplanet TrES-3b",
+     "venue": "A&A 585, A114",
+     "url": "https://arxiv.org/abs/1510.04988",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "authors": "Mackebrandt, F. et al.",
+     "year": "2017",
+     "title": "Transmission spectroscopy of the hot Jupiter TrES-3 b: Disproof of an overly large Rayleigh-like feature",
+     "venue": "A&A 608, A26",
+     "url": "https://arxiv.org/abs/1709.06124",
+     "status": "publicado"
+    },
+    {
+     "n": 7,
+     "authors": "Fressin, F. et al.",
+     "year": "2010",
+     "title": "The Broadband Infrared Emission Spectrum of the Exoplanet TrES-3",
+     "venue": "ApJ 711, 374",
+     "url": "https://arxiv.org/abs/0909.5221",
+     "status": "publicado"
+    },
+    {
+     "n": 8,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 9,
+     "text": {
+      "es": "ExoClock, base de datos de planetas: TrES-3 b, T0 = 2457657,754796 BJD_TDB y P = 1,306186314 d.",
+      "en": "ExoClock planet database: TrES-3 b, T0 = 2457657.754796 BJD_TDB and P = 1.306186314 d."
+     },
+     "url": "https://www.exoclock.space/database/planets_json",
+     "status": "base de datos"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta TrES-3 b, medida desde el observatorio AstroCamp.",
@@ -594,7 +843,7 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
      "Centro · 7 · IX",
@@ -602,7 +851,7 @@
     ],
     [
      "O−C · 7 · IX",
-     "-0.7 min"
+     "-0.7 min (ExoClock)"
     ],
     [
      "Centro · 21 · IX",
@@ -610,7 +859,7 @@
     ],
     [
      "O−C · 21 · IX",
-     "-2.0 min"
+     "-2.0 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -644,7 +893,7 @@
     ],
     [
      "Rp/R★ published",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
      "Mid-transit · 7 Sep",
@@ -652,7 +901,7 @@
     ],
     [
      "O−C · 7 Sep",
-     "-0.7 min"
+     "-0.7 min (ExoClock)"
     ],
     [
      "Mid-transit · 21 Sep",
@@ -660,7 +909,7 @@
     ],
     [
      "O−C · 21 Sep",
-     "-2.0 min"
+     "-2.0 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -736,6 +985,78 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "WASP-52 b, descubierto con SuperWASP y publicado en 2013, tiene la mitad de masa que Júpiter y un radio un 27 % mayor: un planeta «inflado», de baja densidad [1]. Su tránsito es profundo, un 2,7 % [1]. La estrella, una enana K activa [5], está salpicada de manchas que el planeta tapa a veces al pasar: se vieron cruces de manchas en 5 de 13 curvas de luz [2], y su brillo varía en torno a un 7 % de pico a pico en el visible [3]. Con el Keck se detectó helio escapando del planeta: un 3,44 % de absorción adicional, equivalente a perder un 0,5 % de su masa cada mil millones de años [4]. El JWST ha medido vapor de agua y helio, con dos cruces de manchas claros en la misma curva [5]. En 2026 llegó la primera detección de dióxido de carbono, aunque nubes y manchas impiden fijar su metalicidad [6].",
+    "En mis dos noches, 7 y 21 de septiembre, el centro del tránsito llegó 0,7 y 2,0 min antes de lo que predice la efeméride de ExoClock [7]. La profundidad no vale: hubo volteo de meridiano en mitad de los dos tránsitos [7]."
+   ],
+   "en": [
+    "WASP-52 b, discovered with SuperWASP and published in 2013, has half the mass of Jupiter and a radius 27% larger: an “inflated”, low-density planet [1]. Its transit is deep, 2.7% [1]. The star, an active K dwarf [5], is dotted with spots that the planet sometimes covers as it passes: spot crossings were seen in 5 of 13 light curves [2], and its brightness varies by about 7% peak to peak in the visible [3]. With Keck, helium was detected escaping from the planet: 3.44% of extra absorption, equivalent to losing 0.5% of its mass every billion years [4]. JWST has measured water vapour and helium, with two clear spot crossings in the same curve [5]. In 2026 came the first detection of carbon dioxide, although clouds and spots prevent pinning down its metallicity [6].",
+    "On my two nights, 7 and 21 September, the mid-transit arrived 0.7 and 2.0 min earlier than the ExoClock ephemeris predicts [7]. The depth is not valid: there was a meridian flip in the middle of both transits [7]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "Hébrard, G. et al.",
+     "year": "2013",
+     "title": "WASP-52b, WASP-58b, WASP-59b, and WASP-60b: four new transiting close-in giant planets",
+     "venue": "A&A 549, A134",
+     "url": "https://arxiv.org/abs/1211.0810",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Mancini, L. et al.",
+     "year": "2017",
+     "title": "Orbital alignment and starspot properties in the WASP-52 planetary system",
+     "venue": "MNRAS 465, 843",
+     "url": "https://arxiv.org/abs/1608.02001",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "Rosich, A. et al.",
+     "year": "2020",
+     "title": "Correcting for chromatic stellar activity effects in transits with multiband photometric monitoring: Application to WASP-52",
+     "venue": "A&A 641, A82",
+     "url": "https://arxiv.org/abs/2007.00573",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Kirk, J. et al.",
+     "year": "2022",
+     "title": "Keck/NIRSPEC studies of He I in the atmospheres of two inflated hot gas giants orbiting K dwarfs: WASP-52b and WASP-177b",
+     "venue": "AJ 164, 24",
+     "url": "https://arxiv.org/abs/2205.11579",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "authors": "Fournier-Tondreau, M. et al.",
+     "year": "2025",
+     "title": "Transmission spectroscopy of WASP-52 b with JWST NIRISS: Water and helium atmospheric absorption, alongside prominent star-spot crossings",
+     "venue": "MNRAS 539, 422",
+     "url": "https://arxiv.org/abs/2412.17072",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "authors": "JWST GO 3969 Team: Pan, Y. et al.",
+     "year": "2026",
+     "title": "JWST MEP – A World Under Spotty Starlight: Detection of CO2 and H2O in the Hot Saturn WASP-52b with JWST NIRSpec G395H",
+     "venue": "AJ 172, 234",
+     "url": "https://arxiv.org/abs/2609.21810",
+     "status": "publicado"
+    },
+    {
+     "n": 7,
+     "own": true,
+     "status": "datos propios"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta WASP-52 b, medida desde el observatorio AstroCamp.",
@@ -834,10 +1155,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1463 ± 0.0006"
+     "0.1463 ± 0.0006 (Collins et al. 2017)"
     ],
     [
-     "Profundidad",
+     "(Rp/R★)²",
      "2.18 % (medida) vs 2.14 % (literatura)"
     ],
     [
@@ -850,7 +1171,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -884,10 +1205,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1463 ± 0.0006"
+     "0.1463 ± 0.0006 (Collins et al. 2017)"
     ],
     [
-     "Depth",
+     "(Rp/R★)²",
      "2.18 % (measured) vs 2.14 % (literature)"
     ],
     [
@@ -900,7 +1221,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -976,6 +1297,96 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "Qatar-1 b fue el primer planeta del sondeo de tránsitos qatarí (Alsubai Project): un júpiter caliente que gira alrededor de una enana K rica en metales en 1,42 días, unas 34 horas [1]. Su órbita está alineada con el giro de la estrella; la oblicuidad proyectada es de −8,4 ± 7,1° [2]. En 2013, 26 tránsitos sugirieron que las horas de paso oscilaban con un periodo de unos 190 días, lo que podría delatar un segundo cuerpo [3]. Dos años después, 18 tránsitos nuevos resultaron compatibles con un periodo constante, sin rastro de variaciones periódicas de hasta un minuto [4]. El catálogo ExoClock IV (un preprint de 2025, aún sin revisión por pares) ya no ve desviaciones significativas [5], y un estudio de 2026 sobre 20 júpiteres calientes no encuentra indicios convincentes de decaimiento orbital [6]. Con Spitzer se midió un lado diurno a unos 1550 K y, contra lo que esperaban los modelos, el punto más caliente no aparece desplazado hacia el este [7].",
+    "Mi tránsito del 22 de septiembre llegó 0,9 ± 1,3 min antes de lo que predice la efeméride de ExoClock, dentro de su error [8, 9]. El tamaño relativo que medí, Rp/R★ = 0,1476 ± 0,0046, coincide con el publicado, 0,1463 ± 0,0006 [8]."
+   ],
+   "en": [
+    "Qatar-1 b was the first planet of the Qatari transit survey (Alsubai Project): a hot Jupiter that orbits a metal-rich K dwarf in 1.42 days, about 34 hours [1]. Its orbit is aligned with the star's spin; the projected obliquity is −8.4 ± 7.1° [2]. In 2013, 26 transits suggested that the transit times oscillated with a period of about 190 days, which could betray a second body [3]. Two years later, 18 new transits turned out to be compatible with a constant period, with no trace of periodic variations of up to one minute [4]. The ExoClock IV catalogue (a 2025 preprint, not yet peer reviewed) no longer sees significant deviations [5], and a 2026 study of 20 hot Jupiters finds no convincing evidence of orbital decay [6]. With Spitzer, a dayside at about 1550 K was measured and, contrary to what the models expected, the hottest spot does not appear shifted to the east [7].",
+    "My transit of 22 September arrived 0.9 ± 1.3 min earlier than the ExoClock ephemeris predicts, within its error [8, 9]. The relative size I measured, Rp/R★ = 0.1476 ± 0.0046, agrees with the published one, 0.1463 ± 0.0006 [8]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "Alsubai, K. A. et al.",
+     "year": "2011",
+     "title": "Qatar-1b: a hot Jupiter orbiting a metal-rich K dwarf star",
+     "venue": "MNRAS 417, 709",
+     "url": "https://arxiv.org/abs/1012.3027",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Covino, E. et al.",
+     "year": "2013",
+     "title": "The GAPS programme with HARPS-N at TNG. I: Observations of the Rossiter-McLaughlin effect and characterisation of the transiting system Qatar-1",
+     "venue": "A&A 554, A28",
+     "url": "https://arxiv.org/abs/1304.0005",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "von Essen, C. et al.",
+     "year": "2013",
+     "title": "Qatar-1: indications for possible transit timing variations",
+     "venue": "A&A 555, A92",
+     "url": "https://arxiv.org/abs/1309.1457",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Maciejewski, G. et al.",
+     "year": "2015",
+     "title": "No variations in transit times for Qatar-1 b",
+     "venue": "A&A 577, A109",
+     "url": "https://arxiv.org/abs/1503.07191",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "authors": "Kokori, A. et al.",
+     "year": "2025",
+     "title": "ExoClock Project IV: A homogeneous catalogue of 620 updated exoplanet ephemerides",
+     "venue": "arXiv:2511.14407",
+     "url": "https://arxiv.org/abs/2511.14407",
+     "status": "preprint"
+    },
+    {
+     "n": 6,
+     "authors": "Kutluay, A. C. et al.",
+     "year": "2026",
+     "title": "Chasing the Tides: Searching for Orbital Decay Signatures in Transit Timing Data and Tidal Models for 20 Hot Jupiters",
+     "venue": "PASP 138, 024405",
+     "url": "https://arxiv.org/abs/2602.01446",
+     "status": "publicado"
+    },
+    {
+     "n": 7,
+     "authors": "Keating, D. et al.",
+     "year": "2020",
+     "title": "Smaller than expected bright-spot offsets in Spitzer phase curves of the hot Jupiter Qatar-1b",
+     "venue": "AJ 159, 225",
+     "url": "https://arxiv.org/abs/2004.00014",
+     "status": "publicado"
+    },
+    {
+     "n": 8,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 9,
+     "text": {
+      "es": "ExoClock, base de datos de planetas: efeméride vigente de Qatar-1 b, T0 = 2457980,733187 BJD_TDB y P = 1,420024447 d.",
+      "en": "ExoClock planet database: current ephemeris of Qatar-1 b, T0 = 2457980.733187 BJD_TDB and P = 1.420024447 d."
+     },
+     "url": "https://www.exoclock.space/database/planets_json",
+     "status": "base de datos"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta Qatar-1 b, medida desde el observatorio AstroCamp.",
@@ -1074,10 +1485,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1254 ± 0.0005"
+     "0.1254 ± 0.0005 (Esteves et al. 2015)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "1.56 % (medida) vs 1.57 % (literatura)"
     ],
     [
@@ -1090,7 +1501,7 @@
     ],
     [
      "O−C",
-     "+1.8 min"
+     "+1.8 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1124,10 +1535,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1254 ± 0.0005"
+     "0.1254 ± 0.0005 (Esteves et al. 2015)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "1.56 % (measured) vs 1.57 % (literature)"
     ],
     [
@@ -1140,7 +1551,7 @@
     ],
     [
      "O−C",
-     "+1.8 min"
+     "+1.8 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1207,8 +1618,8 @@
    }
   ],
   "notes": {
-   "es": "<p><em class=\"gi\">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso o el egreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p>",
-   "en": "<p><em class=\"gi\">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress or the egress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p>"
+   "es": "<p><em class=\"gi\">Resultado parcial.</em> La hora central del tránsito vale para el O−C; la profundidad no, porque falta el ingreso del tránsito.</p><p>ExoClock la acepta marcada: los residuos no son gaussianos.</p>",
+   "en": "<p><em class=\"gi\">Partial result.</em> The mid-transit time is good for O−C; the depth is not, because the ingress of the transit is missing.</p><p>ExoClock accepts it flagged: the residuals are not Gaussian.</p>"
   },
   "made_with": {
    "name": "Cabra<em class=\"gi\">Transit</em>",
@@ -1216,6 +1627,105 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "TrES-2 b fue el primer planeta en tránsito hallado en el campo de la futura misión Kepler: un júpiter caliente que da una vuelta en 2,47 días, con tránsitos de un 1,4 % de profundidad [1]. Cruza la estrella muy cerca de su borde; en 2007 era, entre los planetas cercanos, el de mayor parámetro de impacto [2]. En 2011 se le llamó «el exoplaneta más oscuro conocido» [3]. Según el análisis de los datos de Kepler, su albedo geométrico va de 0,014 [4] a 0,025, y quedaría por debajo del 1 % si se descuenta su emisión térmica [3]. Su espectro con el Hubble no muestra rasgos [5]. Si su órbita decae sigue abierto: con tránsitos de aficionados (base ETD) se estimó un acortamiento del periodo de 12,6 ± 2,4 ms por año [6] y con TESS, de 5,58 ± 1,81 ms por año [7], sin que ninguno se dé por concluyente; ExoClock IV (un preprint de 2025, aún sin revisión por pares) no lo incluye entre los planetas que se apartan de un periodo constante [8].",
+    "Mi noche del 6 de septiembre empezó a mitad del tránsito: tengo la salida, no la entrada [9, inf.]. La hora central vale, +1,8 ± 6,2 min frente a la efeméride de ExoClock; la profundidad, no [9, 10]."
+   ],
+   "en": [
+    "TrES-2 b was the first transiting planet found in the field of the future Kepler mission: a hot Jupiter that completes an orbit in 2.47 days, with transits 1.4% deep [1]. It crosses the star very close to its edge; in 2007 it had, among the nearby planets, the largest impact parameter [2]. In 2011 it was called “the darkest exoplanet known” [3]. According to the analysis of the Kepler data, its geometric albedo ranges from 0.014 [4] to 0.025, and it would fall below 1% if its thermal emission is discounted [3]. Its Hubble spectrum shows no features [5]. Whether its orbit decays remains open: with amateur transits (ETD database) a shortening of the period of 12.6 ± 2.4 ms per year was estimated [6] and with TESS, of 5.58 ± 1.81 ms per year [7], with neither regarded as conclusive; ExoClock IV (a 2025 preprint, not yet peer reviewed) does not include it among the planets that depart from a constant period [8].",
+    "My night of 6 September began halfway through the transit: I have the egress, not the ingress [9, inf.]. The mid-transit time is valid, +1.8 ± 6.2 min against the ExoClock ephemeris; the depth is not [9, 10]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "O'Donovan, F. T. et al.",
+     "year": "2006",
+     "title": "TrES-2: The First Transiting Planet in the Kepler Field",
+     "venue": "ApJ 651, L61",
+     "url": "https://arxiv.org/abs/astro-ph/0609335",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Holman, M. J. et al.",
+     "year": "2007",
+     "title": "The Transit Light Curve Project. VI. Three Transits of the Exoplanet TrES-2",
+     "venue": "ApJ 664, 1185",
+     "url": "https://arxiv.org/abs/0704.2907",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "authors": "Kipping, D. M. & Spiegel, D. S.",
+     "year": "2011",
+     "title": "Detection of visible light from the darkest world",
+     "venue": "MNRAS 417, L88",
+     "url": "https://arxiv.org/abs/1108.2297",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "authors": "Barclay, T. et al.",
+     "year": "2012",
+     "title": "Photometrically derived masses and radii of the planet and star in the TrES-2 system",
+     "venue": "ApJ 761, 53",
+     "url": "https://arxiv.org/abs/1210.4592",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "authors": "Ranjan, S. et al.",
+     "year": "2014",
+     "title": "Atmospheric Characterization of 5 Hot Jupiters with Wide Field Camera 3 on the Hubble Space Telescope",
+     "venue": "ApJ 785, 148",
+     "url": "https://arxiv.org/abs/1403.1266",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "authors": "Hagey, S. R., Edwards, B. & Boley, A. C.",
+     "year": "2022",
+     "title": "Evidence of Long-Term Period Variations in the Exoplanet Transit Database (ETD)",
+     "venue": "AJ 164",
+     "url": "https://arxiv.org/abs/2209.10752",
+     "status": "publicado"
+    },
+    {
+     "n": 7,
+     "authors": "Biswas, S. et al.",
+     "year": "2024",
+     "title": "Probing the Possible Causes of the Transit Timing Variation for TrES-2b in the TESS Era",
+     "venue": "AJ 168, 176",
+     "url": "https://arxiv.org/abs/2409.12069",
+     "status": "publicado"
+    },
+    {
+     "n": 8,
+     "authors": "Kokori, A. et al.",
+     "year": "2025",
+     "title": "ExoClock Project IV: A homogeneous catalogue of 620 updated exoplanet ephemerides",
+     "venue": "arXiv:2511.14407",
+     "url": "https://arxiv.org/abs/2511.14407",
+     "status": "preprint"
+    },
+    {
+     "n": 9,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 10,
+     "text": {
+      "es": "ExoClock, base de datos de planetas: TrES-2 b, T0 = 2455714,2416097 BJD_TDB y P = 2,470613387 d.",
+      "en": "ExoClock planet database: TrES-2 b, T0 = 2455714.2416097 BJD_TDB and P = 2.470613387 d."
+     },
+     "url": "https://www.exoclock.space/database/planets_json",
+     "status": "base de datos"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta TrES-2 b, medida desde el observatorio AstroCamp.",
@@ -1314,10 +1824,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.0888 ± 0.0018"
+     "0.0888 ± 0.0018 (Alsubai et al. 2017)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "0.66 % (medida) vs 0.79 % (literatura)"
     ],
     [
@@ -1326,11 +1836,11 @@
     ],
     [
      "Centro del tránsito",
-     "00:42:44 UTC ± 4.4 min"
+     "14 · IX, 00:42:44 UTC ± 4.4 min"
     ],
     [
      "O−C",
-     "-7.5 min"
+     "-7.5 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1364,10 +1874,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.0888 ± 0.0018"
+     "0.0888 ± 0.0018 (Alsubai et al. 2017)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "0.66 % (measured) vs 0.79 % (literature)"
     ],
     [
@@ -1376,11 +1886,11 @@
     ],
     [
      "Mid-transit",
-     "00:42:44 UTC ± 4.4 min"
+     "14 Sep, 00:42:44 UTC ± 4.4 min"
     ],
     [
      "O−C",
-     "-7.5 min"
+     "-7.5 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1456,6 +1966,58 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "Qatar-3 b es un «júpiter caliente pesado»: 4,31 ± 0,47 masas de Júpiter con un radio parecido al de Júpiter, alrededor de una estrella joven, de entre 100 y 300 millones de años [1]. Casi nadie ha vuelto a estudiarlo: en los resúmenes de arXiv solo aparece su artículo de descubrimiento [2], que ni siquiera daba la incertidumbre del periodo [3]. Lo sigue sobre todo la red de ExoClock, con 36 de las 46 observaciones registradas [4]. Con la efeméride de ExoClock, mi tránsito llegó 7,5 ± 4,4 min antes de lo previsto [4, 5]; con otras efemérides esa cifra va de +7 a −18 min [inf.]."
+   ],
+   "en": [
+    "Qatar-3 b is a “heavy hot Jupiter”: 4.31 ± 0.47 Jupiter masses with a radius similar to Jupiter's, around a young star, between 100 and 300 million years old [1]. Hardly anyone has studied it since: in arXiv abstracts only its discovery paper appears [2], which did not even give the uncertainty of the period [3]. It is followed mainly by the ExoClock network, with 36 of the 46 recorded observations [4]. With the ExoClock ephemeris, my transit arrived 7.5 ± 4.4 min earlier than predicted [4, 5]; with other ephemerides that figure ranges from +7 to −18 min [inf.]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "Alsubai, K. A. et al.",
+     "year": "2017",
+     "title": "Qatar Exoplanet Survey: Qatar-3b, Qatar-4b, and Qatar-5b",
+     "venue": "AJ 153, 200",
+     "url": "https://arxiv.org/abs/1606.06882",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "text": {
+      "es": "Búsqueda en la API de arXiv, 12-11-2026: abs:\"Qatar-3b\" y abs:\"Qatar-3\" devuelven 1 resultado cada una, el artículo de descubrimiento.",
+      "en": "Search of the arXiv API, 12-11-2026: abs:\"Qatar-3b\" and abs:\"Qatar-3\" return 1 result each, the discovery paper."
+     },
+     "url": "https://export.arxiv.org/api/query?search_query=abs:%22Qatar-3%22",
+     "status": "base de datos"
+    },
+    {
+     "n": 3,
+     "authors": "Mallonn, M. et al.",
+     "year": "2019",
+     "title": "Ephemeris refinement of 21 Hot Jupiter exoplanets with high timing uncertainties",
+     "venue": "A&A 622, A81",
+     "url": "https://arxiv.org/abs/1812.05882",
+     "status": "publicado"
+    },
+    {
+     "n": 4,
+     "text": {
+      "es": "ExoClock, base de datos de planetas: Qatar-3 b, 46 observaciones (36 de la red ExoClock, 9 espaciales) y 1 tiempo de la literatura; efeméride T0 = 2457565,78263 BJD_TDB, P = 2,50790151 d.",
+      "en": "ExoClock planet database: Qatar-3 b, 46 observations (36 from the ExoClock network, 9 from space) and 1 time from the literature; ephemeris T0 = 2457565.78263 BJD_TDB, P = 2.50790151 d."
+     },
+     "url": "https://www.exoclock.space/database/planets_json",
+     "status": "base de datos"
+    },
+    {
+     "n": 5,
+     "own": true,
+     "status": "datos propios"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta Qatar-3 b, medida desde el observatorio AstroCamp.",
@@ -1554,10 +2116,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1300 ± 0.0060"
+     "0.1300 ± 0.0060 (Hébrard et al. 2013, vía Knudstrup et al. 2024)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "1.88 % (medida) vs 1.69 % (literatura)"
     ],
     [
@@ -1566,11 +2128,11 @@
     ],
     [
      "Centro del tránsito",
-     "01:09:16 UTC ± 1.7 min"
+     "4 · IX, 01:09:16 UTC ± 1.7 min"
     ],
     [
      "O−C",
-     "+1.2 min"
+     "+1.2 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -1604,10 +2166,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1300 ± 0.0060"
+     "0.1300 ± 0.0060 (Hébrard et al. 2013, via Knudstrup et al. 2024)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "1.88 % (measured) vs 1.69 % (literature)"
     ],
     [
@@ -1616,11 +2178,11 @@
     ],
     [
      "Mid-transit",
-     "01:09:16 UTC ± 1.7 min"
+     "4 Sep, 01:09:16 UTC ± 1.7 min"
     ],
     [
      "O−C",
-     "+1.2 min"
+     "+1.2 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -1696,6 +2258,76 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "WASP-59 b, publicado en 2013, da una vuelta a una enana K5 cada 7,9 días [1]. Es un júpiter templado [2] de 0,86 masas y 0,78 radios de Júpiter, probablemente con un núcleo grande y denso [1]. Su literatura cabe en pocas líneas [3]: dos medidas del ángulo entre su órbita y el giro de la estrella dan 16° y −1°, con errores de casi 20°; la segunda se considera compatible con una órbita alineada [2, 4]. Gaia le encontró además una estrella compañera a unas 9500 unidades astronómicas [5]. Mi tránsito, centrado el 4 de septiembre a la 01:09 UTC, llegó 1,2 min tarde [6, 7]."
+   ],
+   "en": [
+    "WASP-59 b, published in 2013, orbits a K5 dwarf every 7.9 days [1]. It is a warm Jupiter [2] of 0.86 Jupiter masses and 0.78 Jupiter radii, probably with a large, dense core [1]. Its literature fits in a few lines [3]: two measurements of the angle between its orbit and the star's spin give 16° and −1°, with errors of almost 20°; the second is considered compatible with an aligned orbit [2, 4]. Gaia also found a companion star at about 9500 astronomical units [5]. My transit, centred on 4 September at 01:09 UTC, arrived 1.2 min late [6, 7]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "authors": "Hébrard, G. et al.",
+     "year": "2013",
+     "title": "WASP-52b, WASP-58b, WASP-59b, and WASP-60b: four new transiting close-in giant planets",
+     "venue": "A&A 549, A134",
+     "url": "https://arxiv.org/abs/1211.0810",
+     "status": "publicado"
+    },
+    {
+     "n": 2,
+     "authors": "Knudstrup, E. et al.",
+     "year": "2024",
+     "title": "Obliquities of exoplanet host stars: 19 new and updated measurements, and trends in the sample of 205 measurements",
+     "venue": "A&A 690, A379",
+     "url": "https://arxiv.org/abs/2408.09793",
+     "status": "publicado"
+    },
+    {
+     "n": 3,
+     "text": {
+      "es": "Búsqueda en la API de arXiv, 12-11-2026: abs:\"WASP-59b\" devuelve 2 resultados (el descubrimiento y [4]); abs:\"WASP-59\", ninguno.",
+      "en": "Search of the arXiv API, 12-11-2026: abs:\"WASP-59b\" returns 2 results (the discovery and [4]); abs:\"WASP-59\", none."
+     },
+     "url": "https://export.arxiv.org/api/query?search_query=abs:%22WASP-59b%22",
+     "status": "base de datos"
+    },
+    {
+     "n": 4,
+     "authors": "Zak, J. et al.",
+     "year": "2025",
+     "title": "Stellar obliquities of eight close-in gas giant exoplanets",
+     "venue": "A&A 694, A91",
+     "url": "https://arxiv.org/abs/2501.05615",
+     "status": "publicado"
+    },
+    {
+     "n": 5,
+     "authors": "Fontanive, C. & Bardalez Gagliuffi, D.",
+     "year": "2021",
+     "title": "The Census of Exoplanets in Visual Binaries: population trends from a volume-limited Gaia DR2 and literature search",
+     "venue": "Frontiers in Astronomy and Space Sciences 8, 625250",
+     "url": "https://arxiv.org/abs/2101.12667",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 7,
+     "text": {
+      "es": "ExoClock, base de datos de planetas: WASP-59 b, T0 = 2459695,71571 BJD_TDB y P = 7,9195883 d; 93 observaciones (90 de su red) y 1 tiempo de la literatura.",
+      "en": "ExoClock planet database: WASP-59 b, T0 = 2459695.71571 BJD_TDB and P = 7.9195883 d; 93 observations (90 from its network) and 1 time from the literature."
+     },
+     "url": "https://www.exoclock.space/database/planets_json",
+     "status": "base de datos"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta WASP-59 b, medida desde el observatorio AstroCamp.",
@@ -1898,7 +2530,7 @@
     ],
     [
      "Totalidad",
-     "18:30:30 – 18:32:30 UTC"
+     "18:30:31 – 18:32:11 UTC · 1 min 40 s (IGN)"
     ],
     [
      "Timelapse",
@@ -1936,7 +2568,7 @@
     ],
     [
      "Totality",
-     "18:30:30 – 18:32:30 UTC"
+     "18:30:31 – 18:32:11 UTC · 1 min 40 s (IGN)"
     ],
     [
      "Timelapse",
@@ -1963,6 +2595,108 @@
   "notes": {
    "es": "<p>Desde el mirador del Cabrero, entre Fortanete y Villarroya de los Pinares (Teruel), con dos equipos en el mismo sitio. La Vaonis Vespera Pro fotografió el paso de la Luna por delante del Sol cada 2 s aproximadamente, del primer contacto a la puesta. Durante la totalidad, entre las 18:30:30 y las 18:32:30 UTC, su filtro solar solo deja pasar ruido; después el creciente reaparece por el otro lado y el Sol se pone, todavía eclipsado, hacia las 18:51.</p><p>La corona (Fig. 1 y el disco de las 18:31 en la serie de fases) es de la otra cámara: una Fuji X-T5 a pulso, a 300 mm de focal. Son 99 tomas de exposiciones distintas en 25 s, combinadas en una sola imagen de alto rango dinámico con CabraEclipse, para que se vean a la vez la corona exterior, muy débil, y el borde de la Luna.</p><p>Todos los discos de fase se han recortado igual, centrados en el Sol, y pintados con el mismo color para que la serie se lea de un vistazo.</p>",
    "en": "<p>From the Cabrero viewpoint, between Fortanete and Villarroya de los Pinares (Teruel, Spain), with two instruments at the same spot. The Vaonis Vespera Pro photographed the Moon crossing the Sun roughly every 2 s, from first contact until sunset. During totality, between 18:30:30 and 18:32:30 UTC, its solar filter lets only noise through; then the crescent reappears on the other side and the Sun sets, still eclipsed, at about 18:51.</p><p>The corona (Fig. 1, and the 18:31 disc in the phase series) comes from the other camera: a handheld Fuji X-T5 at 300 mm focal length. It is 99 frames at different exposures over 25 s, merged into a single high-dynamic-range image with CabraEclipse, so that the faint outer corona and the edge of the Moon show at the same time.</p><p>All the phase discs are cut the same way, centred on the Sun, and painted in the same colour so the series reads at a glance.</p>"
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "El 12 de agosto de 2026, al atardecer, la sombra de la Luna cruzó la península de oeste a este [1]: fue el primer eclipse total visible desde la península Ibérica en más de un siglo [2]. Para Fortanete y Villarroya de los Pinares, entre los que está el mirador del Cabrero [7], el IGN calculó la totalidad entre las 20:30:31 y las 20:32:11 hora peninsular, 1 min 40 s, con el Sol a 5° sobre el horizonte [1]. El ciclo solar ya había pasado su máximo: la media suavizada de manchas tocó techo en octubre de 2024, con 160,9, y la media de agosto de 2026 fue 76,0, aún provisional [3]. Predictive Science publicó una predicción de la corona [4] con un modelo que asimila casi en tiempo real el campo magnético solar, ya contrastado en el eclipse de 2024 [5]. Según la prensa, el modelo del Raman Research Institute acertó las grandes serpentinas y falló una más fina, cerca del polo sur [6]. Aún no hay un estudio revisado [4].",
+    "Mi Vespera solo registró ruido entre las 18:30:30 y las 18:32:30 UTC [7]."
+   ],
+   "en": [
+    "On 12 August 2026, at dusk, the Moon's shadow crossed the peninsula from west to east [1]: it was the first total eclipse visible from the Iberian Peninsula in more than a century [2]. For Fortanete and Villarroya de los Pinares, between which lies the Cabrero viewpoint [7], the IGN calculated totality between 20:30:31 and 20:32:11 peninsular time, 1 min 40 s, with the Sun 5° above the horizon [1]. The solar cycle had already passed its maximum: the smoothed sunspot average peaked in October 2024, at 160.9, and the August 2026 average was 76.0, still provisional [3]. Predictive Science published a prediction of the corona [4] with a model that assimilates the solar magnetic field in near real time, already tested at the 2024 eclipse [5]. According to the press, the Raman Research Institute's model got the large streamers right and missed a finer one, near the south pole [6]. There is no peer-reviewed study yet [4].",
+    "My Vespera recorded only noise between 18:30:30 and 18:32:30 UTC [7]."
+   ],
+   "refs": [
+    {
+     "n": 1,
+     "text": {
+      "es": "Instituto Geográfico Nacional (IGN/OAN). «Eclipse total de Sol del 12 de agosto de 2026», página y tabla por municipios.",
+      "en": "Instituto Geográfico Nacional (IGN/OAN). «Eclipse total de Sol del 12 de agosto de 2026» (Total solar eclipse of 12 August 2026), page and table by municipality."
+     },
+     "url": "https://eclipses.ign.es/eclipse-total-sol-de-12-de-agosto-2026.html",
+     "status": "base de datos",
+     "status_note": {
+      "es": "institucional",
+      "en": "institutional"
+     }
+    },
+    {
+     "n": 2,
+     "text": {
+      "es": "IGN. Página de inicio de «Eclipses visibles en España 2026, 2027 y 2028».",
+      "en": "IGN. Home page of «Eclipses visibles en España 2026, 2027 y 2028» (Eclipses visible from Spain in 2026, 2027 and 2028)."
+     },
+     "url": "https://eclipses.ign.es/home.html",
+     "status": "nota de prensa",
+     "status_note": {
+      "es": "institucional",
+      "en": "institutional"
+     }
+    },
+    {
+     "n": 3,
+     "text": {
+      "es": "SILSO, Royal Observatory of Belgium. Número de manchas: serie suavizada SN_ms_tot_V2.0 y mensual SN_m_tot_V2.0.",
+      "en": "SILSO, Royal Observatory of Belgium. Sunspot number: smoothed series SN_ms_tot_V2.0 and monthly series SN_m_tot_V2.0."
+     },
+     "url": [
+      "https://www.sidc.be/SILSO/DATA/SN_ms_tot_V2.0.txt",
+      "https://www.sidc.be/SILSO/DATA/SN_m_tot_V2.0.txt"
+     ],
+     "status": "base de datos"
+    },
+    {
+     "n": 4,
+     "authors": "NASA",
+     "year": "2026",
+     "title": "NASA Shares Views of August Solar Eclipse from Ground, Air, Space",
+     "venue": {
+      "es": "21-08-2026",
+      "en": "21 Aug 2026"
+     },
+     "url": "https://science.nasa.gov/science-research/heliophysics/nasa-shares-views-of-august-solar-eclipse-from-ground-air-space/",
+     "status": "nota de prensa"
+    },
+    {
+     "n": 5,
+     "authors": "Downs, C. et al.",
+     "year": "2025",
+     "title": "A near-real-time data-assimilative model of the solar corona",
+     "venue": "Science 388, 1306",
+     "url": "https://doi.org/10.1126/science.adq0872",
+     "status": "publicado"
+    },
+    {
+     "n": 6,
+     "authors": "Jain, A.",
+     "year": "2026",
+     "title": "RRI faces the real Sun: what its eclipse prediction revealed about the corona",
+     "venue": {
+      "es": "ETV Bharat, 19-08-2026",
+      "en": "ETV Bharat, 19 Aug 2026"
+     },
+     "url": "https://www.etvbharat.com/en/technology/rri-faces-the-real-sun-what-its-eclipse-prediction-revealed-about-the-corona-enn26081903708",
+     "status": "nota de prensa"
+    },
+    {
+     "n": 7,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 8,
+     "text": {
+      "es": "IGN. «Curiosidades y eclipses futuros».",
+      "en": "IGN. «Curiosidades y eclipses futuros» (Curiosities and future eclipses)."
+     },
+     "url": "https://eclipses.ign.es/curiosidades-y-eclipses-futuros.html",
+     "status": "nota de prensa",
+     "status_note": {
+      "es": "institucional",
+      "en": "institutional"
+     }
+    }
+   ]
   },
   "description": {
    "es": "El eclipse total del 12 de agosto de 2026 desde el mirador del Cabrero (Teruel): la corona (Fuji X-T5, HDR con CabraEclipse) y un timelapse de 2193 fotografías con la Vaonis Vespera Pro.",
@@ -2061,10 +2795,10 @@
     ],
     [
      "Rp/R★ publicado",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
-     "Profundidad (orientativo)",
+     "(Rp/R★)² (orientativo)",
      "2.80 % (medida) vs 2.65 % (literatura)"
     ],
     [
@@ -2077,7 +2811,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescopio",
@@ -2111,10 +2845,10 @@
     ],
     [
      "Rp/R★ published",
-     "0.1629 ± 0.0044"
+     "0.1629 ± 0.0044 (Baluev et al. 2015)"
     ],
     [
-     "Depth (indicative)",
+     "(Rp/R★)² (indicative)",
      "2.80 % (measured) vs 2.65 % (literature)"
     ],
     [
@@ -2127,7 +2861,7 @@
     ],
     [
      "O−C",
-     "-0.9 min"
+     "-0.9 min (ExoClock)"
     ],
     [
      "Telescope",
@@ -2203,6 +2937,39 @@
     "es": "Fotometría de tránsitos de exoplanetas, del FITS a la curva de luz. En el taller: aún sin publicar.",
     "en": "Exoplanet transit photometry, from FITS to light curve. In the workshop: not released yet."
    }
+  },
+  "story": {
+   "source": "propuestas-estetica/d4-investigacion/RELATOS.md (12-11-2026, decisiones R1-R5)",
+   "es": [
+    "Esta es una de las dos noches que se combinan en la Lám. IX, donde se cuenta el planeta. Seguí la estrella de las 20:22 a las 04:12 UTC con 652 tomas de 30 s, y el centro del tránsito cayó a las 23:40:58 UTC ± 1,2 min, 0,9 min antes de lo previsto [1]. El volteo de meridiano llegó en mitad del tránsito: la hora vale; la profundidad, no [1]. En esta estrella la profundidad es, además, una medida delicada, porque sus manchas cambian de una época a otra y alteran lo que mide cada tránsito [2]."
+   ],
+   "en": [
+    "This is one of the two nights combined in Pl. IX, where the planet is described. I followed the star from 20:22 to 04:12 UTC with 652 frames of 30 s, and the mid-transit fell at 23:40:58 UTC ± 1.2 min, 0.9 min earlier than predicted [1]. The meridian flip came in the middle of the transit: the time is valid; the depth is not [1]. In this star the depth is, moreover, a delicate measurement, because its spots change from one epoch to another and alter what each transit measures [2]."
+   ],
+   "links": {
+    "es": {
+     "Lám. IX": "wasp52b-2026"
+    },
+    "en": {
+     "Pl. IX": "wasp52b-2026"
+    }
+   },
+   "refs": [
+    {
+     "n": 1,
+     "own": true,
+     "status": "datos propios"
+    },
+    {
+     "n": 2,
+     "authors": "Rosich, A. et al.",
+     "year": "2020",
+     "title": "Correcting for chromatic stellar activity effects in transits with multiband photometric monitoring: Application to WASP-52",
+     "venue": "A&A 641, A82",
+     "url": "https://arxiv.org/abs/2007.00573",
+     "status": "publicado"
+    }
+   ]
   },
   "description": {
    "es": "Curva de luz del tránsito del exoplaneta WASP-52 b, medida desde el observatorio AstroCamp.",
