@@ -6,11 +6,12 @@
 |---|---|
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
-| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; las 20 a mano lo cargarán en F5. |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin migrar (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; **desde F5a también las 10 páginas de las 5 herramientas** (ES y EN); los 5 catálogos a mano lo cargarán en F5b. |
+| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin migrar (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
 | `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
 | `atlas/atlas.js` | Script de cabecera de Atlas I. **Ya no lo carga ninguna página** (F2); se borra en F6. No cargarlo junto a `atlas2.js`: los dos alternarían el modo noche y un clic se anularía. |
-| `atlas/astroforecast.css` | Titular y paneles Atlas de Astro Forecast. |
+| `atlas/astroforecast.css` | Paneles Atlas de Astro Forecast (desde F5a la cabecera es la de `atlas2.css`; se carga después de `atlas2.css`). |
+| `atlas/tools-base.css` | (F5a) Convivencia de las 5 herramientas con `atlas2.css`: devuelve al interior lo que la base de `atlas2.css` le cambiaba. Ver «F5a». |
 | `atlas/img/` | Logo dorado, grano, retícula, anillo y capturas usadas en varias páginas. |
 | `obs/observaciones.json` | Tu trabajo: una entrada por observación. `facts` guarda cada dato con su fuente (fichero y línea del informe); `facts_display` es lo que se ve en la ficha. |
 | `obs/<slug>/` | Imágenes, curvas y vídeos de cada observación. |
@@ -73,7 +74,7 @@ histograma con el punto de simetría (`tools/histograma.py`, AutoGHS), placa de 
 Cada uno escribe su SVG en `atlas/img/`. El SVG es negro sobre transparente y la página lo usa como
 **máscara** pintada con `var(--gold)`, así el modo noche lo vuelve rojo sin tocarlo. Dentro de un SVG
 usado como imagen no cargan las fuentes web: los textos van en fuentes del sistema (Times).
-Estilos: `.tl-top` / `.tl-art.art-<nombre>` en `atlas/tools.css` (Astro Forecast: `.aw-obs`).
+Desde F5a las cabeceras son `.pag-cab` de `atlas2.css` y el grabado va en `.pag-grab > .grab.grab-<nombre>` (las capas `.tl-top` / `.tl-art` / `.aw-obs` de Atlas I se retiraron de `tools.css` y `astroforecast.css`).
 
 CabraSpace Web es un cockpit sin scroll: su franja es compacta (88 px bajo la barra) y la rejilla se
 encoge esa misma altura. Si cambias la franja, mide que la rejilla sigue acabando dentro de la pantalla.
@@ -167,3 +168,29 @@ páginas, la siguiente ejecución lo devuelve al valor viejo y los navegadores s
 `tools/fases_eclipse.py` rehace `obs/eclipse-2026/fase-*.jpg` desde los fotogramas de la Vespera (disco
 E:) con los centros medidos por el pipeline del timelapse (`centros2.csv`, solo `cal >= 0.8`), y la
 totalidad desde la corona de CabraEclipse. Imprime la lista de fases para `observaciones.json`.
+
+## F5a (13-11-2026): cabecera Atlas II en las 5 herramientas (ES y EN)
+
+CabraSpace Web (Nº I), Astro Forecast (Nº II), AutoGHS (Nº III), Contaminación (mapa, Nº IV) y PixelMath-teca (Nº V).
+Solo cambia la cabecera: miga «Herramientas web», cartela con su número, título, entradilla y su grabado (`.pag-cab`,
+como `v2/autoghs.html`), y el filete debajo. La interfaz y el JavaScript de cada herramienta no se tocan.
+
+- **Orden del `<head>`** (lo ordena `tools/sync_nav.py`): `index.css` · hojas propias · `atlas.css` · fuente · `atlas2-marco.css` ·
+  `atlas2.css` · **`tools-base.css`** · `tools.css` (o `astroforecast.css`). `atlas.css` SE QUEDA en estas páginas (oculta
+  `.grid-overlay`/`.radial-glow` de `index.css` y da `.a3 .card/.btn/.ghost` al mapa de Contaminación); se va en F6 con el interior.
+  `sync_nav.py` ya mantiene el `?v=` de `atlas.css` y de las capas `EXTRA_CSS` (lista, ahora) en estas páginas.
+- **Por qué `tools-base.css`**: la base de `atlas2.css` (`body{font-size:16px}`, `button{font:inherit;color:inherit}`, `a{color:inherit;
+  text-decoration:none}`, `img{display:block…}`, `.rotulo`, `.refs`, `.btn`, `--gx`) cambiaba el interior de las herramientas.
+  Medido con los estilos calculados de ~12 500 elementos antes y después: con `atlas2.css` sin más, 360 cambios distintos;
+  con `tools-base.css`, ninguno salvo la altura que da la cabecera nueva. Las raíces del interior son `main.container`,
+  `.aw-section` y `.cm-maps`. Se borra cuando se rediseñe cada interior (D6). Una regla de `atlas2.css` NO se puede neutralizar
+  desde fuera: `@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }`
+  (§17) apaga también las animaciones CSS del interior (p. ej. el giro del «Procesando…») para quien pida reducir movimiento.
+- **CabraSpace Web (cockpit sin scroll)**: cabecera compacta `.pag-cab--cockpit` de `--cockpit-cab` = 96 px (+4 del filete), una sola
+  fila (cartela · título · entradilla · grabado). La rejilla mide `100vh - 38px - --cockpit-cab - 4px - --marco-top`: es la misma
+  cuenta de antes con la franja de 88 px cambiada por la cabecera nueva. Por debajo de 1100 px se ocultan entradilla y grabado.
+- Las reglas de PixelMath-teca de la sección 7 de `atlas2-marco.css` (sticky del simulador y su padding en móvil) pasaron a `tools.css`.
+  Quedan en la sección 7 las de los catálogos (`.section-header`… y el lateral de Coffee Break).
+- La versión inglesa de CabraSpace Web se genera: la cabecera está en `tools/i18n_workflow_en.json` (entrada nueva) y se quitaron
+  las 20 traducciones obsoletas (18 del menú antiguo + consola y pie viejos; la consola ganó su entrada nueva).
+  `python tools/build_workflow_en.py --check` sigue marcando DESFASE, pero solo en cabecera y pie, que reescribe `sync_nav.py`.

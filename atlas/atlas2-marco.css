@@ -22,7 +22,7 @@
      - --marco-top = alto de lo que hay encima del contenido (margen de la hoja + filetes + orla +
        cabecera). Lo usan las herramientas de pantalla completa (tools.css: rejilla de CabraSpace Web).
      - Seccion 7 «compatibilidad»: los pocos ajustes del interior que dependian de la cabecera fija
-       (padding-top:150px de 4 catalogos, sticky top:100px). Se borran en F5 al migrar esas paginas.
+       (padding-top:150px de 4 catalogos, sticky top:100px del lateral de Coffee Break). Se borran en F5 al migrar esas paginas.
 
    PIEZAS
      1. Tokens ............ :root, body.night-vision (penumbra, D5)
@@ -237,11 +237,9 @@ body.night-vision :is(.cab, .pie, .esq) svg { filter: none !important; opacity: 
    cabecera, a 1440 y a 390). */
 :is(.section-header, .courses-header, .divulgacion-header, .database-header) { padding-top: calc(150px - 81px) !important; }
 /* sticky: top:100px dejaba sitio a la cabecera fija; ahora no hay nada encima al bajar */
-aside.simulator-card, aside.podcast-sidebar { top: 24px; }
-/* PixelMath-teca en movil: sus dos tarjetas no bajan de 333 px de ancho (minimo de su contenido) y, con la
-   orla (23 px por lado a 390), el hueco de main.container (16 px de padding) se quedaba en 312: la tarjeta se
-   salia 21 px y la orla la cortaba 4 px (medido). La hoja ya da el margen: el padding baja a 4 px. */
-@media (max-width: 700px) { .tl-top + main.container:has(aside.simulator-card) { padding-left: 4px; padding-right: 4px; } }
+aside.podcast-sidebar { top: 24px; }
+/* (F5, 13-11-2026) Lo de PixelMath-teca de esta seccion (sticky del simulador y su padding en movil) paso a atlas/tools.css
+   al migrar la pagina. Quedan los catalogos: Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guias de Contaminacion. */
 
 /* ---------------------------------------------------------------- 8. responsive */
 @media (max-width: 1080px) {

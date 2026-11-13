@@ -39,9 +39,11 @@
   <meta name="twitter:image" content="https://cabraspace.com/logo.png">
   <!-- SEO-AUTO-END -->
   <link rel="stylesheet" href="atlas/atlas.css?v=20261112a">
-  <link rel="stylesheet" href="atlas/astroforecast.css?v=20261112a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/tools-base.css?v=20261112a">
+  <link rel="stylesheet" href="atlas/astroforecast.css?v=20261112a">
 </head>
 <body>
   <script>
@@ -74,12 +76,18 @@
     <div class="filete" aria-hidden="true"></div>
   </header>
 
-  <section class="a3 aw-top">
-    <div class="glow" aria-hidden="true"></div><div class="ret" aria-hidden="true"></div><div class="aw-obs" aria-hidden="true"></div>
-    <div style="display: flex; align-items: center; gap: 14px"><span style="width: 32px; height: 1px; background: var(--gold)"></span><span class="caps" style="color: var(--gold)">Nº II · Astro Forecast · AstroCamp</span><span style="width: 32px; height: 1px; background: var(--gold)"></span></div>
-    <h1>Tonight at <em class="gi">AstroCamp</em></h1>
-    <p>Whether the observatory will open, what the sensors say right now and which objects are worth it tonight.</p>
-  </section>
+  <div class="wrap pag-wrap">
+    <div class="pag-cab">
+      <div class="pag-tx">
+        <a class="miga" href="herramientas-en.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Web tools</a>
+        <p class="cartela">Nº II <i>·</i> AstroCamp</p>
+        <h1 class="tit-1">Tonight at <em class="gi">AstroCamp</em></h1>
+        <p class="entradilla">Whether the observatory will open, what the sensors say right now and which objects are worth it tonight.</p>
+      </div>
+      <div class="pag-grab"><span class="grab grab-observatorio" aria-hidden="true"></span></div>
+    </div>
+  </div>
+  <div class="filete" aria-hidden="true"></div>
   <!-- AstroWeather: tonight at AstroCamp, read from the engine's public JSON -->
   <section class="aw-section">
     <div id="astroweather" class="aw-panel" data-lang="en"></div>

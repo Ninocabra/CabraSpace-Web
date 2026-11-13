@@ -1,0 +1,35 @@
+/* ==========================================================================
+   Herramientas web · capa de convivencia con atlas2.css (F5 de Atlas II, 13-11-2026)
+   La cabecera de las 5 herramientas es la de atlas2.css (.pag-cab…), pero atlas2.css lleva también una BASE pensada
+   para páginas sin hoja vieja (body, button, a, img, .rotulo, .refs, .btn, --gx…) que, cargada sobre el interior de
+   una herramienta (index.css + atlas.css + sus <style>), lo cambiaba: botones a 16 px y Figtree en vez del tamaño del
+   sistema, enlaces sin su subrayado, el font-size de <html>, etc. Medido el 13-11-2026 con los estilos calculados de
+   TODOS los elementos del interior, antes y después (ver informe de F5). Esta hoja se carga justo DESPUÉS de atlas2.css
+   (lo ordena tools/sync_nav.py) y solo devuelve al interior lo que tenía. No toca la cabecera ni el marco.
+   Raíces del interior: main.container (CabraSpace Web, AutoGHS, PixelMath-teca), .aw-section (Astro Forecast),
+   .cm-maps (Contaminación, mapa).
+   Se borra, con atlas.css e index.css, cuando se rediseñe el interior de cada herramienta (D6).
+   ========================================================================== */
+
+/* body{font-size:16px} de atlas2.css pisaba el de <html> (CabraSpace Web lo fija en 15 px y todo su rem cuelga de él) */
+body { font-size: inherit; }
+
+/* resets de elemento de atlas2.css §2: button{font:inherit;color:inherit} a{color:inherit;text-decoration:none}
+   img{display:block;max-width:100%;height:auto}. revert devuelve el valor del navegador, que es lo que tenían. */
+:where(main.container, .aw-section, .cm-maps) button { font: revert; color: revert; }
+:where(main.container, .aw-section, .cm-maps) a { color: revert; text-decoration: revert; }
+:where(main.container, .aw-section, .cm-maps) img { display: revert; max-width: revert; height: revert; }
+
+/* Contaminación, mapa: sus tarjetas son de atlas.css (.a3 .card/.btn/.ghost). atlas2.css cambia --gx (80/40/18 px
+   de Atlas I -> clamp 16–44) y le añade al .btn un white-space: nowrap y un svg que no encoge. */
+.cm-maps { --gx: 80px; }
+@media (max-width: 1100px) { .cm-maps { --gx: 40px; } }
+@media (max-width: 700px) { .cm-maps { --gx: 18px; } }
+.cm-maps .btn { white-space: normal; min-height: 0; }
+.cm-maps .btn svg { flex: 0 1 auto; }
+
+/* Astro Forecast: nombres de clase de la interfaz que atlas2.css también usa (.rotulo, .refs). El «?» de la fuente es
+   .aw-info.refs: atlas2.css le ponía el ancho, el aire y la línea punteada de su lista de referencias. */
+.aw-sem-col .rotulo { margin-bottom: 0; }
+.aw-info.refs { max-width: none; padding-top: 0; border-top: 1px solid rgba(255, 255, 255, 0.22); }
+.aw-info.refs:hover, .aw-info.refs:focus { border-top-color: rgba(207, 171, 74, 0.6); }

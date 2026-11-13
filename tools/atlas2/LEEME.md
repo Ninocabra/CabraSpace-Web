@@ -97,12 +97,12 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
 
 ## Pendiente para F4–F5 (escrito en F3; F4 ya hecho)
 
-- **Numeración D2**: hecha en las 10 páginas de F3 (cartelas Tabula I–IV). Falta la de las cabeceras a mano de las
-  herramientas (F5): CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,
-  PixelMath-teca «Nº V». Numeran herramientas, no secciones, igual que el bento de la portada y la lista de
+- **Numeración D2**: hecha en las 10 páginas de F3 (cartelas Tabula I–IV). Las cabeceras de las
+  herramientas (F5a, 13-11-2026): CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,
+  PixelMath-teca «Nº V» (hechas). Numeran herramientas, no secciones, igual que el bento de la portada y la lista de
   Herramientas (Nº I–V): si se mantienen, ya coinciden.
-- Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css` (F3 no tenía ninguna:
-  sus selectores son de los catálogos y de PixelMath-teca).
+- Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css` (F5a: la de PixelMath-teca
+  ya está fuera; quedan las de los catálogos). Detalle de F5a en `atlas/LEEME.md`.
 - F4: `build_obs_page` puede reutilizar `lam_card`, `lam_meta`, `nb_title` y `thumb_alt` (ya en `build_atlas.py`) para
   sus «Más en…», y pasar a `interior="a2"`. Los «Más en exoplanetas» enlazan a `observaciones.html#exoplanetas`: el
   ancla funciona con los filtros nuevos.
