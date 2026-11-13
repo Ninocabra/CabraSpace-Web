@@ -178,6 +178,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [SyQon Studio ya está disponible: cómo usarlo con SASpro y PixInsight](https://www.youtube.com/watch?v=ov2L5AErUMQ) (2026-09-25)
 - **Modelo: TAIC**
   - [Mantén tu software y prescinde del PC Windows en la montura (Joey Troy)](https://www.youtube.com/watch?v=Tp08gy1xJZ8) (2026-09-19)
+- **Modelo: Vicent Peris**
+  - [Novedades de PixInsight 1.9.6 presentadas por Vicent Peris](https://www.youtube.com/watch?v=pz9Ha3dvQ_A) (2026-11-11)
 - **Modelo: View into Space**
   - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
 
@@ -300,8 +302,6 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### CAMERAS
 - **Modelo: AE676M**
   - [ToupTek AE676M: Capturando la Luna con un Zoom Impresionante](https://www.youtube.com/shorts/s6878VBcidk) (2026-10-20)
-- **Modelo: Cámara CMOS**
-  - [Los verdaderos colores del universo, revelados cuadro a cuadro](https://www.youtube.com/shorts/ETahgkaZ4_c) (2026-07-29)
 - **Modelo: Cámaras Astronómicas**
   - [Comparativa de cámaras ToupTek para diferentes objetivos astronómicos](https://www.youtube.com/shorts/wzLoYet_pzk) (2026-09-19)
 - **Modelo: HOPE D60**

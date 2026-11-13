@@ -1,5 +1,24 @@
 [
   {
+    "id": "https://www.youtube.com/watch?v=pz9Ha3dvQ_A",
+    "title_es": "PixInsight 1.9.6: Vicent Peris presenta las novedades",
+    "title_en": "PixInsight 1.9.6: Vicent Peris Reveals All the New Features",
+    "summary_es": "Vicent Peris detalla las principales novedades y mejoras introducidas en PixInsight 1.9.6, incluyendo cambios en herramientas de procesamiento y flujos de trabajo. El vídeo repasa las nuevas funcionalidades del software y su impacto en el procesado astrofotográfico.",
+    "summary_en": "Vicent Peris details the main new features and improvements introduced in PixInsight 1.9.6, including changes to processing tools and workflows. The video reviews the software's new capabilities and their impact on astrophotography processing.",
+    "category_es": "SOFTWARE",
+    "category_en": "SOFTWARE",
+    "date": "2026-11-11",
+    "url": "https://www.youtube.com/watch?v=pz9Ha3dvQ_A",
+    "tags": [
+      "PixInsight 1.9.6",
+      "Vicent Peris",
+      "Actualización",
+      "Procesamiento",
+      "Novedades",
+      "Tutorial"
+    ]
+  },
+  {
     "id": "https://www.youtube.com/watch?v=XjxIXt4aAwM",
     "title_es": "Corrección de gradientes con referencia al cielo real: un enfoque detallado",
     "title_en": "Gradient Correction Using Real Sky Reference: A Detailed Approach",
@@ -1859,25 +1878,6 @@
       "Calibration",
       "Stretching",
       "Gradient Removal"
-    ]
-  },
-  {
-    "id": "https://www.youtube.com/watch?v=nCpmB7c4UWc",
-    "title_es": "NBExtract: Separando datos de banda estrecha con estrellas, no curvas QE",
-    "title_en": "NBExtract: Separating Narrowband Data Using Stars, Not QE Curves",
-    "summary_es": "Este recurso explica cómo utilizar el script NBExtract en PixInsight para una separación precisa de los datos de banda estrecha. El método se basa en el análisis de las estrellas en lugar de las curvas de eficiencia cuántica (QE) del fabricante. Demuestra una técnica basada en los datos para segregar canales como Ha y S_II.",
-    "summary_en": "This resource demonstrates the use of the NBExtract script in PixInsight for precise narrowband data separation. It advocates using star analysis over manufacturer QE curves for channel separation. The video teaches a data-driven approach to effectively segregate narrowband channels like Ha and S_II.",
-    "category_es": "SCRIPTS",
-    "category_en": "SCRIPTS",
-    "date": "2026-06-02",
-    "url": "https://www.youtube.com/watch?v=nCpmB7c4UWc",
-    "tags": [
-      "PixInsight",
-      "NBExtract",
-      "Narrowband",
-      "Separación de canales",
-      "Script",
-      "Astrofotografía"
     ]
   }
 ]
