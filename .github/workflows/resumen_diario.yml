@@ -1,0 +1,44 @@
+name: Resumen diario de la Bitácora por correo
+
+on:
+  schedule:
+    # 07:00 UTC = 08:00 en invierno / 09:00 en verano (hora peninsular)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    # Permite lanzarlo a mano desde GitHub (botón «Run workflow»)
+
+concurrency:
+  group: resumen-diario
+  cancel-in-progress: false
+
+jobs:
+  resumen:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # para guardar tools/resumen_enviados.json
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Enviar resumen
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RESUMEN_USER: ninocabra@gmail.com
+          RESUMEN_TO: ninocabra@gmail.com
+        run: python tools/resumen_diario.py
+
+      - name: Guardar qué se ha enviado
+        run: |
+          git config user.name "CabraSpace Bot"
+          git config user.email "ninocabra@gmail.com"
+          git add tools/resumen_enviados.json
+          git diff --staged --quiet && exit 0
+          git commit -m "🤖 Resumen diario enviado [$(date +'%Y-%m-%d')]"
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 5; done
+          exit 1
