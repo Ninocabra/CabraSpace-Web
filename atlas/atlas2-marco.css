@@ -47,7 +47,7 @@
   --c2: rgba(229, 181, 63, .3);           /* segundo filete, mas tenue */
   --pt: rgba(208, 193, 165, .3);          /* linea de puntos */
   --grab: .3;                             /* opacidad de un grabado de fondo */
-  --orla-op: .45;                         /* intensidad de la orla graduada (numeros, grados, tramos, estrellas): 1 = como el prototipo */
+  --orla-op: .25;                        /* intensidad de la orla graduada (numeros, grados, tramos, estrellas): 1 = como el prototipo */
 
   --f-disp: "Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
   --f-fell: "IM Fell English", Georgia, serif;
