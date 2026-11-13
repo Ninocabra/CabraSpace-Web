@@ -40,6 +40,19 @@ Fabricantes relevantes que aún **no** tienen canal oficial vigilado (complétal
 - Astro-Physics
 - Sky-Watcher Global (además del USA)
 
+## Prensa especializada y Google News (`prensa_fuentes.json`, desde 13-11-2026)
+
+Los blogs oficiales publican poco (medido 13-11-2026: ≤1 entrada en 14 días en casi todos) y varios
+canales oficiales de YouTube no sirven por RSS (Vaonis y Dwarflab solo devuelven vídeos de 2012; Pegasus, 0).
+Los **anuncios de marca** llegan antes y mejor por la prensa que los cubre. Cada entrada es una consulta de
+Google News (`google_news`, con `when:7d`) o un RSS de revista (`rss`). Reglas:
+
+- Ventana de **7 días**, cupo de **6** por ejecución (`MAX_PRESS_ITEMS`), orden: blogs oficiales → prensa → YouTube oficial → terceros.
+- Filtro (`check_press_relevance`): marca conocida en el titular **y** tipo de equipo o código de modelo (S30, Gen3…).
+- Se descarta todo artículo sobre un **modelo con número ya cubierto** (reseñas y «vs» del mismo lanzamiento).
+- Medios bloqueados (tiendas que inundan Google News): `PRESS_BLOCKED_PUBLISHERS` en el script.
+- La fuente mostrada es el medio real (Space, Digital Camera World…), separado del titular de Google News.
+
 ## Cómo se prioriza (lógica del motor)
 
 - Los oficiales se procesan **antes** que los terceros; dentro de oficiales, los **blogs/releases** van antes que el **YouTube oficial** (centrado en engagement).

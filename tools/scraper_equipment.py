@@ -7,6 +7,7 @@ from datetime import datetime
 import re
 import sys
 import ssl
+import email.utils
 
 # Bypass SSL certificate validation globally for safety with astronomy vendor servers
 ssl_context = ssl._create_unverified_context()
@@ -25,10 +26,12 @@ def print(*args, **kwargs):
 
 # Database and Scraping Config
 DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "equipamiento.json")
-MAX_ITEMS_TO_PROCESS = 12  # Process max 12 new items per run
-MAX_DB_SIZE = 150         # Keep DB file size balanced
+MAX_ITEMS_TO_PROCESS = 20  # Process max 20 new items per run (12 se quedaba corto al sumar prensa)
+MAX_DB_SIZE = 250         # ~4-5 meses de historial con el nuevo volumen
 # Prioridad de canales oficiales sobre terceros (reviewers/foros):
 MAX_OTHER_ITEMS = 5       # Tope de items de fuentes NO oficiales por run (reserva capacidad para oficiales)
+MAX_PRESS_ITEMS = 6       # Tope de items de PRENSA especializada / Google News por run
+PRESS_MAX_AGE_DAYS = 7    # Prensa: una semana (Google News ya filtra con when:7d)
 # Ventana de antigüedad. Los BLOGS/releases oficiales publican poco (Celestron ~mensual,
 # William Optics esporádico), así que un anuncio de marca no caduca en 2 semanas: ventana amplia.
 # Todo lo demás (YouTube oficial incluido, reviewers, foros) publica a diario: ventana corta para
@@ -140,8 +143,41 @@ if not MFG_SOURCES:
         {"name": "Svbony (YouTube)", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCPY-1ni4gqa83qmFEujXFIw", "is_youtube": True, "is_mfg": True}
     ]
 
-# Composición final. El orden no afecta a la prioridad: main() reordena por is_mfg (oficiales primero).
-SOURCES = MFG_SOURCES + COMMUNITY_SOURCES + YOUTUBE_SOURCES
+# PRESS-SOURCES-BEGIN
+# Prensa especializada y Google News: cubre los ANUNCIOS de las marcas (lanzamientos, notas de prensa)
+# que los blogs oficiales publican tarde o nunca y que antes solo llegaban vía youtubers.
+# Medido 13-11-2026: blogs oficiales con <=1 entrada en 14 días; Google News, 19-27 por consulta.
+def load_press_sources():
+    fuentes_file = os.path.join(TOOLS_DIR, "prensa_fuentes.json")
+    sources = []
+    if not os.path.exists(fuentes_file):
+        return sources
+    try:
+        with open(fuentes_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        for m in data:
+            name = (m.get("name") or "").strip()
+            if not name:
+                continue
+            if m.get("google_news"):
+                es = m.get("lang") == "es"
+                base = ("https://news.google.com/rss/search?hl=es&gl=ES&ceid=ES:es&q=" if es
+                        else "https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US:en&q=")
+                url = base + urllib.parse.quote(m["google_news"])
+            elif m.get("rss"):
+                url = m["rss"]
+            else:
+                continue
+            sources.append({"name": name, "url": url, "is_youtube": False, "is_mfg": False, "is_press": True})
+    except Exception as e:
+        print(f"Error loading prensa_fuentes.json: {e}")
+    return sources
+
+PRESS_SOURCES = load_press_sources()
+# PRESS-SOURCES-END
+
+# Composición final. El orden no afecta a la prioridad: main() reordena (oficiales, prensa, resto).
+SOURCES = MFG_SOURCES + PRESS_SOURCES + COMMUNITY_SOURCES + YOUTUBE_SOURCES
 # MFG-SOURCES-JSON-END
 
 
@@ -184,40 +220,40 @@ def fetch_feed_items(source_info):
         'Accept-Language': 'en-US,en;q=0.9'
     }
     req = urllib.request.Request(url, headers=headers)
-    
+
     try:
         with urllib.request.urlopen(req, context=ssl_context, timeout=12) as response:
             xml_data = response.read()
-            
+
         root = ET.fromstring(xml_data)
         tag_name = root.tag
         results = []
-        
+
         # Atom XML Feed (YouTube and Shopify Feeds like Celestron/William Optics)
         if "feed" in tag_name.lower():
             ns = {
                 'atom': 'http://www.w3.org/2005/Atom'
             }
-            
+
             entries = root.findall('atom:entry', ns)
             for entry in entries:
                 title_el = entry.find('atom:title', ns)
                 title = title_el.text.strip() if title_el is not None and title_el.text else ""
-                
+
                 link_el = entry.find('atom:link[@rel="alternate"]', ns)
                 if link_el is None:
                     link_el = entry.find('atom:link', ns)
                 link = link_el.attrib.get('href', '').strip() if link_el is not None else ""
                 if "stargazerslounge.com/topic/" in link:
                     link = link.split('?')[0]
-                
+
                 pub_date_el = entry.find('atom:published', ns)
                 if pub_date_el is None:
                     pub_date_el = entry.find('atom:updated', ns)
                 pub_date_str = pub_date_el.text.strip() if pub_date_el is not None and pub_date_el.text else ""
-                
+
                 author = source_info["name"]
-                
+
                 # Format: "2026-06-02T15:00:00+00:00" -> "2026-06-02"
                 date_formatted = pub_date_str.split('T')[0] if 'T' in pub_date_str else datetime.now().strftime("%Y-%m-%d")
 
@@ -239,7 +275,7 @@ def fetch_feed_items(source_info):
                         "is_mfg": source_info.get("is_mfg", False),
                         "body_content": body_content
                     })
-                    
+
         # RSS 2.0 Feed
         else:
             channel = root.find('channel')
@@ -251,10 +287,12 @@ def fetch_feed_items(source_info):
                     if "stargazerslounge.com/topic/" in link:
                         link = link.split('?')[0]
                     pub_date_str = item.find('pubDate').text.strip() if item.find('pubDate') is not None and item.find('pubDate').text else ""
-                    
+
+                    # parsedate_to_datetime acepta «GMT», «+0000», «-0500»... El parser anterior solo
+                    # entendía «+hhmm»: con «GMT» (Google News y muchos WordPress) caía a la fecha de
+                    # HOY y colaba artículos viejos como novedad.
                     try:
-                        clean_date_str = pub_date_str.split(' +')[0].split(' -')[0].strip()
-                        dt = datetime.strptime(clean_date_str, "%a, %d %b %Y %H:%M:%S")
+                        dt = email.utils.parsedate_to_datetime(pub_date_str)
                         date_formatted = dt.strftime("%Y-%m-%d")
                     except Exception:
                         date_formatted = datetime.now().strftime("%Y-%m-%d")
@@ -265,13 +303,21 @@ def fetch_feed_items(source_info):
                         body_el = item.find('description')
                     body_content = _strip_html(body_el.text) if body_el is not None else ""
 
+                    item_source = source_info["name"]
+                    # Google News: el título llega como «Titular - Medio». Separamos el medio para
+                    # mostrarlo como fuente (Space.com, Sky at Night...) en lugar de «Google News».
+                    if "news.google.com" in url and " - " in title:
+                        title, publisher = title.rsplit(" - ", 1)
+                        title, item_source = title.strip(), publisher.strip()
+
                     if title and link:
                         results.append({
                             "id": link,
                             "title": title,
                             "url": link,
                             "date": date_formatted,
-                            "source": source_info["name"],
+                            "source": item_source,
+                            "is_press": source_info.get("is_press", False),
                             "is_youtube": is_youtube,
                             "is_mfg": source_info.get("is_mfg", False),
                             "body_content": body_content
@@ -289,20 +335,20 @@ def fetch_github_release(repo_info):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
     req = urllib.request.Request(url, headers=headers)
-    
+
     try:
         with urllib.request.urlopen(req, context=ssl_context, timeout=12) as response:
             data = json.loads(response.read().decode('utf-8'))
-            
+
         tag = data.get('tag_name', '')
         name = data.get('name', '')
         pub_date = data.get('published_at', '')
         html_url = data.get('html_url', '')
         body = data.get('body', '')
-        
+
         date_formatted = pub_date.split('T')[0] if 'T' in pub_date else datetime.now().strftime("%Y-%m-%d")
         version_title = name if name else tag
-        
+
         if html_url:
             return {
                 "id": html_url,
@@ -316,7 +362,7 @@ def fetch_github_release(repo_info):
             }
     except Exception as e:
         print(f"Error fetching GitHub release for '{repo}': {e}")
-        
+
     return None
 
 def fetch_gitlab_release(repo_info):
@@ -328,22 +374,22 @@ def fetch_gitlab_release(repo_info):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
     req = urllib.request.Request(url, headers=headers)
-    
+
     try:
         with urllib.request.urlopen(req, context=ssl_context, timeout=12) as response:
             data = json.loads(response.read().decode('utf-8'))
-            
+
         if data and isinstance(data, list):
             latest = data[0]
             tag = latest.get('tag_name', '')
             name = latest.get('name', '')
             released_at = latest.get('released_at', '')
             description = latest.get('description', '')
-            
+
             date_formatted = released_at.split('T')[0] if 'T' in released_at else datetime.now().strftime("%Y-%m-%d")
             version_title = name if name else tag
             html_url = f"https://gitlab.com/{project}/-/releases/{tag}"
-            
+
             return {
                 "id": html_url,
                 "title": f"{repo_info['name']} Release {version_title}",
@@ -356,7 +402,7 @@ def fetch_gitlab_release(repo_info):
             }
     except Exception as e:
         print(f"Error fetching GitLab release for '{project}': {e}")
-        
+
     return None
 
 def load_database():
@@ -382,7 +428,7 @@ def save_database(data):
 def process_with_gemini(item, api_key):
     """Uses the Gemini 2.5 API with responseSchema to translate, summarize, and filter equipment relevance."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
-    
+
     body_content = item.get("body_content", "")
     body_prompt = ""
     if body_content:
@@ -392,14 +438,14 @@ def process_with_gemini(item, api_key):
     prompt = f"""
     You are an expert astrophotographer and astrophotography equipment specialist.
     Analyze the following resource.
-    
+
     Title: "{item['title']}"
     Source/Creator: "{item['source']}"
     URL: {item['url']}
     {body_prompt}
-    
+
     Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
-    
+
     CRITICAL FILTERING AND VALIDATION RULES:
     1. STRICTLY REJECT ALL SELF-REFERENCED FORUM/REDDIT POSTS:
        - Reject posts/threads where a user is showing off or sharing their personal equipment purchase, acquisition, or unboxing (e.g., "My new AM5 mount has arrived!", "Look at my new telescope setup", "Unboxing my new camera").
@@ -410,10 +456,10 @@ def process_with_gemini(item, api_key):
        - Only accept posts/threads about official new commercial product releases or announcements by manufacturers (e.g., ZWO, Celestron, Pegasus Astro, Sky-Watcher, Askar, Player One, etc.), legitimate product leaks/rumors of upcoming commercial gear, or professional/detailed reviews of newly released commercial gear.
        - A thread/post is valid ONLY if it refers to a brand new commercial product that is being released to the market and discussed/referenced by other sources, NOT a single user's personal DIY build or personal purchase.
     3. If the resource violates any rejection rule or does not contain general commercial new product announcement/news/reviews, mark relevant = false.
-    
+
     Return the response as a JSON object matching the requested schema.
     """
-    
+
     payload = {
         "contents": [{
             "parts": [{
@@ -430,27 +476,27 @@ def process_with_gemini(item, api_key):
                         "description": "True if directly relevant to astrophotography equipment, reviews, firmware/software updates, or hardware news. False otherwise."
                     },
                     "title_es": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "description": "Título en español limpio y natural (traducido y adaptado, sin emojis excesivos ni clickbait de YouTube)."
                     },
                     "title_en": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "description": "A refined, clean title in English."
                     },
                     "summary_es": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "description": "Resumen técnico de 2 o 3 frases en español detallando de qué trata este equipamiento, análisis o actualización."
                     },
                     "summary_en": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "description": "A concise technical summary in English of 2 to 3 sentences."
                     },
                     "category_es": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "enum": ["TELESCOPIOS", "CÁMARAS", "MONTURAS", "ACCESORIOS", "SOFTWARE"]
                     },
                     "category_en": {
-                        "type": "STRING", 
+                        "type": "STRING",
                         "enum": ["TELESCOPES", "CAMERAS", "MOUNTS", "ACCESSORIES", "SOFTWARE"]
                     },
                     "tags": {
@@ -463,28 +509,28 @@ def process_with_gemini(item, api_key):
             }
         }
     }
-    
+
     headers = {'Content-Type': 'application/json', 'User-Agent': BROWSER_UA}
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
-    
+
     import time
     max_retries = 3
     retry_delay = 6.0
-    
+
     for attempt in range(max_retries):
         try:
             with urllib.request.urlopen(req, context=ssl_context) as response:
                 res_data = json.loads(response.read().decode('utf-8'))
-                
+
             text_response = res_data['candidates'][0]['content']['parts'][0]['text']
             gemini_result = json.loads(text_response)
-            
+
             # Check relevance
             if not gemini_result.get('relevant', False):
                 print(f"Skipping off-topic resource: '{item['title']}' is not related to astrophotography equipment.")
                 return {"skipped": True}
-                
+
             processed_item = {
                 "id": item['url'],
                 "title_es": gemini_result['title_es'],
@@ -498,7 +544,7 @@ def process_with_gemini(item, api_key):
                 "tags": gemini_result['tags']
             }
             return processed_item
-            
+
         except urllib.error.HTTPError as he:
             if he.code in [429, 503, 504] and attempt < max_retries - 1:
                 print(f"Gemini API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
@@ -530,7 +576,7 @@ def clean_json_text(text):
 def process_with_deepseek(item, api_key):
     """Uses the DeepSeek API to translate, summarize, and filter equipment relevance as fallback."""
     url = "https://api.deepseek.com/chat/completions"
-    
+
     system_prompt = """You are an expert astrophotographer and astrophotography equipment specialist.
 Analyze the provided resource (video, blog post, or forum topic).
 Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
@@ -581,7 +627,7 @@ URL: {item['url']}
         },
         "stream": False
     }
-    
+
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {api_key}',
@@ -589,19 +635,19 @@ URL: {item['url']}
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
-    
+
     max_retries = 3
     retry_delay = 4.0
-    
+
     for attempt in range(max_retries):
         try:
             with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
                 res_data = json.loads(response.read().decode('utf-8'))
-                
+
             text_response = res_data['choices'][0]['message']['content'].strip()
             text_response = clean_json_text(text_response)
             deepseek_result = json.loads(text_response)
-            
+
             # Extract keys defensively
             relevant = deepseek_result.get('relevant', False)
             title_es = deepseek_result.get('title_es') or deepseek_result.get('titulo_es') or item['title']
@@ -611,12 +657,12 @@ URL: {item['url']}
             category_es = deepseek_result.get('category_es') or deepseek_result.get('categoria_es') or "ACCESORIOS"
             category_en = deepseek_result.get('category_en') or deepseek_result.get('categoria_en') or "ACCESSORIES"
             tags = deepseek_result.get('tags') or []
-            
+
             # Check relevance
             if not relevant:
                 print(f"Skipping off-topic resource (DeepSeek): '{item['title']}' is not related to astrophotography equipment.")
                 return {"skipped": True}
-                
+
             processed_item = {
                 "id": item['url'],
                 "title_es": title_es,
@@ -630,7 +676,7 @@ URL: {item['url']}
                 "tags": tags
             }
             return processed_item
-            
+
         except urllib.error.HTTPError as he:
             if he.code in [429, 503, 504] and attempt < max_retries - 1:
                 print(f"DeepSeek API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
@@ -650,7 +696,7 @@ URL: {item['url']}
 def process_with_groq(item, api_key):
     """Uses the Groq API (Llama 3.1 8B) to translate, summarize, and filter equipment relevance as fallback."""
     url = "https://api.groq.com/openai/v1/chat/completions"
-    
+
     system_prompt = """You are an expert astrophotographer and astrophotography equipment specialist.
 Analyze the provided resource (video, blog post, or forum topic).
 Decide if this resource is directly relevant to astrophotography equipment news, new product announcements, hardware releases, firmware updates, software for capturing (like ASIAIR, N.I.N.A., Pegasus Unity, EKOS/INDI, etc.), or detailed reviews of astrophotography equipment (telescopes, mounts, cameras, filters, focusers, rotators, adapters, observatory gear).
@@ -701,7 +747,7 @@ URL: {item['url']}
         },
         "stream": False
     }
-    
+
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {api_key}',
@@ -709,19 +755,19 @@ URL: {item['url']}
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers=headers, method='POST')
-    
+
     max_retries = 3
     retry_delay = 4.0
-    
+
     for attempt in range(max_retries):
         try:
             with urllib.request.urlopen(req, context=ssl_context, timeout=15) as response:
                 res_data = json.loads(response.read().decode('utf-8'))
-                
+
             text_response = res_data['choices'][0]['message']['content'].strip()
             text_response = clean_json_text(text_response)
             groq_result = json.loads(text_response)
-            
+
             # Extract keys defensively
             relevant = groq_result.get('relevant', False)
             title_es = groq_result.get('title_es') or groq_result.get('titulo_es') or item['title']
@@ -731,12 +777,12 @@ URL: {item['url']}
             category_es = groq_result.get('category_es') or groq_result.get('categoria_es') or "ACCESORIOS"
             category_en = groq_result.get('category_en') or groq_result.get('categoria_en') or "ACCESSORIES"
             tags = groq_result.get('tags') or []
-            
+
             # Check relevance
             if not relevant:
                 print(f"Skipping off-topic resource (Groq): '{item['title']}' is not related to astrophotography equipment.")
                 return {"skipped": True}
-                
+
             processed_item = {
                 "id": item['url'],
                 "title_es": title_es,
@@ -750,7 +796,7 @@ URL: {item['url']}
                 "tags": tags
             }
             return processed_item
-            
+
         except urllib.error.HTTPError as he:
             if he.code in [429, 503, 504] and attempt < max_retries - 1:
                 print(f"Groq API returned HTTP {he.code}. Retrying in {retry_delay}s (Attempt {attempt+1}/{max_retries})...")
@@ -793,17 +839,17 @@ if os.path.exists(PALABRAS_CLAVE_FILE):
 # Fallback hardcoded lists if files are missing or empty
 if not FABRICANTES:
     FABRICANTES = [
-        "ZWO", "Pegasus Astro", "Player One", "PrimaLuceLab", "Planewave", 
-        "William Optics", "Celestron", "Sky-Watcher", "Skywatcher", "Explore Scientific", 
-        "Lunt Solar Systems", "Askar", "Sharpstar", "Svbony", "QHY", "Meade", 
+        "ZWO", "Pegasus Astro", "Player One", "PrimaLuceLab", "Planewave",
+        "William Optics", "Celestron", "Sky-Watcher", "Skywatcher", "Explore Scientific",
+        "Lunt Solar Systems", "Askar", "Sharpstar", "Svbony", "QHY", "Meade",
         "Orion", "Vixen", "Takahashi", "Bresser", "Dwarflab", "MLAstro", "Touptek", "ToupTek"
     ]
 
 if not PALABRAS_CLAVE:
     PALABRAS_CLAVE = [
-        "telescope", "refractor", "newtonian", "mount", "camera", "filter", "sensor", 
-        "optics", "software", "firmware", "nina", "asiair", "indi", "ekos", "focuser", 
-        "rotator", "flattener", "reducer", "guiding", "guide scope", "review", 
+        "telescope", "refractor", "newtonian", "mount", "camera", "filter", "sensor",
+        "optics", "software", "firmware", "nina", "asiair", "indi", "ekos", "focuser",
+        "rotator", "flattener", "reducer", "guiding", "guide scope", "review",
         "unboxing", "setup", "seestar", "vespera", "stellina", "accessory", "accessories",
         "firecapture", "sharpcap", "autostakkert", "pixinsight"
     ]
@@ -821,12 +867,21 @@ ENGAGEMENT_NOISE_PATTERNS = [
     "cyber monday", "year in review", "behind the scenes"
 ]
 
-def is_engagement_noise(title):
+def is_engagement_noise(title, is_official_youtube=False):
     """True si el título es claramente contenido de engagement/comunidad, no una novedad de
     producto. Denylist de alta precisión: estos términos no aparecen en anuncios de equipo
     (verificado: 0 falsos positivos sobre títulos reales de producto)."""
     title_lower = title.lower()
-    return any(p in title_lower for p in ENGAGEMENT_NOISE_PATTERNS)
+    if any(p in title_lower for p in ENGAGEMENT_NOISE_PATTERNS):
+        return True
+    # Shorts «POV: ...» (ZWO, ToupTek): siempre relleno.
+    if re.match(r'^\W*pov\b', title_lower) or 'pov:' in title_lower:
+        return True
+    # Shorts de marca: 3+ hashtags en el YouTube OFICIAL. Medido 13-11-2026 sobre 810 títulos:
+    # 19 casos, todos relleno. NO se aplica a youtubers (Patriot Astro titula así sus vídeos normales).
+    if is_official_youtube and len(re.findall(r'#\w+', title_lower)) >= 3:
+        return True
+    return False
 # NOISE-FILTER-END
 
 def check_relevance_fallback(title):
@@ -844,7 +899,7 @@ def check_relevance_fallback(title):
                 return True
         elif brand_lower in title_lower:
             return True
-            
+
     # 2. Match keywords
     for keyword in PALABRAS_CLAVE:
         keyword_lower = keyword.lower()
@@ -857,34 +912,59 @@ def check_relevance_fallback(title):
                 return True
         elif keyword_lower in title_lower:
             return True
-            
+
     return False
 
 def check_forum_relevance(title):
     """Strict pre-filter for forum and Reddit posts to focus on new product announcements."""
     title_lower = title.lower()
-    
+
     # 1. Must contain a product or brand keyword
     product_keywords = ["telescope", "telescopio", "mount", "montura", "camera", "cámara", "filter", "filtro", "focuser", "enfocador", "rotator", "rotador", "strainwave", "harmonic", "harmónico", "refractor", "eyepiece", "ocular"]
     brand_keywords = [b.lower() for b in FABRICANTES]
-    
+
     has_product_or_brand = any(k in title_lower for k in product_keywords) or any(b in title_lower for b in brand_keywords)
     if not has_product_or_brand:
         return False
-        
+
     # 2. Must contain a 'new product' indicating keyword
     new_keywords = ["new", "nuevo", "nueva", "release", "released", "lanzamiento", "lanzado", "announce", "announced", "anuncio", "anunciado", "unveil", "unveiled", "presenta", "presentado", "leak", "filtración", "filtrado", "rumor", "launch", "launching", "introducing", "introducción", "pre-order", "pre-venta", "preorder"]
-    
+
     return any(k in title_lower for k in new_keywords)
+
+
+def check_press_relevance(title):
+    """Prensa general (Google News, revistas): exige MARCA conocida + tipo de equipo en el titular.
+    Sin la marca entran noticias de ciencia (Euclid, telescopios profesionales) que no son equipo."""
+    t = re.sub(r'#\w+', ' ', title.lower())
+    has_brand = False
+    for brand in list(FABRICANTES) + ["seestar", "dwarf", "unistellar", "vespera"]:
+        b = brand.lower()
+        if (re.search(r'\b' + re.escape(b) + r'\b', t) if len(b) <= 3 else b in t):
+            has_brand = True
+            break
+    if not has_brand:
+        return False
+    gear = ["telescope", "telescopio", "camera", "cámara", "mount", "montura", "filter", "filtro",
+            "refractor", "astrograph", "focuser", "eyepiece", "binocular", "smart", "sensor", "lens",
+            "powerbox", "guider", "rotator"]
+    # Un código de modelo (S30, Vespera 3, Gen3, AM5, 2600MM) delata un producto aunque el titular
+    # no diga «telescope»: «ZWO introduces the Seestar S30 Plus», «Pegasus ... Powerbox Gen3».
+    has_model_code = re.search(r'\b[a-z]*\d+[a-z]*\b', t) is not None
+    return any(g in t for g in gear) or has_model_code
+
+
+# Medios de Google News que son tiendas o agregadores de anuncios (spam de producto), no prensa.
+PRESS_BLOCKED_PUBLISHERS = {"motorvsmotor"}
 
 
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
     print(f"Fallback processing for item: {item['title']}")
-    
+
     tags = ["Equipamiento", item['source']]
     title_lower = item['title'].lower()
-    
+
     # 1. Identify brands from our comprehensive list
     for brand in FABRICANTES:
         brand_lower = brand.lower()
@@ -895,39 +975,39 @@ def process_fallback(item):
         elif brand_lower in title_lower:
             if brand not in tags:
                 tags.append(brand)
-                
+
     # 2. Categorize and tag based on keywords
     category_es = "ACCESORIOS"
     category_en = "ACCESSORIES"
-    
+
     # Check for telescopes
     telescope_keywords = ["telescopio", "telescope", "refractor", "reflector", "newtonian", "newtoniano", "dobsonian", "dobson", "schmidt-cassegrain", "maksutov-cassegrain", "ritchey-chretien", "astrograph", "astrografo", "ota", "redcat"]
     if any(k in title_lower for k in telescope_keywords):
         category_es = "TELESCOPIOS"
         category_en = "TELESCOPES"
         tags.append("Telescopio")
-        
+
     # Check for cameras
     camera_keywords = ["camera", "cámara", "sensor", "cmos", "ccd", "mono", "monocroma", "color", "refrigerada", "cooled", "guia", "guide cam"]
     if any(k in title_lower for k in camera_keywords):
         category_es = "CÁMARAS"
         category_en = "CAMERAS"
         tags.append("Cámara")
-        
+
     # Check for mounts
     mount_keywords = ["mount", "montura", "ecuatorial", "alt-az", "goto", "strain wave", "wave", "tracker", "seguidor"]
     if any(k in title_lower for k in mount_keywords):
         category_es = "MONTURAS"
         category_en = "MOUNTS"
         tags.append("Montura")
-        
+
     # Check for software
     software_keywords = ["software", "firmware", "nina", "asiair", "indi", "ekos", "driver", "app", "kstars", "stellarMate", "controlador"]
     if any(k in title_lower for k in software_keywords) or "releases" in item['source'].lower():
         category_es = "SOFTWARE"
         category_en = "SOFTWARE"
         tags.append("Software")
-        
+
     return {
         "id": item['url'],
         "title_es": f"{item['title']} ({item['source']})",
@@ -946,19 +1026,19 @@ def extract_known_models(db, source_type=None):
     If source_type is given ("official"/"reviewer"), only counts entries from that origin.
     Entries without an explicit source_type (legacy) are treated as "reviewer"."""
     brands = {b.lower() for b in FABRICANTES} | {
-        "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron", 
-        "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one", 
-        "primalucelab", "planewave", "explore scientific", "dwarflab", "askar", 
-        "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos", 
+        "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron",
+        "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one",
+        "primalucelab", "planewave", "explore scientific", "dwarflab", "askar",
+        "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos",
         "kstars", "seestar", "dwarf ii"
     }
-    
+
     # Generic keywords and phrases to exclude from being treated as models
     generic = {
         # Categories and product types (ES/EN)
-        "telescopio", "telescope", "cámara", "camera", "montura", "mount", 
-        "accesorio", "accessory", "accessories", "software", "firmware", 
-        "guiding", "filtro", "filter", "focuser", "rotator", "flattener", 
+        "telescopio", "telescope", "cámara", "camera", "montura", "mount",
+        "accesorio", "accessory", "accessories", "software", "firmware",
+        "guiding", "filtro", "filter", "focuser", "rotator", "flattener",
         "reducer", "eyepiece", "ocular", "oculares", "binocular", "binoculares",
         "binoculars", "prismáticos", "smart telescope", "guide scope",
         "telescopios", "telescopes", "cámaras", "cameras", "monturas", "mounts",
@@ -966,7 +1046,7 @@ def extract_known_models(db, source_type=None):
         "web app", "web apps", "controller", "controllers", "sensor", "sensors",
         "optics", "óptica", "ópticas", "optical", "mirror", "mirrors",
         "adapter", "adapters", "adaptador", "adaptadores", "kit lens", "lens", "lente",
-        
+
         # General astronomy and astrophotography terms
         "astrophotography", "astrofotografía", "astronomy", "astronomía",
         "deep sky", "deep-sky", "cielo profundo", "planetary", "planetaria",
@@ -980,7 +1060,7 @@ def extract_known_models(db, source_type=None):
         "alineación", "alignment", "collimation", "colimación", "focusing",
         "focus", "focal", "aperture", "apertura", "focal ratio",
         "vía láctea", "milky way", "moon", "sun", "stars", "star",
-        
+
         # Action, type of resource and content terms
         "review", "unboxing", "setup", "tutorial", "guía", "guide", "tips",
         "tricks", "first look", "first impressions", "primeras impresiones",
@@ -993,7 +1073,7 @@ def extract_known_models(db, source_type=None):
         "scheduler", "secuenciador", "sequencer", "software update",
         "firmware update", "processing", "procesamiento", "compatibility",
         "compatibilidad", "troubleshooting", "error", "problem",
-        
+
         # Target audience and general adjectives
         "beginner", "beginners", "principiante", "principiantes", "first",
         "primero", "primer", "best", "mejor", "mejores", "top", "budget",
@@ -1001,7 +1081,7 @@ def extract_known_models(db, source_type=None):
         "profesional", "affordable", "new", "nuevo", "nueva", "latest",
         "último", "actual", "modern", "moderno", "portable", "compact",
         "compacto", "innovación", "innovation", "tech", "technology",
-        
+
         # Miscellaneous words found in tags
         "actualización", "astrofotografía ir", "astrografía", "astroimaging software",
         "astronomy apps", "astronomy camera", "astronomy forecast", "astronómica",
@@ -1022,7 +1102,7 @@ def extract_known_models(db, source_type=None):
         "new product", "novedad", "novedades", "nuevo producto", "reddit",
         "stargazers lounge", "pixinsight"
     }
-    
+
     known_models = set()
     for entry in db:
         if source_type is not None and entry.get("source_type", "reviewer") != source_type:
@@ -1032,27 +1112,31 @@ def extract_known_models(db, source_type=None):
             # Exclude brand names, generic words, or tags that are empty/too short
             if tag_clean and len(tag_clean) > 2 and tag_clean not in brands and tag_clean not in generic:
                 known_models.add(tag_clean)
-                
+
     return known_models
 
 
-def is_duplicate_product_introduction(title, known_models):
+def is_duplicate_product_introduction(title, known_models, require_intro=True):
     """
     Checks if a candidate title contains a known model name AND introductory keywords
     indicating it is a duplicate introduction/unboxing/presentation.
     """
     title_lower = title.lower()
-    
+
     # Normalize a string by removing spaces and non-alphanumeric characters
     def normalize_str(s):
         return re.sub(r'[^a-z0-9]', '', s)
-        
+
     title_normalized = normalize_str(title_lower)
-    
+
     matched_model = None
     for model in known_models:
         model_normalized = normalize_str(model)
         if not model_normalized:
+            continue
+        # Prensa (require_intro=False): solo modelos con número («s30 plus», «am5»). Etiquetas de
+        # marca/familia como «dwarf» u «origin» bloquearían toda noticia futura de esa marca.
+        if not require_intro and not re.search(r'\d', model_normalized):
             continue
         # If the model is a short code (e.g. 3 chars like 'am5'), matching it as a substring of normalized title might be risky
         # but since 'am5' would be in 'zwoam5mount', it works. Let's make sure it is not too short.
@@ -1064,27 +1148,32 @@ def is_duplicate_product_introduction(title, known_models):
             if model_normalized in title_normalized:
                 matched_model = model
                 break
-                
+
     if not matched_model:
         return False, None
-        
+
+    # Prensa: cualquier artículo sobre un modelo YA cubierto es repetición (reseñas y «vs» del mismo
+    # lanzamiento), no solo los de presentación.
+    if not require_intro:
+        return True, matched_model
+
     introductory_keywords = [
-        "presentando", "presentacion", "presentación", "presenta", "presentamos", 
-        "introducing", "introduction", "introduces", "unveiling", "first look", 
-        "first impression", "primeras impresiones", "unboxing", "lanzamiento", "launch", 
+        "presentando", "presentacion", "presentación", "presenta", "presentamos",
+        "introducing", "introduction", "introduces", "unveiling", "first look",
+        "first impression", "primeras impresiones", "unboxing", "lanzamiento", "launch",
         "anuncio de", "announcing", "anunciando", "new product", "nuevo producto"
     ]
-    
+
     for keyword in introductory_keywords:
         if keyword in title_lower:
             return True, matched_model
-            
+
     return False, None
 
 def regenerate_markdown_catalog(db):
     """Regenerates the markdown product catalog from the database entries."""
     catalog_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "catalogo_productos.md")
-    
+
     # 1. Map brands dynamically
     brands_lower = {b.lower(): b for b in FABRICANTES}
     extra_brands = {
@@ -1122,61 +1211,61 @@ def regenerate_markdown_catalog(db):
             brands_lower[k] = v
 
     known_models = extract_known_models(db)
-    
+
     # Group products by manufacturer and category
     grouped = {}
     for entry in db:
         mfg = None
         tags = [t.strip() for t in entry.get("tags", [])]
-        
+
         for tag in tags:
             tag_lower = tag.lower()
             if tag_lower in brands_lower:
                 mfg = brands_lower[tag_lower]
                 break
-                
+
         if not mfg:
             title_lower = entry.get("title_en", "").lower()
             for b_low, b_name in brands_lower.items():
                 if b_low in title_lower:
                     mfg = b_name
                     break
-                    
+
         if not mfg:
             mfg = "Otros / No especificado"
-            
+
         category = entry.get("category_en", "ACCESSORIES")
-        
+
         model = None
         for tag in tags:
             tag_lower = tag.lower()
             if tag_lower in known_models:
                 model = tag
                 break
-                
+
         if not model:
             model = "General / No especificado"
-            
+
         if mfg not in grouped:
             grouped[mfg] = {}
         if category not in grouped[mfg]:
             grouped[mfg][category] = {}
         if model not in grouped[mfg][category]:
             grouped[mfg][category][model] = []
-            
+
         grouped[mfg][category][model].append({
             "title": entry.get("title_es", entry.get("title_en", "")),
             "date": entry.get("date", ""),
             "url": entry.get("url", "")
         })
-        
+
     md_content = """# Catálogo de Equipamiento por Fabricante
 
 Este documento contiene la lista de todos los productos de astrofotografía y hardware identificados en la base de datos de CabraSpace (`equipamiento.json`) agrupados por fabricante y categoría. Se regenera automáticamente cada vez que se ejecuta el scraper.
 
 ---
 """
-    
+
     for mfg in sorted(grouped.keys()):
         if mfg == "Otros / No especificado" and len(grouped[mfg]) == 0:
             continue
@@ -1190,7 +1279,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
                     md_content += f"- **Modelo: {model}**\n"
                 for item in grouped[mfg][category][model]:
                     md_content += f"  - [{item['title']}]({item['url']}) ({item['date']})\n"
-                    
+
     try:
         with open(catalog_path, "w", encoding="utf-8") as f:
             f.write(md_content)
@@ -1203,18 +1292,18 @@ def main():
     gemini_key = os.environ.get("GEMINI_API_KEY")
     groq_key = os.environ.get("GROQ_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
-    
+
     is_dry_run = False
     if not gemini_key and not groq_key and not deepseek_key:
         print("Warning: Neither GEMINI_API_KEY, GROQ_API_KEY nor DEEPSEEK_API_KEY environment variables found. Running in fallback dry-run mode (database will not be modified).")
         is_dry_run = True
-        
+
     db = load_database()
     existing_ids = {entry['id'] for entry in db}
     known_models = extract_known_models(db)
     known_models_official = extract_known_models(db, source_type="official")
     print(f"Extracted {len(known_models)} known product models from database tags ({len(known_models_official)} already covered by official sources).")
-    
+
     # Gather candidates from all feeds
     source_health = []  # (name, count, is_mfg) -> para el resumen de salud al final
     candidates = []
@@ -1224,7 +1313,7 @@ def main():
         print(f"Fetched {len(items)} items from {source['name']}.")
         source_health.append((source['name'], len(items), source.get('is_mfg', False)))
         candidates.extend(items)
-        
+
     # Gather software releases from GitHub
     print("\nFetching software releases from GitHub...")
     for repo_info in GITHUB_REPOS:
@@ -1233,7 +1322,7 @@ def main():
         if release_item:
             print(f"Found release for {repo_info['name']}: {release_item['title']}")
             candidates.append(release_item)
-            
+
     # Gather software releases from GitLab
     print("\nFetching software releases from GitLab...")
     for repo_info in GITLAB_REPOS:
@@ -1242,7 +1331,7 @@ def main():
         if release_item:
             print(f"Found release for {repo_info['name']}: {release_item['title']}")
             candidates.append(release_item)
-        
+
     # Resumen de salud de fuentes: feeds que devolvieron 0 items (probable 403/404/feed roto).
     # Imprescindible para no volver a quedarnos sin fuentes OFICIALES sin enterarnos (el motivo
     # por el que el equipamiento oficial llevaba tiempo sin entrar pese a 'optimizar' el filtro).
@@ -1258,7 +1347,7 @@ def main():
 
     # Sort all candidates by date (newest first)
     candidates.sort(key=lambda x: x['date'], reverse=True)
-    
+
     # Filter out duplicates and items older than 3 days (both against existing database and within the current run candidates)
     current_date = datetime.now()
     seen_urls_this_run = set()
@@ -1272,33 +1361,42 @@ def main():
             # Ventana amplia SOLO para blogs/releases oficiales (publican poco); el YouTube oficial
             # y todo lo demás usan ventana corta porque publican relleno a diario.
             is_official_blog = c.get('is_mfg', False) and not c.get('is_youtube', False)
-            max_age = MFG_BLOG_MAX_AGE_DAYS if is_official_blog else OTHER_MAX_AGE_DAYS
+            if is_official_blog:
+                max_age = MFG_BLOG_MAX_AGE_DAYS
+            elif c.get('is_press', False):
+                max_age = PRESS_MAX_AGE_DAYS
+            else:
+                max_age = OTHER_MAX_AGE_DAYS
             if days_diff <= max_age:
                 new_candidates.append(c)
                 seen_urls_this_run.add(c['url'])
         except Exception:
             new_candidates.append(c)
             seen_urls_this_run.add(c['url'])
-            
+
     # Partition into manufacturers/official releases vs others to avoid starvation of vendor updates
     new_mfg_candidates = [c for c in new_candidates if c.get('is_mfg', False)]
-    new_other_candidates = [c for c in new_candidates if not c.get('is_mfg', False)]
+    new_press_candidates = [c for c in new_candidates if c.get('is_press', False)]
+    new_other_candidates = [c for c in new_candidates if not c.get('is_mfg', False) and not c.get('is_press', False)]
     # Dentro de oficiales: blogs/releases (centrados en producto) ANTES que el YouTube oficial
     # (centrado en engagement), para que las novedades de producto consuman primero el cupo de
     # MAX_ITEMS_TO_PROCESS y no se lo coman los shorts diarios de marca.
     mfg_blogs = [c for c in new_mfg_candidates if not c.get('is_youtube', False)]
     mfg_youtube = [c for c in new_mfg_candidates if c.get('is_youtube', False)]
     new_mfg_candidates = mfg_blogs + mfg_youtube
-    new_candidates = new_mfg_candidates + new_other_candidates
-    
-    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)} (Manufacturers/Official: {len(new_mfg_candidates)}, Others: {len(new_other_candidates)})")
-    
+    # La prensa (anuncios de marca cubiertos por medios) va DETRÁS de los blogs oficiales y DELANTE
+    # del YouTube oficial, que es sobre todo tutoriales y relleno.
+    new_candidates = mfg_blogs + new_press_candidates + mfg_youtube + new_other_candidates
+
+    print(f"Total compiled candidates: {len(candidates)}, Unique new candidates: {len(new_candidates)} (Manufacturers/Official: {len(new_mfg_candidates)}, Press: {len(new_press_candidates)}, Others: {len(new_other_candidates)})")
+
     if not new_candidates:
         print("No new updates. Database is up to date.")
         return
-        
+
     processed_count = 0
     other_count = 0
+    press_count = 0
     updates_to_add = []
 
     gemini_disabled = False
@@ -1313,18 +1411,22 @@ def main():
 
         # Check if candidate is from a manufacturer feed
         is_mfg = item.get('is_mfg', False)
+        is_press = item.get('is_press', False)
         is_forum = item['source'] in ["Stargazers Lounge", "Reddit r/astrophotography", "Reddit r/telescopes"]
 
         # Descarta contenido de engagement (eventos, webcasts, historias, fechas señaladas) de
         # CUALQUIER fuente, incluidas las OFICIALES: su YouTube publica mucho relleno que no es
         # novedad de equipo y antes se colaba directo a la IA por ser is_mfg.
-        if is_engagement_noise(item['title']):
+        if is_engagement_noise(item['title'], is_official_youtube=is_mfg and item.get('is_youtube', False)):
             print(f"Skipping engagement/non-product content (pre-filtered): '{item['title']}' from {item['source']}")
             continue
 
         # Reserva de capacidad: limita cuántos items de terceros se procesan por run para que
         # los canales oficiales (procesados primero por el orden mfg-first) no se queden sin slots.
-        if not is_mfg and other_count >= MAX_OTHER_ITEMS:
+        if is_press and press_count >= MAX_PRESS_ITEMS:
+            print(f"Skipping press item (quota {press_count}/{MAX_PRESS_ITEMS}): '{item['title']}' from {item['source']}")
+            continue
+        if not is_mfg and not is_press and other_count >= MAX_OTHER_ITEMS:
             print(f"Skipping third-party item (official quota reserved, {other_count}/{MAX_OTHER_ITEMS} used): '{item['title']}' from {item['source']}")
             continue
 
@@ -1334,7 +1436,14 @@ def main():
         dedup_set = known_models_official if is_mfg else known_models
 
         # Pre-filter candidates using keyword check to save Gemini API quota and avoid rate limits
-        if is_forum:
+        if is_press:
+            if item['source'].strip().lower() in PRESS_BLOCKED_PUBLISHERS:
+                print(f"Skipping blocked publisher: '{item['title']}' from {item['source']}")
+                continue
+            if not check_press_relevance(item['title']):
+                print(f"Skipping off-topic press candidate (pre-filtered): '{item['title']}' from {item['source']}")
+                continue
+        elif is_forum:
             if not check_forum_relevance(item['title']):
                 print(f"Skipping off-topic forum candidate (pre-filtered): '{item['title']}' from {item['source']}")
                 continue
@@ -1344,14 +1453,18 @@ def main():
                 continue
 
         # Check if candidate is a duplicate product introduction
-        is_dup, matched_m = is_duplicate_product_introduction(item['title'], dedup_set)
+        # Prensa: deduplica contra TODO lo conocido (oficial o reviewer) y sin exigir verbo de anuncio.
+        if is_press:
+            is_dup, matched_m = is_duplicate_product_introduction(item['title'], known_models, require_intro=False)
+        else:
+            is_dup, matched_m = is_duplicate_product_introduction(item['title'], dedup_set)
         if is_dup:
             print(f"Skipping duplicate product introduction (pre-filtered): '{item['title']}' matches known model '{matched_m}'")
             continue
-            
+
         print(f"\nProcessing new candidate: '{item['title']}' from {item['source']} ({item['date']})")
         processed_item = None
-        
+
         # 1. Gemini. Auth-error (key/modelo) -> deshabilitar ya. Error transitorio (429/red) -> NO
         #    matar Gemini al primer fallo: reintentar en los siguientes items y deshabilitar solo
         #    tras AI_FAIL_LIMIT fallos seguidos (señal de cuota diaria agotada).
@@ -1410,25 +1523,25 @@ def main():
                 continue
             elif processed_item is None:
                 print("DeepSeek failed as well.")
-                
+
         # 4. Fallback to local heuristic parsing if all APIs were tried and failed, or none are configured
         if processed_item is None:
             processed_item = process_fallback(item)
-            
+
         if processed_item:
             # Post-filter check: identify candidate model tags and verify if they are a subset of known models
             candidate_models = set()
             brands = {b.lower() for b in FABRICANTES} | {
-                "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron", 
-                "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one", 
-                "primalucelab", "planewave", "explore scientific", "dwarflab", "askar", 
-                "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos", 
+                "touptek", "zwo", "pegasus", "sky-watcher", "skywatcher", "celestron",
+                "william optics", "lunt", "svbony", "qhy", "qhyccd", "player one",
+                "primalucelab", "planewave", "explore scientific", "dwarflab", "askar",
+                "sharpstar", "siril", "stellarium", "phd2", "nina", "indi", "ekos",
                 "kstars", "seestar", "dwarf ii"
             }
             generic = {
-                "telescopio", "telescope", "cámara", "camera", "montura", "mount", 
-                "accesorio", "accessory", "accessories", "software", "firmware", 
-                "guiding", "filtro", "filter", "focuser", "rotator", "flattener", 
+                "telescopio", "telescope", "cámara", "camera", "montura", "mount",
+                "accesorio", "accessory", "accessories", "software", "firmware",
+                "guiding", "filtro", "filter", "focuser", "rotator", "flattener",
                 "reducer", "eyepiece", "ocular", "oculares", "binocular", "binoculares",
                 "binoculars", "prismáticos", "smart telescope", "guide scope",
                 "telescopios", "telescopes", "cámaras", "cameras", "monturas", "mounts",
@@ -1484,12 +1597,12 @@ def main():
                 "new product", "novedad", "novedades", "nuevo producto", "reddit",
                 "stargazers lounge", "pixinsight"
             }
-            
+
             for tag in processed_item.get('tags', []):
                 tag_clean = tag.strip().lower()
                 if tag_clean and len(tag_clean) > 2 and tag_clean not in brands and tag_clean not in generic:
                     candidate_models.add(tag_clean)
-                    
+
             # If the candidate has product model tags, check if they are all already known
             if candidate_models:
                 if candidate_models.issubset(dedup_set):
@@ -1497,17 +1610,24 @@ def main():
                     software_keywords = ["firmware", "software", "driver", "controlador", "update", "actualización", "version", "versión", "release"]
                     title_lower = processed_item['title_en'].lower()
                     is_software = processed_item['category_en'] == "SOFTWARE" or any(k in title_lower for k in software_keywords)
-                    
+
                     if not is_software:
                         print(f"Skipping duplicate product entry (post-filtered): '{processed_item['title_en']}' only references known models {candidate_models}")
                         continue
-                
+
             # Marca el origen para la deduplicación futura (preferencia oficial sobre reviewer).
-            processed_item['source_type'] = "official" if is_mfg else "reviewer"
+            processed_item['source_type'] = "official" if is_mfg else ("press" if is_press else "reviewer")
             processed_item['source'] = item['source']
             updates_to_add.append(processed_item)
             processed_count += 1
-            if not is_mfg:
+            # Dedup dentro del MISMO run: sin esto, cinco medios hablando del mismo lanzamiento
+            # entraban los cinco (known_models solo se calculaba al empezar).
+            known_models.update(candidate_models)
+            if is_mfg:
+                known_models_official.update(candidate_models)
+            if is_press:
+                press_count += 1
+            elif not is_mfg:
                 other_count += 1
 
     if updates_to_add:
@@ -1516,7 +1636,7 @@ def main():
         # Trim database if it exceeds max size
         if len(db) > MAX_DB_SIZE:
             db = db[:MAX_DB_SIZE]
-        
+
         if not is_dry_run:
             save_database(db)
             print(f"Successfully added {processed_count} new entries to equipamiento.json")
