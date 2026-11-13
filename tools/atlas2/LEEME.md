@@ -17,7 +17,7 @@ de portada e índices (ver «F3» abajo); **F4 (12-11-2026):** también las 20 l
 | `atlas/atlas2.css` | Interior del sistema (base, botones, cartelas, héroe, grabados, herramientas, láminas, bitácora, composición, frisos, página secundaria). Necesita `atlas2-marco.css` antes. El margen de la hoja ya no es un `padding` del `body` (lo da `.hoja`). |
 | `atlas/atlas2.js` | (F2) Único script de cabecera de las 54 páginas: orla graduada, filtro `#cb-noche` de respaldo, modo noche (`localStorage 'night-vision'`), cajón móvil `#atlas-drawer`. La sección actual ya no la marca el JS: la escribe `sync_nav.py`. |
 | `atlas/armilar.js` | Esfera armilar animada. **Generado** por `tools/atlas2/armilar/build_armilar.py`: no se edita. |
-| `atlas/capricornus2.js` | Capricornio animada (el `capricornus.js` del prototipo; el «2» evita confundirlo con `tools/capricornus.py`). Su bloque `DATA-BEGIN/END` lo reescribe `carta_capricornio.py`. |
+| `atlas/capricornus2.js` | Capricornio animada (el `capricornus.js` del prototipo; el «2» evitaba confundirlo con `tools/capricornus.py`, borrado en F6). Su bloque `DATA-BEGIN/END` lo reescribe `carta_capricornio.py`. |
 | `atlas/img/*.svg` | Grabados-máscara nuevos (armilar, astrolabio, octante, refractor, cúpula, horizonte, taller, archivo, las tres capas de la carta y `rosa.svg`). Los que ya existían idénticos (observatorio, factorias, pizarra, histograma, placa) no se duplican. |
 | `atlas/atlas2-muestra.html` | Página de humo: el muestrario del prototipo con la carta de Capricornio y la esfera armilar montadas. |
 | `tools/atlas2/carta_capricornio.py` + `datos/` | Carta (3 SVG), bloque de datos de `capricornus2.js` y el SVG animado de la página (entre `CAP-SVG-BEGIN/END`). Necesita `matplotlib` y `fonttools`. |
@@ -59,14 +59,14 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   con el marcado del prototipo y cargan `atlas2-marco.css` + `atlas2.css`, **sin** `index.css` ni `atlas.css`
   (`page(..., interior="a2")`; `sync_nav.py` reconoce el enlace a `atlas2.css` y no les añade `atlas.css`). Las 20
   láminas siguen con `interior="a1"`, byte a byte como antes. Detalle de la convivencia: `atlas/LEEME.md`.
-- **Capricornio**: la portada ya no usa `tools/capricornus.py` (gnomónica propia; queda sin uso, F6). `build_atlas.py`
+- **Capricornio**: la portada ya no usa `tools/capricornus.py` (gnomónica propia; borrado en F6, sigue en el historial de git). `build_atlas.py`
   importa `carta_capricornio.figure_for_page(lang)` (solo biblioteca estándar: matplotlib/fontTools se importan
   dentro de `chart()`), así que la figura de la portada es la misma función que la de la muestra y que el bloque de
   datos de `capricornus2.js`. Tras cambiar la carta: `carta_capricornio.py` **y** la cadena build_atlas → sync_nav →
   seo_inject. Comprobado: salida idéntica por SHA-256 antes y después del cambio, `--check` 0,00 px.
 - **D3**: `tools/atlas2/d3/techo.py` escribe `atlas/img/techo-corredizo.svg` (o `$ATLAS_IMG_OUT`) y
   `tools/atlas2/d3/llamadas.json` (posición de las letras a–f, que lee `build_atlas.py`). Regenera el SVG idéntico
-  (SHA-256 0acc341d…) al aprobado en `propuestas-estetica/d3-techo/`. `atlas/img/cupula.svg` queda sin usar (F6).
+  (SHA-256 0acc341d…) al aprobado en `propuestas-estetica/d3-techo/`. `atlas/img/cupula.svg` no lo usa ninguna página del sitio (sí `atlas2-muestra.html`; F6 lo conserva).
 - Piezas nuevas en `atlas2.css` (documentadas en su índice): `.grab-techo` (máscara declarada entera), `.desde`,
   `.prog-cab`, `.prog`, `.reg-mas`, `.cartela-l`/`.cartela--larga` (rótulo que se oculta en móvil si la cartela pasa
   de 32 caracteres) y el ▶ destacado de `.cap-play.paused` (D1).
@@ -82,7 +82,7 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   «siguiente» espejada en `.pasa-fin`, y `.cartela--l40`/`--l52` (cartelas largas: rótulo oculto por debajo de 760 / 960
   px). Cambian dos piezas existentes, solo usadas por las láminas: `.lam-natural img` y `.video` ya no fijan proporción
   en CSS (la dan `width`/`height`, o la clase de caja del vídeo).
-- `VERSION` de `sync_nav.py` **no** se ha subido (cambiaría las 54 páginas, también las 20 a mano): se sube una vez en F6.
+- `VERSION` de `sync_nav.py` no se subió en F4 (cambiaría las 54 páginas): **subida en F6 a `20261113a`**.
 - Herramientas nuevas: `tools/miniaturas.py` (miniaturas WebP de las curvas) y `tools/check_relatos.py` (fidelidad de los
   relatos frente a RELATOS.md; visto fallar con cuatro alteraciones a propósito).
 
@@ -92,7 +92,7 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   original hasta que alguien ejecute `python tools/miniaturas.py`. Se puede añadir a su lista `BUILD` si Pillow está
   en la máquina que publica.
 - Las cartelas de la cabecera «a la par» de Herramientas y Bitácora (F3) se salen de su columna entre 880 y 1020 px
-  (medido en F4 con un barrido de anchos; no es de F4 y no se ha tocado).
+  (medido en F4 con un barrido de anchos; no es de F4 y no se ha tocado). **Arreglado en F6** (una columna por debajo de 1040 px).
 - Superíndices de las llamadas: objetivo táctil pequeño (por debajo de 44 px), como en cualquier texto con notas.
 
 ## Pendiente para F4–F5 (escrito en F3; F4 ya hecho)
@@ -111,4 +111,13 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
   `atlas.css` y ordena fuente · marco · interior.
 - Los `<canvas>` de las herramientas (resultado de PixelMath-teca, visor de CabraSpace Web) no se filtran en modo noche
   (como antes de F2): siguen saliendo en color. Decidir en F5 si se filtran.
-- `index.css:1395` (`.dashboard-section`, padding-top 150px) no lo usa ninguna página: F6.
+- `index.css:1395` (`.dashboard-section`, padding-top 150px) no lo usaba ninguna página: borrado en F6.
+
+## F6 (13-11-2026): resumen y estado
+
+Detalle, pasos para publicar y vuelta atrás: `atlas/LEEME.md` («F6»). Resumen: `VERSION` (`sync_nav.py`) y `A2_ASSET_V`
+(`build_atlas.py`) = `20261113a`; `.pag-cab--par` en una columna por debajo de 1040 px; borrados `atlas/atlas.js`, `tools/capricornus.py` y
+`.dashboard-section` de `index.css`; `cupula.svg` se queda (lo usa `atlas2-muestra.html`). `tools/atlas2/p3/laminas.py` sigue escribiendo
+`cupula.svg` por defecto (es su generador, no se tocó).
+**Pendiente tras F6** (a propósito): retirar `atlas.css` y purgar `index.css`/`tools.css` (las herramientas dependen de ellas; hace falta
+rediseñar cada interior, D6); `publish_from_inbox.py` sin llamar a `miniaturas.py`; superíndices de las llamadas con objetivo táctil pequeño.

@@ -7,9 +7,9 @@
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
 | `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; **desde F5a también las 10 páginas de las 5 herramientas** (ES y EN); **desde F5b también los 5 catálogos** (ES y EN). |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin interior nuevo (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; desde F5a/F5b las 20 a mano llevan la cabecera nueva pero conservan esta hoja; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (F6 las borra). |
+| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin interior nuevo (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; desde F5a/F5b las 20 a mano llevan la cabecera nueva pero conservan esta hoja; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (siguen en la hoja: F6 NO la retira, ver «F6»). |
 | `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
-| `atlas/atlas.js` | Script de cabecera de Atlas I. **Ya no lo carga ninguna página** (F2); se borra en F6. No cargarlo junto a `atlas2.js`: los dos alternarían el modo noche y un clic se anularía. |
+| `atlas/atlas.js` | **Borrado en F6** (`git rm`; sigue en el historial). Era el script de cabecera de Atlas I; ninguna página lo cargaba desde F2. Si algún día vuelve: no cargarlo junto a `atlas2.js`, los dos alternarían el modo noche. |
 | `atlas/astroforecast.css` | Paneles Atlas de Astro Forecast (desde F5a la cabecera es la de `atlas2.css`; se carga después de `atlas2.css`). |
 | `atlas/tools-base.css` | (F5a, F5b) Convivencia de las 5 herramientas **y de los 5 catálogos** con `atlas2.css`: devuelve al interior lo que la base de `atlas2.css` le cambiaba; al final, las reglas propias de los catálogos. Ver «F5a» y «F5b». |
 | `atlas/img/` | Logo dorado, grano, retícula, anillo y capturas usadas en varias páginas. |
@@ -123,7 +123,7 @@ fuentes web (Bodoni Moda, Figtree, IBM Plex Mono; las ponía antes el `@import` 
 - Modo noche: el interior hereda los tokens de penumbra del marco; `atlas2.css` no redefine rojos.
 - Sección 7 de compatibilidad de `atlas2-marco.css`: nada era de estas páginas (catálogos y PixelMath-teca).
 - «Desde dónde se observa» (Observaciones) usa el grabado del techo corredizo (D3, `atlas/img/techo-corredizo.svg`,
-  generador en `tools/atlas2/d3/`). `atlas/img/cupula.svg` queda en el repo sin usar (F6).
+  generador en `tools/atlas2/d3/`). `atlas/img/cupula.svg` ya no lo usa ninguna página del sitio, pero SÍ el muestrario `atlas/atlas2-muestra.html` (`.grab-cupula`): F6 lo conserva.
 
 ## F4 (12-11-2026): las 20 láminas de observación con el interior nuevo y su relato
 
@@ -261,3 +261,67 @@ Todos cuelgan de **III Bitácora** en el menú (`SECTIONS` de `sync_nav.py`) y l
   y el `top:24px` del lateral de Coffee Break pasó a `tools-base.css` junto a las otras reglas de catálogo.
 - Grabados elegidos (los de `atlas2.css`, ninguno nuevo): Equipamiento `refractor`, Novedades `octante`, Cursos `pizarra`, Coffee Break
   `armilar`, Contaminación `factorias`. El prototipo no define el grabado de cada catálogo: es una elección de ilustración por tema.
+
+## F6 (13-11-2026): limpieza acotada y rama lista para publicar
+
+**Qué se hizo** (sin commit: queda en el árbol de `atlas2` para revisar y confirmar):
+
+- **Versión de caché**: `VERSION` de `tools/sync_nav.py` y `A2_ASSET_V` de `tools/build_atlas.py` pasan a `20261113a`. Comprobado en las 54
+  páginas: los 8 CSS/JS propios que cambian respecto a `main` (`atlas2-marco.css`, `atlas2.css`, `atlas2.js`, `tools-base.css`, `tools.css`,
+  `astroforecast.css`, `armilar.js`, `capricornus2.js`) se enlazan SIEMPRE con `?v=20261113a`. Sin `?v=` quedan `support.css` (20 páginas),
+  `index.js` (4) y `autoghs.js` (2), pero NO han cambiado desde `main` (su caché es la correcta). `index.css?v=1.4` no se sube a mano: el
+  único cambio de F6 en él es borrar una regla que nadie usaba (sin efecto visible).
+- **Sitemap y hreflang** regenerados con la cadena: idénticos a los de la rama (el sitemap no guarda secciones; `contaminacion.html` y `-en`
+  siguen emparejados es/en/x-default). Las 2 redirecciones `pi-workflow` siguen con su `meta refresh` y su `canonical` al destino y fuera del
+  sitemap (igual que `cabrascripts`, que ya estaba fuera en la rama).
+- **Cabeceras «a la par»** (`.pag-cab--par`, Herramientas y Bitácora, ES y EN): `atlas2.css` §14 pasa a UNA columna por debajo de 1040 px.
+  Antes la cartela se salía de su columna entre 1000 y 880 px (hasta +123 px en `herramientas-en` a 880); ahora 0 desbordes en el barrido de
+  1920 a 360 px (24 anchos × 4 páginas). A 1060 px y más no cambia nada.
+- **Borrado** (`git rm`; siguen en el historial): `atlas/atlas.js`, `tools/capricornus.py`; y la regla `.dashboard-section` de `index.css`.
+  Con `grep` previo de cada uno (ninguna página, hoja, script, generador ni workflow de `.github/` los usa). Los workflows de los robots solo
+  escriben JSON/`.md` y no dependen de nada borrado.
+- **NO borrado a propósito**: `atlas/img/cupula.svg` (lo usa `atlas/atlas2-muestra.html`, `.grab-cupula`); `atlas.css`, `index.css`, `tools.css`
+  (las herramientas aún dependen de ellas).
+
+**Qué queda** (inventario para una limpieza posterior, por coincidencia estática de nombres de clase, no medida):
+
+| Hoja | Páginas que la cargan | Clases que casan con alguna de esas páginas |
+|---|---|---|
+| `index.css` | 22 (las 20 a mano + `cabrascripts` ES/EN) | 27 de 84 |
+| `support.css` | 20 (las 20 a mano) | 3 de 25 |
+| `atlas/atlas.css` | 22 (las mismas que `index.css`) | 45 de 116; sin uso: la familia `.ah*`, `.ad*`, `.af*`, `.cap-*`, `.mega*`, `.acc`, `.kv`, `.hero-title`, `.sec-title`… |
+| `atlas/tools.css` | 8 (AutoGHS, CabraSpace Web, mapa de Contaminación, PixelMath-teca; ES y EN) | 65 de 65 |
+| `atlas/tools-base.css` | 20 (las 20 a mano) | 11 de 11 |
+| `atlas/astroforecast.css` | 2 (Astro Forecast) | 16 de 20 |
+
+Antes de retirar `atlas.css`: sus clases en uso (`.a3`, `.card`, `.btn`, `.ghost`, `.plate`, `.chip`, `.tile`, `.grid-overlay`, `.radial-glow`…)
+hay que mover o rehacer en cada interior de herramienta (decisión D6). `.dashboard-grid` y `.dashboard-col` de `index.css` tampoco las usa
+ningún HTML (`index.js` solo usa `.dashboard-item`, `-meta` y `-loading`): candidatas para el siguiente barrido. Otros ficheros sin
+referencias (no tocados, no son de Atlas II): `atlas/img/ring.svg`, `tools/optimize_images.py`, `cors_proxy.js`, `vercel-proxy/`.
+
+**Publicar** (fusionar `atlas2` en `main`; `main` es producción y los robots empujan a ella cada pocas horas). PowerShell, desde la carpeta
+del repo:
+
+```powershell
+cd "C:\Users\ninoc\Documents\PixInsight\CabraSpace\Pagina Web"
+git status                                  # revisar los cambios de F6 y, si valen, confirmarlos en atlas2
+git add -A
+git commit -m "Atlas II, F6: version de cache, cabeceras a la par, limpieza"
+git fetch origin
+git checkout main
+git pull --ff-only origin main              # trae lo que hayan empujado los robots
+git merge --no-ff atlas2 -m "Atlas II: fusion de atlas2 en main"
+python -X utf8 tools\build_atlas.py
+python -X utf8 tools\sync_nav.py
+python -X utf8 tools\seo_inject.py
+git status --short                          # debe salir vacio: la cadena es idempotente
+node tools\check_site.mjs --baseline tools\check_site_baseline.json   # con el servidor local encendido: 0 fallos nuevos
+python -X utf8 tools\check_relatos.py       # 10/10
+git push origin main                        # GitHub Pages publica main tal cual
+```
+
+El 13-11-2026 la fusión en seco (`git merge-tree`) salió limpia: `main` llevaba 2 commits de los robots (noticias; solo `novedades.json`,
+`equipamiento.json`, `latest.json` y `catalogo_productos.md`) que `atlas2` no tiene, y ninguno toca un fichero de la rama.
+
+**Volver atrás**: `git log --merges -1` da el commit de fusión; `git revert -m 1 <hash>` y `git push origin main`. Los robots solo tocan JSON
+y no estorban. Ojo: tras revertir, para volver a fusionar `atlas2` hay que revertir antes el propio revert.

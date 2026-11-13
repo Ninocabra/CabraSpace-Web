@@ -1391,11 +1391,6 @@ body.night-vision .search-highlight {
 /* ==========================================================================
    Live Dashboard Section Styles
    ========================================================================== */
-.dashboard-section {
-  padding-top: 150px;
-  padding-bottom: 40px;
-}
-
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;

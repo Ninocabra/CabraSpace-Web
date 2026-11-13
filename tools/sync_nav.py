@@ -35,7 +35,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20261112a"
+VERSION = "20261113a"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño

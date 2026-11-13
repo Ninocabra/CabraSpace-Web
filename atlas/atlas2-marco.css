@@ -230,6 +230,8 @@ footer.pie { position: relative; z-index: 1; display: block; margin: 0; padding:
    Iconos del marco: index.css filtra en noche todo <svg> (sepia...); los del marco ya son rojos por color. */
 body.night-vision img, body.night-vision video, body.night-vision iframe, body.night-vision .video-thumbnail-bg { filter: url(#cb-noche) !important; opacity: .75; }
 body.night-vision :is(.cab, .pie, .esq) svg { filter: none !important; opacity: 1; }
+/* las estrellas de esquina son parte de la orla: misma intensidad que ella tambien de noche */
+body.night-vision .hoja .esq svg { opacity: var(--orla-op) !important; }
 
 /* ---------------------------------------------------------------- 7. (vacia desde F5b, 13-11-2026)
    Aqui estaba la compatibilidad de las paginas a mano con la cabecera fija de 81 px (padding-top:150px de los

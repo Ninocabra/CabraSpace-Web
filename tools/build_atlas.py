@@ -89,7 +89,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "atl
 import carta_capricornio  # noqa: E402  (tools/atlas2/carta_capricornio.py: the animated figure, stdlib only here)
 
 # Atlas II pieces (F3)
-A2_ASSET_V = "20261112f3"      # ?v= of the scripts this file links (armilar.js, capricornus2.js); atlas2.css: sync_nav VERSION
+A2_ASSET_V = "20261113a"      # ?v= of the scripts this file links (armilar.js, capricornus2.js); atlas2.css: sync_nav VERSION
 A2_FONTS = ('\n  <link rel="preconnect" href="https://fonts.googleapis.com">'
             '\n  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '\n  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;'

@@ -516,6 +516,9 @@ a.herr:hover .herr-ir svg, a.herr:hover .btn svg { transform: translateX(4px); }
    ...h1</div><p class="entradilla">...</p></div> */
 .pag-cab--par { grid-template-columns: minmax(0, 1fr) minmax(0, 440px); padding-bottom: clamp(26px, 3vw, 40px); }
 .pag-cab--par .entradilla { margin-bottom: 6px; font-size: 17px; color: var(--t3); }
+/* F6: la cartela de Herramientas/Bitacora (hasta 430 px con su rotulo) no cabia en la columna izquierda entre 880 y 1010 px
+   (medido: +96 px a 900 en Herramientas, +28 en Bitacora): una sola columna por debajo de 1040 px (margen ~25 px). */
+@media (max-width: 1040px) { .pag-cab--par { grid-template-columns: minmax(0, 1fr); } }
 /* cabecera con UN grabado mayor que el hueco normal (Programas: el astrolabio es el unico de la pagina):
    <div class="pag-cab prog-cab"> ... <div class="pag-grab"><span class="grab grab-astrolabio"></span></div></div> */
 .prog-cab { align-items: center; padding-bottom: clamp(28px, 3.4vw, 48px); }
