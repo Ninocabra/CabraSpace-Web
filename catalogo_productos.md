@@ -339,6 +339,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: ATLAS**
   - [Noticias de Astrofotografía: VAONIS ATLAS, SV580, SW Orbis 60EDX y más](https://www.youtube.com/watch?v=nAnmjjyauQw) (2026-10-29)
 
+### CAMERAS
+- **Modelo: Vespera 3**
+  - [Reseña completa: He usado la Vaonis Vespera 3 durante semanas y a quién la recomendaría](https://news.google.com/rss/articles/CBMi0gFBVV95cUxNbVFWVFB0SVJjT3RXZlItZllxRmZXaHI2cHp1dGtybjFmTmI3TVdKYThqU1lDN1JrdE90b2NPNURKQ0htZUNoNGJxLU5adkx2d2R2aHBqYlJWQTh0VmxKZGFabWtNWUFGZG8xZXZIQm9CVEx0Tmk4NkRiWGV3SkNaRWg5aElnU082OWhkSDIyS0tEUVFzTzBVMWVsSzlBM1RlSEI1b21rcmJGXzdzdERxdUJUenY1THpqR3VzSG4xMjF4VTVOZ0NMY1FmN2pQcmxLYVE?oc=5) (2026-11-12)
+
 ### TELESCOPES
 - **Modelo: Atlas**
   - [Vaonis Atlas Revelado: Telescopio Dual Modular y Resultados de Imagen](https://www.youtube.com/watch?v=MwYJpWJLg9I) (2026-10-17)
@@ -397,9 +401,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Análisis del Seestar S50 Pro: ¿Está Obsoleto por el Draco?](https://www.youtube.com/watch?v=FYjgvCXXDeY) (2026-09-12)
 - **Modelo: Dwarf**
   - [Comparativa de telescopios inteligentes: Seestar S50 Pro vs S30 Pro vs Dwarf Mini](https://www.youtube.com/shorts/B7ID2G30dY0) (2026-09-04)
+- **Modelo: IOAA-jr**
+  - [ZWO presenta sus telescopios inteligentes Seestar en la IOAA-jr 2026 en Tailandia](https://www.seestar.com/blogs/news/zwo-brings-seestar-smart-telescopes-to-ioaa-jr-2026-in-thailand) (2026-11-11)
 - **Modelo: Pilares de la Creación**
   - [Capturando los Pilares de la Creación con Telescopios ZWO](https://www.youtube.com/shorts/iMmTV-CDEkQ) (2026-10-01)
 - **Modelo: S30 Plus**
+  - [Seestar lanza el S30 Plus, un telescopio inteligente dual 2K para astrofotografía de cielo profundo y campo amplio](https://www.seestar.com/blogs/news/seestar-introduces-s30-plus-a-dual-2k-smart-telescope-for-deep-sky-and-wide-field-imaging) (2026-11-11)
   - [Análisis del Seestar S30 Plus: ¿Es Realmente Diferente?](https://www.youtube.com/watch?v=eA_Z6ewfHyM) (2026-11-10)
   - [Análisis del Nuevo Seestar para Principiantes: S30 Plus](https://www.youtube.com/watch?v=jBmDATTnlmo) (2026-11-10)
 - **Modelo: S50 Pro**
