@@ -8,6 +8,8 @@ Uso:  python tools/seo_inject.py     (desde la raíz del repo)
 import os
 import re
 import glob
+import html
+import json
 
 SITE = "https://cabraspace.com"
 DEFAULT_OG_IMAGE = f"{SITE}/logo.png"
@@ -59,6 +61,21 @@ def build_block(fname):
     en_url = url_for(en_file)
     ogtype = "website" if fname in ("index.html", "en.html") else "article"
 
+    # Structured data (schema.org): states in machine-readable form what the site is about, for search engines
+    # and for the URL classifiers of web filters, which had the domain as "uncategorized" (13-11-2026).
+    home = fname in ("index.html", "en.html")
+    topics = (["Astronomy", "Astrophotography", "Exoplanet transits", "Image processing"] if lang == "en"
+              else ["Astronomía", "Astrofotografía", "Tránsitos de exoplanetas", "Procesado de imagen"])
+    site = {"@type": "WebSite", "@id": f"{SITE}/#website", "name": "CabraSpace", "url": f"{SITE}/",
+            "inLanguage": ["es", "en"], "about": [{"@type": "Thing", "name": t} for t in topics]}
+    if home:
+        ld = dict(site, **{"@context": "https://schema.org", "description": html.unescape(desc)})
+    else:
+        ld = {"@context": "https://schema.org", "@type": "WebPage", "url": self_url,
+              "name": html.unescape(title), "description": html.unescape(desc), "inLanguage": lang,
+              "isPartOf": site}
+    ld_json = json.dumps(ld, ensure_ascii=False).replace("</", "<\\/")
+
     return f"""  <!-- SEO-AUTO-BEGIN (generado por tools/seo_inject.py; no editar a mano) -->
   <link rel="canonical" href="{self_url}">
   <link rel="alternate" hreflang="es" href="{es_url}">
@@ -75,6 +92,7 @@ def build_block(fname):
   <meta name="twitter:title" content="{title}">
   <meta name="twitter:description" content="{desc}">
   <meta name="twitter:image" content="{og_image}">
+  <script type="application/ld+json">{ld_json}</script>
   <!-- SEO-AUTO-END -->
 """
 
@@ -101,7 +119,7 @@ def inject_all():
         block = build_block(fname)
         if "SEO-AUTO-BEGIN" in txt:
             new = re.sub(r"  <!-- SEO-AUTO-BEGIN.*?SEO-AUTO-END -->\n",
-                         block, txt, flags=re.S)
+                         lambda _m: block, txt, flags=re.S)  # callable: the JSON-LD may carry backslashes
         else:
             new = txt.replace("</head>", block + "</head>", 1)
         if new != txt:
