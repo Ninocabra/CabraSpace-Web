@@ -99,8 +99,9 @@ Medido el 12-11-2026: los 11 SVG y `armilar.js` salen idénticos byte a byte (SH
 
 - **Numeración D2**: hecha en las 10 páginas de F3 (cartelas Tabula I–IV). Las cabeceras de las
   herramientas (F5a, 13-11-2026): CabraSpace Web «Nº I», Astro Forecast «Nº II», AutoGHS «Nº III», Contaminación mapa «Nº IV»,
-  PixelMath-teca «Nº V» (hechas). Numeran herramientas, no secciones, igual que el bento de la portada y la lista de
-  Herramientas (Nº I–V): si se mantienen, ya coinciden.
+  PixelMath-teca «Nº V» (hechas). **Regla fijada en F5c (decisión J): «Tabula» numera la SECCIÓN y «Nº» (en láminas, «Lám.») numera la
+  pieza DENTRO de su sección**, siempre con la Tabula delante: «Tabula I · Nº III · Estirado», «Tabula II · Lám. V · …», catálogos
+  «Tabula III · <tema>», guías de Contaminación «Tabula I · Guías». Tabla completa en `atlas/LEEME.md` («F5c»).
 - Al migrar cada página, quitar su parte de la sección 7 «compatibilidad» de `atlas2-marco.css` (hecho: F5a sacó la de
   PixelMath-teca y F5b la de los catálogos; la sección 7 está vacía). Detalle de F5a y F5b en `atlas/LEEME.md`.
 - F4: `build_obs_page` puede reutilizar `lam_card`, `lam_meta`, `nb_title` y `thumb_alt` (ya en `build_atlas.py`) para

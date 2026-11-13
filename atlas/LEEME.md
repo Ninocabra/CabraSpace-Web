@@ -172,7 +172,7 @@ totalidad desde la corona de CabraEclipse. Imprime la lista de fases para `obser
 ## F5a (13-11-2026): cabecera Atlas II en las 5 herramientas (ES y EN)
 
 CabraSpace Web (Nº I), Astro Forecast (Nº II), AutoGHS (Nº III), Contaminación (mapa, Nº IV) y PixelMath-teca (Nº V).
-Solo cambia la cabecera: miga «Herramientas web», cartela con su número, título, entradilla y su grabado (`.pag-cab`,
+Solo cambia la cabecera: miga «Herramientas web», cartela «Tabula I · Nº N · tema» (desde F5c; en F5a era «Nº N · tema»), título, entradilla y su grabado (`.pag-cab`,
 como `v2/autoghs.html`), y el filete debajo. La interfaz y el JavaScript de cada herramienta no se tocan.
 
 - **Orden del `<head>`** (lo ordena `tools/sync_nav.py`): `index.css` · hojas propias · `atlas.css` · fuente · `atlas2-marco.css` ·
@@ -186,20 +186,60 @@ como `v2/autoghs.html`), y el filete debajo. La interfaz y el JavaScript de cada
   `.aw-section` y `.cm-maps`. Se borra cuando se rediseñe cada interior (D6). Una regla de `atlas2.css` NO se puede neutralizar
   desde fuera: `@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }`
   (§17) apaga también las animaciones CSS del interior (p. ej. el giro del «Procesando…») para quien pida reducir movimiento.
-- **CabraSpace Web (cockpit sin scroll)**: cabecera compacta `.pag-cab--cockpit` de `--cockpit-cab` = 96 px (+4 del filete), una sola
+- **CabraSpace Web (cockpit sin scroll)**: cabecera compacta `.pag-cab--cockpit` de `--cockpit-cab` = 78 px desde F5c (96 en F5a; +4 del filete), una sola
   fila (cartela · título · entradilla · grabado). La rejilla mide `100vh - 38px - --cockpit-cab - 4px - --marco-top`: es la misma
-  cuenta de antes con la franja de 88 px cambiada por la cabecera nueva. Por debajo de 1100 px se ocultan entradilla y grabado.
+  cuenta de antes con la franja de 88 px cambiada por la cabecera nueva. Por debajo de 1180 px (1100 hasta F5c) se ocultan entradilla y grabado.
 - Las reglas de PixelMath-teca de la sección 7 de `atlas2-marco.css` (sticky del simulador y su padding en móvil) pasaron a `tools.css`.
   (F5b: la sección 7 ha quedado vacía, ver «F5b».)
 - La versión inglesa de CabraSpace Web se genera: la cabecera está en `tools/i18n_workflow_en.json` (entrada nueva) y se quitaron
   las 20 traducciones obsoletas (18 del menú antiguo + consola y pie viejos; la consola ganó su entrada nueva).
   `python tools/build_workflow_en.py --check` sigue marcando DESFASE, pero solo en cabecera y pie, que reescribe `sync_nav.py`.
 
+## F5c (13-11-2026): decisiones G, H, D, J, I tras revisar las cabeceras nuevas
+
+- **G.** Errata de la entradilla de `equipamiento.html`: «utilízala».
+- **H. CabraSpace Web, franja compacta con su miga.** Antes la miga «← Herramientas web» estaba en el marcado pero `tools.css` la
+  ocultaba (`display:none`) por encima de 768 px. Ahora se ve **dentro de la franja**: `.pag-tx` pasa a rejilla de tres columnas
+  (miga sobre cartela · título · entradilla), sin tocar el marcado. La franja **baja** de 96 a **78 px** (`--cockpit-cab`): la miga y la
+  cartela apiladas miden 58 px. El motivo no es estético: el `aside.piw-card` lateral (overflow:auto, contenido de 654 px a 1440) tenía
+  unos 5 px de scroll interno ya en F4 (franja de 88) y la franja de 96 + 4 lo subió a 17 px (la rejilla perdió 12 px). Con 78 + 4 la
+  rejilla mide lo que el contenido del lateral (655 px a 1440×900) y no hay scroll interno ahí; sigue habiendo scroll interno a 1280×800
+  (lateral de 555 px frente a 654 de contenido), como en F4: es el comportamiento de un lateral que no cabe, no un fallo de la franja.
+- **J. Numeración de las cartelas**: **«Tabula» numera la SECCIÓN** (I Herramientas · II Observaciones · III Bitácora · IV Programas) y
+  **«Nº» numera la pieza dentro de su sección** (en las láminas, «Lám.» / «Pl.»). Siempre se escribe la Tabula primero:
+  | Página | Cartela |
+  |---|---|
+  | Portada (3 secciones) | `Tabula I`, `Tabula II`, `Tabula III` |
+  | Herramientas · Observaciones · Bitácora · Programas | `Tabula I · Sin instalar nada` · `Tabula II · Fotografía y medidas` · `Tabula III · Registro` · `Tabula IV · Para instalar` (y, en Programas, `Tabula IV · En el taller`) |
+  | Las 5 herramientas | `Tabula I · Nº I · Procesado` (CabraSpace Web) · `Nº II · AstroCamp` · `Nº III · Estirado` · `Nº IV · Brillo del cielo` · `Nº V · Fórmulas` |
+  | Guías de Contaminación | `Tabula I · Guías` / `Tabula I · Guides` |
+  | Catálogos (Equipamiento, Novedades, Cursos, Coffee Break) | `Tabula III · <tema>` |
+  | Láminas de observación (20) | `Tabula II · Lám. N · <subtítulo>` / `Tabula II · Pl. N · <subtitle>` |
+  Las cartelas largas usan el mecanismo de siempre (`.cartela-l` y las clases `.cartela--l26`, `--larga`, `--l40`, `--l52`, `--l64` de
+  `atlas2.css` §17, que ponen `cartela()` en `build_atlas.py` y, a mano, las 10 herramientas; el rótulo se oculta por debajo de un ancho
+  y queda el número). Con la Tabula delante todas crecen, así que se añadieron dos escalones medidos con un barrido de 1920 a 360 px:
+  `--l26` (más de 26 caracteres: sin rótulo por debajo de 410 px; un móvil de 360 px admite 26) y `--l64` (más de 64: por debajo de
+  1100 px; la lámina del eclipse, 77, se salía a 1024). Las cartelas de las herramientas llevan siempre el **tema** en `.cartela-l`:
+  en un móvil estrecho queda «Tabula I · Nº IV».
+  `build_atlas.py` `cartela()` ya cuenta el largo sin las etiquetas `<i>`; la lámina pasa «Tabula II <i>·</i> Lám. N» como número.
+- **D. Las guías de Contaminación pasan de Bitácora a Herramientas**, junto al mapa (que sigue siendo la herramienta Nº IV; no hay
+  Nº VI): `SECTIONS` de `sync_nav.py` (menú y cajón marcan «Herramientas web»), miga «Herramientas web» / «Web tools» (enlaza a
+  `herramientas.html`), cartela `Tabula I · Guías`. Salen de la lista «Catálogos completos» de `bitacora.html` y entran en
+  `herramientas.html` como una segunda línea de cierre («Guías y vídeos sobre contaminación lumínica → Guías») y en el mapa como un
+  enlace bajo sus dos tarjetas (`.cm-guias`). Las guías ya enlazaban al mapa (botón «Abrir Mapa Interactivo»).
+- **I. Cabeceras de las 20 páginas a mano iguales entre sí** (excepto la franja del cockpit): `atlas2.css` §14, regla
+  `.pag-wrap:not(.pag-wrap--cockpit) .pag-grab`: caja de grabado de proporción fija 7:6 (280×240 a 1440; 170×146 en móvil, donde ya iba
+  encima del texto) con el dibujo **contenido y centrado** (`.grab` absoluto a toda la caja, `aspect-ratio:auto`; la máscara ya era
+  `contain`). La caja es más baja que el texto más corto (258 px: miga + cartela + título + 2 líneas de entradilla), así que **nunca
+  empuja la cabecera**: el alto lo da el texto y la miga cae siempre a la misma altura. Los dibujos que traen su marco dentro del SVG
+  (el histograma de AutoGHS) llenan la caja; los demás flotan dentro de ella: el marco es del dibujo, no de la caja (no se han tocado
+  los SVG). `.pag-wrap` solo lo llevan estas 20 páginas: Programas (`.prog-cab`) y los frisos no cambian.
+
 ## F5b (13-11-2026): cabecera Atlas II en los 5 catálogos (ES y EN)
 
 Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guías de Contaminación (`contaminacion.html`; el mapa es la herramienta Nº IV).
 Todos cuelgan de **III Bitácora** en el menú (`SECTIONS` de `sync_nav.py`) y la Bitácora los lista, así que llevan la cartela
-«Tabula III · <nombre>» y la miga «Bitácora» (ES) / «Logbook» (EN). El resto de la cabecera es la de F5a: `.pag-cab` con título
+«Tabula III · <nombre>» y la miga «Bitácora» (ES) / «Logbook» (EN). **Desde F5c las guías de Contaminación ya no** (cuelgan de Herramientas: «Tabula I · Guías», miga «Herramientas web»; ver «F5c»). El resto de la cabecera es la de F5a: `.pag-cab` con título
 (una palabra en cursiva dorada), la entradilla que ya tenía la página y un grabado (`.pag-grab`), seguida del filete.
 
 - La cabecera sale de `<main>` (antes era un `<section class="database-header|courses-header|divulgacion-header|section-header">`

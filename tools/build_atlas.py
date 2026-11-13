@@ -102,6 +102,8 @@ BACK = ('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="cur
 
 def cartela(num, label=""):
     """<p class="cartela">Tabula I <i>·</i> label</p> (D2: I Herramientas · II Observaciones · III Bitácora · IV Programas).
+    Numbering rule (F5, decision J): «Tabula» numbers the SECTION; «Nº» (tools) / «Lám.»·«Pl.» (plates) numbers the PIECE inside
+    its section, after the Tabula: «Tabula I · Nº III · Estirado», «Tabula II · Lám. V · Curva de luz». Always pass the Tabula.
     A cartela is one line that never wraps: above 32 characters it does not fit a phone (measured at 390 px with
     «Tabula II · Photography and measurements»), so it gets .cartela--larga and atlas2.css hides the label there."""
     if not label:
@@ -109,8 +111,11 @@ def cartela(num, label=""):
     # F4: plate cartelas are longer (the subtitle): measured, «Lám. III · Eclipse total · 12 · VIII · 2026 · Mirador del
     # Cabrero» overflowed its column from 540 to 860 px. Two more steps: > 40 characters, label hidden below 760 px;
     # > 52, below 960 px (atlas2.css §17). The F3 cartelas (<= 40) do not change.
-    n = len(f"{num} · {label}")
-    long_ = (" cartela--larga" if n > 32 else "") + (" cartela--l40" if n > 40 else "") + (" cartela--l52" if n > 52 else "")
+    # F5c (J): the Tabula prefix makes every cartela longer. Two steps added, measured with a width sweep 1920 -> 360: > 26,
+    # label hidden below 410 px (a 360 px phone holds 26 characters); > 64, below 1100 px (the eclipse plate, 77, overflowed at 1024).
+    n = len(re.sub(r"<[^>]*>", "", f"{num} · {label}"))
+    long_ = ((" cartela--l26" if n > 26 else "") + (" cartela--larga" if n > 32 else "") + (" cartela--l40" if n > 40 else "")
+             + (" cartela--l52" if n > 52 else "") + (" cartela--l64" if n > 64 else ""))
     return f'<p class="cartela{long_}">{num}<span class="cartela-l"> <i>·</i> {label}</span></p>'
 
 
@@ -710,6 +715,7 @@ def build_herramientas(lang):
     </div>
 
     <p class="cierre"><span class="fell">{T("¿Necesitas algo que corra dentro de PixInsight?", "Need something that runs inside PixInsight?")(lang)}</span><a class="lnk" href="{fname("programas.html", lang)}">{T("Programas para instalar", "Software to install")(lang)}{ARROW}</a></p>
+    <p class="cierre cierre--2"><span class="fell">{T("Guías y vídeos sobre contaminación lumínica", "Guides and videos on light pollution")(lang)}</span><a class="lnk" href="{fname("contaminacion.html", lang)}">{T("Guías", "Guides")(lang)}{ARROW}</a></p>
 
   </div>
 </section>
@@ -749,7 +755,7 @@ def build_programas(lang):
 <section class="sec" aria-labelledby="t-taller">
   <div class="wrap">
     <header class="sec-cab sec-cab--izq">
-      {cartela(T("En el taller", "In the workshop")(lang))}
+      {cartela("Tabula IV", T("En el taller", "In the workshop")(lang))}
       <h2 class="tit-2" id="t-taller">{T('Aún <em class="gi">sin publicar</em>', 'Not <em class="gi">released yet</em>')(lang)}</h2>
       <p class="sub">{T("Programas en los que trabajo; saldrán cuando estén listos.", "Programs I am working on; they will be released when ready.")(lang)}</p>
     </header>
@@ -771,7 +777,7 @@ def build_bitacora(lang):
         f'<button class="chip{" is-on" if k == "all" else ""}" type="button" data-k="{k}" aria-pressed="{"true" if k == "all" else "false"}">'
         f'{l(lang)} <small data-n="{k}"></small></button>' for k, l in kinds)
     more = [("equipamiento.html", T("Catálogo de equipo", "Equipment catalogue")), ("novedades.html", T("Novedades de software", "Software news")),
-            ("cursos-youtube.html", T("Cursos de YouTube", "YouTube courses")), ("contaminacion.html", T("Contaminación lumínica: vídeos y guías", "Light pollution: videos and guides")),
+            ("cursos-youtube.html", T("Cursos de YouTube", "YouTube courses")),
             ("divulgacion-coffeebreak.html", T("Archivo: Coffee Break, señal y ruido", "Archive: Coffee Break podcast"))]
     cats = "\n          ".join(f'<li><a href="{fname(h, lang)}">{l(lang)}{ARROW}</a></li>' for h, l in more)
     body = f"""
@@ -1115,7 +1121,7 @@ def build_obs_page(o, obs, lang):
   <div class="pag-cab">
     <div class="pag-tx">
       {ruta}
-      {cartela(lam, esc(sub))}
+      {cartela(f"Tabula II <i>·</i> {lam}", esc(sub))}
       <h1 class="tit-1">{title_h1(o, lang)}</h1>
       <p class="entradilla">{esc(desc)}</p>
     </div>

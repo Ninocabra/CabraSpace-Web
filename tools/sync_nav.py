@@ -59,10 +59,10 @@ FONT_HREF = "https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&d
 # cielo-* are observations too (Atlas I missed them: atlas/atlas.js:8).
 SECTIONS = [
     ("herr", ("herramientas", "cabraspace-imaging-workflow", "pi-workflow", "astroforecast", "autoghs",
-              "contaminacion-mapa", "pixelmath")),
+              "contaminacion-mapa", "contaminacion.html", "pixelmath")),   # F5 (D): las guías cuelgan del mapa, en Herramientas
     ("obs", ("observaciones", "eclipse-", "transito-", "cielo-")),
     ("prog", ("programas", "cabrascripts")),
-    ("bit", ("bitacora", "novedades", "equipamiento", "cursos-youtube", "contaminacion.html", "divulgacion-")),
+    ("bit", ("bitacora", "novedades", "equipamiento", "cursos-youtube", "divulgacion-")),
 ]
 SECTION_INDEX = {"herr": "herramientas.html", "obs": "observaciones.html", "prog": "programas.html", "bit": "bitacora.html"}
 
