@@ -127,7 +127,9 @@ def send(subject, body_html, user, to, password):
             return
         except Exception as e:
             last = e
-            print(f"Error enviando (intento {attempt}): {type(e).__name__}: {e} · longitud contraseña={len(password)}")
+            # Sin datos de la contraseña: los registros de Actions de este repo son públicos.
+            hint = "" if len(password) == 16 else " · la contraseña guardada NO tiene 16 letras (no parece de aplicación)"
+            print(f"Error enviando (intento {attempt}): {type(e).__name__}: {e}{hint}")
             if attempt == 1:
                 import time
                 time.sleep(8)
