@@ -47,6 +47,7 @@
   --c2: rgba(229, 181, 63, .3);           /* segundo filete, mas tenue */
   --pt: rgba(208, 193, 165, .3);          /* linea de puntos */
   --grab: .3;                             /* opacidad de un grabado de fondo */
+  --orla-op: .45;                         /* intensidad de la orla graduada (numeros, grados, tramos, estrellas): 1 = como el prototipo */
 
   --f-disp: "Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
   --f-fell: "IM Fell English", Georgia, serif;
@@ -122,7 +123,7 @@ body.night-vision {
 /* overflow: clip y NO hidden: hidden crea un contenedor de scroll y apaga position: sticky dentro
    (PixelMath-teca, Coffee Break). clip recorta igual (frisos, carta) sin ese efecto. */
 .hoja-in { position: relative; margin: var(--b); border: 1px solid var(--c); overflow: clip; }
-.orla { position: absolute; display: flex; overflow: hidden; pointer-events: none; }
+.orla { position: absolute; display: flex; overflow: hidden; pointer-events: none; opacity: var(--orla-op); }
 .orla i { flex: 1 1 0; position: relative; display: block; min-width: 0; min-height: 0; }
 .orla b { position: absolute; font: italic 400 11px/1 var(--f-fell); color: var(--t3); white-space: nowrap; }
 .orla-t, .orla-b { left: var(--b); right: var(--b); height: var(--b); }
@@ -145,7 +146,7 @@ body.night-vision {
 .orla-l b { top: 0; left: 19px; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
 .orla-r b { top: 0; right: 19px; writing-mode: vertical-rl; transform: translateY(-50%); }
 .esq { position: absolute; width: var(--b); height: var(--b); display: flex; align-items: center; justify-content: center; color: var(--gold); pointer-events: none; }
-.esq svg { width: 14px; height: 14px; }
+.esq svg { width: 14px; height: 14px; opacity: var(--orla-op); }
 .esq-tl { top: 0; left: 0; border-right: 1px solid var(--c); border-bottom: 1px solid var(--c); }
 .esq-tr { top: 0; right: 0; border-left: 1px solid var(--c); border-bottom: 1px solid var(--c); }
 .esq-bl { bottom: 0; left: 0; border-right: 1px solid var(--c); border-top: 1px solid var(--c); }
