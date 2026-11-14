@@ -10,6 +10,11 @@ on:
   workflow_dispatch:
     # Permite lanzarlo manualmente desde GitHub si hace falta
 
+concurrency:
+  # Se turna con el resumen diario y el lector de respuestas (todos tocan los mismos JSON).
+  group: bitacora-datos
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -46,6 +51,6 @@ jobs:
         run: |
           git config user.name "CabraSpace Bot"
           git config user.email "ninocabra@gmail.com"
-          git add novedades.json equipamiento.json catalogo_productos.md latest.json
+          git add novedades.json equipamiento.json catalogo_productos.md latest.json tools/candidatas.json
           git diff --staged --quiet || git commit -m "🤖 Actualización automática de noticias [$(date +'%Y-%m-%d %H:%M')]"
           git push
