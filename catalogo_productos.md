@@ -292,6 +292,10 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: eyepieces**
   - [Takahashi lanza nuevos oculares eyecuativo TOE de 58°](https://stargazerslounge.com/topic/447288-takahashi-released-new-toe-25mm-58%C2%B0toe-33mm-58%C2%B0toe-40mm-58%C2%B0-eyepieces/) (2026-08-05)
 
+### TELESCOPES
+- **Modelo: Epsilon 180 ED**
+  - [Análisis del astrografo Takahashi Epsilon 180 ED f/2.8](https://stargazerslounge.com/topic/450235-takahashi-epsilon-180-ed-f28-newt-astrograph/) (2026-11-14)
+
 ## Touptek
 
 ### ACCESSORIES
