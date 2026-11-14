@@ -2,20 +2,24 @@ name: Resumen diario de la Bitácora por correo
 
 on:
   schedule:
-    # 07:00 UTC = 08:00 en invierno / 09:00 en verano (hora peninsular)
-    - cron: '0 7 * * *'
+    # 07:17 UTC = 08:17 en invierno / 09:17 en verano (hora peninsular).
+    # NO en el minuto :00: GitHub retrasa o descarta los cron de la hora en punto por la carga
+    # (el 14-11-2026 el de las 07:00 UTC no llegó a arrancar).
+    - cron: '17 7 * * *'
   workflow_dispatch:
     # Permite lanzarlo a mano desde GitHub (botón «Run workflow»)
 
 concurrency:
-  group: resumen-diario
+  # Mismo grupo que el scraper y el lector de respuestas: los tres escriben equipamiento.json /
+  # candidatas.json y se turnan en vez de pisarse al hacer push.
+  group: bitacora-datos
   cancel-in-progress: false
 
 jobs:
   resumen:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # para guardar tools/resumen_enviados.json
+      contents: write  # para guardar resumen_enviados.json y el registro de candidatas
 
     steps:
       - name: Descargar repositorio
@@ -37,7 +41,7 @@ jobs:
         run: |
           git config user.name "CabraSpace Bot"
           git config user.email "ninocabra@gmail.com"
-          git add tools/resumen_enviados.json
+          git add tools/resumen_enviados.json tools/candidatas.json tools/curacion_digests.json
           git diff --staged --quiet && exit 0
           git commit -m "🤖 Resumen diario enviado [$(date +'%Y-%m-%d')]"
           for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 5; done

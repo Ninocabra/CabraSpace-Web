@@ -1,0 +1,51 @@
+name: Respuestas a las candidatas del resumen diario (IMAP)
+
+on:
+  schedule:
+    # Cada hora, en el minuto 41 (no en :00, que GitHub retrasa o descarta)
+    - cron: '41 * * * *'
+  workflow_dispatch:
+    # Permite lanzarlo a mano desde GitHub (botón «Run workflow»)
+
+concurrency:
+  # Mismo grupo que el scraper y el resumen diario: los tres escriben los mismos JSON.
+  group: bitacora-datos
+  cancel-in-progress: false
+
+jobs:
+  respuestas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # publica en equipamiento.json y guarda las decisiones
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Pruebas del lector de respuestas y del filtro de seguridad
+        # Si fallan, no se toca el buzón ni se publica nada.
+        run: python -m unittest discover -s tools -p "test_curacion.py"
+
+      - name: Leer respuestas y publicar lo elegido
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # Mismos valores que en resumen_diario.yml: la cuenta del buzón y el ÚNICO remitente válido.
+          RESUMEN_USER: ninocabra@gmail.com
+          RESUMEN_TO: ninocabra@gmail.com
+        # El registro solo lleva recuentos: este repositorio y sus logs son públicos.
+        run: python tools/procesar_respuestas.py
+
+      - name: Guardar decisiones y publicación
+        run: |
+          git config user.name "CabraSpace Bot"
+          git config user.email "ninocabra@gmail.com"
+          git add equipamiento.json latest.json catalogo_productos.md tools/candidatas.json tools/curacion_digests.json tools/decisiones.json tools/resumen_enviados.json
+          git diff --staged --quiet && exit 0
+          git commit -m "🤖 Curación por correo: respuestas aplicadas [$(date +'%Y-%m-%d %H:%M')]"
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 5; done
+          exit 1

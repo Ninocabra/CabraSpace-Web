@@ -9,6 +9,10 @@ import sys
 import ssl
 import email.utils
 
+# Curación por correo (candidatas): módulo hermano en tools/. Ver tools/CURACION.md.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import curacion
+
 # Bypass SSL certificate validation globally for safety with astronomy vendor servers
 ssl_context = ssl._create_unverified_context()
 
@@ -957,6 +961,184 @@ def check_press_relevance(title):
 # Medios de Google News que son tiendas o agregadores de anuncios (spam de producto), no prensa.
 PRESS_BLOCKED_PUBLISHERS = {"motorvsmotor"}
 
+# CURATION-BEGIN
+# CANDIDATAS (decisión del dueño, 14-11-2026): lo que el filtro ESTRICTO de arriba publica sigue
+# publicándose solo, sin cambios. Además, con criterios RELAJADOS, lo que el estricto descarta pero
+# podría interesar se guarda como «candidata» (tools/candidatas.json), NO se publica, y sale numerado
+# en el correo diario; el dueño contesta «publica 2, 5 y 7» (tools/procesar_respuestas.py).
+# DEFINICIÓN EXACTA (relaxed_reason) — es candidata un item NUEVO (ya dedupado por URL contra la
+# Bitácora, las pendientes y lo decidido, dentro de su ventana de antigüedad) que NO se publicó y cumple UNA:
+#   1. «cuota»:     pasó pre-filtro y dedup estrictos, pero no cupo en un tope del run (global, prensa o terceros).
+#   2. «prefiltro»: PRENSA que el estricto descartó (exige marca + tipo de equipo/código de modelo) y que
+#                   a) cita una marca conocida sin tipo de equipo ni modelo, o
+#                   b) habla de equipo de astrofotografía (palabra de equipo + contexto aficionado) sin marca, o
+#                   c) es una reseña editorial («REVIEW:», «Hands-on:», «First look:») sin marca conocida
+#                      (p. ej. «REVIEW: Spectrum Optics SkyPilot 127», Astronomy.com) y sin vocabulario de misión espacial.
+#   3. «ia»:        la IA (Gemini/Groq/DeepSeek) lo marcó relevant=false pero el titular cita una marca
+#                   conocida (o viene del canal oficial de la marca). Excluye foros/Reddit.
+# NUNCA candidata: relleno (is_engagement_noise), tiendas/editores bloqueados, foros/Reddit (salvo «cuota»,
+# que ya pasó el estricto), duplicados de modelo ya cubierto (la repetición de lanzamientos es justo lo
+# que el estricto existe para evitar), y todo lo que no cita marca ni equipo.
+FORUM_SOURCES = ("Stargazers Lounge", "Reddit r/astrophotography", "Reddit r/telescopes")
+CAND_MAX_AI = 8   # candidatas que se puntúan con Gemini por pasada (6 s entre llamadas)
+# Marcas cuyo nombre es también una palabra común de la astronomía: no valen como señal «solo marca».
+AMBIGUOUS_BRANDS = {"orion", "pier", "pico", "asi", "asa", "fli", "basler", "dwarf", "pro"}
+_GEAR_WORDS = ["telescope", "telescopio", "camera", "cámara", "mount", "montura", "filter", "filtro",
+               "refractor", "astrograph", "focuser", "eyepiece", "binocular", "smart", "sensor", "lens",
+               "powerbox", "guider", "rotator"]
+_EDITORIAL_REVIEW_RE = re.compile(r"^\W*(review|hands-on|hands on|first look)\s*[:\-–]", re.I)
+_SPACE_MISSION_WORDS = ["nasa", "spacex", "starship", "rocket", "mission", "satellite", "rover", "probe", "esa ",
+                        "artemis", "orbit", "lander", "cohete", "misión"]
+_AMATEUR_CONTEXT = ["astrophotograph", "astrofotograf", "astroimag", "backyard", "amateur", "smart telescope",
+                    "telescopio inteligente", "deep-sky", "deep sky", "cielo profundo", "stargaz", "aficionad"]
+
+
+def brand_in_title(title):
+    """Marca conocida citada en el titular (sin las ambiguas), o None."""
+    t = re.sub(r'#\w+', ' ', title.lower())
+    for brand in list(FABRICANTES) + ["seestar", "unistellar", "vespera"]:
+        b = brand.lower()
+        if b in AMBIGUOUS_BRANDS:
+            continue
+        if (re.search(r'\b' + re.escape(b) + r'\b', t) if len(b) <= 3 else b in t):
+            return brand
+    return None
+
+
+def relaxed_press_reason(title):
+    brand = brand_in_title(title)
+    if brand:
+        return f"Prensa: cita {brand}, pero el titular no nombra el tipo de equipo ni un modelo"
+    t = title.lower()
+    if any(g in t for g in _GEAR_WORDS) and any(c in t for c in _AMATEUR_CONTEXT):
+        return "Prensa: equipo de astrofotografía, sin marca conocida en el titular"
+    if _EDITORIAL_REVIEW_RE.match(title) and not any(w in t for w in _SPACE_MISSION_WORDS):
+        return "Prensa: reseña editorial de equipo, sin marca conocida en el titular"
+    return None
+
+
+def strict_prefilter_ok(item):
+    """Réplica SIN efectos del pre-filtro estricto de main(): True si el item llegaría a la IA."""
+    is_mfg, is_press = item.get('is_mfg', False), item.get('is_press', False)
+    if is_press:
+        return item['source'].strip().lower() not in PRESS_BLOCKED_PUBLISHERS and check_press_relevance(item['title'])
+    if item['source'] in FORUM_SOURCES:
+        return check_forum_relevance(item['title'])
+    if not is_mfg:
+        return check_relevance_fallback(item['title'])
+    return True
+
+
+def relaxed_reason(item, via):
+    """Motivo (texto para el correo) por el que `item` es candidata, o None si no debe serlo.
+    via: 'cuota' | 'prefiltro' | 'ia'. Para 'cuota' quien llama ya comprobó pre-filtro y dedup."""
+    title = item['title']
+    if is_engagement_noise(title, is_official_youtube=item.get('is_mfg', False) and item.get('is_youtube', False)):
+        return None
+    if item['source'].strip().lower() in PRESS_BLOCKED_PUBLISHERS:
+        return None
+    if via == 'cuota':
+        return "Cumplía el filtro estricto, pero se quedó fuera por el límite de entradas de esta pasada"
+    if via == 'prefiltro':
+        return relaxed_press_reason(title) if item.get('is_press', False) else None
+    if via == 'ia':
+        if item['source'] in FORUM_SOURCES:
+            return None
+        brand = brand_in_title(title) or (item['source'] if item.get('is_mfg', False) else None)
+        return f"La IA lo descartó como no-novedad, pero cita {brand}" if brand else None
+    return None
+
+
+def process_candidate_with_gemini(item, reason, decisions, api_key):
+    """Puntúa 0-10 una candidata con ejemplos de las últimas decisiones del dueño (aprendizaje, fase 1) y
+    devuelve también título/resumen traducidos. dict | None (fallo transitorio) | AUTH_ERROR."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
+    text = {"type": "STRING"}
+    payload = {
+        "contents": [{"parts": [{"text": curacion.build_candidate_prompt(item, reason, decisions)}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "responseSchema": {
+                "type": "OBJECT",
+                "properties": {
+                    "score": {"type": "INTEGER", "description": "0-10: probabilidad de que el dueño quiera publicarla."},
+                    "title_es": text, "title_en": text, "summary_es": text, "summary_en": text,
+                    "category_es": {"type": "STRING", "enum": ["TELESCOPIOS", "CÁMARAS", "MONTURAS", "ACCESORIOS", "SOFTWARE"]},
+                    "category_en": {"type": "STRING", "enum": ["TELESCOPES", "CAMERAS", "MOUNTS", "ACCESSORIES", "SOFTWARE"]},
+                    "tags": {"type": "ARRAY", "items": {"type": "STRING"}},
+                },
+                "required": ["score", "title_es", "title_en", "summary_es", "summary_en", "category_es", "category_en", "tags"],
+            },
+        },
+    }
+    req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST',
+                                 headers={'Content-Type': 'application/json', 'User-Agent': BROWSER_UA})
+    import time
+    delay = 6.0
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, context=ssl_context) as response:
+                res = json.loads(response.read().decode('utf-8'))
+            out = json.loads(res['candidates'][0]['content']['parts'][0]['text'])
+            out['score'] = max(0, min(10, int(out['score'])))
+            return out
+        except urllib.error.HTTPError as he:
+            if he.code in (429, 503, 504) and attempt < 2:
+                time.sleep(delay)
+                delay *= 2
+            elif he.code in (401, 403, 404):
+                return AUTH_ERROR
+            else:
+                print(f"Candidata: error de Gemini HTTP {he.code}.")
+                return None
+        except Exception as e:
+            print(f"Candidata: error al puntuar ({type(e).__name__}).")
+            return None
+    return None
+
+
+def finish_curation(cand_doc, cand_new, cand_raw, decisions, cand_policy, gemini_key, cand_path, save, muted):
+    """Cierra la parte de candidatas del run: alta, caducidad, puntuación con IA y guardado."""
+    blocked = {d["url"] for d in decisions["decisions"]}
+    blocked |= {e['id'] for e in load_database()}
+    added = curacion.add_candidates(cand_doc, cand_new, blocked)
+    expired = curacion.expire(cand_doc)
+    scored = failed = 0
+    if gemini_key:
+        import time
+        todo = [c for c in cand_doc["candidates"] if c["status"] == "pending" and c["score"] is None and not c.get("digest")]
+        todo.sort(key=lambda c: c["date"], reverse=True)
+        for c in todo[:CAND_MAX_AI]:
+            time.sleep(6.0)
+            raw = cand_raw.get(c["id"]) or {"title": c["title"], "source": c["source"], "url": c["url"]}
+            res = process_candidate_with_gemini(raw, c["reason"], decisions["decisions"], gemini_key)
+            if res == AUTH_ERROR:
+                print("Candidatas: Gemini con credencial inválida; sin puntuar.")
+                break
+            if res is None:
+                failed += 1
+                if failed >= 2:
+                    print("Candidatas: Gemini falla seguido; el resto queda sin puntuar hasta la próxima pasada.")
+                    break
+                continue
+            failed = 0
+            c["score"] = res["score"]
+            c["publish"].update({k: res[k] for k in ("title_es", "title_en", "summary_es", "summary_en",
+                                                      "category_es", "category_en", "tags")})
+            if res["score"] <= curacion.CAND_MIN_SCORE:
+                c["status"] = "ia_descartada"      # se conserva como memoria: que no vuelva a entrar
+            scored += 1
+    pend = [c for c in cand_doc["candidates"] if c["status"] == "pending"]
+    print(f"Candidatas: {added} nuevas, {len(pend)} pendientes, {scored} puntuadas, {expired} caducadas, "
+          f"{muted} de fuentes silenciadas por el historial.")
+    for c in cand_new[:40]:
+        print(f"  [candidata] ({c['reason'][:60]}) {c['title'][:90]} · {c['source']}")
+    if save:
+        curacion.save_json(cand_path, cand_doc)
+    else:
+        print("[DRY-RUN] Las candidatas no se guardan (define CANDIDATAS_FILE para probar en local).")
+# CURATION-END
+
 
 def process_fallback(item):
     """Fallback processor if API Key is missing or request fails."""
@@ -1304,6 +1486,63 @@ def main():
     known_models_official = extract_known_models(db, source_type="official")
     print(f"Extracted {len(known_models)} known product models from database tags ({len(known_models_official)} already covered by official sources).")
 
+    # Candidatas: si algo falla aquí (fichero roto...) se desactiva SOLO esta parte; el filtro estricto sigue igual.
+    cand_path = os.environ.get("CANDIDATAS_FILE") or curacion.CANDIDATAS_FILE
+    cand_save = (not is_dry_run) or bool(os.environ.get("CANDIDATAS_FILE"))
+    cand_doc = decisions_doc = cand_policy = None
+    cand_new, cand_raw, cand_muted = [], {}, [0]
+    try:
+        cand_doc = curacion.load_candidatas(cand_path)
+        decisions_doc = curacion.load_decisiones(curacion.DECISIONES_FILE)
+        cand_policy = curacion.source_policy(decisions_doc["decisions"])
+    except Exception as e:
+        print(f"Candidatas desactivadas en este run: {e}")
+
+    def offer(item, via):
+        """Registra `item` como candidata si el criterio relajado lo permite. Nunca afecta al estricto."""
+        if cand_doc is None or item['url'] in cand_raw:
+            return
+        try:
+            reason = relaxed_reason(item, via)
+            if not reason:
+                return
+            if curacion.source_action(cand_policy, item['source']) == 'mute':
+                cand_muted[0] += 1
+                return
+            publish = process_fallback(item)
+            publish['source_type'] = "official" if item.get('is_mfg') else ("press" if item.get('is_press') else "reviewer")
+            publish['source'] = item['source']
+            cand_new.append(curacion.make_candidate(item, reason, publish))
+            cand_raw[item['url']] = item
+        except Exception as e:
+            print(f"Candidata ignorada ({type(e).__name__}).")
+
+    def wrap_up():
+        if cand_doc is None:
+            return
+        try:
+            finish_curation(cand_doc, cand_new, cand_raw, decisions_doc, cand_policy, gemini_key, cand_path,
+                            cand_save, cand_muted[0])
+        except Exception as e:
+            print(f"Candidatas: error al cerrar ({type(e).__name__}: {e}).")
+
+    def offer_skipped(item):
+        """Item que el run no llegó a evaluar por un cupo: candidata «cuota» si habría pasado el estricto; si el
+        estricto lo habría descartado igualmente, se le aplica el criterio relajado de prensa («prefiltro»)."""
+        if viable_strict(item):
+            offer(item, 'cuota')
+        elif item.get('is_press', False) and not strict_prefilter_ok(item):
+            offer(item, 'prefiltro')
+
+    def viable_strict(item):
+        """¿Habría llegado a la IA por el camino estricto? (para las descartadas solo por cupo)"""
+        if not strict_prefilter_ok(item):
+            return False
+        if item.get('is_press', False):
+            return not is_duplicate_product_introduction(item['title'], known_models, require_intro=False)[0]
+        dedup = known_models_official if item.get('is_mfg', False) else known_models
+        return not is_duplicate_product_introduction(item['title'], dedup)[0]
+
     # Gather candidates from all feeds
     source_health = []  # (name, count, is_mfg) -> para el resumen de salud al final
     candidates = []
@@ -1392,6 +1631,7 @@ def main():
 
     if not new_candidates:
         print("No new updates. Database is up to date.")
+        wrap_up()     # reintenta puntuar las candidatas que quedaron sin puntuar
         return
 
     processed_count = 0
@@ -1404,9 +1644,11 @@ def main():
     gemini_fails = 0
     groq_fails = 0
 
-    for item in new_candidates:
+    for idx, item in enumerate(new_candidates):
         if processed_count >= MAX_ITEMS_TO_PROCESS:
             print("Reached processing limit for this run.")
+            for rest in new_candidates[idx:]:       # lo que ya no cupo: candidata (ver offer_skipped)
+                offer_skipped(rest)
             break
 
         # Check if candidate is from a manufacturer feed
@@ -1425,9 +1667,11 @@ def main():
         # los canales oficiales (procesados primero por el orden mfg-first) no se queden sin slots.
         if is_press and press_count >= MAX_PRESS_ITEMS:
             print(f"Skipping press item (quota {press_count}/{MAX_PRESS_ITEMS}): '{item['title']}' from {item['source']}")
+            offer_skipped(item)
             continue
         if not is_mfg and not is_press and other_count >= MAX_OTHER_ITEMS:
             print(f"Skipping third-party item (official quota reserved, {other_count}/{MAX_OTHER_ITEMS} used): '{item['title']}' from {item['source']}")
+            offer_skipped(item)
             continue
 
         # Deduplicación consciente del origen: un anuncio OFICIAL solo se descarta si el modelo ya
@@ -1442,6 +1686,7 @@ def main():
                 continue
             if not check_press_relevance(item['title']):
                 print(f"Skipping off-topic press candidate (pre-filtered): '{item['title']}' from {item['source']}")
+                offer(item, 'prefiltro')
                 continue
         elif is_forum:
             if not check_forum_relevance(item['title']):
@@ -1479,6 +1724,7 @@ def main():
                 processed_item = None
             elif isinstance(processed_item, dict) and processed_item.get("skipped"):
                 print("Gemini classified item as not relevant. Skipping.")
+                offer(item, 'ia')
                 continue
             elif processed_item is None:
                 gemini_fails += 1
@@ -1500,6 +1746,7 @@ def main():
                 processed_item = None
             elif isinstance(processed_item, dict) and processed_item.get("skipped"):
                 print("Groq classified item as not relevant. Skipping.")
+                offer(item, 'ia')
                 continue
             elif processed_item is None:
                 groq_fails += 1
@@ -1520,6 +1767,7 @@ def main():
                 processed_item = None
             elif isinstance(processed_item, dict) and processed_item.get("skipped"):
                 print("DeepSeek classified item as not relevant. Skipping.")
+                offer(item, 'ia')
                 continue
             elif processed_item is None:
                 print("DeepSeek failed as well.")
@@ -1647,6 +1895,8 @@ def main():
         print("No new relevant updates added in this run.")
         if not is_dry_run:
             regenerate_markdown_catalog(db)
+
+    wrap_up()
 
 if __name__ == "__main__":
     main()

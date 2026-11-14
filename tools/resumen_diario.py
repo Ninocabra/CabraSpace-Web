@@ -7,6 +7,10 @@ Lo ya enviado se recuerda en tools/resumen_enviados.json, que el workflow guarda
 Uso:
   python tools/resumen_diario.py                  # envía (necesita GMAIL_APP_PASSWORD) y guarda estado
   python tools/resumen_diario.py --preview f.html # solo genera el HTML, no envía ni guarda estado
+  python tools/resumen_diario.py --preview f.html --candidatas c.json   # idem, con otro fichero de candidatas
+
+Además lista las CANDIDATAS (lo que el filtro estricto no publicó) numeradas, y el dueño contesta al
+correo «publica 2, 5 y 7»: lo lee tools/procesar_respuestas.py. Ver tools/CURACION.md.
 
 Variables de entorno: GMAIL_APP_PASSWORD (obligatoria para enviar), RESUMEN_USER y RESUMEN_TO.
 """
@@ -15,9 +19,13 @@ import sys
 import json
 import html
 import smtplib
+import email.utils
 from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import curacion as cu
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE_FILE = os.path.join(ROOT, "tools", "resumen_enviados.json")
@@ -74,7 +82,66 @@ GROUP_ORDER = ["Equipo · Marcas (oficial)", "Equipo · Prensa especializada", "
                "Software y PixInsight", "Cursos de YouTube"]
 
 
-def render(new, today):
+def cand_view(c):
+    """Lo que se muestra de una candidata: título/resumen en español si la IA ya los hizo."""
+    pub = c.get("publish") or {}
+    scored = c.get("score") is not None
+    return {"title": (pub.get("title_es") if scored and pub.get("title_es") else c["title"]),
+            "summary": pub.get("summary_es", "") if scored else "",
+            "meta": " · ".join(p for p in [c.get("source", ""), "-".join(reversed(c["date"].split("-")))] if p),
+            "reason": c.get("reason", ""), "score": c.get("score"), "url": c["url"]}
+
+
+def render_candidates(cands, digest_id):
+    """Sección «Candidatas»: numeradas (el número es la posición en ESTE correo) y con instrucciones."""
+    e = html.escape
+    k = len(cands)
+    parts = [f'<div style="background:#fff;border:1px solid {LINE};border-left:4px solid {GOLD};'
+             f'border-radius:4px;padding:14px 16px;margin:30px 0 8px">',
+             f'<div style="font:bold 13px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:{GOLD}">'
+             f'Candidatas · {k}</div>',
+             f'<div style="font:14px/1.5 Arial,sans-serif;color:#3d3830;margin-top:8px">'
+             f'El filtro automático no las ha publicado. <b>Responde a este correo con los números de las que '
+             f'quieras publicar</b>, por ejemplo <b>«publica 2, 5 y 7»</b> (vale también «2,5,7», «2 5 7» o '
+             f'«todas»). Con «ninguna» se descartan todas. Las que no nombres se descartan y no vuelven a salir.</div></div>']
+    for i, c in enumerate(cands, 1):
+        v = cand_view(c)
+        summary = v["summary"]
+        if len(summary) > 240:
+            summary = summary[:237].rsplit(" ", 1)[0] + "…"
+        extra = f' · puntuación IA {v["score"]}/10' if v["score"] is not None else ""
+        parts.append(
+            f'<table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 14px"><tr>'
+            f'<td style="width:44px;vertical-align:top;padding:2px 10px 0 0">'
+            f'<div style="width:34px;height:34px;line-height:34px;text-align:center;border-radius:50%;'
+            f'background:{GOLD};color:#fff;font:bold 16px Arial,sans-serif">{i}</div></td>'
+            f'<td style="vertical-align:top">'
+            f'<a href="{e(v["url"])}" style="color:{INK};font-size:16px;text-decoration:none;border-bottom:1px solid {GOLD}">{e(v["title"])}</a>'
+            f'<div style="font:12px Arial,sans-serif;color:{MUTED};margin:4px 0">{e(v["meta"])}</div>'
+            f'<div style="font:12px Arial,sans-serif;color:{GOLD}">Por qué es candidata: {e(v["reason"])}{e(extra)}</div>'
+            + (f'<div style="font:14px/1.45 Arial,sans-serif;color:#3d3830;margin-top:4px">{e(summary)}</div>' if summary else '')
+            + '</td></tr></table>')
+    parts.append(f'<div style="font:11px Arial,sans-serif;color:{MUTED}">Referencia de este correo: {e(digest_id)} '
+                 f'(no la borres del asunto al contestar).</div>')
+    return "".join(parts)
+
+
+def render_text(new, cands, digest_id, today):
+    """Versión de texto plano (la que cita tu cliente de correo al contestar)."""
+    out = [f"CabraSpace · Bitácora — resumen del {today}", f"{len(new)} entradas nuevas.", ""]
+    for r in new:
+        out.append(f"- {r['title']} ({r['source']})")
+    if cands:
+        out += ["", f"CANDIDATAS ({len(cands)}) — responde con los números que quieras publicar, p. ej. «publica 2, 5 y 7»; "
+                    "«todas» o «ninguna» también valen.", ""]
+        for i, c in enumerate(cands, 1):
+            v = cand_view(c)
+            out.append(f"{i}. {v['title']} [{v['meta']}] — {v['reason']}")
+        out += ["", f"Referencia: {digest_id}"]
+    return "\n".join(out)
+
+
+def render(new, today, cands=None, digest_id=None):
     e = html.escape
     n = len(new)
     parts = [f'<div style="background:{PAPER};padding:24px 12px;font-family:Georgia,serif;color:{INK}">',
@@ -83,7 +150,9 @@ def render(new, today):
              f'<h1 style="font-weight:normal;font-size:26px;margin:8px 0 4px">Resumen del {e(today)}</h1>',
              f'<div style="font:14px Arial,sans-serif;color:{MUTED};margin-bottom:20px">'
              + (f'{n} entrada{"s" if n != 1 else ""} nueva{"s" if n != 1 else ""} desde el último correo.' if n
-                else 'Sin novedades desde el último correo.') + '</div>']
+                else 'Sin novedades desde el último correo.')
+             + (f' <b style="color:{GOLD}">{len(cands)} candidata{"s" if len(cands) != 1 else ""} esperan tu respuesta ↓</b>'
+                if cands else '') + '</div>']
     for g in GROUP_ORDER:
         items = [r for r in new if r["group"] == g]
         if not items:
@@ -103,15 +172,26 @@ def render(new, today):
                 f'<a href="{e(r["url"])}" style="color:{INK};font-size:17px;text-decoration:none;border-bottom:1px solid {GOLD}">{e(r["title"])}</a>'
                 f'<div style="font:12px Arial,sans-serif;color:{MUTED};margin:4px 0">{e(meta)}</div>'
                 f'<div style="font:14px/1.45 Arial,sans-serif;color:#3d3830">{e(summary)}</div></div>')
+    if cands:
+        parts.append(render_candidates(cands, digest_id))
     parts.append(f'<div style="font:12px Arial,sans-serif;color:{MUTED};border-top:1px solid {LINE};'
                  f'margin-top:28px;padding-top:12px">Todo el registro en <a href="{SITE}" style="color:{GOLD}">'
                  f'cabraspace.com/bitacora</a>.</div></div></div>')
     return "".join(parts)
 
 
-def send(subject, body_html, user, to, password):
+def send(subject, body_html, user, to, password, body_text=None, digest_id=None):
     msg = MIMEMultipart("alternative")
-    msg["Subject"], msg["From"], msg["To"] = subject, f"CabraSpace Bitácora <{user}>", to
+    # formataddr: con el nombre «Bitácora» (no ASCII), concatenar f"... <{user}>" hacía que Python codificara
+    # TODO el valor, dirección incluida, dentro de una sola palabra codificada: el From quedaba sin dirección real.
+    msg["Subject"], msg["From"], msg["To"] = subject, email.utils.formataddr(("CabraSpace Bitácora", user)), to
+    if digest_id:
+        # El lector de respuestas descarta cualquier correo con esta cabecera (es el propio resumen) y
+        # busca el token CB-... en Asunto / In-Reply-To / References para saber a qué resumen contestan.
+        msg[cu.DIGEST_HEADER] = digest_id
+        msg["Message-ID"] = email.utils.make_msgid(idstring=digest_id, domain="cabraspace.com")
+    if body_text:
+        msg.attach(MIMEText(body_text, "plain", "utf-8"))
     msg.attach(MIMEText(body_html, "html", "utf-8"))
     # Gmail muestra la contraseña de aplicación en grupos de 4 con espacios; al pegarla en el
     # secreto pueden colarse espacios o saltos de línea, y entonces Gmail CORTA la conexión en el
@@ -150,10 +230,32 @@ def main():
         sent = set(state.get("sent", []))
         new = [r for r in rows if r["id"] not in sent]
 
+    # Candidatas. Un fallo aquí NUNCA debe impedir el resumen diario: se envía sin la sección.
+    cand_path = cu.CANDIDATAS_FILE
+    if "--candidatas" in sys.argv:
+        cand_path = sys.argv[sys.argv.index("--candidatas") + 1]
+    cands_doc, selected, digest_id = None, [], None
+    try:
+        cands_doc = cu.load_candidatas(cand_path)
+        decisions = cu.load_decisiones(cu.DECISIONES_FILE)["decisions"]
+        published_ids = {r["id"] for r in rows}
+        if not preview:
+            cu.drop_published(cands_doc, published_ids)   # ya entraron por la vía automática
+            cu.expire(cands_doc)
+        selected = cu.select_for_digest(cands_doc, published_ids, cu.source_policy(decisions))
+        if selected:
+            digest_id = cu.new_digest_id(cu.utcnow(), [c["id"] for c in selected])
+    except Exception as ex:
+        print(f"AVISO: candidatas no disponibles ({type(ex).__name__}); el resumen sale sin ellas.")
+        selected, digest_id = [], None
+
     today = datetime.now(timezone(timedelta(hours=1))).strftime("%d-%m-%Y")
-    body = render(new, today)
-    subject = f"Bitácora CabraSpace · {len(new)} novedad{'es' if len(new) != 1 else ''} · {today}"
-    print(f"{len(new)} entradas nuevas.")
+    body = render(new, today, selected, digest_id)
+    subject = f"Bitácora CabraSpace · {len(new)} novedad{'es' if len(new) != 1 else ''}"
+    if selected:
+        subject += f" · {len(selected)} candidata{'s' if len(selected) != 1 else ''}"
+    subject += f" · {today}" + (f" [{digest_id}]" if digest_id else "")
+    print(f"{len(new)} entradas nuevas, {len(selected)} candidatas.")
     for r in new:
         print(f"  [{r['group']}] {r['title'][:90]}")
 
@@ -170,8 +272,15 @@ def main():
         print("ERROR: faltan GMAIL_APP_PASSWORD o RESUMEN_USER; no se envía.")
         return 1
 
-    send(subject, body, user, to, password)
+    send(subject, body, user, to, password, render_text(new, selected, digest_id, today), digest_id)
     print(f"Correo enviado: «{subject}»")
+
+    # Candidatas: registrar QUÉ número era cada una en ESTE correo (la respuesta se mapea con esto).
+    if digest_id and cands_doc is not None:
+        digests = cu.load_digests(cu.DIGESTS_FILE)
+        cu.register_digest(digests, cands_doc, digest_id, selected)
+        cu.save_json(cu.DIGESTS_FILE, digests)
+        cu.save_json(cand_path, cands_doc)
 
     # Estado: todo lo actual queda como enviado (incluido lo no seleccionado en la 1.ª ejecución).
     ids = [r["id"] for r in rows]
