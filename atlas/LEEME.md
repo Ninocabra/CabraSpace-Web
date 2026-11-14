@@ -385,3 +385,9 @@ rediseñar cada interior (D6).
 `tools/atlas2/carta_capricornio.py` lo ESCRIBE y `atlas2.css` define `.grab-cupula` con `cupula.svg`); no es retirable sin tocar el generador.
 **Publicar:** igual que en F6 (fusión en `main`, cadena, comprobadores). El `?v=20261114b` ya está en las 52 páginas con cabecera.
 
+## Menores 6g y 6i (14-11-2026, rama `menores-1114b`, desde `main`)
+
+`VERSION` de `sync_nav.py` = `20261114c` (las 52 páginas con cabecera cambian solo el `?v=`). Todo en `atlas/tools-base.css`.
+- **6g** Mapa de Contaminación (ES/EN): la cabecera toma el `--gx` del interior (80/40/18 px a >1100 / ≤1100 / ≤700) y el ancho `980 + 2·--gx`, con `.pag-wrap:has(+ .filete + .cm-maps)`. Borde izquierdo del título = el de la primera tarjeta: 1440 px 100,2→230 (tarjeta 230); 1040 px 81,7→90,5 (90,5); 375 px 39→41 (41). Efecto colateral: a 1440 la columna de texto es más estrecha y el título pasa de 2 a 3 líneas.
+- **6i** Astro Forecast en modo noche: `body.night-vision` lleva el verde de «Abierto», el rojo claro de «Cerrado» previsto, el ámbar de «sin dato», los valores de sensor bien/alerta, las etiquetas de objeto y los puntos del semáforo (`.aw-light .dot`, `.cuenta i`) a la escala roja. Se distinguen por brillo y forma: abierto/bien = `#ff6a5a` macizo; intermedio = medio relleno; cerrado/mal = anillo apagado. Día sin cambios (estilos calculados idénticos). Sigue en color en noche: la leyenda `.aw-key .sw i` (azules/amarillo de la cúpula) y bordes dorados translúcidos.
+
