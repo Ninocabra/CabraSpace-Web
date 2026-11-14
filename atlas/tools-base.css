@@ -59,6 +59,14 @@ main.cat-main .btn.btn-primary:hover { background: var(--gold-light); border-col
 @media (max-width: 600px) { .pag-wrap:has(+ .filete + .aw-section) { padding-left: 16px; padding-right: 16px; } }
 @media (max-width: 480px) { .pag-wrap:has(+ .filete + main.container:not(.piw-container)) { padding-left: 16px; padding-right: 16px; } }
 
+/* ---------- 6g (14-11-2026): cabecera del mapa de Contaminación alineada con su interior (Atlas I) ----------
+   El interior es .cm-maps de tools.css: 980 px de contenido + padding --gx de 80/40/18 px (los de atlas.css, declarados arriba para
+   .cm-maps; el --gx de atlas2.css, clamp(16px, 3vw, 44px), es el de la cabecera). El titulo empezaba en 100 px y la primera tarjeta
+   en 230 (a 1440); a 1040, 81,7 frente a 90,5. La cabecera toma el mismo --gx y el mismo ancho total (980 + 2 x --gx). */
+.pag-wrap:has(+ .filete + .cm-maps) { --gx: 80px; max-width: calc(980px + 2 * var(--gx)); }
+@media (max-width: 1100px) { .pag-wrap:has(+ .filete + .cm-maps) { --gx: 40px; } }
+@media (max-width: 700px) { .pag-wrap:has(+ .filete + .cm-maps) { --gx: 18px; } }
+
 /* ---------- 6d/6e (14-11-2026): modo noche del interior ----------
    Insignias de nivel de Cursos (verde/azul/rojo fijos) y contadores de las pestañas (dorado fijo): paleta de penumbra.
    Lienzos (PixelMath-teca, Astro Forecast: mapa de nubes y boveda/cupula) y las barras de Astro Forecast (franjas de la noche y
@@ -68,3 +76,22 @@ body.night-vision .video-level-badge { color: var(--gold2); background: rgba(196
 body.night-vision .category-tab.active { background: rgba(196, 33, 22, .1); box-shadow: none; }
 body.night-vision .category-tab.active .category-count { background: rgba(196, 33, 22, .2); }
 body.night-vision canvas, body.night-vision .aw-franja .barra, body.night-vision .aw-timeline .track { filter: url(#cb-noche); }
+
+/* ---------- 6i (14-11-2026): estados semanticos de Astro Forecast en modo noche ----------
+   El verde de «Abierto», el rojo claro de «Cerrado» previsto, el ambar de «sin dato» y los puntos del semaforo (verde/ambar/rojo)
+   seguian en color y destrozaban la vision nocturna. Todo pasa a la escala roja de penumbra, y los estados se distinguen por brillo
+   y por forma, no por tono: abierto/bien = claro y macizo; intermedio = medio relleno; cerrado/mal = anillo apagado. La cupula ya
+   distingue abierta (rendija con estrellas) de cerrada (costura) por dibujo; la palabra lo dice con texto. Dia sin cambios. */
+body.night-vision .aw-sem-col.ok { color: #ff6a5a; }
+body.night-vision .aw-sem-col.no { color: #a8281d; }
+body.night-vision .aw-sem-col.sin, body.night-vision .aw-sem-col.sin .pie, body.night-vision .aw-sem-col.sin .pie .n { color: #d8402f; }
+body.night-vision .aw-cupula circle { fill: currentColor; }
+body.night-vision .aw-sensor.good .v { color: #ff6a5a; }
+body.night-vision .aw-sensor.alert .v { color: #a8281d; }
+body.night-vision .aw-tag.ok, body.night-vision .aw-results button .h i.ok { color: #ff6a5a; }
+body.night-vision .aw-tag.mid, body.night-vision .aw-results button .h i.mid { color: #c4382c; }
+body.night-vision .aw-tag.low, body.night-vision .aw-results button .h i.low { color: #7d2119; }
+/* puntos: macizo claro / medio relleno / anillo apagado */
+body.night-vision .aw-light.verde .dot, body.night-vision .aw-lane-row.fold > summary .cuenta i.verde { background: #ff6a5a; box-shadow: 0 0 8px rgba(255, 106, 90, .45); }
+body.night-vision .aw-light.ambar .dot, body.night-vision .aw-lane-row.fold > summary .cuenta i.ambar { background: linear-gradient(90deg, #d8402f 50%, transparent 50%); box-shadow: inset 0 0 0 1.5px #d8402f; }
+body.night-vision .aw-light.rojo .dot, body.night-vision .aw-lane-row.fold > summary .cuenta i.rojo { background: transparent; box-shadow: inset 0 0 0 1.5px #8f2118; }
