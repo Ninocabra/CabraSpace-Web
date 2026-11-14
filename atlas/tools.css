@@ -1,6 +1,6 @@
 /* ==========================================================================
    Herramientas web en estilo Atlas: CabraSpace Web, AutoGHS y PixelMath-teca.
-   Se carga después de atlas/atlas.css (lo enlaza tools/sync_nav.py) y SOLO cambia el aspecto:
+   Se carga después de atlas2.css y tools-base.css (lo enlaza tools/sync_nav.py) y SOLO cambia el aspecto:
    ningún id, ninguna clase que lea el JavaScript, ningún tamaño que use el lienzo.
    ========================================================================== */
 

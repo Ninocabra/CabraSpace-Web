@@ -130,4 +130,25 @@
     var onWide = function () { if (mq.matches && !drawer.hidden) set(false); };
     if (mq.addEventListener) mq.addEventListener('change', onWide); else window.addEventListener('resize', onWide);
   });
+
+  // ---- 5. cartelas (6f, 14-11-2026): el rotulo (.cartela-l) solo se oculta cuando la cartela no cabe en su columna.
+  // Antes lo ocultaban umbrales fijos por numero de caracteres (atlas2.css §17), que quitaban el rotulo antes de hacer falta.
+  // html.fit-js desactiva esos umbrales (siguen valiendo sin JavaScript); .cartela--corta oculta el rotulo.
+  var cartelas = [].slice.call(document.querySelectorAll('.cartela .cartela-l')).map(function (l) { return l.parentNode; });
+  if (cartelas.length) {
+    document.documentElement.classList.add('fit-js');
+    var fit = function () {
+      cartelas.forEach(function (c) { c.classList.remove('cartela--corta'); });   // todas con rotulo, y despues se mide
+      cartelas.forEach(function (c) {
+        var p = c.parentNode, ps = getComputedStyle(p), cs = getComputedStyle(c);
+        var libre = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+        var pide = c.offsetWidth + parseFloat(cs.marginLeft) + parseFloat(cs.marginRight);   // el margen aloja las asas
+        if (pide > libre + 0.5) c.classList.add('cartela--corta');
+      });
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }
 })();

@@ -7,7 +7,7 @@
 | `atlas/atlas2-marco.css` | **Desde F2 (12-11-2026): el marco de las 54 páginas** — tokens, variables heredadas, hoja con orla, cabecera con su cajón móvil, pie y modo noche (penumbra). Se carga la ÚLTIMA. Ver «Convivencia de hojas» abajo. |
 | `atlas/atlas2.js` | **Desde F2: el único script de cabecera** — orla, filtro de noche, modo noche (clave `night-vision` de siempre) y cajón móvil. Sustituye a `atlas/atlas.js` en todas las páginas. |
 | `atlas/atlas2.css` | Componentes del INTERIOR de Atlas II (láminas, herramientas, bitácora…). **Lo cargan las 30 páginas generadas** (F3 portada e índices, F4 las 20 láminas), después del marco; **desde F5a también las 10 páginas de las 5 herramientas** (ES y EN); **desde F5b también los 5 catálogos** (ES y EN). |
-| `atlas/atlas.css` | Capa de Atlas I. Sigue cargada en las 22 páginas sin interior nuevo (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; desde F5a/F5b las 20 a mano llevan la cabecera nueva pero conservan esta hoja; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (siguen en la hoja: F6 NO la retira, ver «F6»). |
+| `atlas/atlas.css` | **RETIRADA el 14-11-2026 (rama `limpieza-1114`; ver «Limpieza 14-11-2026» al final): `git rm`, sus reglas vivas están al final de `index.css`.** Texto histórico: capa de Atlas I. Seguía cargada en las 22 páginas sin interior nuevo (contadas el 12-11-2026: las 20 a mano más `cabrascripts` ES/EN; desde F5a/F5b las 20 a mano llevan la cabecera nueva pero conservan esta hoja; las 2 redirecciones `pi-workflow` no cargan ninguna hoja): su interior (`.a3 …`, `--gx`, `.card`, `.plate`…) depende de ella. Las 30 generadas ya no la cargan. (F5a: las 10 de las herramientas la siguen cargando, ver «F5a».) Sus reglas de cabecera/cajón/pie (`.ah`, `.ad`, `.af`) ya no casan con nada (siguen en la hoja: F6 NO la retira, ver «F6»). |
 | `atlas/capricornus2.js` · `atlas/armilar.js` | (F3) Capricornio animada y esfera armilar de la portada. La figura SVG la escribe `build_atlas.py` con `tools/atlas2/carta_capricornio.py` (ver `tools/atlas2/LEEME.md`). |
 | `atlas/atlas.js` | **Borrado en F6** (`git rm`; sigue en el historial). Era el script de cabecera de Atlas I; ninguna página lo cargaba desde F2. Si algún día vuelve: no cargarlo junto a `atlas2.js`, los dos alternarían el modo noche. |
 | `atlas/astroforecast.css` | Paneles Atlas de Astro Forecast (desde F5a la cabecera es la de `atlas2.css`; se carga después de `atlas2.css`). |
@@ -283,7 +283,7 @@ Todos cuelgan de **III Bitácora** en el menú (`SECTIONS` de `sync_nav.py`) y l
 - **NO borrado a propósito**: `atlas/img/cupula.svg` (lo usa `atlas/atlas2-muestra.html`, `.grab-cupula`); `atlas.css`, `index.css`, `tools.css`
   (las herramientas aún dependen de ellas).
 
-**Qué queda** (inventario para una limpieza posterior, por coincidencia estática de nombres de clase, no medida):
+**Qué queda** (inventario escrito en F6; **superado por «Limpieza 14-11-2026» al final**: `atlas.css` y `support.css` ya no existen y `index.css` está purgada; por coincidencia estática de nombres de clase, no medida):
 
 | Hoja | Páginas que la cargan | Clases que casan con alguna de esas páginas |
 |---|---|---|
@@ -325,3 +325,63 @@ El 13-11-2026 la fusión en seco (`git merge-tree`) salió limpia: `main` llevab
 
 **Volver atrás**: `git log --merges -1` da el commit de fusión; `git revert -m 1 <hash>` y `git push origin main`. Los robots solo tocan JSON
 y no estorban. Ojo: tras revertir, para volver a fusionar `atlas2` hay que revertir antes el propio revert.
+
+## Menores 6a-6f (14-11-2026, rama `menores-1114`)
+
+`VERSION` de `sync_nav.py` = `20261114a` (`A2_ASSET_V` sigue en `20261113a`: `armilar.js` y `capricornus2.js` no cambiaron).
+- **6a** `tools-base.css`: `.pag-wrap` toma el ancho y el padding del interior (AutoGHS y catalogos 1050/24 px, Astro Forecast 1028/24, PixelMath-teca solo padding) con `:has(+ .filete + …)`. La cabecera de CabraSpace Web (cockpit) y las del mapa de Contaminacion (interior Atlas I de 80/40/18 px) no se tocan.
+- **6b** `atlas2.css` §17: la regla de `prefers-reduced-motion` ya no alcanza al interior de las herramientas (`main.container`, `.aw-section`, `.cm-maps`): sigue apagando transiciones y animaciones del marco y de las paginas de Atlas II. (Corrige lo que aqui se daba por «no neutralizable».)
+- **6c** `cursos-youtube-en.html`: `relativeEn()` traduce al pintar «hace 2 a» / «Emitido hace 7 m» (`youtube_courses.json` guarda el texto de YouTube en español).
+- **6d/6e** `tools-base.css`: insignias de nivel y contadores de Cursos en la paleta de penumbra; `canvas` y las barras de Astro Forecast con el filtro `#cb-noche`. Siguen en color: el verde/amarillo semantico de «Abierto/Cerrado» y los puntos de Astro Forecast, y los iframes que no se pueden estilar.
+- **6f** `atlas2.js` §5 + `atlas2.css`: el rotulo de la cartela se oculta solo si no cabe en su columna (`html.fit-js`, `.cartela--corta`); los umbrales por caracteres quedan solo como respaldo sin JavaScript.
+
+## Limpieza 14-11-2026 (rama `limpieza-1114`, desde `menores-1114`): `atlas.css` retirada, `index.css` purgada
+
+**Estado nuevo.** Las 22 páginas que aún llevaban hojas viejas (las 20 a mano + `cabrascripts` ES/EN) ya NO cargan `atlas/atlas.css` ni `support.css`:
+- `atlas/atlas.css` y `support.css`: `git rm` (siguen en el historial). `support.css` no tenía NINGUNA regla viva (ninguna clase suya aparece en el
+  HTML ni en el JS de esas 20 páginas: modal de pago y tarjetas de apoyo de una versión antigua).
+- `index.css` (sigue en las 22): purgada, y **lleva al final «Capa de Atlas I»**: las reglas de `atlas.css` que aún casan con algo (61 selectores de 258:
+  `:root` de tokens, `body{background,color}`, `.grid-overlay/.radial-glow{display:none!important}`, `:is(.a3…) .btn/.card/.ghost/.chip/.tile…` del mapa de
+  Contaminación, `footer.af`…). Va AL FINAL de `index.css` porque `atlas.css` se cargaba justo después de `index.css`: se conserva el orden de cascada y,
+  como no se movió nada por detrás de `atlas2-marco.css`/`atlas2.css`, no hizo falta tocar `tools-base.css`. Sus `url(img/…)` pasaron a `url(atlas/img/…)`
+  (la hoja estaba en `atlas/`; `index.css` está en la raíz y `img/` de la raíz es otra carpeta).
+- `atlas/tools.css`: **0 reglas muertas** (112 selectores, todos con elemento en alguna de sus 8 páginas). No se tocó el contenido (solo un comentario).
+- `tools/sync_nav.py` (`VERSION = 20261114b`): ya no escribe `atlas.css`; quita un enlace suelto; las páginas sin interior Atlas II colocan fuente y marco
+  tras su última hoja local; y `index.css?v=` toma el `?v=` de `VERSION` (antes era `?v=1.4` a mano: sin esto, un visitante con la caché vieja de
+  `index.css` vería la purga a medias).
+- Bytes (blobs del repo, LF): `index.css` 33 989 + `atlas.css` 27 401 + `support.css` 6 198 = 67 588 → `index.css` 21 074. **−46 514 bytes (−68,8 %).**
+  Selectores muertos eliminados: 152 de `index.css`, 197 de `atlas.css`, 37 de `support.css`.
+
+**Cómo se decidió qué está muerto** (herramientas en `propuestas-estetica/limpieza-1114/instrumento/`, copiadas de la carpeta de trabajo):
+1. *Etapa 1, estática.* Un selector está vivo si cada clase/id/etiqueta/atributo `data-`/`aria-` que exige aparece en el HTML de las páginas que cargan esa hoja
+   (solo valores de `class="…"`, `id`, etiquetas y atributos; NO el texto visible, que hizo falta excluir: «ad», «card», «row» son palabras corrientes) o en
+   alguna cadena de su JavaScript (clases que el JS crea; también `'prefijo-' + x`). `:is()/:where()` se expanden; `:not()`, `:has()` y pseudo-clases no exigen nada.
+2. *Etapa 2, DOM real.* Los selectores vivos de la etapa 1 se relajan (se quitan clases/ids que el JS puede cambiar, atributos y pseudo-clases) y se buscan con
+   `querySelector` en las 22 páginas cargadas en Chrome (1440 px): los que no casan con ningún elemento se tiran (11 de `atlas.css`, 4 de `index.css`:
+   `.ti*`, `.dashboard-item h4`, `body.night-vision video`…).
+3. Se conservan `@import` y `@font-face`, y un `@keyframes` solo si su nombre se usa. Los selectores con estado (`:hover`, `.open`, `.scrolled`…) se juzgan por su base.
+Qué NO se ha hecho: quitar reglas que casan con elementos pero están pisadas por otra hoja (no se puede probar para todos los estados: hover, foco, JS); las variables
+CSS sin uso de `:root` (inofensivas).
+
+**Verificación** (rama contra `git archive menores-1114` servida aparte; 54 páginas × 375/1040/1440 px × día/noche = 324 configuraciones por lado; Chrome sin cabeza por
+CDP): por elemento, hash de TODAS las propiedades calculadas (≈350 por elemento, `--*` ordenadas, px a 0,1) + su rectángulo + `::before/::after` con contenido, comparando
+`querySelectorAll('*')` sin los `<link>`. Se bloquea todo lo que no es `127.0.0.1` (Google Fonts, CDN, teselas, APIs) y se llevan las animaciones finitas a su final y
+las infinitas a 0, para que dos cargas iguales den lo mismo.
+- **Control cero visto fallar (el instrumento no es determinista del todo):** antes contra antes (dos cargas del mismo código) da diferencias en 11 configuraciones de estilo y
+  39 de píxeles (portada y `en`: el Capricornio de `capricornus2.js` está animado por JS; Contaminación: animaciones de entrada que mueven 1 px las tarjetas; Astro
+  Forecast: datos en vivo bloqueados, nº de elementos variable). Una primera versión del instrumento (sin bloquear red ni esperar a `atlas2.js`) daba 47 y 97: el control
+  es lo que obligó a arreglarlo.
+- **Control positivo:** inyectar `letter-spacing:.3px` en `main`/`.container` cambia entre el 87 % y el 99 % de los elementos de 5 páginas: el instrumento ve cualquier
+  cambio de estilo.
+- **Resultado, 22 páginas tocadas × 12 configuraciones: 0 diferencias de estilo calculado** (y 0 en el resto salvo el Capricornio animado de portada y `en`, idéntico al
+  control). Píxeles: el máximo está en Contaminación (≈250 000 px distintos), igual de grande entre dos cargas de la MISMA versión (A-A hasta 125 000 en ese mismo
+  caso; con 5 cargas «antes» y 4 «después» hay pares A-B con 0 píxeles distintos). Montaje de las 3 páginas con más diferencia, mirado: idénticas a simple vista.
+- `node tools/check_site.mjs --baseline tools/check_site_baseline.json`: 0 fallos (54 páginas, 155 URLs locales). `python tools/check_relatos.py`: 10/10.
+  La cadena `build_atlas → sync_nav → seo_inject` es idempotente (mismo `git diff` al repetirla).
+
+**Páginas que se quedan con hojas viejas:** ninguna con `atlas.css`/`support.css`. Las 22 siguen con `index.css` (purgada) y 8 con `tools.css`: se retiran al
+rediseñar cada interior (D6).
+**`atlas/img/cupula.svg` y `atlas2-muestra.html` se quedan:** `atlas2-muestra.html` es el muestrario del sistema (`noindex`, ningún enlace del sitio lo apunta, pero
+`tools/atlas2/carta_capricornio.py` lo ESCRIBE y `atlas2.css` define `.grab-cupula` con `cupula.svg`); no es retirable sin tocar el generador.
+**Publicar:** igual que en F6 (fusión en `main`, cadena, comprobadores). El `?v=20261114b` ya está en las 52 páginas con cabecera.
+

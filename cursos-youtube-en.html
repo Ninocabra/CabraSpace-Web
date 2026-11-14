@@ -7,8 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YouTube PixInsight Courses - CabraSpace</title>
   <meta name="description" content="Learn astrophotography processing in PixInsight for free with our curated database of YouTube lessons ordered by difficulty level.">
-  <link rel="stylesheet" href="index.css?v=1.4">
-  <link rel="stylesheet" href="support.css">
+  <link rel="stylesheet" href="index.css?v=20261114b">
   <style>
     /* Specific styles for YouTube Courses Page */
     /* Video Grid */
@@ -418,11 +417,10 @@
   <meta name="twitter:image" content="https://cabraspace.com/logo.png">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "url": "https://cabraspace.com/cursos-youtube-en.html", "name": "YouTube PixInsight Courses - CabraSpace", "description": "Learn astrophotography processing in PixInsight for free with our curated database of YouTube lessons ordered by difficulty level.", "inLanguage": "en", "isPartOf": {"@type": "WebSite", "@id": "https://cabraspace.com/#website", "name": "CabraSpace", "url": "https://cabraspace.com/", "inLanguage": ["es", "en"], "about": [{"@type": "Thing", "name": "Astronomy"}, {"@type": "Thing", "name": "Astrophotography"}, {"@type": "Thing", "name": "Exoplanet transits"}, {"@type": "Thing", "name": "Image processing"}]}}</script>
   <!-- SEO-AUTO-END -->
-  <link rel="stylesheet" href="atlas/atlas.css?v=20261113a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap">
-  <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261113a">
-  <link rel="stylesheet" href="atlas/atlas2.css?v=20261113a">
-  <link rel="stylesheet" href="atlas/tools-base.css?v=20261113a">
+  <link rel="stylesheet" href="atlas/atlas2-marco.css?v=20261114b">
+  <link rel="stylesheet" href="atlas/atlas2.css?v=20261114b">
+  <link rel="stylesheet" href="atlas/tools-base.css?v=20261114b">
 </head>
 <body>
   <!-- FOUC Preventer for Night Mode -->
@@ -692,6 +690,15 @@
         return num + ' views';
       }
 
+      // youtube_courses.json keeps YouTube's Spanish text ("hace 2 a", "Emitido hace 7 m"): shown here in English.
+      const REL_UNIT = { a: 'year', m: 'month', sem: 'week', d: 'day', h: 'hour' };
+      function relativeEn(s) {
+        const m = /^(Emitido )?hace (\d+) (a|m|sem\.?|d|h)$/.exec((s || '').trim());
+        if (!m) return s || 'Recent';
+        const n = +m[2], u = REL_UNIT[m[3].replace('.', '')];
+        return (m[1] ? 'Streamed ' : '') + n + ' ' + u + (n === 1 ? '' : 's') + ' ago';
+      }
+
       function renderActiveVideos() {
         const filtered = getFilteredVideos();
         const total = filtered.length;
@@ -745,7 +752,7 @@
               <p class="video-summary" title="${video.summary_en}">${video.summary_en}</p>
               <div class="video-meta-row">
                 <span class="video-author">${video.author}</span>
-                <span class="video-date">${video.published_relative || 'Recent'}</span>
+                <span class="video-date">${relativeEn(video.published_relative)}</span>
               </div>
               <div class="video-footer">
                 <span class="video-views">${formattedViewsStr}</span>
@@ -803,6 +810,6 @@
   <script src="index.js"></script>
   
   
-  <script src="atlas/atlas2.js?v=20261113a"></script>
+  <script src="atlas/atlas2.js?v=20261114b"></script>
 </body>
 </html>

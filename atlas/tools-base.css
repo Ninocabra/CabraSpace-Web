@@ -10,7 +10,7 @@
    (Astro Forecast), .cm-maps (Contaminación, mapa).
    F5b (13-11-2026): la cargan también los 5 catálogos (Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guías de
    Contaminación; ES y EN), cuya cabecera es la misma .pag-cab. Sus reglas propias están al final («Catálogos»).
-   Se borra, con atlas.css e index.css, cuando se rediseñe el interior de cada herramienta (D6).
+   Se borra, con index.css, cuando se rediseñe el interior de cada herramienta (D6). (atlas.css se retiró el 14-11-2026.)
    ========================================================================== */
 
 /* body{font-size:16px} de atlas2.css pisaba el de <html> (CabraSpace Web lo fija en 15 px y todo su rem cuelga de él) */
@@ -47,3 +47,24 @@ aside.podcast-sidebar { top: 24px; }
    texto en tinta, gap, alto mínimo y transición) lo pisaba. Se devuelve lo de index.css, también al pasar el ratón. */
 main.cat-main .btn.btn-primary { border: 1px solid var(--gold-primary); color: var(--bg-color); gap: normal; min-height: 0; transition: var(--transition-smooth); }
 main.cat-main .btn.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); box-shadow: 0 0 25px var(--gold-glow); }
+
+/* ---------- 6a (14-11-2026): la cabecera se alinea con la columna del interior ----------
+   .pag-wrap (atlas2.css: ancho de --wrap con padding --gx) era mas ancha que el interior de AutoGHS y los catalogos
+   (main.container: 1050 px con 24 px de padding, 16 por debajo de 480) y que el panel de Astro Forecast (980 px), asi que el borde
+   izquierdo de miga/titulo no coincidia (a 1440: 100 px frente a 219; a 1040: 81,7 frente a 74,5). La columna de la cabecera
+   toma el ancho y el padding del interior. PixelMath-teca (main de 1320 px) solo iguala el padding. Sin :has() queda como estaba. */
+.pag-wrap:has(+ .filete + main.container:not(.piw-container)) { max-width: 1050px; padding-left: 24px; padding-right: 24px; }
+.pag-wrap:has(+ .filete + main.container:has(aside.simulator-card)) { max-width: 1326px; }
+.pag-wrap:has(+ .filete + .aw-section) { max-width: 1028px; padding-left: 24px; padding-right: 24px; }   /* 980 del panel + 2 x 24 */
+@media (max-width: 600px) { .pag-wrap:has(+ .filete + .aw-section) { padding-left: 16px; padding-right: 16px; } }
+@media (max-width: 480px) { .pag-wrap:has(+ .filete + main.container:not(.piw-container)) { padding-left: 16px; padding-right: 16px; } }
+
+/* ---------- 6d/6e (14-11-2026): modo noche del interior ----------
+   Insignias de nivel de Cursos (verde/azul/rojo fijos) y contadores de las pestañas (dorado fijo): paleta de penumbra.
+   Lienzos (PixelMath-teca, Astro Forecast: mapa de nubes y boveda/cupula) y las barras de Astro Forecast (franjas de la noche y
+   linea de tiempo): el mismo filtro #cb-noche que las fotos (luminancia -> canal rojo). Sin opacity: las dos capas de la
+   boveda se apilan y bajarian a la vez. Los reproductores de terceros (iframe de Coffee Break) ya los filtra atlas2-marco.css. */
+body.night-vision .video-level-badge { color: var(--gold2); background: rgba(196, 33, 22, .1); border-color: rgba(196, 33, 22, .35); }
+body.night-vision .category-tab.active { background: rgba(196, 33, 22, .1); box-shadow: none; }
+body.night-vision .category-tab.active .category-count { background: rgba(196, 33, 22, .2); }
+body.night-vision canvas, body.night-vision .aw-franja .barra, body.night-vision .aw-timeline .track { filter: url(#cb-noche); }

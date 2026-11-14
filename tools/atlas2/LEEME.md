@@ -119,5 +119,6 @@ Detalle, pasos para publicar y vuelta atrás: `atlas/LEEME.md` («F6»). Resumen
 (`build_atlas.py`) = `20261113a`; `.pag-cab--par` en una columna por debajo de 1040 px; borrados `atlas/atlas.js`, `tools/capricornus.py` y
 `.dashboard-section` de `index.css`; `cupula.svg` se queda (lo usa `atlas2-muestra.html`). `tools/atlas2/p3/laminas.py` sigue escribiendo
 `cupula.svg` por defecto (es su generador, no se tocó).
-**Pendiente tras F6** (a propósito): retirar `atlas.css` y purgar `index.css`/`tools.css` (las herramientas dependen de ellas; hace falta
-rediseñar cada interior, D6); `publish_from_inbox.py` sin llamar a `miniaturas.py`; superíndices de las llamadas con objetivo táctil pequeño.
+**Pendiente tras F6** (a propósito): ~~retirar `atlas.css` y purgar `index.css`/`tools.css`~~ (hecho el 14-11-2026 en `limpieza-1114`: `atlas.css` y
+`support.css` retiradas, `index.css` purgada y con la capa de Atlas I al final, `tools.css` sin reglas muertas; ver `atlas/LEEME.md`, «Limpieza 14-11-2026»;
+lo que queda de `index.css` se borra al rediseñar cada interior, D6); `publish_from_inbox.py` sin llamar a `miniaturas.py`; superíndices de las llamadas con objetivo táctil pequeño.
