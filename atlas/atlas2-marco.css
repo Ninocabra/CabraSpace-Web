@@ -5,7 +5,7 @@
    (laminas, herramientas, bitacora, formularios...) y NECESITA esta hoja cargada antes.
 
    CONVIVENCIA (por que esta hoja se puede cargar sobre paginas que aun no se han migrado)
-     Orden en <head> (lo pone tools/sync_nav.py):  index.css · [support.css ...] · atlas/atlas.css ·
+     Orden en <head> (lo pone tools/sync_nav.py):  index.css (con la capa de Atlas I al final; atlas.css y support.css se retiraron el 14-11-2026) ·
        [capa EXTRA_CSS: tools.css / astroforecast.css] · IM Fell English · ESTA HOJA (la ultima).
      - Todos los selectores son del marco y solo del marco: .hoja .hoja-in .orla .esq, .cab ...
        (cabecera, con id="navbar"), .cab-cajon (#atlas-drawer) y footer.pie. Ninguna regla de

@@ -10,7 +10,7 @@
    (Astro Forecast), .cm-maps (Contaminación, mapa).
    F5b (13-11-2026): la cargan también los 5 catálogos (Equipamiento, Novedades, Cursos YouTube, Coffee Break y las guías de
    Contaminación; ES y EN), cuya cabecera es la misma .pag-cab. Sus reglas propias están al final («Catálogos»).
-   Se borra, con atlas.css e index.css, cuando se rediseñe el interior de cada herramienta (D6).
+   Se borra, con index.css, cuando se rediseñe el interior de cada herramienta (D6). (atlas.css se retiró el 14-11-2026.)
    ========================================================================== */
 
 /* body{font-size:16px} de atlas2.css pisaba el de <html> (CabraSpace Web lo fija en 15 px y todo su rem cuelga de él) */

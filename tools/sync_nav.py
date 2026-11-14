@@ -3,15 +3,14 @@ Fuente única del MARCO (estilo Atlas II) de TODAS las páginas: hoja con orla, 
 móvil y pie. Desde F2 de la migración (12-11-2026).
 
 Qué hace en cada *.html de la raíz (idempotente: re-ejecutar no cambia nada):
-  - <head>: asegura, en este orden, atlas/atlas.css?v=  ·  [capa EXTRA_CSS]?v=  ·  fuente IM Fell English
-    ·  atlas/atlas2-marco.css?v=  (la última: el marco gana a index.css/atlas.css solo en lo suyo; ver la
+  - <head>: asegura, en este orden, las hojas propias de la página (index.css…)  ·  [capa EXTRA_CSS]?v=  ·  fuente
+    IM Fell English  ·  atlas/atlas2-marco.css?v=  (la última: el marco gana a index.css solo en lo suyo; ver la
     cabecera de atlas/atlas2-marco.css, «CONVIVENCIA»).
-    Páginas con INTERIOR Atlas II (desde F3: las que enlazan atlas/atlas2.css, hoy las 10 que genera
-    build_atlas.py con el interior nuevo): NO se les añade atlas.css; el orden es fuente IM Fell English ·
-    atlas2-marco.css?v= · atlas2.css?v= (el interior, después del marco). Las demás quedan igual que en F2.
-    F5a: las 10 páginas de las 5 herramientas también enlazan atlas2.css (cabecera Atlas II) pero SIGUEN con
-    atlas.css (el de siempre, con ?v=) y con su capa EXTRA_CSS (lista: tools-base.css + tools.css / astroforecast.css),
-    que va DESPUÉS de atlas2.css: atlas.css · fuente · marco · atlas2.css · capas.
+    Páginas con INTERIOR Atlas II (desde F3: las que enlazan atlas/atlas2.css, hoy las que genera
+    build_atlas.py y las 20 a mano): el orden es fuente IM Fell English · atlas2-marco.css?v= · atlas2.css?v=
+    (el interior, después del marco) · capa EXTRA_CSS (tools-base.css + tools.css / astroforecast.css).
+    atlas/atlas.css se RETIRÓ el 14-11-2026 (limpieza-1114): sus reglas vivas están ahora al final de index.css, y un
+    enlace suelto a atlas.css se quita. index.css lleva el mismo ?v= que el resto (VERSION).
   - Sustituye el <header id="navbar">…</header> por la cabecera Atlas II (ES o EN). El cajón móvil
     (#atlas-drawer) va DENTRO de la cabecera; el cajón viejo <div class="ad" id="atlas-drawer"> se quita.
   - Quita el antiguo <div class="mobile-menu-overlay">.
@@ -35,7 +34,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "20261114a"
+VERSION = "20261114b"
 TWIN_OVERRIDES = {"index.html": "en.html", "en.html": "index.html"}
 SKIP = {"pi-workflow.html", "pi-workflow-en.html"}          # redirecciones sin cabecera
 SKIP_PREFIX = ("borrador-",)                                 # borradores de diseño
@@ -235,7 +234,6 @@ def footer(fname):
         f'  </footer>')
 
 
-CSS_LINK = f'<link rel="stylesheet" href="atlas/atlas.css?v={VERSION}">'
 FONT_LINK = f'<link rel="stylesheet" href="{FONT_HREF}">'
 MARCO_LINK = f'<link rel="stylesheet" href="atlas/atlas2-marco.css?v={VERSION}">'
 JS_TAG = f'<script src="atlas/atlas2.js?v={VERSION}"></script>'
@@ -245,7 +243,9 @@ header_re = re.compile(r'<header id="navbar"[^>]*>.*?</header>', re.S)
 drawer_re = re.compile(r'\s*<div class="ad" id="atlas-drawer" hidden>.*?\n  </div></div>', re.S)   # cajón de Atlas I
 overlay_re = re.compile(r'\s*<div class="mobile-menu-overlay"[^>]*>\s*</div>', re.S)
 footer_re = re.compile(r'<footer\b[^>]*>.*?</footer>', re.S)
-css_re = re.compile(r'<link rel="stylesheet" href="atlas/atlas\.css[^"]*">')
+# atlas/atlas.css was retired on 14-11-2026 (limpieza-1114); css_re only removes a stale link (and its line)
+css_re = re.compile(r'[ \t]*<link rel="stylesheet" href="atlas/atlas\.css[^"]*">[ \t]*\r?\n?')
+idx_re = re.compile(r'(<link rel="stylesheet" href="index\.css)(?:\?v=[^"]*)?(">)')
 A2_LINK = f'<link rel="stylesheet" href="atlas/atlas2.css?v={VERSION}">'
 a2_re = re.compile(r'<link rel="stylesheet" href="atlas/atlas2\.css[^"]*">')       # interior Atlas II (F3)
 marco_re = re.compile(r'[ \t]*<link rel="stylesheet" href="(?:atlas/atlas2-marco\.css[^"]*|' + re.escape(FONT_HREF) + r')">[ \t]*\r?\n?')
@@ -265,31 +265,32 @@ def process(fname, txt):
         txt = a2_re.sub(A2_LINK, txt)
         txt = marco_re.sub("", txt)
         block = FONT_LINK + "\n  " + MARCO_LINK + "\n  " + A2_LINK
-        # F5: the hand-made tool pages with Atlas II header keep atlas.css (grid-overlay, .a3 cards; F6 removes it) and
-        # their EXTRA_CSS layer, which must come AFTER atlas2.css (it restores the tool interior over atlas2's base).
-        # Both links keep ?v=VERSION. Pages without them (F3/F4) are untouched.
-        if css_re.search(txt):
-            txt = css_re.sub(CSS_LINK, txt)
+        # F5: the hand-made tool pages with Atlas II header keep their EXTRA_CSS layer, which must come AFTER atlas2.css
+        # (it restores the tool interior over atlas2's base). The link keeps ?v=VERSION. Pages without it (F3/F4) are
+        # untouched. atlas.css was retired on 14-11-2026 (limpieza-1114): a stale link is removed.
+        txt = css_re.sub("", txt)
         base = fname[:-len("-en.html")] if fname.endswith("-en.html") else fname[:-len(".html")]
         for extra in EXTRA_CSS.get(base, []):
             txt = re.sub(r'\s*<link rel="stylesheet" href="' + re.escape(extra) + r'[^"]*">', "", txt)
             block += "\n  " + f'<link rel="stylesheet" href="{extra}?v={VERSION}">'
         txt = txt.replace(A2_LINK, block, 1)
     else:
-        # stylesheets: atlas.css, [extra layer], font, marco (last)
-        if css_re.search(txt):
-            txt = css_re.sub(CSS_LINK, txt)
-        elif "</head>" in txt:
-            txt = txt.replace("</head>", f"  {CSS_LINK}\n</head>", 1)
+        # stylesheets: the page's own sheets (index.css…), [extra layer], font, marco (last). atlas.css retired (see above)
+        txt = css_re.sub("", txt)
         txt = marco_re.sub("", txt)
         base = fname[:-len("-en.html")] if fname.endswith("-en.html") else fname[:-len(".html")]
-        after = CSS_LINK
         for extra in EXTRA_CSS.get(base, []):
-            link = f'<link rel="stylesheet" href="{extra}?v={VERSION}">'
             txt = re.sub(r'\s*<link rel="stylesheet" href="' + re.escape(extra) + r'[^"]*">', "", txt)
-            txt = txt.replace(after, after + "\n  " + link, 1)
-            after = link
-        txt = txt.replace(after, after + "\n  " + FONT_LINK + "\n  " + MARCO_LINK, 1)
+        tail = "".join("\n  " + f'<link rel="stylesheet" href="{extra}?v={VERSION}">' for extra in EXTRA_CSS.get(base, []))
+        tail += "\n  " + FONT_LINK + "\n  " + MARCO_LINK
+        local_links = list(re.finditer(r'<link rel="stylesheet" href="(?!https?:)[^"]*">', txt))
+        if local_links:
+            e = local_links[-1].end()
+            txt = txt[:e] + tail + txt[e:]
+        else:
+            txt = txt.replace("</head>", tail.lstrip() + "\n</head>", 1)
+    # index.css (the legacy interior sheet) takes the same ?v= as the managed sheets, so a change reaches cached visitors
+    txt = idx_re.sub(r'\1?v=' + VERSION + r'\2', txt)
     # header (with its drawer inside)
     txt = drawer_re.sub("", txt)
     txt = overlay_re.sub("", txt)
