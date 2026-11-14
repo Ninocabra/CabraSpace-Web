@@ -775,16 +775,23 @@ body.night-vision .cap-dot { box-shadow: none; }
   .prog .herr-t, .prog .herr-d { max-width: none; }
 }
 @media (max-width: 520px) {
-  .cartela--larga .cartela-l { display: none; }
+  html:not(.fit-js) .cartela--larga .cartela-l { display: none; }
 }
 /* F4: cartelas de lamina mas largas (el subtitulo): > 40 caracteres, sin rotulo por debajo de 760 px; > 52, por
    debajo de 960 px (medido: la del eclipse se salia de su columna entre 540 y 860 px) */
-@media (max-width: 760px) { .cartela--l40 .cartela-l { display: none; } }
-@media (max-width: 960px) { .cartela--l52 .cartela-l { display: none; } }
+@media (max-width: 760px) { html:not(.fit-js) .cartela--l40 .cartela-l { display: none; } }
+@media (max-width: 960px) { html:not(.fit-js) .cartela--l52 .cartela-l { display: none; } }
 /* F5c (J): con la Tabula por delante todas son mas largas. > 26 caracteres: sin rotulo por debajo de 410 px (un movil de 360 px
    admite 26); > 64: por debajo de 1100 px (la lamina del eclipse, 77, se salia a 1024). Medido con un barrido de 1920 a 360 px. */
-@media (max-width: 409px) { .cartela--l26 .cartela-l { display: none; } }
-@media (max-width: 1099px) { .cartela--l64 .cartela-l { display: none; } }
+@media (max-width: 409px) { html:not(.fit-js) .cartela--l26 .cartela-l { display: none; } }
+@media (max-width: 1099px) { html:not(.fit-js) .cartela--l64 .cartela-l { display: none; } }
+/* 6f (14-11-2026): con JavaScript (atlas2.js §5, html.fit-js) los umbrales de arriba no se usan: el rotulo se oculta solo si la
+   cartela no cabe en su columna (.cartela--corta). */
+.cartela--corta .cartela-l { display: none; }
+/* 6b (14-11-2026): solo lo decorativo (marco, cabecera, orla, grabados, paginas de Atlas II). El interior de las herramientas
+   (main.container, .aw-section, .cm-maps: sus indicadores de «Procesando…», giros, barras) conserva su comportamiento. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  :not(:where(main.container, .aw-section, .cm-maps) *),
+  :not(:where(main.container, .aw-section, .cm-maps) *)::before,
+  :not(:where(main.container, .aw-section, .cm-maps) *)::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }

@@ -325,3 +325,13 @@ El 13-11-2026 la fusión en seco (`git merge-tree`) salió limpia: `main` llevab
 
 **Volver atrás**: `git log --merges -1` da el commit de fusión; `git revert -m 1 <hash>` y `git push origin main`. Los robots solo tocan JSON
 y no estorban. Ojo: tras revertir, para volver a fusionar `atlas2` hay que revertir antes el propio revert.
+
+## Menores 6a-6f (14-11-2026, rama `menores-1114`)
+
+`VERSION` de `sync_nav.py` = `20261114a` (`A2_ASSET_V` sigue en `20261113a`: `armilar.js` y `capricornus2.js` no cambiaron).
+- **6a** `tools-base.css`: `.pag-wrap` toma el ancho y el padding del interior (AutoGHS y catalogos 1050/24 px, Astro Forecast 1028/24, PixelMath-teca solo padding) con `:has(+ .filete + …)`. La cabecera de CabraSpace Web (cockpit) y las del mapa de Contaminacion (interior Atlas I de 80/40/18 px) no se tocan.
+- **6b** `atlas2.css` §17: la regla de `prefers-reduced-motion` ya no alcanza al interior de las herramientas (`main.container`, `.aw-section`, `.cm-maps`): sigue apagando transiciones y animaciones del marco y de las paginas de Atlas II. (Corrige lo que aqui se daba por «no neutralizable».)
+- **6c** `cursos-youtube-en.html`: `relativeEn()` traduce al pintar «hace 2 a» / «Emitido hace 7 m» (`youtube_courses.json` guarda el texto de YouTube en español).
+- **6d/6e** `tools-base.css`: insignias de nivel y contadores de Cursos en la paleta de penumbra; `canvas` y las barras de Astro Forecast con el filtro `#cb-noche`. Siguen en color: el verde/amarillo semantico de «Abierto/Cerrado» y los puntos de Astro Forecast, y los iframes que no se pueden estilar.
+- **6f** `atlas2.js` §5 + `atlas2.css`: el rotulo de la cartela se oculta solo si no cabe en su columna (`html.fit-js`, `.cartela--corta`); los umbrales por caracteres quedan solo como respaldo sin JavaScript.
+
