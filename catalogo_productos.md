@@ -182,6 +182,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Novedades de PixInsight 1.9.6 presentadas por Vicent Peris](https://www.youtube.com/watch?v=pz9Ha3dvQ_A) (2026-11-11)
 - **Modelo: View into Space**
   - [Tu telescopio inteligente puede rastrear manchas solares: Creé una aplicación gratuita para ello](https://www.youtube.com/watch?v=dpPPufLFdHs) (2026-09-29)
+- **Modelo: Workflow**
+  - [Optimiza tu flujo de trabajo en PixInsight: Crea tu proceso una vez](https://www.youtube.com/watch?v=CAqrZ44zW_Y) (2026-11-15)
 
 ### TELESCOPES
 - **Modelo: Lukomatico**
@@ -401,6 +403,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [ZWO Reconoce a Un Astrógrafo y Comparte La Pasión Por La Imagen Planetaria](https://www.zwoastro.com/2026/08/04/konstantinos-planetary-astrophotography-journey/) (2026-08-04)
 
 ### TELESCOPES
+- **Modelo: DWARF**
+  - [Seestar S30 Plus vs. DWARF Mini: ¿El Mejor Telescopio Inteligente para Principiantes?](https://www.youtube.com/watch?v=RcWK7oEFV3I) (2026-11-15)
 - **Modelo: Draco**
   - [Análisis del Seestar S50 Pro: ¿Está Obsoleto por el Draco?](https://www.youtube.com/watch?v=FYjgvCXXDeY) (2026-09-12)
 - **Modelo: Dwarf**
