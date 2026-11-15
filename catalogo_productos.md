@@ -194,6 +194,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [S30 Plus: ¿El Mejor Telescopio Inteligente de Nivel de Entrada en 2026?](https://www.youtube.com/watch?v=WIzIg_mYSNA) (2026-11-10)
 - **Modelo: StellaLyra**
   - [Anuncio de Oferta Especial: Telescopio Newtoniano StellaLyra 12" f/4](https://stargazerslounge.com/topic/448696-stellalyra-12-f4-m-lrn-newtonian-3-focuser/) (2026-09-27)
+- **Modelo: telescopios inteligentes**
+  - [El Futuro de la Astrofotografía: Telescopios Inteligentes](https://www.youtube.com/watch?v=r3GS68Ysf34) (2026-11-15)
 
 ## Pegasus Astro
 
