@@ -21,20 +21,15 @@ import curacion as cu  # noqa: E402
 import procesar_respuestas as pr  # noqa: E402
 
 OWNER = "dueno.prueba@gmail.com"
-GOOD_AUTH = ("mx.google.com; dkim=pass header.i=@gmail.com header.s=20230601 header.b=AbCdEf; "
-             "spf=pass (google.com: domain of dueno.prueba@gmail.com designates 209.85.220.41 as permitted sender) "
-             "smtp.mailfrom=dueno.prueba@gmail.com; dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com")
 NOW = datetime(2026, 11, 15, 9, 0, tzinfo=timezone.utc)
 DIGEST = "CB-20261115-a1b2c3"
 
 
 def make_msg(body="publica 2", frm=OWNER, subject=f"Re: Bitácora CabraSpace · 3 candidatas [{DIGEST}]",
-             auth=GOOD_AUTH, in_reply_to="<orig@x>", mid="<m1@mail.gmail.com>", extra_auth=None, extra=None):
+             in_reply_to="<orig@x>", mid="<m1@mail.gmail.com>", extra=None):
+    """Una respuesta tal como queda en la carpeta Enviados de Gmail: SIN Authentication-Results
+    (el correo a uno mismo se entrega por dentro y nunca pasa por el MX, que es quien la añade)."""
     m = EmailMessage()
-    if auth is not None:
-        m["Authentication-Results"] = auth
-    if extra_auth is not None:
-        m["Authentication-Results"] = extra_auth
     if frm is not None:
         m["From"] = frm
     m["To"] = "bot@example.com"
@@ -170,29 +165,16 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(two.count(b"From:"), 2)
         self.assertEqual(cu.check_message(cu.parse_message(two), OWNER), (False, "from"))
 
-    def test_sin_authentication_results(self):
-        self.assertEqual(self.verdict(auth=None), (False, "sin_auth"))
+    def test_respuesta_sin_authentication_results_se_acepta(self):
+        # Caso real medido en producción: Gmail -> el mismo Gmail no lleva Authentication-Results.
+        m = cu.parse_message(raw())
+        self.assertIsNone(m["Authentication-Results"])
+        self.assertEqual(cu.check_message(m, OWNER), (True, "ok"))
 
-    def test_dkim_ausente_o_fallido(self):
-        self.assertEqual(self.verdict(auth="mx.google.com; spf=pass smtp.mailfrom=dueno.prueba@gmail.com"), (False, "dkim"))
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("dkim=pass", "dkim=fail")), (False, "dkim"))
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("dkim=pass", "dkim=none")), (False, "dkim"))
-
-    def test_dkim_de_otro_dominio(self):
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("header.i=@gmail.com", "header.i=@evil.com")), (False, "dkim"))
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("header.i=@gmail.com", "header.i=@evilgmail.com")), (False, "dkim"))
-
-    def test_spf_fallido_o_de_otro_dominio(self):
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("spf=pass", "spf=softfail")), (False, "spf"))
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("smtp.mailfrom=dueno.prueba@gmail.com", "smtp.mailfrom=x@evil.com")),
-                         (False, "spf"))
-
-    def test_cabecera_falsificada_por_debajo_de_la_de_gmail_no_cuenta(self):
-        bad = GOOD_AUTH.replace("dkim=pass", "dkim=fail")
-        self.assertEqual(self.verdict(auth=bad, extra_auth=GOOD_AUTH), (False, "dkim"))
-
-    def test_cabecera_que_no_es_de_gmail(self):
-        self.assertEqual(self.verdict(auth=GOOD_AUTH.replace("mx.google.com", "mx.evil.example")), (False, "auth_no_gmail"))
+    def test_authentication_results_ya_no_se_mira(self):
+        # La prueba de autoría es la carpeta Enviados, no esta cabecera: ni suma ni resta.
+        for auth in ("mx.google.com; dkim=fail header.i=@evil.com; spf=fail", "mx.evil.example; dkim=pass"):
+            self.assertEqual(self.verdict(extra={"Authentication-Results": auth}), (True, "ok"))
 
     def test_no_es_respuesta(self):
         self.assertEqual(self.verdict(in_reply_to=None, subject=f"Hola [{DIGEST}]"), (False, "no_respuesta"))
@@ -201,7 +183,7 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(self.verdict(in_reply_to=None), (True, "ok"))
 
     def test_la_propia_copia_del_resumen_se_ignora(self):
-        # El resumen llega a la misma bandeja, del mismo remitente y con autenticación válida.
+        # El resumen sale de la cuenta del dueño, así que su copia TAMBIÉN está en Enviados.
         v = self.verdict(extra={cu.DIGEST_HEADER: DIGEST}, subject=f"Re: x [{DIGEST}]")
         self.assertEqual(v, (False, "es_resumen"))
 
@@ -315,16 +297,27 @@ class ApplyAndIdempotencyTests(unittest.TestCase):
 
     def test_atacante_no_publica(self):
         spoof = raw(body="publica todas", frm="atacante@gmail.com", mid="<s1@x>")
-        noauth = raw(body="publica todas", auth=None, mid="<s2@x>")
-        failed = raw(body="publica todas", auth=GOOD_AUTH.replace("dkim=pass", "dkim=fail"), mid="<s3@x>")
-        cands, digests, decisions, db, count, ids = self.run_process([spoof, noauth, failed])
+        trap = raw(body="publica todas", frm=f'"{OWNER}" <malo@evil.com>', mid="<s2@x>")
+        digest_copy = raw(body="publica todas", extra={cu.DIGEST_HEADER: DIGEST}, mid="<s3@x>")
+        cands, digests, decisions, db, count, ids = self.run_process([spoof, trap, digest_copy])
         self.assertEqual(ids, [])
         self.assertEqual(db, [{"id": "viejo"}])
         self.assertEqual(decisions["decisions"], [])
-        self.assertEqual((count["rechazado_from"], count["rechazado_sin_auth"], count["rechazado_dkim"]), (1, 1, 1))
+        self.assertEqual((count["rechazado_from"], count["rechazado_es_resumen"]), (2, 1))
         self.assertEqual(len(cands["candidates"]), 4)                    # nada tocado
         self.assertIsNone(digests["digests"][DIGEST]["resolved"])        # y el resumen sigue abierto
         self.assertEqual(digests["processed"], [])                       # un rechazo no «quema» el mensaje
+
+    def test_respuesta_sin_authentication_results_se_aplica(self):
+        *_, count, ids = self.run_process([raw(body="publica 1")])
+        self.assertEqual((count["respuestas_aplicadas"], len(ids)), (1, 1))
+
+    def test_copia_del_resumen_en_enviados_junto_a_la_respuesta(self):
+        # En Enviados conviven el resumen (misma cuenta, asunto con CB-) y la respuesta: solo cuenta la segunda.
+        digest_copy = raw(body="publica todas", subject=f"Bitácora [{DIGEST}]", in_reply_to=None,
+                          extra={cu.DIGEST_HEADER: DIGEST}, mid="<d@x>")
+        *_, count, ids = self.run_process([digest_copy, raw(body="publica 2", mid="<r@x>")])
+        self.assertEqual((count["rechazado_es_resumen"], count["respuestas_aplicadas"], len(ids)), (1, 1, 1))
 
     def test_la_cita_del_resumen_no_publica_lo_citado(self):
         *_, count, ids = self.run_process([raw(body=quoted_reply("gracias"))])
@@ -393,10 +386,31 @@ class SendTests(unittest.TestCase):
         self.assertNotIn("Candidatas", rd.render([], "14-11-2026", [], None))
 
 
+GMAIL_LIST_ES = [
+    rb'(\HasNoChildren) "/" "INBOX"',
+    rb'(\HasNoChildren \Important) "/" "[Gmail]/Importantes"',
+    rb'(\HasNoChildren \Sent) "/" "[Gmail]/Enviados"',
+    rb'(\HasNoChildren \Trash) "/" "[Gmail]/Papelera"',
+    rb'(\HasNoChildren \Junk) "/" "[Gmail]/Spam"',
+    rb'(\HasChildren \Noselect) "/" "[Gmail]"',
+]
+GMAIL_LIST_EN = [
+    rb'(\HasNoChildren) "/" "INBOX"',
+    rb'(\HasNoChildren \Drafts) "/" "[Gmail]/Drafts"',
+    rb'(\HasNoChildren \Sent) "/" "[Gmail]/Sent Mail"',
+    rb'(\HasNoChildren \Trash) "/" "[Gmail]/Trash"',
+]
+
+
 class FakeIMAP:
-    """Doble de imaplib.IMAP4_SSL: solo lo que usa procesar_respuestas.fetch_raw_messages."""
-    def __init__(self, raws):
+    """Doble de imaplib.IMAP4_SSL: solo lo que usan procesar_respuestas.find_sent_mailbox y fetch_raw_messages."""
+    def __init__(self, raws, listing=None):
         self.raws, self.calls, self.readonly = raws, [], None
+        self.listing = GMAIL_LIST_ES if listing is None else listing
+
+    def list(self, directory='""', pattern="*"):
+        self.calls.append(("list",))
+        return "OK", list(self.listing)
 
     def select(self, box, readonly=False):
         self.readonly = readonly
@@ -413,6 +427,52 @@ class FakeIMAP:
 
     def logout(self):
         self.calls.append(("logout",))
+
+
+class SentMailboxTests(unittest.TestCase):
+    def test_gmail_en_espanol(self):
+        self.assertEqual(pr.find_sent_mailbox(FakeIMAP([], GMAIL_LIST_ES)), "[Gmail]/Enviados")
+
+    def test_gmail_en_ingles(self):
+        self.assertEqual(pr.find_sent_mailbox(FakeIMAP([], GMAIL_LIST_EN)), "[Gmail]/Sent Mail")
+
+    def test_solo_vale_la_marca_sent_no_el_nombre(self):
+        # Una carpeta llamada «Sent» sin la marca \Sent NO sirve, y \SentX tampoco.
+        lst = [rb'(\HasNoChildren) "/" "Sent"', rb'(\HasNoChildren \SentX) "/" "Enviados"',
+               rb'(\HasNoChildren) "/" "INBOX"']
+        with self.assertRaises(RuntimeError):
+            pr.find_sent_mailbox(FakeIMAP([], lst))
+
+    def test_sin_carpeta_sent_es_error_claro(self):
+        with self.assertRaises(RuntimeError) as cm:
+            pr.find_sent_mailbox(FakeIMAP([], [rb'(\HasNoChildren) "/" "INBOX"']))
+        self.assertIn("Sent", str(cm.exception))
+
+    def test_nombre_en_utf7_modificado_se_devuelve_tal_cual(self):
+        lst = [rb'(\HasNoChildren \Sent) "/" "[Gmail]/Mensajes enviados &AOk-"']
+        self.assertEqual(pr.find_sent_mailbox(FakeIMAP([], lst)), "[Gmail]/Mensajes enviados &AOk-")
+
+    def test_nombre_como_literal_imap(self):
+        lst = [(rb'(\HasNoChildren \Sent) "/" {15}', b"[Gmail]/Enviado")]
+        self.assertEqual(pr.find_sent_mailbox(FakeIMAP([], lst)), "[Gmail]/Enviado")
+
+    def test_list_que_falla_es_error(self):
+        imap = FakeIMAP([])
+        imap.list = lambda *a, **k: ("NO", [b"x"])
+        with self.assertRaises(RuntimeError):
+            pr.find_sent_mailbox(imap)
+
+    def test_el_nombre_se_cita_para_select(self):
+        # imaplib NO cita el argumento: con espacios y corchetes hay que ponerlo entre comillas.
+        self.assertEqual(pr.quote_mailbox("[Gmail]/Sent Mail"), '"[Gmail]/Sent Mail"')
+        self.assertEqual(pr.quote_mailbox('a"b\\c'), '"a\\"b\\\\c"')
+
+    def test_fetch_abre_enviados_en_solo_lectura_y_no_inbox(self):
+        fake = FakeIMAP([])
+        pr.fetch_raw_messages(fake, NOW)
+        selects = [c[1] for c in fake.calls if c[0] == "select"]
+        self.assertEqual(selects, ['"[Gmail]/Enviados"'])
+        self.assertTrue(fake.readonly)
 
 
 class MainEndToEndTests(unittest.TestCase):
@@ -489,6 +549,33 @@ class MainEndToEndTests(unittest.TestCase):
         self.assertEqual(crit[0], "SINCE")
         self.assertRegex(crit[1], r"^\d{2}-[A-Z][a-z]{2}-\d{4}$")
         self.assertEqual(crit[2:], ("SUBJECT", "CB-"))
+
+    def test_flujo_completo_lee_enviados_y_acepta_respuesta_sin_authentication_results(self):
+        digest_copy = raw(body="publica todas", subject=f"Bitácora [{DIGEST}]", in_reply_to=None,
+                          extra={cu.DIGEST_HEADER: DIGEST}, mid="<d@x>")
+        rc, out, fake = self.run_main([digest_copy, raw(body="publica 2", mid="<r@x>")])
+        self.assertEqual(rc, 0)
+        self.assertEqual([c[1] for c in fake.calls if c[0] == "select"], ['"[Gmail]/Enviados"'])
+        self.assertIn("respuestas_aplicadas=1", out)
+        self.assertIn("rechazado_es_resumen=1", out)
+
+    def test_sin_carpeta_sent_falla_alto_y_no_toca_nada(self):
+        fake = FakeIMAP([raw(body="todas")], listing=[rb'(\HasNoChildren) "/" "INBOX"'])
+        def snapshot():
+            out = []
+            for p in (self.equipo, *self.paths.values()):
+                with open(p, encoding="utf-8") as f:
+                    out.append(f.read())
+            return out
+        before = snapshot()
+        out = io.StringIO()
+        with redirect_stdout(out), self.assertRaises(RuntimeError) as cm:
+            pr.main(imap_factory=lambda: fake, derived=False)
+        self.assertEqual(before, snapshot())
+        self.assertEqual([c for c in fake.calls if c[0] in ("select", "search", "fetch")], [])   # ni leyó INBOX por si acaso
+        self.assertIn(("logout",), fake.calls)                                                   # y cerró la sesión
+        for secreto in (OWNER, "abcdefghijklmnop", "abcd"):
+            self.assertNotIn(secreto, str(cm.exception) + out.getvalue())
 
     def test_faltan_variables(self):
         with mock.patch.dict(os.environ, {"RESUMEN_USER": "", "RESUMEN_TO": ""}, clear=False):

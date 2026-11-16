@@ -1,10 +1,15 @@
 """Lee por IMAP las respuestas del dueño al resumen diario y publica las candidatas que elija.
 
-Lo lanza .github/workflows/curacion_respuestas.yml cada hora. Flujo:
+Lo lanza .github/workflows/curacion_respuestas.yml (cron horario; GitHub lo ejecuta cada 4-7 h). Flujo:
   1. Si no hay ningún resumen con candidatas sin contestar, NO abre IMAP (nada que hacer).
-  2. Busca en la bandeja correos recientes con «CB-» en el asunto.
-  3. Cada correo pasa el filtro de seguridad (curacion.check_message): remitente EXACTO del dueño,
-     Authentication-Results de Gmail con dkim=pass y spf=pass, y ser una respuesta (no el propio resumen).
+  2. Busca correos recientes con «CB-» en el asunto en la carpeta ENVIADOS de la cuenta (la que Gmail marca
+     con la marca IMAP \\Sent; su nombre depende del idioma y no se escribe a mano). NO se lee INBOX: el
+     resumen se envía a la propia cuenta y Gmail entrega ese correo por dentro, sin pasar por el MX, así que
+     nunca lleva Authentication-Results y no hay forma de autenticarlo ahí. En Enviados solo entra lo que
+     sale de la cuenta del dueño: un «From: dueño» falsificado desde fuera no llega nunca. Esa es la prueba
+     de autoría. Si no hay carpeta \\Sent, se aborta con un error claro.
+  3. Cada correo pasa el filtro curacion.check_message: remitente EXACTO del dueño, ser una respuesta y
+     no el propio resumen (cuya copia también está en Enviados), con su token CB-.
   4. Se interpreta el texto escrito (sin la parte citada), se aplica al resumen al que contesta y se
      guarda la decisión (aceptadas Y rechazadas). Un correo ya aplicado (hash de su Message-ID) o un
      resumen ya resuelto no se vuelven a aplicar.
@@ -17,6 +22,7 @@ import os
 import sys
 import json
 import imaplib
+import re
 import subprocess
 from collections import Counter
 from datetime import datetime, timedelta, timezone
@@ -41,11 +47,46 @@ def connect(user, password):
     return m
 
 
-def fetch_raw_messages(imap, since):
-    """Correos de la bandeja desde `since` con «CB-» en el asunto. Solo lectura (BODY.PEEK)."""
-    typ, _ = imap.select("INBOX", readonly=True)
+_LIST_RE = re.compile(r'^\((?P<flags>[^)]*)\)\s+(?:"(?:[^"\\]|\\.)*"|NIL)\s*(?P<name>.*)$')
+
+
+def find_sent_mailbox(imap):
+    """Nombre (tal como lo devuelve el servidor, en UTF-7 modificado) de la carpeta con la marca IMAP \\Sent.
+    Gmail la localiza («[Gmail]/Enviados», «[Gmail]/Sent Mail»…): se busca por la marca, nunca por el nombre."""
+    typ, data = imap.list()
     if typ != "OK":
-        raise RuntimeError("IMAP: no se pudo abrir INBOX")
+        raise RuntimeError("IMAP: LIST falló, no se puede localizar la carpeta Enviados")
+    for item in data or []:
+        literal = None
+        if isinstance(item, tuple):                    # nombre enviado como literal {n}: (línea, nombre)
+            item, literal = item[0], item[1]
+        if not isinstance(item, bytes):
+            continue
+        m = _LIST_RE.match(item.decode("utf-8", "replace").strip())
+        if not m or "\\sent" not in [f.lower() for f in m.group("flags").split()]:
+            continue
+        if literal is not None:
+            return literal.decode("utf-8", "replace")
+        name = m.group("name").strip()
+        if len(name) >= 2 and name[0] == name[-1] == '"':
+            name = re.sub(r"\\(.)", r"\1", name[1:-1])
+        return name
+    raise RuntimeError("IMAP: la cuenta no tiene ninguna carpeta con la marca \\Sent "
+                       "(¿Enviados oculta para IMAP en los ajustes de Gmail?)")
+
+
+def quote_mailbox(name):
+    """imaplib NO cita el nombre al hacer SELECT: con espacios o corchetes hay que entrecomillarlo."""
+    return '"' + name.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def fetch_raw_messages(imap, since):
+    """Correos de la carpeta Enviados desde `since` con «CB-» en el asunto. Solo lectura (BODY.PEEK).
+    Se localiza ANTES de seleccionar nada: sin \\Sent no se lee ninguna otra carpeta de sustitución."""
+    box = find_sent_mailbox(imap)
+    typ, _ = imap.select(quote_mailbox(box), readonly=True)
+    if typ != "OK":
+        raise RuntimeError("IMAP: no se pudo abrir la carpeta Enviados")
     typ, data = imap.search(None, "SINCE", imap_date(since), "SUBJECT", "CB-")
     if typ != "OK":
         raise RuntimeError("IMAP: la búsqueda falló")

@@ -415,30 +415,15 @@ def message_key(msg):
     return hashlib.sha256(mid.encode()).hexdigest()[:20] if mid else None
 
 
-def _auth_domain_ok(msg, domain):
-    """Authentication-Results. Se usa SOLO la cabecera MÁS ALTA y solo si la puso Gmail
-    (authserv-id mx.google.com): un atacante puede añadir una cabecera propia que diga «pass», pero
-    queda por debajo de la de Gmail. Exige dkim=pass firmado por el dominio y spf=pass del dominio."""
-    hdrs = msg.get_all("Authentication-Results") or []
-    if not hdrs:
-        return False, "sin_auth"
-    flat = " ".join(str(hdrs[0]).split()).lower()
-    if not flat.startswith("mx.google.com"):
-        return False, "auth_no_gmail"
-    dom = re.escape(domain.lower())
-    segs = [s.strip() for s in flat.split(";")]
-    dkim_ok = any(re.match(r"dkim=pass\b", s) and re.search(rf"header\.(?:i=@|d=){dom}(?![\w.-])", s) for s in segs)
-    spf_ok = any(re.match(r"spf=pass\b", s) and re.search(rf"smtp\.mailfrom=[^\s;]*@{dom}(?![\w.-])", s) for s in segs)
-    if not dkim_ok:
-        return False, "dkim"
-    if not spf_ok:
-        return False, "spf"
-    return True, "ok"
-
-
 def check_message(msg, owner):
-    """(True, 'ok') solo si el correo es una RESPUESTA del dueño, autenticada por Gmail. Si no, (False, motivo).
-    Orden barato → caro. Los motivos son códigos fijos: sirven para el recuento del log sin revelar nada."""
+    """(True, 'ok') solo si el correo es una RESPUESTA escrita por el dueño. Si no, (False, motivo).
+    Orden barato → caro. Los motivos son códigos fijos: sirven para el recuento del log sin revelar nada.
+
+    OJO: aquí NO se comprueba la autoría criptográficamente (no hay Authentication-Results: Gmail no lo
+    añade al correo a uno mismo, que se entrega por dentro sin pasar por el MX). La prueba de autoría es
+    de QUIEN LLAMA: solo se le deben pasar correos leídos de la carpeta Enviados de la cuenta
+    (procesar_respuestas.fetch_raw_messages), donde un «From: dueño» falsificado desde fuera nunca aparece.
+    Pasarle correos de la bandeja de entrada dejaría la puerta abierta a cualquiera que falsifique el From."""
     owner = (owner or "").strip().lower()
     if not owner or "@" not in owner:
         return False, "sin_dueno"
@@ -446,15 +431,12 @@ def check_message(msg, owner):
     if len(froms) != 1 or parseaddr(str(froms[0]))[1].strip().lower() != owner:
         return False, "from"
     if msg.get(DIGEST_HEADER):
-        return False, "es_resumen"        # la propia copia del resumen, que llega a la misma bandeja
+        return False, "es_resumen"        # la propia copia del resumen: también está en Enviados
     subject = str(msg.get("Subject") or "")
     is_reply = bool(msg.get("In-Reply-To") or msg.get("References")) or \
         re.match(r"\s*(?:re|rv|aw|sv)\s*:", subject, re.I) is not None
     if not is_reply:
         return False, "no_respuesta"
-    ok, why = _auth_domain_ok(msg, owner.split("@", 1)[1])
-    if not ok:
-        return False, why
     return True, "ok"
 
 
