@@ -108,6 +108,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: Sidara Nano**
   - [Explore Scientific Sidara Nano: Nueva Montura Alt-Az Portátil](https://www.youtube.com/watch?v=qTcJkLXp70M) (2026-09-29)
 - **Modelo: Sidara Pro**
+  - [Presentación del Sidara Pro: Montura GoTo Controlada por Smartphone](https://www.youtube.com/shorts/wUCaa9rieh8) (2026-11-16)
   - [Primer Vistazo a la Montura Explore Scientific Sidara Pro GoTo con SkyAssist](https://www.youtube.com/watch?v=bF0HJ0NIjWA) (2026-10-05)
 
 ### TELESCOPES
