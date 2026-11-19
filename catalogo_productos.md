@@ -282,6 +282,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: MK127**
   - [SVBONY MK127 + SC571CC: Un equipo compacto de cielo profundo ensamblado](https://www.youtube.com/watch?v=p79AsdwipG0) (2026-08-27)
+- **Modelo: SV503**
+  - [Descuento en Telescopio Svbony SV503](https://www.youtube.com/shorts/kKtTs1HjgeM) (2026-11-19)
 - **Modelo: SV530**
   - [Nuevo Telescopio Refractor SVBONY SV530 80mm ED: Desempaquetado, Montaje y Configuración para Observación Visual](https://www.youtube.com/watch?v=46mQmVGOW9s) (2026-09-02)
 - **Modelo: SV550**
