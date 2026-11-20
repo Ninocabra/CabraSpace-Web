@@ -364,6 +364,12 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 - **Modelo: telescopio inteligente**
   - [Vaonis Atlas o DwarfLab Draco: análisis a fondo de los nuevos telescopios inteligentes](https://www.youtube.com/watch?v=9HedLEWT8dU) (2026-10-17)
 
+## William Optics
+
+### TELESCOPES
+- **Modelo: Cat A-51 WIFD**
+  - [William Optics presenta el nuevo telescopio compacto Cat A-51 WIFD 2027](https://williamoptics.com/blogs/news/introducing-the-2027-cat-a-51-wifd) (2026-11-20)
+
 ## ZWO
 
 ### ACCESSORIES
