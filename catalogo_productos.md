@@ -359,6 +359,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: Atlas**
   - [Vaonis Atlas Revelado: Telescopio Dual Modular y Resultados de Imagen](https://www.youtube.com/watch?v=MwYJpWJLg9I) (2026-10-17)
+- **Modelo: Vespera Pro**
+  - [Oferta: Más de 400$ de descuento en el Vaonis Vespera Pro](https://news.google.com/rss/articles/CBMivwFBVV95cUxQbmhPYV9rejI2c1RoTmlERXFOdXgxTkJrRTlTSnRWMjN5U2p3T29UV1RDUGtJYnRSRW9BRU1EeXlsOGZKWVhUUmd6US1OYzBTOERadGNHc3JQQ05vV1lrYnNieTBPRW9PdUhSZ3ZEcXJDVHlHWTczUGF6bnE3Sk9ySzdaNHVnMUJrY2F1TlQ1X3JoWXdyRWhIVlZuVDc4V09jV1pYWXJfUXIwSDRXcmxDaUVwVlBrN1B5MTh2c29hOA?oc=5) (2026-11-19)
 - **Modelo: telescopio inteligente**
   - [Vaonis Atlas o DwarfLab Draco: análisis a fondo de los nuevos telescopios inteligentes](https://www.youtube.com/watch?v=9HedLEWT8dU) (2026-10-17)
 
