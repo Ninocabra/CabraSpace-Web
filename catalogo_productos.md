@@ -264,6 +264,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Equipos de Astronomía**
   - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
+- **Modelo: Guía de Compras**
+  - [Guía de Compras de Acción de Gracias de SVBONY | ¡Encuentra tu Equipo de Astronomía Perfecto!](https://www.youtube.com/watch?v=0hzzi9FFK2c) (2026-11-21)
 - **Modelo: Kit de Cielo Profundo**
   - [Oferta de Día de Astronomía de SVBONY #2: Construye tu Kit de Cielo Profundo con Francisco](https://www.youtube.com/watch?v=sYmor4_z7UE) (2026-09-15)
 - **Modelo: Ofertas**
