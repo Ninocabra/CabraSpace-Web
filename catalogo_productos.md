@@ -147,6 +147,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Ed Ting**
   - [El Rig de Astrofotografía de Cielo Profundo de Ed Ting: Estado del Arte](https://www.youtube.com/watch?v=bmzvuG8SsW8) (2026-10-18)
+- **Modelo: Filtros**
+  - [Los filtros de telescopio, ¿ralentizan tu equipo?](https://www.youtube.com/watch?v=7PqF7xD8cxo) (2026-11-21)
 - **Modelo: Nebula Photos**
   - [Cómo añadir autoenfoque a tu telescopio](https://www.youtube.com/watch?v=5aFmfiffPVM) (2026-07-31)
 - **Modelo: ToupTek Astro**
@@ -163,6 +165,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### SOFTWARE
 - **Modelo: Apple Silicon**
   - [Solución para scripts rotos en PixInsight 1.9.4 en Apple Silicon](https://www.youtube.com/watch?v=0CjJHVG_vNQ) (2026-08-17)
+- **Modelo: Astrocitas**
+  - [Astrocitas presenta su agente inteligente para PixInsight](https://www.youtube.com/watch?v=YoepS5KyOvo) (2026-11-20)
 - **Modelo: Luminar Neo**
   - [Luminar Neo: ¿El secreto para mejores fotos con telescopios inteligentes?](https://www.youtube.com/watch?v=xlVSZKcjZSc) (2026-08-02)
 - **Modelo: MLDenoise**
