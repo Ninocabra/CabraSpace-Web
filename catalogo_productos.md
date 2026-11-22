@@ -401,6 +401,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
 - **Modelo: ASI676MM**
   - [ZWO ASI676MM: Primeras impresiones de usuarios como cámara "all-sky"](https://stargazerslounge.com/topic/441691-new-camera-zwo-asi676mm/) (2026-10-15)
+- **Modelo: S50 Pro**
+  - [Comparativa: Seestar S50 Pro vs Dwarf Mini - ¿Merece la pena la diferencia de luz?](https://www.youtube.com/watch?v=yjDTDcxm9Cs) (2026-11-22)
 - **Modelo: Seestar S50 Pro**
   - [Presentando el Seestar S50 Pro: La Nueva Evolución de la Astrofotografía Inteligente](https://www.youtube.com/watch?v=_NEwxBAF6HI) (2026-08-25)
 - **Modelo: cámara astro**
