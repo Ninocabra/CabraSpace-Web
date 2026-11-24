@@ -228,6 +228,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## QHYCCD
 
 ### CAMERAS
+- **Modelo: QHY600M PH**
+  - [Actualización de Configuración de Sensor para Cámaras QHY600M PH, QHY268M PH y QHY600M ProI](https://www.qhyccd.com/product-notice-sensor-configuration-update-for-qhy600mph-qhy268mph-and-qhy600mproi/) (2026-11-24)
 - **Modelo: miniCAM8M**
   - [Cámara QHYCCD miniCAM8M Juega un Rol Clave en el Descubrimiento de la Nebulosa Planetaria HMK 1](https://www.qhyccd.com/qhyccd-minicam8m-helps-reveal-hmk-1-a-newly-documented-planetary-nebula/) (2026-10-12)
 
@@ -401,6 +403,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Anuncio de la Cámara ZWO ASI2600MC Duo](https://www.youtube.com/watch?v=5O7mjMxv1pw) (2026-09-22)
 - **Modelo: ASI676MM**
   - [ZWO ASI676MM: Primeras impresiones de usuarios como cámara "all-sky"](https://stargazerslounge.com/topic/441691-new-camera-zwo-asi676mm/) (2026-10-15)
+- **Modelo: Planetary Imaging**
+  - [Misión Planetaria Nocturna con Equipamiento ZWO](https://www.youtube.com/shorts/Vl2adV52j1g) (2026-11-23)
 - **Modelo: S50 Pro**
   - [Comparativa: Seestar S50 Pro vs Dwarf Mini - ¿Merece la pena la diferencia de luz?](https://www.youtube.com/watch?v=yjDTDcxm9Cs) (2026-11-22)
 - **Modelo: Seestar S50 Pro**
@@ -453,5 +457,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Problemas Reales y Soluciones del Seestar S50 Pro](https://www.youtube.com/watch?v=hpHKMMM3cH0) (2026-10-22)
   - [ZWO Lanza el Telescopio Inteligente Seestar S50 Pro con Apertura de 50mm](https://www.zwoastro.com/2026/08/25/seestar-s50-pro-now-available-50mm-aperture-revealing-more-of-the-universe/) (2026-08-25)
   - [Seestar S50 Pro: ¿El Nuevo Telescopio Inteligente Definitivo?](https://www.youtube.com/watch?v=5353YmK9fhU) (2026-08-25)
+- **Modelo: Seestar S80**
+  - [Seestar S80: Lo que reveló el CEO de ZWO y su costo real](https://www.youtube.com/watch?v=7mjwGXLNk6M) (2026-11-23)
 - **Modelo: telescopio inteligente**
   - [ZWO Seestar: Llévalo a tu próxima aventura astronómica](https://www.youtube.com/watch?v=GzP0xuBYJek) (2026-09-01)
