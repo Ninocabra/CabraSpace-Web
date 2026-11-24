@@ -101,6 +101,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Explore Scientific: 8 Opciones de Telescopios Oculares ED de 72°](https://www.youtube.com/shorts/R2q0nnRKGiM) (2026-10-14)
 - **Modelo: Sale**
   - [Comienza hoy la Venta de Descubrimiento de Septiembre de Explore Scientific](https://www.youtube.com/shorts/NUBIBteTD0I) (2026-09-09)
+- **Modelo: Smartphone Adapter**
+  - [Adaptador Explore Scientific para Smartphone: Fotografía de Telescopio Fácil](https://www.youtube.com/watch?v=akuXkOIT4Y0) (2026-11-24)
 - **Modelo: Vidrio ED**
   - [Nuevos oculares Explore Scientific a prueba de agua con vidrio ED listos para el lanzamiento](https://www.youtube.com/watch?v=kzm58mTjPEU) (2026-09-29)
 
@@ -191,6 +193,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Optimiza tu flujo de trabajo en PixInsight: Crea tu proceso una vez](https://www.youtube.com/watch?v=CAqrZ44zW_Y) (2026-11-15)
 
 ### TELESCOPES
+- **Modelo: Astrobackyard**
+  - [Los Mejores Telescopios para Principiantes (Mis 4 Favoritos)](https://www.youtube.com/watch?v=-0owjCiBb98) (2026-11-24)
 - **Modelo: Lukomatico**
   - [Telescopio económico f/3 vs Sensor grande: ¿Cuál es la mejor opción?](https://www.youtube.com/watch?v=aHmgWODEuA4) (2026-10-03)
   - [Comparativa de Telescopio Presupuestario f/3 con Sensor Grande](https://www.youtube.com/watch?v=ZeIBNH5jCVU) (2026-10-03)
