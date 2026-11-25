@@ -304,6 +304,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Observación del eclipse solar en España con la SVBONY SV555](https://www.youtube.com/watch?v=b4DjxdUNjuM) (2026-09-16)
   - [SVBONY presenta el nuevo astrógrafo SV555 de 54 mm f/4.5 APO Petzval](https://www.youtube.com/watch?v=abla3V1YJNM) (2026-08-19)
 - **Modelo: SV580**
+  - [Primera Luz con el Telescopio Svbony SV580 y Cámara SC591CC en una Sesión Invernal](https://www.youtube.com/watch?v=_1Oa26Oam5I) (2026-11-24)
   - [Configuración del Telescopio Insignia SVBONY SV580 y Captura Lunar](https://www.youtube.com/watch?v=KCrfZ-etiXw) (2026-10-26)
   - [Presentamos el SVBONY SV580: Una Nueva Era en Astrofotografía Full-Frame](https://www.youtube.com/watch?v=QbBxcfESfrI) (2026-10-13)
 
