@@ -268,6 +268,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Svbony
 
 ### ACCESSORIES
+- **Modelo: Astrophotography Kit**
+  - [Kit todo en uno de Svbony para astrofotografía de cielo profundo](https://www.youtube.com/shorts/U3_Z2IMqhM4) (2026-11-25)
 - **Modelo: Equipos de Astronomía**
   - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
 - **Modelo: Guía de Compras**
