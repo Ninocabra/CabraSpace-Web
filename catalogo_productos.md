@@ -9,6 +9,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Autofocus**
   - [Demostración de la Curva de Autenfoque de Askar con NINA](https://www.youtube.com/watch?v=zrXrnTt7EE0) (2026-08-10)
+- **Modelo: SQA70 Pro**
+  - [Noticias de Astrofotografía: Askar SQA70 Pro, SEESTAR S30 Plus, Touptek ATLAS SH20 y más](https://www.youtube.com/watch?v=kCM9gZ1qYfQ) (2026-11-24)
 - **Modelo: Sesto Senso**
   - [Askar WAF vs ZWO EAF vs Sesto Senso 3: ¿Qué Autoc Closer Deberías Comprar?](https://www.youtube.com/watch?v=e451HuLv148) (2026-08-25)
 - **Modelo: WAF**
@@ -270,6 +272,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### ACCESSORIES
 - **Modelo: Astrophotography Kit**
   - [Kit todo en uno de Svbony para astrofotografía de cielo profundo](https://www.youtube.com/shorts/U3_Z2IMqhM4) (2026-11-25)
+- **Modelo: Equipo de Astronomía**
+  - [Configuración de SVBONY de Francisco: Selección de equipo de astronomía en una sesión en vivo](https://www.youtube.com/watch?v=cTGNwsgFucg) (2026-11-26)
 - **Modelo: Equipos de Astronomía**
   - [El Setup de SVBONY de Francisco: 5 Equipos de Astronomía en una Sesión en Vivo](https://www.youtube.com/watch?v=SRdBh7wmdik) (2026-09-19)
 - **Modelo: Guía de Compras**
