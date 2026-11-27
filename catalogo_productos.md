@@ -433,6 +433,7 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 
 ### SOFTWARE
 - **Modelo: ASIAIR**
+  - [Para qué sirve un ASIAIR y comparativa con Synlink](https://www.youtube.com/watch?v=-aTyyrwepE0) (2026-11-27)
   - [Novedades en ASIAIR V3.0 de ZWO](https://www.youtube.com/shorts/jHi-yW2CYWg) (2026-08-13)
 - **Modelo: Death Valley Observatories**
   - [El viaje astronómico de Nicolas Paladini: de aficionado a profesional](https://www.zwoastro.com/2026/08/04/nicolas-paladini-astrophotography-journey/) (2026-08-04)
