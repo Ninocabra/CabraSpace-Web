@@ -151,6 +151,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ## Otros / No especificado
 
 ### ACCESSORIES
+- **Modelo: Dwarf Mini**
+  - [Presentamos el Dwarf Mini: Listo para la astrofotografía en cualquier lugar con un descuento de $80](https://news.google.com/rss/articles/CBMivwFBVV95cUxOWDNndFk5UXNsUVVXcTZqT1FLc0lRaWVjMWJWaE1HbHlxcHNHS3FTYzdkUHBPang1d1RSdnJOS0VKQjlHRTNjdWV3YXN3dWZxUHg2MnAzSWNMY2lWU2I2Mk1Pb2ZuOE9vOTlCZlRrN2pfREluY1paV0FpeUhUSTFTcUVmTEEwN2x3UUpWeHhjTV8zTUpHUzlOb05GUmlHTEJ5N0NQaHpnVnN5c1oySEV0M0tWMDA1Umd6UzZWcnpvZw?oc=5) (2026-11-26)
 - **Modelo: Ed Ting**
   - [El Rig de Astrofotografía de Cielo Profundo de Ed Ting: Estado del Arte](https://www.youtube.com/watch?v=bmzvuG8SsW8) (2026-10-18)
 - **Modelo: Filtros**
