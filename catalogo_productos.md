@@ -83,6 +83,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
 ### TELESCOPES
 - **Modelo: DRACO**
   - [Análisis del Telescopio DWARFLAB DRACO](https://www.youtube.com/watch?v=85uc8z6ucFw) (2026-09-25)
+- **Modelo: Draco**
+  - [Análisis del DWARFLAB Draco: Primeros Resultados Nocturnos](https://www.youtube.com/watch?v=60fm1EKwHvA) (2026-11-25)
 
 ## Ekos
 
