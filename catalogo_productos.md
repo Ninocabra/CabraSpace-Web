@@ -71,6 +71,8 @@ Este documento contiene la lista de todos los productos de astrofotografía y ha
   - [Tutorial Paso a Paso de Mosaicos Celestron Origin con el Dr. Sasse](https://www.youtube.com/watch?v=H3D8Vg9UqDo) (2026-10-21)
 - **Modelo: Ed Ting**
   - [La Elección Definitiva: Mi Único Telescopio Catadióptrico/Compuesto Ideal](https://www.youtube.com/watch?v=NA1QAqBwe3E) (2026-08-09)
+- **Modelo: Inspire 100AZ**
+  - [El Celestron Inspire 100AZ, el primer telescopio para principiantes, ahora en oferta](https://news.google.com/rss/articles/CBMi6gFBVV95cUxPZTl0S2plVHFiQVRZUy03a05ZdE5ERG91MnpJX0JkVjU3Y2docjVMNjNNQ3lpN09pTndsaVN1cUhYU0VldW5pYkFKcWp2NzdicXVCWEpRMVJPSmtGRXIwamlYUWEtT2tRWGhBb3hRdzlfbjd0WHNlcFpTTjZENl95NmlfbTFnb0hyb2R3U1RUMW10OFlTOHNSSHdieGJBVWZtUVAwSlItT3FzYzQySjVJcGpjMTVhaG42VHFySWZWTE9ONi0wM0J1T1Nld0dtcWlvU2hwWWtZcnY4Tmdrd20zVklvRjZPZHNtekE?oc=5) (2026-11-27)
 - **Modelo: RASA 6**
   - [Nuevo Astrográfo Celestron RASA 6](https://stargazerslounge.com/topic/431636-new-celestron-rasa-6-astrograph/) (2026-09-14)
 
